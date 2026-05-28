@@ -1,0 +1,30 @@
+# Architecture
+
+## What this is
+Lumen (working title) — a premium daily logic-puzzle web app (Flutter mobile later). The puzzle is a binary Latin-square: a 6×6 grid filled with two symbols under adjacency, balance, and `=`/`≠` edge constraints. See [GAME-RULES.md](GAME-RULES.md) for the rules and engine spec.
+
+## Monorepo map (pnpm workspaces)
+```
+apps/web            Next.js 16 (App Router) web app — the only frontend for now
+packages/engine     pure TS: puzzle generator + solver + validators (no deps, no DOM)
+packages/design     design tokens (color/space/type) — single source of truth
+supabase/           migrations, edge functions, seed
+docs/               these context docs
+```
+Phase 5 adds a Flutter app that re-implements `packages/engine` in Dart against the same Supabase backend.
+
+## Request flows
+- **Daily puzzle:** a scheduled Supabase Edge Function mints one puzzle/day at a fixed difficulty into `puzzles` keyed by date. All users fetch the same row → shared daily.
+- **Practice:** puzzle generated on demand (edge function or client — 6×6 generation is cheap).
+- **Solve:** on completion, the web app writes a `solves` row. Streaks/stats are **derived** from `solves`, not denormalized.
+- **Auth:** Supabase Auth from day one; per-user data protected by RLS.
+
+## Data model (Supabase, RLS-protected)
+- `puzzles` — id, date (nullable for practice), difficulty, grid spec (solution + given cells + edge constraints), seed.
+- `profiles` — user id (FK auth.users), display name, created_at.
+- `solves` — user id, puzzle id, solved_at, duration_ms, used_hint. One row per solve.
+- RLS: users read/write only their own `profiles`/`solves`; `puzzles` world-readable, writes restricted to service role / edge function.
+
+## Conventions
+- Next.js 16, Supabase, and TypeScript conventions are inherited from the global CLAUDE.md — not repeated here.
+- The engine is framework-agnostic and fully unit-tested before any UI consumes it.

@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+.pnp.*
+.yarn/*
+
+# Build output
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+**/supabase/.env
+
+# Logs & caches
+*.log
+npm-debug.log*
+.turbo/
+.cache/
+coverage/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude local settings (machine-specific permissions; shared settings.json is fine to commit)
+.claude/settings.local.json
+
+# Flutter (added in Phase 5)
+**/.dart_tool/
+**/build/
+*.iml
