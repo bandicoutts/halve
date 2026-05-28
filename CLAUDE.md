@@ -1,6 +1,6 @@
-# Lumen (working title)
+# Parity
 
-Premium daily logic-puzzle web app — a 6×6 binary Latin-square puzzle (sun/moon, adjacency + balance + `=`/`≠` edge constraints, unique deduction-only solutions). Web-first (Next.js + Supabase + Vercel); Flutter mobile later.
+Premium daily logic-puzzle web app — a 6×6 binary Latin-square puzzle (two opposite pieces, **fire & water**; adjacency + balance + `=`/`≠` edge constraints; unique deduction-only solutions). The name comes from the balance rule. Web-first (Next.js + Supabase + Vercel); Flutter mobile later.
 
 ## Repo map (pnpm monorepo)
 - `apps/web` — Next.js 16 app (only frontend for now)

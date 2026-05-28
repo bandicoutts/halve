@@ -4,6 +4,7 @@ Append-only. Newest first. One entry per decision: `date · decision · why`. Lo
 
 ---
 
+- **2026-05-29 · Renamed to "Parity"; symbols changed from sun/moon to fire & water.** Supersedes the earlier "Lumen / refined-celestial" identity. *Why:* sun/moon is Tango's signature element and undercut the goal of an original stamp; and "Lumen" (a unit of light) only fit a celestial theme. *Now:* the name **Parity** is decoupled from the art (it names the balance rule), and the pieces are an amber-red **flame** vs cool teal **droplet** — genuine opposites mapping to the `≠` rule, with fire as the single hero accent. The earlier sun+moon master mark also failed the 44px squint test (muddy overlap); the new mark must read as one clean shape at small sizes. Folder + GitHub repo renamed `lumen` → `parity` (old URL auto-redirects).
 - **2026-05-29 · Web-first, Flutter later, shared Supabase backend.** Lowest-risk path to a shippable, beautiful product; lets us nail design + engine once before porting.
 - **2026-05-29 · Daily puzzle + unlimited practice mode.** Daily drives streaks/sharing (viral loop); practice drives replay. Covers both retention loops.
 - **2026-05-29 · Build our own generator + solver (not a precomputed bank).** Infinite content; full control over uniqueness + deduction-only guarantee and difficulty scoring. 6×6 generation is cheap enough at runtime.
