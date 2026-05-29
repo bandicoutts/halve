@@ -2,12 +2,17 @@
  * Generates daily puzzles for a date range and upserts them into Supabase.
  *
  * Usage:
- *   SUPABASE_URL=<url> SUPABASE_SERVICE_ROLE_KEY=<key> npx tsx scripts/seed-puzzles.ts [start-date] [end-date]
+ *   SUPABASE_URL=<url> SUPABASE_SERVICE_ROLE_KEY=<key> npx tsx scripts/seed-puzzles.mts [start-date] [end-date]
  *
  * start-date / end-date: YYYY-MM-DD. Defaults to today if omitted.
  */
 import { createClient } from "@supabase/supabase-js";
 import { generatePuzzle, hashSeed } from "@parity/engine";
+
+// Load .env.local / .env automatically (Node 20.12+ built-in; silently skipped if absent)
+for (const f of [".env.local", ".env"]) {
+  try { (process as any).loadEnvFile(f); } catch {} // eslint-disable-line @typescript-eslint/no-explicit-any
+}
 
 const args = process.argv.slice(2);
 const today = new Date().toISOString().slice(0, 10);

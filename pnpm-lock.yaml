@@ -72,6 +72,15 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@20.19.41)(lightningcss@1.32.0)
 
+  scripts:
+    dependencies:
+      '@parity/engine':
+        specifier: workspace:*
+        version: link:../packages/engine
+      '@supabase/supabase-js':
+        specifier: ^2.106.2
+        version: 2.106.2
+
 packages:
 
   '@alloc/quick-lru@5.2.0':
