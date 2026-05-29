@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -42,6 +43,13 @@ interface StatsScreenProps {
 export function StatsScreen({ stats }: StatsScreenProps) {
   const router = useRouter();
   const { theme, toggle } = useTheme();
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut({ scope: "local" });
+    router.push("/");
+    router.refresh();
+  }
 
   const maxDist = stats ? Math.max(...stats.timeDist, 1) : 1;
   const peakIdx = stats ? stats.timeDist.indexOf(Math.max(...stats.timeDist)) : -1;
@@ -99,7 +107,7 @@ export function StatsScreen({ stats }: StatsScreenProps) {
             </div>
 
             {/* Last 14 days */}
-            <div style={{ marginTop: 30, paddingBottom: 40 }}>
+            <div style={{ marginTop: 30, paddingBottom: 20 }}>
               <Eyebrow style={{ marginBottom: 14 }}>Last 14 days</Eyebrow>
               <div style={{ display: "flex", gap: 6 }}>
                 {stats.last14Days.map((solved, i) => (
@@ -114,6 +122,16 @@ export function StatsScreen({ stats }: StatsScreenProps) {
                   />
                 ))}
               </div>
+            </div>
+
+            {/* Sign out */}
+            <div style={{ paddingBottom: 40, textAlign: "center" }}>
+              <button
+                onClick={handleSignOut}
+                style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3 }}
+              >
+                Sign out
+              </button>
             </div>
           </>
         ) : (

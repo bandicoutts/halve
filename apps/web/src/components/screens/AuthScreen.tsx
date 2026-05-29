@@ -62,15 +62,30 @@ function SentScreen({ email, onBack }: { email: string; onBack: () => void }) {
   );
 }
 
+// ─── Error message normaliser ─────────────────────────────────────────────────
+
+function friendlyError(msg: string): string {
+  const lower = msg.toLowerCase();
+  if (lower.includes("rate limit") || lower.includes("429"))
+    return "Too many attempts — wait a minute and try again.";
+  if (lower.includes("user already registered"))
+    return "An account with this email already exists. Try signing in with a magic link.";
+  if (lower.includes("invalid login credentials") || lower.includes("invalid credentials"))
+    return "Wrong email or password.";
+  if (lower.includes("email not confirmed"))
+    return "Please confirm your email first — check your inbox.";
+  return msg;
+}
+
 // ─── Main auth screen ─────────────────────────────────────────────────────────
 
-export function AuthScreen() {
+export function AuthScreen({ initialError }: { initialError?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError ?? null);
   const [sent, setSent] = useState(false);
 
   async function handleMagicLink(e: React.FormEvent) {
@@ -84,7 +99,7 @@ export function AuthScreen() {
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
     setLoading(false);
-    if (error) { setError(error.message); return; }
+    if (error) { setError(friendlyError(error.message)); return; }
     setSent(true);
   }
 
@@ -99,9 +114,9 @@ export function AuthScreen() {
     if (signInError) {
       if (signInError.message.toLowerCase().includes("invalid login credentials") || signInError.message.toLowerCase().includes("user not found")) {
         const { error: signUpError } = await supabase.auth.signUp({ email, password });
-        if (signUpError) { setError(signUpError.message); setLoading(false); return; }
+        if (signUpError) { setError(friendlyError(signUpError.message)); setLoading(false); return; }
       } else {
-        setError(signInError.message);
+        setError(friendlyError(signInError.message));
         setLoading(false);
         return;
       }

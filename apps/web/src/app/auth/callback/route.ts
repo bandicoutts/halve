@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-const SAFE_PATHS = ["/", "/play", "/practice", "/stats"];
+const SAFE_PATHS = ["/", "/play", "/practice", "/stats", "/archive"];
 
 function safeNext(next: string | null): string {
   if (!next) return "/";

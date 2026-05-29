@@ -7,7 +7,7 @@ export const config = {
   ],
 };
 
-const SAFE_REDIRECT_PATHS = ["/", "/play", "/practice", "/stats"];
+const SAFE_REDIRECT_PATHS = ["/", "/play", "/practice", "/stats", "/archive"];
 
 function safeRedirect(next: string | null): string {
   if (!next) return "/";
@@ -55,6 +55,19 @@ export async function proxy(request: NextRequest) {
     if (code) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
       if (!error) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("display_name")
+            .eq("id", user.id)
+            .maybeSingle();
+          if (!profile?.display_name) {
+            return NextResponse.redirect(
+              new URL(`/onboarding?next=${encodeURIComponent(next)}`, request.url)
+            );
+          }
+        }
         return NextResponse.redirect(new URL(next, request.url));
       }
     }
