@@ -90,17 +90,32 @@ export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps)
         </div>
 
         <div style={{ marginTop: 40, display: "flex", justifyContent: "center", alignItems: "center", gap: 20 }}>
-          <Link href="/practice" style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none" }}>
+          <Link
+            href="/practice"
+            style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+          >
             Practice
           </Link>
-          <span style={{ color: "var(--hairline)", userSelect: "none" }}>·</span>
-          <Link href="/archive" style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none" }}>
+          <span aria-hidden="true" style={{ color: "var(--hairline)", userSelect: "none" }}>·</span>
+          <Link
+            href="/archive"
+            style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+          >
             Archive
           </Link>
           {!isSignedIn && (
             <>
-              <span style={{ color: "var(--hairline)", userSelect: "none" }}>·</span>
-              <Link href="/auth" style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none" }}>
+              <span aria-hidden="true" style={{ color: "var(--hairline)", userSelect: "none" }}>·</span>
+              <Link
+                href="/auth"
+                style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+              >
                 Sign in
               </Link>
             </>
@@ -110,7 +125,12 @@ export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps)
         <div style={{ flex: 1 }} />
 
         <div style={{ textAlign: "center" }}>
-          <Link href="/tutorial" style={{ fontSize: 13, color: "var(--fg-3)", textDecoration: "none" }}>
+          <Link
+            href="/tutorial"
+            style={{ fontSize: 13, color: "var(--fg-3)", textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
+          >
             How to play
           </Link>
         </div>

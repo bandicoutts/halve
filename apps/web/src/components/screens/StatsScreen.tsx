@@ -130,7 +130,9 @@ export function StatsScreen({ stats }: StatsScreenProps) {
             <div style={{ paddingBottom: 40, textAlign: "center" }}>
               <button
                 onClick={handleSignOut}
-                style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3 }}
+                style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: "12px 4px", textDecoration: "underline", textUnderlineOffset: 3 }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
               >
                 Sign out
               </button>
