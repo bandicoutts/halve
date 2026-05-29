@@ -71,9 +71,11 @@ export function StatsScreen({ stats }: StatsScreenProps) {
             <div style={{ fontSize: 17, fontWeight: 600, color: "var(--fg-1)" }}>
               {stats ? stats.displayName : "Guest"}
             </div>
-            <div style={{ fontSize: 14, color: "var(--fg-3)", marginTop: 2 }}>
-              {stats ? `${stats.totalSolved} puzzle${stats.totalSolved !== 1 ? "s" : ""} solved` : "Sign in to sync your progress"}
-            </div>
+            {stats && (
+              <div style={{ fontSize: 14, color: "var(--fg-3)", marginTop: 2 }}>
+                {`${stats.totalSolved} puzzle${stats.totalSolved !== 1 ? "s" : ""} solved`}
+              </div>
+            )}
           </div>
         </div>
 
@@ -137,10 +139,10 @@ export function StatsScreen({ stats }: StatsScreenProps) {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 12, paddingBottom: 40 }}>
             <p style={{ fontSize: 15, color: "var(--fg-2)", margin: 0, lineHeight: 1.5 }}>
-              Create an account to track your streak, see your solve times, and keep your progress across devices.
+              Sign in to track your streak and see your stats.
             </p>
             <Link href="/auth" style={{ textDecoration: "none" }}>
-              <Button variant="primary" full>Sign in or create account</Button>
+              <Button variant="primary" full>Sign in</Button>
             </Link>
           </div>
         )}

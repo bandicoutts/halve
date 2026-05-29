@@ -56,7 +56,6 @@ export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps)
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "0 24px 40px" }}>
 
-        {/* Streak — only rendered when there's something meaningful to show */}
         {hasStreak && (
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 32 }}>
             <FlameIcon />
@@ -67,7 +66,6 @@ export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps)
           </div>
         )}
 
-        {/* Daily ritual block — tight to streak when present, generous from top when absent */}
         <div style={{ marginTop: hasStreak ? 16 : 40 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Eyebrow>{todayLabel()}</Eyebrow>
@@ -79,7 +77,6 @@ export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps)
           </h1>
         </div>
 
-        {/* Primary CTA — swaps to a quieter state once the daily is done */}
         <div style={{ marginTop: 24 }}>
           {solvedToday ? (
             <Link href="/play" style={{ textDecoration: "none" }}>
@@ -92,7 +89,6 @@ export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps)
           )}
         </div>
 
-        {/* Secondary navigation — equal-weight text row, no hierarchy accidents */}
         <div style={{ marginTop: 40, display: "flex", justifyContent: "center", alignItems: "center", gap: 20 }}>
           <Link href="/practice" style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none" }}>
             Practice
@@ -113,7 +109,6 @@ export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps)
 
         <div style={{ flex: 1 }} />
 
-        {/* Footer — low-frequency, for new users */}
         <div style={{ textAlign: "center" }}>
           <Link href="/tutorial" style={{ fontSize: 13, color: "var(--fg-3)", textDecoration: "none" }}>
             How to play

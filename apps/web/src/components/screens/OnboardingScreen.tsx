@@ -66,7 +66,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
           What should we call you?
         </h1>
         <p style={{ marginTop: 14, fontSize: 16, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: 300 }}>
-          This shows on your stats page. You can skip for now.
+          Shown on your stats page.
         </p>
       </div>
 
