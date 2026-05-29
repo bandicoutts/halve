@@ -33,10 +33,12 @@ function todayLabel(): string {
 interface HomeScreenProps {
   streak?: number;
   isSignedIn?: boolean;
+  solvedToday?: boolean;
 }
 
-export function HomeScreen({ streak, isSignedIn }: HomeScreenProps) {
+export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps) {
   const { theme, toggle } = useTheme();
+  const hasStreak = isSignedIn && streak !== undefined && streak > 0;
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
@@ -51,66 +53,73 @@ export function HomeScreen({ streak, isSignedIn }: HomeScreenProps) {
           </div>
         }
       />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "0 24px" }}>
-        {/* Streak */}
-        <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 6 }}>
-          <FlameIcon />
-          {isSignedIn ? (
-            <span style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-1)" }}>
-              {streak && streak > 0
-                ? <><span className="tnum" style={{ color: "var(--accent)" }}>{streak}</span>{" day streak"}</>
-                : "Start your streak today"}
-            </span>
-          ) : (
-            <span style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-1)" }}>
-              Sign in to track your streak
-            </span>
-          )}
-        </div>
 
-        {/* Title block */}
-        <div style={{ marginTop: 56 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "0 24px 40px" }}>
+
+        {/* Streak — only rendered when there's something meaningful to show */}
+        {hasStreak && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 32 }}>
+            <FlameIcon />
+            <span style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-1)" }}>
+              <span className="tnum" style={{ color: "var(--accent)" }}>{streak}</span>
+              {" day streak"}
+            </span>
+          </div>
+        )}
+
+        {/* Daily ritual block — tight to streak when present, generous from top when absent */}
+        <div style={{ marginTop: hasStreak ? 16 : 40 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Eyebrow>{todayLabel()}</Eyebrow>
             <span style={{ color: "var(--hairline)", fontSize: 12 }}>·</span>
             <Eyebrow>Medium</Eyebrow>
           </div>
-          <h1 style={{ fontSize: 44, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", marginTop: 10, lineHeight: 1.1 }}>
+          <h1 style={{ fontSize: 44, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", marginTop: 8, lineHeight: 1.1 }}>
             {"Today's puzzle"}
           </h1>
         </div>
 
-        {/* Primary CTA */}
-        <div style={{ marginTop: 28 }}>
-          <Link href="/play" style={{ textDecoration: "none" }}>
-            <Button variant="primary" full>Play today</Button>
+        {/* Primary CTA — swaps to a quieter state once the daily is done */}
+        <div style={{ marginTop: 24 }}>
+          {solvedToday ? (
+            <Link href="/play" style={{ textDecoration: "none" }}>
+              <Button variant="secondary" full>View today's result</Button>
+            </Link>
+          ) : (
+            <Link href="/play" style={{ textDecoration: "none" }}>
+              <Button variant="primary" full>Play today</Button>
+            </Link>
+          )}
+        </div>
+
+        {/* Secondary navigation — equal-weight text row, no hierarchy accidents */}
+        <div style={{ marginTop: 40, display: "flex", justifyContent: "center", alignItems: "center", gap: 20 }}>
+          <Link href="/practice" style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none" }}>
+            Practice
           </Link>
+          <span style={{ color: "var(--hairline)", userSelect: "none" }}>·</span>
+          <Link href="/archive" style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none" }}>
+            Archive
+          </Link>
+          {!isSignedIn && (
+            <>
+              <span style={{ color: "var(--hairline)", userSelect: "none" }}>·</span>
+              <Link href="/auth" style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none" }}>
+                Sign in
+              </Link>
+            </>
+          )}
         </div>
 
         <div style={{ flex: 1 }} />
 
-        <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
-          <Link href="/practice" style={{ flex: 1, textDecoration: "none" }}>
-            <Button variant="secondary" full>Practice</Button>
-          </Link>
-          {isSignedIn ? (
-            <Link href="/stats" style={{ flex: 1, textDecoration: "none" }}>
-              <Button variant="secondary" full>My stats</Button>
-            </Link>
-          ) : (
-            <Link href="/auth" style={{ flex: 1, textDecoration: "none" }}>
-              <Button variant="secondary" full>Sign in</Button>
-            </Link>
-          )}
-        </div>
-        <div style={{ textAlign: "center", paddingBottom: 40, paddingTop: 16, display: "flex", justifyContent: "center", gap: 24 }}>
-          <Link href="/archive" style={{ fontSize: 14, fontWeight: 500, color: "var(--fg-3)", textDecoration: "none" }}>
-            Archive
-          </Link>
-          <Link href="/tutorial" style={{ fontSize: 14, fontWeight: 500, color: "var(--fg-3)", textDecoration: "none" }}>
+        {/* Footer — low-frequency, for new users */}
+        <div style={{ textAlign: "center" }}>
+          <Link href="/tutorial" style={{ fontSize: 13, color: "var(--fg-3)", textDecoration: "none" }}>
             How to play
           </Link>
         </div>
+
       </div>
     </div>
   );

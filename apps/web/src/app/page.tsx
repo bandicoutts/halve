@@ -17,6 +17,7 @@ function computeStreak(days: string[], today: string): number {
 export default async function Home() {
   let streak: number | undefined;
   let isSignedIn = false;
+  let solvedToday = false;
 
   try {
     const supabase = await createClient();
@@ -26,20 +27,30 @@ export default async function Home() {
       isSignedIn = true;
       const today = new Date().toISOString().slice(0, 10);
 
-      const { data } = await supabase
-        .from("solves")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("solved_at", { ascending: false });
+      const [{ data }, { data: todayPuzzle }] = await Promise.all([
+        supabase
+          .from("solves")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("solved_at", { ascending: false }),
+        supabase
+          .from("puzzles")
+          .select("id")
+          .eq("date", today)
+          .maybeSingle(),
+      ]);
 
       if (data) {
         const days = [...new Set(data.map((r) => r.solved_at.slice(0, 10)))];
         streak = computeStreak(days, today);
+        if (todayPuzzle) {
+          solvedToday = data.some((r) => r.puzzle_id === todayPuzzle.id);
+        }
       }
     }
   } catch {
     // Supabase unavailable — render guest state
   }
 
-  return <HomeScreen streak={streak} isSignedIn={isSignedIn} />;
+  return <HomeScreen streak={streak} isSignedIn={isSignedIn} solvedToday={solvedToday} />;
 }
