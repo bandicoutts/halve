@@ -1,3 +1,4 @@
 {
-  "installCommand": "cd ../.. && pnpm install"
+  "installCommand": "cd ../.. && pnpm install",
+  "buildCommand": "cd ../.. && pnpm --filter @parity/engine build && pnpm --filter @parity/design build && pnpm --filter @parity/web build"
 }
