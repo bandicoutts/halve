@@ -21,10 +21,10 @@ Phases & milestones. Check off as completed.
 - [x] Lock symbol direction + typefaces
 - [x] Interactive board component (tap-cycle, undo, hint)
 - [x] Core interactions + solve animation
-- [ ] Wireframes → high-fidelity screens
+- [x] Board screen live at `/` (generated medium puzzle, full interactivity, light/dark toggle)
 
 ## Phase 3 — App shell + Supabase
-- [ ] Next.js routes + layout shell
+- [ ] Next.js routes + layout shell (Home, Board, Win, Practice, Stats, Auth screens)
 - [ ] Supabase Auth (email + social)
 - [ ] Schema + RLS migrations
 - [ ] Daily-puzzle edge function (scheduled)
