@@ -103,7 +103,10 @@ export function HomeScreen({ streak, isSignedIn }: HomeScreenProps) {
             </Link>
           )}
         </div>
-        <div style={{ textAlign: "center", paddingBottom: 40, paddingTop: 16 }}>
+        <div style={{ textAlign: "center", paddingBottom: 40, paddingTop: 16, display: "flex", justifyContent: "center", gap: 24 }}>
+          <Link href="/archive" style={{ fontSize: 14, fontWeight: 500, color: "var(--fg-3)", textDecoration: "none" }}>
+            Archive
+          </Link>
           <Link href="/tutorial" style={{ fontSize: 14, fontWeight: 500, color: "var(--fg-3)", textDecoration: "none" }}>
             How to play
           </Link>
