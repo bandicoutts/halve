@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/symbols/Logo";
 import { Button } from "@/components/ui/Button";
 
@@ -32,17 +33,41 @@ export function AuthScreen() {
   const [mode, setMode] = useState<"signup" | "signin">("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const signup = mode === "signup";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    /* Supabase auth will be wired here in next step */
-    setSent(true);
+    setError(null);
+    setLoading(true);
+    const supabase = createClient();
+
+    if (signup) {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) { setError(error.message); setLoading(false); return; }
+      setSent(true);
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) { setError(error.message); setLoading(false); return; }
+      router.push("/");
+      router.refresh();
+    }
+    setLoading(false);
   }
 
   async function handleMagicLink() {
-    /* Supabase OTP will be wired here in next step */
+    if (!email) { setError("Enter your email first."); return; }
+    setError(null);
+    setLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (error) { setError(error.message); setLoading(false); return; }
+    setLoading(false);
     setSent(true);
   }
 
@@ -55,11 +80,14 @@ export function AuthScreen() {
             Check your email.
           </h1>
           <p style={{ marginTop: 14, fontSize: 16, color: "var(--fg-2)", lineHeight: 1.5, maxWidth: 300 }}>
-            We sent a magic link to <strong style={{ color: "var(--fg-1)" }}>{email}</strong>. Click it to sign in.
+            We sent a link to <strong style={{ color: "var(--fg-1)" }}>{email}</strong>. Click it to sign in.
           </p>
         </div>
         <div style={{ flex: 1 }} />
-        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 15, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3 }}>
+        <button
+          onClick={() => router.push("/")}
+          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 15, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3 }}
+        >
           Back to home
         </button>
       </div>
@@ -95,22 +123,26 @@ export function AuthScreen() {
               onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
             />
           </div>
-          {!signup && (
-            <div>
-              <label style={LABEL_STYLE}>Password</label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={INPUT_STYLE}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
-              />
-            </div>
+          <div>
+            <label style={LABEL_STYLE}>Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required={!signup}
+              style={INPUT_STYLE}
+              onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
+            />
+          </div>
+
+          {error && (
+            <p style={{ fontSize: 14, color: "var(--wrong)", margin: 0 }}>{error}</p>
           )}
-          <Button variant="primary" full type="submit" style={{ marginTop: 4 }}>
-            {signup ? "Create account" : "Sign in"}
+
+          <Button variant="primary" full type="submit" disabled={loading} style={{ marginTop: 4 }}>
+            {loading ? "…" : signup ? "Create account" : "Sign in"}
           </Button>
         </form>
 
@@ -120,17 +152,15 @@ export function AuthScreen() {
           <div style={{ flex: 1, height: 1, background: "var(--hairline)" }} />
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <Button variant="secondary" full onClick={handleMagicLink}>
-            Continue with magic link
-          </Button>
-        </div>
+        <Button variant="secondary" full onClick={handleMagicLink} disabled={loading}>
+          Continue with magic link
+        </Button>
 
         <div style={{ flex: 1 }} />
         <p style={{ textAlign: "center", fontSize: 14, color: "var(--fg-3)", marginTop: 28 }}>
           {signup ? "Already play Parity?" : "New here?"}{" "}
           <button
-            onClick={() => setMode(signup ? "signin" : "signup")}
+            onClick={() => { setMode(signup ? "signin" : "signup"); setError(null); }}
             style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3 }}
           >
             {signup ? "Sign in" : "Create an account"}
