@@ -17,10 +17,10 @@ Phases & milestones. Check off as completed.
 - [x] Fuzz tests asserting invariants
 
 ## Phase 2 — Design system + board UI
-- [ ] Tokens in `packages/design`, wired into Tailwind
-- [ ] Lock symbol direction + typefaces
-- [ ] Interactive board component (tap-cycle, undo, hint)
-- [ ] Core interactions + solve animation
+- [x] Tokens in `packages/design`, wired into Tailwind
+- [x] Lock symbol direction + typefaces
+- [x] Interactive board component (tap-cycle, undo, hint)
+- [x] Core interactions + solve animation
 - [ ] Wireframes → high-fidelity screens
 
 ## Phase 3 — App shell + Supabase
