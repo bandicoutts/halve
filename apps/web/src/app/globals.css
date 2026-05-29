@@ -100,3 +100,15 @@ body {
   from { opacity: 0.5; transform: translateY(7px); }
   to   { opacity: 1;   transform: none; }
 }
+
+/* Soft fade for card transitions */
+@keyframes lm-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Win settle — gentle scale-in with slight overshoot */
+@keyframes lm-settle {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}

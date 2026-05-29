@@ -24,11 +24,12 @@ Phases & milestones. Check off as completed.
 - [x] Board screen live at `/` (generated medium puzzle, full interactivity, light/dark toggle)
 
 ## Phase 3 — App shell + Supabase
-- [ ] Next.js routes + layout shell (Home, Board, Win, Practice, Stats, Auth screens)
-- [ ] Supabase Auth (email + social)
-- [ ] Schema + RLS migrations
-- [ ] Daily-puzzle edge function (scheduled)
-- [ ] Practice generation
+- [x] Next.js routes + layout shell (Home `/`, Board `/play`, Practice `/practice` + `/practice/play`, Stats `/stats`, Auth `/auth` screens)
+- [x] Schema + RLS migrations (`puzzles`, `profiles`, `solves`; RLS policies; auto-create profile trigger)
+- [x] Daily-puzzle edge function (scheduled, idempotent, mints one puzzle/day)
+- [x] Practice generation (client-side `useEffect`, avoids SSR mismatch)
+- [ ] Supabase Auth wired end-to-end (email magic link + OAuth)
+- [ ] Daily puzzle fetched from `puzzles` table (currently generated server-side)
 
 ## Phase 4 — Retention + sharing
 - [ ] Streaks/stats derived from `solves`

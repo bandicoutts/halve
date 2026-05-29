@@ -1,15 +1,18 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Puzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { useTimer } from "@/hooks/useTimer";
+import { useTheme } from "@/components/providers/ThemeProvider";
 import { Board } from "./Board";
 import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
 import { Logo } from "@/components/symbols/Logo";
+import { Mark } from "@/components/symbols/Mark";
+import { Button } from "@/components/ui/Button";
 
-/* Lucide icons as inline SVGs — keeps the bundle zero-dep */
 function UndoIcon() {
   return (
     <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
@@ -29,99 +32,123 @@ function HintIcon() {
   );
 }
 
-interface WinBannerProps {
-  time: string;
-  onDismiss: () => void;
+function ShareIcon() {
+  return (
+    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+      <polyline points="16 6 12 2 8 6" />
+      <line x1="12" y1="2" x2="12" y2="15" />
+    </svg>
+  );
 }
 
-function WinBanner({ time, onDismiss }: WinBannerProps) {
+interface WinScreenProps {
+  time: string;
+  dayNo?: number;
+  onHome: () => void;
+  onStats: () => void;
+}
+
+function WinScreen({ time, dayNo, onHome, onStats }: WinScreenProps) {
+  function handleShare() {
+    const text = dayNo
+      ? `Parity No. ${dayNo} · ${time}`
+      : `Parity · ${time}`;
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+  }
+
   return (
     <div
       style={{
         position: "fixed",
         inset: 0,
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "rgba(0,0,0,0.35)",
+        flexDirection: "column",
+        background: "var(--bg)",
         zIndex: 50,
         animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)",
       }}
-      onClick={onDismiss}
     >
-      <div
-        style={{
-          background: "var(--surface)",
-          border: "1px solid var(--hairline)",
-          borderRadius: "var(--radius-xl)",
-          padding: "40px 48px",
-          textAlign: "center",
-          maxWidth: 340,
-          width: "90%",
-          boxShadow: "var(--shadow-lg)",
-          animation: "settle 0.32s cubic-bezier(0.4,0,0.2,1)",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "var(--fg-3)",
-            marginBottom: 16,
-          }}
-        >
+      <TopBar
+        left={<IconButton label="Close" size={40} onClick={onHome}><CloseIcon /></IconButton>}
+        title={<span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)" }}>Complete</span>}
+        right={<span style={{ width: 40 }} />}
+      />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 24px", gap: 4 }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 8, animation: "lm-settle 0.5s cubic-bezier(0.34,1.4,0.5,1)" }}>
+          <Mark size={64} />
+        </div>
+        <h1 style={{ fontSize: 46, fontWeight: 500, letterSpacing: "-0.02em", textAlign: "center", color: "var(--fg-1)", lineHeight: 1.1, margin: 0 }}>
           Solved
-        </div>
+        </h1>
+        <p style={{ textAlign: "center", color: "var(--fg-2)", marginTop: 10, marginBottom: 28, fontSize: 16 }}>
+          in <span className="tnum" style={{ color: "var(--fg-1)", fontWeight: 600 }}>{time}</span>
+          {dayNo ? null : null}
+        </p>
+
+        {/* Share card */}
         <div
-          className="tnum"
           style={{
-            fontSize: 44,
-            fontWeight: 500,
-            color: "var(--correct)",
-            letterSpacing: "-0.01em",
-            lineHeight: 1,
-            marginBottom: 24,
+            background: "var(--surface)",
+            border: "1px solid var(--hairline)",
+            borderRadius: "var(--radius-xl)",
+            padding: "20px 22px",
+            boxShadow: "var(--shadow-md)",
           }}
         >
-          {time}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+            <Logo size={17} />
+            {dayNo && <span className="tnum" style={{ fontSize: 12, color: "var(--fg-3)" }}>No. {dayNo}</span>}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6, marginBottom: 16 }}>
+            {Array.from({ length: 36 }).map((_, i) => (
+              <div key={i} style={{ aspectRatio: "1", borderRadius: 3, background: "var(--accent)", opacity: 0.85 + (i % 3) * 0.05 }} />
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 26 }}>
+            <div>
+              <div className="tnum" style={{ fontSize: 22, fontWeight: 500, color: "var(--fg-1)", lineHeight: 1 }}>{time}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)", marginTop: 6 }}>Time</div>
+            </div>
+          </div>
         </div>
-        <button
-          onClick={onDismiss}
-          style={{
-            height: 52,
-            borderRadius: 999,
-            border: "none",
-            padding: "0 32px",
-            fontSize: 16,
-            fontWeight: 500,
-            letterSpacing: "-0.01em",
-            background: "var(--accent)",
-            color: "var(--on-accent)",
-            cursor: "pointer",
-            transition: "background 0.16s, transform 0.12s",
-            fontFamily: "var(--font-sans)",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent-strong)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--accent)"; }}
-          onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.98)"; }}
-          onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
-        >
-          Continue
-        </button>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 26 }}>
+          <Button variant="primary" full onClick={handleShare}>
+            <ShareIcon />
+            Share result
+          </Button>
+          <Button variant="secondary" full onClick={onStats}>See your stats</Button>
+        </div>
       </div>
     </div>
   );
 }
 
-interface BoardScreenProps {
-  puzzle: Puzzle;
+function CloseIcon() {
+  return (
+    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
 }
 
-export function BoardScreen({ puzzle }: BoardScreenProps) {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+export interface BoardScreenProps {
+  puzzle: Puzzle;
+  /** If provided, shows puzzle number on win screen */
+  dayNo?: number;
+  /** Back navigation — defaults to "/" */
+  backHref?: string;
+}
+
+export function BoardScreen({ puzzle, dayNo, backHref = "/" }: BoardScreenProps) {
+  const router = useRouter();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [showWin, setShowWin] = useState(false);
   const [winTime, setWinTime] = useState("");
 
@@ -134,12 +161,6 @@ export function BoardScreen({ puzzle }: BoardScreenProps) {
   const { formatted } = useTimer(!solved);
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-  }, [theme]);
-
-  useEffect(() => {
     if (solved && !showWin) {
       const t = setTimeout(() => {
         setWinTime(formatted);
@@ -149,11 +170,6 @@ export function BoardScreen({ puzzle }: BoardScreenProps) {
     }
   }, [solved, showWin, formatted]);
 
-  const toggleTheme = useCallback(() => {
-    setTheme((t) => (t === "light" ? "dark" : "light"));
-  }, []);
-
-  /* Scale cell size to viewport after mount to avoid hydration mismatch */
   const [cellSize, setCellSize] = useState(48);
   useEffect(() => {
     const compute = () =>
@@ -164,6 +180,9 @@ export function BoardScreen({ puzzle }: BoardScreenProps) {
     return () => window.removeEventListener("resize", handler);
   }, []);
   const gap = Math.max(6, Math.floor(cellSize * 0.16));
+
+  const handleBack = useCallback(() => router.push(backHref), [router, backHref]);
+  const handleStats = useCallback(() => router.push("/stats"), [router]);
 
   return (
     <div
@@ -176,50 +195,22 @@ export function BoardScreen({ puzzle }: BoardScreenProps) {
       }}
     >
       <TopBar
-        left={<Logo size={20} />}
+        left={<IconButton label="Back" size={40} onClick={handleBack}><BackIcon /></IconButton>}
         title={
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "var(--fg-3)",
-            }}
-          >
+          <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)" }}>
             {puzzle.difficulty}
           </span>
         }
         right={<ThemeToggle theme={theme} onToggle={toggleTheme} />}
       />
 
-      {/* Timer */}
       <div style={{ textAlign: "center", paddingTop: 8 }}>
-        <div
-          className="tnum"
-          style={{
-            fontSize: 44,
-            fontWeight: 500,
-            letterSpacing: "-0.01em",
-            lineHeight: 1,
-            color: solved ? "var(--correct)" : "var(--fg-1)",
-            transition: "color 0.2s",
-          }}
-        >
+        <div className="tnum" style={{ fontSize: 44, fontWeight: 500, letterSpacing: "-0.01em", lineHeight: 1, color: solved ? "var(--correct)" : "var(--fg-1)", transition: "color 0.2s" }}>
           {formatted}
         </div>
       </div>
 
-      {/* Board — centered, takes available space */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "24px 16px",
-        }}
-      >
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px" }}>
         <Board
           cells={cells}
           givens={puzzle.givens}
@@ -232,16 +223,7 @@ export function BoardScreen({ puzzle }: BoardScreenProps) {
         />
       </div>
 
-      {/* Controls */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 36,
-          padding: "8px 24px 40px",
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 36, padding: "8px 24px 40px" }}>
         <ControlButton label="Undo" disabled={!canUndo} onClick={undo}>
           <UndoIcon />
         </ControlButton>
@@ -251,9 +233,22 @@ export function BoardScreen({ puzzle }: BoardScreenProps) {
       </div>
 
       {showWin && (
-        <WinBanner time={winTime} onDismiss={() => setShowWin(false)} />
+        <WinScreen
+          time={winTime}
+          dayNo={dayNo}
+          onHome={handleBack}
+          onStats={handleStats}
+        />
       )}
     </div>
+  );
+}
+
+function BackIcon() {
+  return (
+    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
   );
 }
 
@@ -273,15 +268,7 @@ function ControlButton({
       <IconButton label={label} onClick={onClick} disabled={disabled} size={48}>
         {children}
       </IconButton>
-      <span
-        style={{
-          fontSize: 12,
-          fontWeight: 600,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "var(--fg-3)",
-        }}
-      >
+      <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)" }}>
         {label}
       </span>
     </div>
