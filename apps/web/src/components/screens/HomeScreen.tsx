@@ -30,7 +30,12 @@ function todayLabel(): string {
   return new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 }
 
-export function HomeScreen() {
+interface HomeScreenProps {
+  streak?: number;
+  isSignedIn?: boolean;
+}
+
+export function HomeScreen({ streak, isSignedIn }: HomeScreenProps) {
   const { theme, toggle } = useTheme();
 
   return (
@@ -50,16 +55,24 @@ export function HomeScreen() {
         {/* Streak */}
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 6 }}>
           <FlameIcon />
-          <span style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-1)" }}>
-            Sign in to track your streak
-          </span>
+          {isSignedIn ? (
+            <span style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-1)" }}>
+              {streak && streak > 0
+                ? <><span className="tnum" style={{ color: "var(--accent)" }}>{streak}</span>{" day streak"}</>
+                : "Start your streak today"}
+            </span>
+          ) : (
+            <span style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-1)" }}>
+              Sign in to track your streak
+            </span>
+          )}
         </div>
 
         {/* Title block */}
         <div style={{ marginTop: 30 }}>
           <Eyebrow>{todayLabel()}</Eyebrow>
           <h1 style={{ fontSize: 44, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", marginTop: 10, lineHeight: 1.1 }}>
-            {"Today’s puzzle"}
+            {"Today's puzzle"}
           </h1>
         </div>
 
@@ -95,9 +108,15 @@ export function HomeScreen() {
           <Link href="/practice" style={{ flex: 1, textDecoration: "none" }}>
             <Button variant="secondary" full>Practice</Button>
           </Link>
-          <Link href="/auth" style={{ flex: 1, textDecoration: "none" }}>
-            <Button variant="secondary" full>Sign in</Button>
-          </Link>
+          {isSignedIn ? (
+            <Link href="/stats" style={{ flex: 1, textDecoration: "none" }}>
+              <Button variant="secondary" full>My stats</Button>
+            </Link>
+          ) : (
+            <Link href="/auth" style={{ flex: 1, textDecoration: "none" }}>
+              <Button variant="secondary" full>Sign in</Button>
+            </Link>
+          )}
         </div>
       </div>
     </div>

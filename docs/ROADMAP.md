@@ -29,9 +29,9 @@ Phases & milestones. Check off as completed.
 - [x] Daily-puzzle edge function (scheduled, idempotent, mints one puzzle/day)
 - [x] Practice generation (client-side `useEffect`, avoids SSR mismatch)
 - [x] Supabase Auth wired end-to-end (email + password sign-up/in, magic-link OTP, `/auth/callback` route)
-- [ ] Daily puzzle fetched from `puzzles` table (currently generated server-side)
-- [ ] Record solve to `solves` table on win
-- [ ] Auth-aware home screen (show streak when signed in)
+- [x] Daily puzzle fetched from `puzzles` table (currently generated server-side)
+- [x] Record solve to `solves` table on win
+- [x] Auth-aware home screen (show streak when signed in)
 
 ## Phase 4 — Retention + sharing
 - [ ] Streaks/stats derived from `solves`

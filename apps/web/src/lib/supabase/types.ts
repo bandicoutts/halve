@@ -14,6 +14,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["puzzles"]["Row"], "id" | "created_at">;
         Update: Partial<Database["public"]["Tables"]["puzzles"]["Insert"]>;
+        Relationships: [];
       };
       profiles: {
         Row: {
@@ -23,6 +24,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["profiles"]["Row"], "created_at">;
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
+        Relationships: [];
       };
       solves: {
         Row: {
@@ -35,10 +37,12 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["solves"]["Row"], "id" | "solved_at">;
         Update: Partial<Database["public"]["Tables"]["solves"]["Insert"]>;
+        Relationships: [];
       };
     };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
-    Enums: Record<string, never>;
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
   };
 }

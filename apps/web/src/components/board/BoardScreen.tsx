@@ -1,9 +1,10 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Puzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { useTimer } from "@/hooks/useTimer";
+import { createClient } from "@/lib/supabase/client";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { Board } from "./Board";
 import { TopBar } from "@/components/ui/TopBar";
@@ -140,25 +141,28 @@ function CloseIcon() {
 
 export interface BoardScreenProps {
   puzzle: Puzzle;
+  /** DB row id for daily puzzles — used to record solves */
+  puzzleId?: string;
   /** If provided, shows puzzle number on win screen */
   dayNo?: number;
   /** Back navigation — defaults to "/" */
   backHref?: string;
 }
 
-export function BoardScreen({ puzzle, dayNo, backHref = "/" }: BoardScreenProps) {
+export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/" }: BoardScreenProps) {
   const router = useRouter();
   const { theme, toggle: toggleTheme } = useTheme();
   const [showWin, setShowWin] = useState(false);
   const [winTime, setWinTime] = useState("");
+  const solveRecorded = useRef(false);
 
-  const { cells, errors, solved, canUndo, tap, undo, hint } = useGame({
+  const { cells, errors, solved, canUndo, usedHint, tap, undo, hint } = useGame({
     givens: puzzle.givens,
     solution: puzzle.solution,
     edges: puzzle.edges,
   });
 
-  const { formatted } = useTimer(!solved);
+  const { secs, formatted } = useTimer(!solved);
 
   useEffect(() => {
     if (solved && !showWin) {
@@ -169,6 +173,26 @@ export function BoardScreen({ puzzle, dayNo, backHref = "/" }: BoardScreenProps)
       return () => clearTimeout(t);
     }
   }, [solved, showWin, formatted]);
+
+  // Record solve once when the puzzle is completed
+  useEffect(() => {
+    if (!solved || solveRecorded.current || !puzzleId) return;
+    solveRecorded.current = true;
+    const durationMs = secs * 1000;
+    const hintUsed = usedHint;
+    const pid = puzzleId;
+    void (async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from("solves").insert({
+        user_id: user.id,
+        puzzle_id: pid,
+        duration_ms: durationMs,
+        used_hint: hintUsed,
+      });
+    })();
+  }, [solved, puzzleId, secs, usedHint]);
 
   const [cellSize, setCellSize] = useState(48);
   useEffect(() => {

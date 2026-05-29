@@ -5,6 +5,7 @@ import type { Cell, Edge, Grid, Solution, Sym } from "@parity/engine";
 export interface GameState {
   cells: Grid;
   history: Grid[];
+  usedHint: boolean;
 }
 
 type Action =
@@ -27,17 +28,17 @@ function reducer(state: GameState, action: Action): GameState {
     case "tap": {
       const next = cloneGrid(state.cells);
       next[action.r][action.c] = cycle(next[action.r][action.c]);
-      return { cells: next, history: [...state.history, state.cells] };
+      return { cells: next, history: [...state.history, state.cells], usedHint: state.usedHint };
     }
     case "undo": {
       if (!state.history.length) return state;
       const prev = state.history[state.history.length - 1];
-      return { cells: prev, history: state.history.slice(0, -1) };
+      return { cells: prev, history: state.history.slice(0, -1), usedHint: state.usedHint };
     }
     case "hint": {
       const next = cloneGrid(state.cells);
       next[action.r][action.c] = action.sym;
-      return { cells: next, history: [...state.history, state.cells] };
+      return { cells: next, history: [...state.history, state.cells], usedHint: true };
     }
     default:
       return state;
@@ -102,6 +103,7 @@ export function useGame({ givens, solution, edges }: UseGameOptions) {
   const [state, dispatch] = useReducer(reducer, {
     cells: givens.map((row) => row.slice()),
     history: [],
+    usedHint: false,
   });
 
   const errors = useMemo(() => computeErrors(state.cells, edges), [state.cells, edges]);
@@ -132,6 +134,7 @@ export function useGame({ givens, solution, edges }: UseGameOptions) {
     errors,
     solved,
     canUndo: state.history.length > 0,
+    usedHint: state.usedHint,
     tap,
     undo,
     hint,
