@@ -34,9 +34,11 @@ interface HomeScreenProps {
   streak?: number;
   isSignedIn?: boolean;
   solvedToday?: boolean;
+  difficulty?: string;
+  puzzleNumber?: number;
 }
 
-export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps) {
+export function HomeScreen({ streak, isSignedIn, solvedToday, difficulty, puzzleNumber }: HomeScreenProps) {
   const { theme, toggle } = useTheme();
   const hasStreak = isSignedIn && streak !== undefined && streak > 0;
 
@@ -69,8 +71,14 @@ export function HomeScreen({ streak, isSignedIn, solvedToday }: HomeScreenProps)
         <div style={{ marginTop: hasStreak ? 16 : 40 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Eyebrow>{todayLabel()}</Eyebrow>
-            <span style={{ color: "var(--hairline)", fontSize: 12 }}>·</span>
-            <Eyebrow>Medium</Eyebrow>
+            <span aria-hidden="true" style={{ color: "var(--hairline)", fontSize: 12 }}>·</span>
+            <Eyebrow>{difficulty ?? "Medium"}</Eyebrow>
+            {puzzleNumber !== undefined && (
+              <>
+                <span aria-hidden="true" style={{ color: "var(--hairline)", fontSize: 12 }}>·</span>
+                <Eyebrow>#{puzzleNumber}</Eyebrow>
+              </>
+            )}
           </div>
           <h1 style={{ fontSize: 44, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", marginTop: 8, lineHeight: 1.1 }}>
             {"Today's puzzle"}

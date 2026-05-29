@@ -18,27 +18,39 @@ export default async function Home() {
   let streak: number | undefined;
   let isSignedIn = false;
   let solvedToday = false;
+  let difficulty: string | undefined;
+  let puzzleNumber: number | undefined;
 
   try {
     const supabase = await createClient();
+    const today = new Date().toISOString().slice(0, 10);
+
     const { data: { user } } = await supabase.auth.getUser();
+
+    // Public puzzle metadata — fetched for all users
+    const [{ data: todayPuzzle }, { count }] = await Promise.all([
+      supabase
+        .from("puzzles")
+        .select("id, difficulty")
+        .eq("date", today)
+        .maybeSingle(),
+      supabase
+        .from("puzzles")
+        .select("*", { count: "exact", head: true })
+        .lte("date", today),
+    ]);
+
+    if (todayPuzzle) difficulty = todayPuzzle.difficulty;
+    if (count !== null && count > 0) puzzleNumber = count;
 
     if (user) {
       isSignedIn = true;
-      const today = new Date().toISOString().slice(0, 10);
 
-      const [{ data }, { data: todayPuzzle }] = await Promise.all([
-        supabase
-          .from("solves")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("solved_at", { ascending: false }),
-        supabase
-          .from("puzzles")
-          .select("id")
-          .eq("date", today)
-          .maybeSingle(),
-      ]);
+      const { data } = await supabase
+        .from("solves")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("solved_at", { ascending: false });
 
       if (data) {
         const days = [...new Set(data.map((r) => r.solved_at.slice(0, 10)))];
@@ -52,5 +64,5 @@ export default async function Home() {
     // Supabase unavailable — render guest state
   }
 
-  return <HomeScreen streak={streak} isSignedIn={isSignedIn} solvedToday={solvedToday} />;
+  return <HomeScreen streak={streak} isSignedIn={isSignedIn} solvedToday={solvedToday} difficulty={difficulty} puzzleNumber={puzzleNumber} />;
 }
