@@ -17,6 +17,7 @@ export function Logo({ size = 26, style }: LogoProps) {
     >
       <Mark size={size * 1.8} />
       <span
+        aria-hidden="true"
         style={{
           fontFamily: "var(--font-sans)",
           fontWeight: 600,

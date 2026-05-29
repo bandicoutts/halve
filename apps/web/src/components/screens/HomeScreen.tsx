@@ -97,42 +97,28 @@ export function HomeScreen({ streak, isSignedIn, solvedToday, difficulty, puzzle
           )}
         </div>
 
-        <div style={{ marginTop: 40, display: "flex", justifyContent: "center", alignItems: "center", gap: 20 }}>
+        <div style={{ marginTop: 40, borderTop: "1px solid var(--hairline)" }}>
           <Link
             href="/practice"
-            style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center" }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+            style={{ display: "flex", alignItems: "center", padding: "16px 0", fontSize: 17, fontWeight: 500, color: "var(--fg-1)", textDecoration: "none", borderBottom: "1px solid var(--hairline)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
           >
             Practice
           </Link>
-          <span aria-hidden="true" style={{ color: "var(--hairline)", userSelect: "none" }}>·</span>
           <Link
             href="/archive"
-            style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center" }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+            style={{ display: "flex", alignItems: "center", padding: "16px 0", fontSize: 17, fontWeight: 500, color: "var(--fg-1)", textDecoration: "none" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
           >
             Archive
           </Link>
-          {!isSignedIn && (
-            <>
-              <span aria-hidden="true" style={{ color: "var(--hairline)", userSelect: "none" }}>·</span>
-              <Link
-                href="/auth"
-                style={{ fontSize: 15, fontWeight: 500, color: "var(--fg-2)", textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center" }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
-              >
-                Sign in
-              </Link>
-            </>
-          )}
         </div>
 
         <div style={{ flex: 1 }} />
 
-        <div style={{ textAlign: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 20 }}>
           <Link
             href="/tutorial"
             style={{ fontSize: 13, color: "var(--fg-3)", textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center" }}
@@ -141,6 +127,19 @@ export function HomeScreen({ streak, isSignedIn, solvedToday, difficulty, puzzle
           >
             How to play
           </Link>
+          {!isSignedIn && (
+            <>
+              <span aria-hidden="true" style={{ color: "var(--hairline)", userSelect: "none" }}>·</span>
+              <Link
+                href="/auth"
+                style={{ fontSize: 13, color: "var(--fg-3)", textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
+              >
+                Sign in
+              </Link>
+            </>
+          )}
         </div>
 
       </div>
