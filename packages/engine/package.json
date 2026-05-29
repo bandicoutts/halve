@@ -1,0 +1,26 @@
+{
+  "name": "@parity/engine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pure TS puzzle engine for Parity: validators, deduction solver, uniqueness checker, generator, difficulty. No deps, no DOM.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

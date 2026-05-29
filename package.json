@@ -1,0 +1,18 @@
+{
+  "name": "parity",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Premium daily binary-logic puzzle app (fire & water).",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}

@@ -1,9 +1,9 @@
 # Game rules & engine spec
 
 ## The puzzle (player-facing rules)
-Fill every cell of a 6×6 grid with one of two symbols — a **sun** or a **moon**:
+Fill every cell of a 6×6 grid with one of two symbols — **fire** or **water**:
 1. **Adjacency:** no more than two of the same symbol may sit next to each other, vertically or horizontally (`●●` ok, `●●●` not).
-2. **Balance:** each row and each column must contain an equal number of suns and moons (3 + 3 in a 6×6).
+2. **Balance:** each row and each column must contain an equal number of fire and water (3 + 3 in a 6×6).
 3. **Equals edge (`=`):** two cells separated by `=` must be the **same** symbol.
 4. **Opposite edge (`≠`/`×`):** two cells separated by `≠` must be **opposite** symbols.
 5. Every puzzle has **one** solution, reachable by pure deduction — the player should never need to guess.
@@ -30,5 +30,11 @@ A separate exhaustive solver that counts solutions. A valid puzzle has **exactly
 ### Difficulty
 Scored by which deduction techniques are required and how many propagation passes / lookahead the human solver needs. Bucketed into **Easy / Medium / Hard**. The daily puzzle uses a fixed difficulty (recommend Medium).
 
+## Engine encoding & API (`packages/engine`, implemented)
+- **Symbols** are `0 = fire`, `1 = water` (matches `@parity/design` `SYMBOL`). A `Cell` is `0 | 1 | null`; a `Grid` is `Cell[][]`; a `Solution` is `Sym[][]`.
+- **Edges**: `{ orientation: 'h' | 'v', r, c, kind: 'eq' | 'ne' }`. `h` links `(r,c)`+`(r,c+1)`; `v` links `(r,c)`+`(r+1,c)`.
+- **Public API**: `findViolations` / `isValid` / `isSolved` / `wouldViolate` (validators), `solve` / `isDeductionSolvable` (human solver, returns per-technique stats + passes), `countSolutions` / `hasUniqueSolution` / `findAnySolution` (backtracking), `generatePuzzle` / `generateSolution` (seedable via mulberry32), `measure` / `classify` / `difficultyOf` (scoring).
+- **Difficulty** is scored from solver effort: `empties + 2.5·(passes−1) + balance/edge premiums`. Minimal puzzles classify *hard*; *easy*/*medium* are produced by revealing extra givens down to a per-difficulty score setpoint. Thresholds for 6×6: easy ≤ 18, medium ≤ 30, else hard.
+
 ## Testing invariants
-Fuzz-generate thousands of puzzles and assert every one is (a) uniquely solvable (checker) and (b) solvable by the human solver with zero guessing.
+Fuzz-generate thousands of puzzles and assert every one is (a) uniquely solvable (checker) and (b) solvable by the human solver with zero guessing. Implemented in `generator.test.ts` (600-puzzle fuzz across all difficulties; all invariants hold).

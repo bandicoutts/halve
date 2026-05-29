@@ -1,0 +1,28 @@
+{
+  "name": "@parity/design",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Parity design tokens (color/type/space/radius/shadow) + brand assets. Single source of truth for styling.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tokens.css": "./styles/tokens.css",
+    "./assets/*": "./assets/*"
+  },
+  "files": [
+    "dist",
+    "styles",
+    "assets"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo \"no tests in @parity/design\" && exit 0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

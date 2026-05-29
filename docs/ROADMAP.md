@@ -5,16 +5,16 @@ Phases & milestones. Check off as completed.
 ## Phase 0 — Foundation
 - [x] Discovery + approved build plan
 - [x] Context docs (ARCHITECTURE, GAME-RULES, DESIGN, DECISIONS, ROADMAP) + root CLAUDE.md
-- [ ] Claude Design wireframes generated (prompt in build plan)
-- [ ] Init pnpm monorepo skeleton (`apps/web`, `packages/engine`, `packages/design`, `supabase/`)
+- [x] Claude Design wireframes generated (handoff bundle received + design system locked)
+- [x] Init pnpm monorepo skeleton (`apps/web` stub, `packages/engine`, `packages/design`, `supabase/` stub)
 
 ## Phase 1 — Engine (`packages/engine`)
-- [ ] Board representation + constraint validators
-- [ ] Human-style deduction solver
-- [ ] Uniqueness checker (backtracking)
-- [ ] Generator (unique + deduction-only)
-- [ ] Difficulty scoring → Easy/Medium/Hard
-- [ ] Fuzz tests asserting invariants
+- [x] Board representation + constraint validators
+- [x] Human-style deduction solver
+- [x] Uniqueness checker (backtracking)
+- [x] Generator (unique + deduction-only)
+- [x] Difficulty scoring → Easy/Medium/Hard
+- [x] Fuzz tests asserting invariants
 
 ## Phase 2 — Design system + board UI
 - [ ] Tokens in `packages/design`, wired into Tailwind

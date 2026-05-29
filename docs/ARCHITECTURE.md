@@ -1,7 +1,7 @@
 # Architecture
 
 ## What this is
-Lumen (working title) — a premium daily logic-puzzle web app (Flutter mobile later). The puzzle is a binary Latin-square: a 6×6 grid filled with two symbols under adjacency, balance, and `=`/`≠` edge constraints. See [GAME-RULES.md](GAME-RULES.md) for the rules and engine spec.
+Parity — a premium daily logic-puzzle web app (Flutter mobile later). The puzzle is a binary Latin-square: a 6×6 grid filled with two symbols (**fire & water**) under adjacency, balance, and `=`/`≠` edge constraints. See [GAME-RULES.md](GAME-RULES.md) for the rules and engine spec.
 
 ## Monorepo map (pnpm workspaces)
 ```
