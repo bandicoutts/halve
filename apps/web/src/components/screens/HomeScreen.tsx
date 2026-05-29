@@ -69,34 +69,19 @@ export function HomeScreen({ streak, isSignedIn }: HomeScreenProps) {
         </div>
 
         {/* Title block */}
-        <div style={{ marginTop: 30 }}>
-          <Eyebrow>{todayLabel()}</Eyebrow>
+        <div style={{ marginTop: 56 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Eyebrow>{todayLabel()}</Eyebrow>
+            <span style={{ color: "var(--hairline)", fontSize: 12 }}>·</span>
+            <Eyebrow>Medium</Eyebrow>
+          </div>
           <h1 style={{ fontSize: 44, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", marginTop: 10, lineHeight: 1.1 }}>
             {"Today's puzzle"}
           </h1>
         </div>
 
-        {/* Hero card */}
-        <div style={{ marginTop: 26, background: "var(--surface)", border: "1px solid var(--hairline)", borderRadius: "var(--radius-xl)", padding: 26, boxShadow: "var(--shadow-md)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <Eyebrow>Daily</Eyebrow>
-            <Eyebrow>Medium</Eyebrow>
-          </div>
-          {/* Mini board preview — static dots */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6, margin: "22px 0 24px" }}>
-            {PREVIEW_CELLS.map((sym, i) => (
-              <div
-                key={i}
-                style={{
-                  aspectRatio: "1",
-                  borderRadius: "var(--radius-cell)",
-                  background: sym === "fire" ? "var(--symbol-fire)" : sym === "water" ? "var(--symbol-water)" : "var(--bg-sunken)",
-                  border: sym === null ? "1.5px solid var(--hairline)" : "none",
-                  opacity: sym ? 0.88 : 1,
-                }}
-              />
-            ))}
-          </div>
+        {/* Primary CTA */}
+        <div style={{ marginTop: 28 }}>
           <Link href="/play" style={{ textDecoration: "none" }}>
             <Button variant="primary" full>Play today</Button>
           </Link>
@@ -127,14 +112,3 @@ export function HomeScreen({ streak, isSignedIn }: HomeScreenProps) {
     </div>
   );
 }
-
-/* Static preview pattern — a small representative grid */
-type PreviewCell = "fire" | "water" | null;
-const PREVIEW_CELLS: PreviewCell[] = [
-  "fire",  "water", null,    "fire",  null,    "water",
-  null,    "fire",  "water", null,    "fire",  null,
-  "water", null,    "fire",  null,    "water", "fire",
-  "fire",  null,    null,    "water", null,    null,
-  null,    "water", "fire",  null,    null,    "fire",
-  null,    null,    "water", "fire",  "water", null,
-];
