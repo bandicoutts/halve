@@ -104,7 +104,7 @@ export function HomeScreen({ streak, isSignedIn }: HomeScreenProps) {
 
         <div style={{ flex: 1 }} />
 
-        <div style={{ display: "flex", gap: 12, marginTop: 28, paddingBottom: 40 }}>
+        <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
           <Link href="/practice" style={{ flex: 1, textDecoration: "none" }}>
             <Button variant="secondary" full>Practice</Button>
           </Link>
@@ -117,6 +117,11 @@ export function HomeScreen({ streak, isSignedIn }: HomeScreenProps) {
               <Button variant="secondary" full>Sign in</Button>
             </Link>
           )}
+        </div>
+        <div style={{ textAlign: "center", paddingBottom: 40, paddingTop: 16 }}>
+          <Link href="/tutorial" style={{ fontSize: 14, fontWeight: 500, color: "var(--fg-3)", textDecoration: "none" }}>
+            How to play
+          </Link>
         </div>
       </div>
     </div>

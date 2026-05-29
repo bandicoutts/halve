@@ -36,7 +36,7 @@ Phases & milestones. Check off as completed.
 ## Phase 4 — Retention + sharing
 - [x] Streaks/stats derived from `solves`
 - [x] Shareable result card
-- [ ] Onboarding tutorial (4×4)
+- [x] Onboarding tutorial (4×4)
 
 ## Phase 5 — Mobile (Flutter)
 - [ ] Port engine to Dart
