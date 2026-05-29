@@ -6,6 +6,10 @@
  *
  * start-date / end-date: YYYY-MM-DD. Defaults to today if omitted.
  */
+// Supabase eagerly initialises a realtime client that checks for WebSocket.
+// The seed script never uses realtime, so a stub satisfies the check.
+if (!globalThis.WebSocket) (globalThis as any).WebSocket = class {};
+
 import { createClient } from "@supabase/supabase-js";
 import { generatePuzzle, hashSeed } from "@parity/engine";
 
