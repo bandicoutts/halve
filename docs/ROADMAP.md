@@ -34,8 +34,8 @@ Phases & milestones. Check off as completed.
 - [x] Auth-aware home screen (show streak when signed in)
 
 ## Phase 4 — Retention + sharing
-- [ ] Streaks/stats derived from `solves`
-- [ ] Shareable result card
+- [x] Streaks/stats derived from `solves`
+- [x] Shareable result card
 - [ ] Onboarding tutorial (4×4)
 
 ## Phase 5 — Mobile (Flutter)

@@ -45,12 +45,13 @@ function ShareIcon() {
 
 interface WinScreenProps {
   time: string;
+  solution: number[][];
   dayNo?: number;
   onHome: () => void;
   onStats: () => void;
 }
 
-function WinScreen({ time, dayNo, onHome, onStats }: WinScreenProps) {
+function WinScreen({ time, solution, dayNo, onHome, onStats }: WinScreenProps) {
   function handleShare() {
     const text = dayNo
       ? `Parity No. ${dayNo} · ${time}`
@@ -105,9 +106,9 @@ function WinScreen({ time, dayNo, onHome, onStats }: WinScreenProps) {
             <Logo size={17} />
             {dayNo && <span className="tnum" style={{ fontSize: 12, color: "var(--fg-3)" }}>No. {dayNo}</span>}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6, marginBottom: 16 }}>
-            {Array.from({ length: 36 }).map((_, i) => (
-              <div key={i} style={{ aspectRatio: "1", borderRadius: 3, background: "var(--accent)", opacity: 0.85 + (i % 3) * 0.05 }} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 4, marginBottom: 16 }}>
+            {solution.flat().map((sym, i) => (
+              <div key={i} style={{ aspectRatio: "1", borderRadius: 3, background: sym === 0 ? "var(--symbol-fire)" : "var(--symbol-water)", opacity: 0.9 }} />
             ))}
           </div>
           <div style={{ display: "flex", gap: 26 }}>
@@ -259,6 +260,7 @@ export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/" }: BoardSc
       {showWin && (
         <WinScreen
           time={winTime}
+          solution={puzzle.solution}
           dayNo={dayNo}
           onHome={handleBack}
           onStats={handleStats}
