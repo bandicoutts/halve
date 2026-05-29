@@ -1,7 +1,6 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { generatePuzzle } from "@parity/engine";
 import type { Puzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { useTimer } from "@/hooks/useTimer";
@@ -165,12 +164,11 @@ function HintIcon() {
 }
 
 interface TutorialStepsProps {
-  onDone: () => void;
-  onSkip: () => void;
+  onPlay: () => void;
   onBack: () => void;
 }
 
-function TutorialSteps({ onDone, onSkip, onBack }: TutorialStepsProps) {
+function TutorialSteps({ onPlay, onBack }: TutorialStepsProps) {
   const [step, setStep] = useState(0);
   const s = STEPS[step];
   const isLast = step === STEPS.length - 1;
@@ -185,7 +183,7 @@ function TutorialSteps({ onDone, onSkip, onBack }: TutorialStepsProps) {
         }
         title={<span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)" }}>How to play</span>}
         right={
-          <button onClick={onSkip} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "var(--fg-3)", padding: "0 4px" }}>
+          <button onClick={onPlay} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "var(--fg-3)", padding: "0 4px" }}>
             Skip
           </button>
         }
@@ -215,8 +213,8 @@ function TutorialSteps({ onDone, onSkip, onBack }: TutorialStepsProps) {
         {/* Footer */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 40 }}>
           <Dots total={STEPS.length} current={step} />
-          <Button variant="primary" onClick={() => isLast ? onDone() : setStep(step + 1)}>
-            {isLast ? "Start playing" : "Next"}
+          <Button variant="primary" onClick={() => isLast ? onPlay() : setStep(step + 1)}>
+            {isLast ? "Play today" : "Next"}
           </Button>
         </div>
       </div>
@@ -327,39 +325,14 @@ function TutorialWin({ time, solution }: { time: string; solution: number[][] })
 
 export function TutorialScreen() {
   const router = useRouter();
-  const [mode, setMode] = useState<"steps" | "board" | "win">("steps");
-  const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
-  const [winData, setWinData] = useState<{ time: string; solution: number[][] } | null>(null);
 
   useEffect(() => {
     localStorage.setItem("parity-tutorial-seen", "1");
-    setPuzzle(generatePuzzle({ size: 4, difficulty: "easy", seed: "parity-tutorial-v1" }));
   }, []);
-
-  const handleWin = useCallback((time: string, solution: number[][]) => {
-    setWinData({ time, solution });
-    setMode("win");
-  }, []);
-
-  if (mode === "win" && winData) {
-    return <TutorialWin time={winData.time} solution={winData.solution} />;
-  }
-
-  if (mode === "board") {
-    if (!puzzle) {
-      return (
-        <div style={{ minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}>
-          <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)" }}>Loading…</span>
-        </div>
-      );
-    }
-    return <TutorialBoard puzzle={puzzle} onWin={handleWin} onBack={() => setMode("steps")} />;
-  }
 
   return (
     <TutorialSteps
-      onDone={() => setMode("board")}
-      onSkip={() => router.push("/")}
+      onPlay={() => router.push("/play")}
       onBack={() => router.push("/")}
     />
   );

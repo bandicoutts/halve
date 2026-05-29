@@ -28,38 +28,54 @@ const LABEL_STYLE: React.CSSProperties = {
   marginBottom: 6,
 };
 
+// ─── Sent confirmation ────────────────────────────────────────────────────────
+
+function SentScreen({ email, onBack }: { email: string; onBack: () => void }) {
+  const router = useRouter();
+  return (
+    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", padding: "64px 24px 40px", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
+      <Logo size={24} />
+      <div style={{ marginTop: 48 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", lineHeight: 1.2 }}>
+          Check your email.
+        </h1>
+        <p style={{ marginTop: 14, fontSize: 16, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: 300 }}>
+          We sent a link to <strong style={{ color: "var(--fg-1)" }}>{email}</strong>. Click it to sign in — no password needed.
+        </p>
+      </div>
+      <div style={{ flex: 1 }} />
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <button
+          onClick={onBack}
+          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 15, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3, textAlign: "left" }}
+        >
+          Use a different email
+        </button>
+        <button
+          onClick={() => router.push("/play")}
+          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 15, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3, textAlign: "left" }}
+        >
+          Play now, sign in later
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main auth screen ─────────────────────────────────────────────────────────
+
 export function AuthScreen() {
   const router = useRouter();
-  const [mode, setMode] = useState<"signup" | "signin">("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
-  const signup = mode === "signup";
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-    const supabase = createClient();
-
-    if (signup) {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) { setError(error.message); setLoading(false); return; }
-      router.push("/");
-      router.refresh();
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) { setError(error.message); setLoading(false); return; }
-      router.push("/");
-      router.refresh();
-    }
-    setLoading(false);
-  }
-
-  async function handleMagicLink() {
-    if (!email) { setError("Enter your email first."); return; }
+    if (!email) { setError("Enter your email to continue."); return; }
     setError(null);
     setLoading(true);
     const supabase = createClient();
@@ -67,106 +83,138 @@ export function AuthScreen() {
       email,
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
-    if (error) { setError(error.message); setLoading(false); return; }
     setLoading(false);
+    if (error) { setError(error.message); return; }
     setSent(true);
   }
 
+  async function handlePassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email || !password) { setError("Enter your email and password."); return; }
+    setError(null);
+    setLoading(true);
+    const supabase = createClient();
+    // Try sign in first; if user not found, sign up
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      if (signInError.message.toLowerCase().includes("invalid login credentials") || signInError.message.toLowerCase().includes("user not found")) {
+        const { error: signUpError } = await supabase.auth.signUp({ email, password });
+        if (signUpError) { setError(signUpError.message); setLoading(false); return; }
+      } else {
+        setError(signInError.message);
+        setLoading(false);
+        return;
+      }
+    }
+    setLoading(false);
+    router.push("/");
+    router.refresh();
+  }
+
   if (sent) {
-    return (
-      <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", padding: "64px 24px 40px", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
-        <Logo size={24} />
-        <div style={{ marginTop: 48 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", lineHeight: 1.2 }}>
-            Check your email.
-          </h1>
-          <p style={{ marginTop: 14, fontSize: 16, color: "var(--fg-2)", lineHeight: 1.5, maxWidth: 300 }}>
-            We sent a link to <strong style={{ color: "var(--fg-1)" }}>{email}</strong>. Click it to sign in.
-          </p>
-        </div>
-        <div style={{ flex: 1 }} />
-        <button
-          onClick={() => router.push("/")}
-          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 15, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3 }}
-        >
-          Back to home
-        </button>
-      </div>
-    );
+    return <SentScreen email={email} onBack={() => setSent(false)} />;
   }
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "64px 24px 40px" }}>
         <Logo size={24} />
+
         <div style={{ marginTop: 48 }}>
           <h1 style={{ fontSize: 32, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", lineHeight: 1.3, whiteSpace: "pre-line" }}>
-            {signup ? "A quiet puzzle,\nevery day." : "Welcome back."}
+            {"A quiet puzzle,\nevery day."}
           </h1>
-          <p style={{ marginTop: 14, fontSize: 16, color: "var(--fg-2)", lineHeight: 1.5, maxWidth: 300 }}>
-            {signup
-              ? "Create an account to keep your streak and sync across devices."
-              : "Sign in to pick up your streak where you left off."}
+          <p style={{ marginTop: 14, fontSize: 16, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: 300 }}>
+            Sign in to keep your streak and sync across devices.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ marginTop: 36, display: "flex", flexDirection: "column", gap: 16 }}>
-          <div>
-            <label style={LABEL_STYLE}>Email</label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={INPUT_STYLE}
-              onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
-            />
-          </div>
-          <div>
-            <label style={LABEL_STYLE}>Password</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required={!signup}
-              style={INPUT_STYLE}
-              onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
-            />
-          </div>
+        {/* Magic link form (default) */}
+        {!showPassword && (
+          <form onSubmit={handleMagicLink} style={{ marginTop: 36, display: "flex", flexDirection: "column", gap: 12 }}>
+            <div>
+              <label style={LABEL_STYLE}>Email</label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+                style={INPUT_STYLE}
+                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
+              />
+            </div>
 
-          {error && (
-            <p style={{ fontSize: 14, color: "var(--wrong)", margin: 0 }}>{error}</p>
-          )}
+            {error && <p style={{ fontSize: 14, color: "var(--wrong)", margin: 0 }}>{error}</p>}
 
-          <Button variant="primary" full type="submit" disabled={loading} style={{ marginTop: 4 }}>
-            {loading ? "…" : signup ? "Create account" : "Sign in"}
-          </Button>
-        </form>
+            <Button variant="primary" full type="submit" disabled={loading} style={{ marginTop: 4 }}>
+              {loading ? "Sending…" : "Send me a link"}
+            </Button>
+          </form>
+        )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "26px 0" }}>
-          <div style={{ flex: 1, height: 1, background: "var(--hairline)" }} />
-          <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)" }}>or</span>
-          <div style={{ flex: 1, height: 1, background: "var(--hairline)" }} />
+        {/* Password form (secondary) */}
+        {showPassword && (
+          <form onSubmit={handlePassword} style={{ marginTop: 36, display: "flex", flexDirection: "column", gap: 12 }}>
+            <div>
+              <label style={LABEL_STYLE}>Email</label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+                style={INPUT_STYLE}
+                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
+              />
+            </div>
+            <div>
+              <label style={LABEL_STYLE}>Password</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={INPUT_STYLE}
+                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
+              />
+            </div>
+
+            {error && <p style={{ fontSize: 14, color: "var(--wrong)", margin: 0 }}>{error}</p>}
+
+            <Button variant="primary" full type="submit" disabled={loading} style={{ marginTop: 4 }}>
+              {loading ? "…" : "Continue"}
+            </Button>
+          </form>
+        )}
+
+        {/* Toggle between magic link and password */}
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <button
+            onClick={() => { setShowPassword(!showPassword); setError(null); }}
+            style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3 }}
+          >
+            {showPassword ? "Send a magic link instead" : "Use a password instead"}
+          </button>
         </div>
 
-        <Button variant="secondary" full onClick={handleMagicLink} disabled={loading}>
-          Continue with magic link
-        </Button>
-
         <div style={{ flex: 1 }} />
-        <p style={{ textAlign: "center", fontSize: 14, color: "var(--fg-3)", marginTop: 28 }}>
-          {signup ? "Already play Parity?" : "New here?"}{" "}
+
+        {/* Guest path */}
+        <div style={{ textAlign: "center", paddingBottom: 8 }}>
           <button
-            onClick={() => { setMode(signup ? "signin" : "signup"); setError(null); }}
-            style={{ background: "none", border: "none", color: "var(--accent)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3 }}
+            onClick={() => router.push("/play")}
+            style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0 }}
           >
-            {signup ? "Sign in" : "Create an account"}
+            Continue without account →
           </button>
-        </p>
+        </div>
       </div>
     </div>
   );
