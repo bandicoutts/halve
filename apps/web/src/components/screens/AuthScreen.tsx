@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/symbols/Logo";
 import { Button } from "@/components/ui/Button";
@@ -28,13 +29,26 @@ const LABEL_STYLE: React.CSSProperties = {
   marginBottom: 6,
 };
 
-// ─── Sent confirmation ────────────────────────────────────────────────────────
+const TEXT_BUTTON: React.CSSProperties = {
+  background: "none",
+  border: "none",
+  color: "var(--fg-3)",
+  fontSize: 15,
+  cursor: "pointer",
+  fontFamily: "var(--font-sans)",
+  padding: "12px 4px",
+  textDecoration: "underline",
+  textUnderlineOffset: 3,
+  textAlign: "left",
+};
 
 function SentScreen({ email, onBack }: { email: string; onBack: () => void }) {
   const router = useRouter();
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", padding: "64px 24px 40px", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
-      <Logo size={24} />
+      <Link href="/" style={{ display: "inline-block", textDecoration: "none" }}>
+        <Logo size={24} />
+      </Link>
       <div style={{ marginTop: 48 }}>
         <h1 style={{ fontSize: 32, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", lineHeight: 1.2 }}>
           Check your email.
@@ -44,16 +58,20 @@ function SentScreen({ email, onBack }: { email: string; onBack: () => void }) {
         </p>
       </div>
       <div style={{ flex: 1 }} />
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         <button
           onClick={onBack}
-          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 15, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3, textAlign: "left" }}
+          style={TEXT_BUTTON}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
         >
           Use a different email
         </button>
         <button
           onClick={() => router.push("/play")}
-          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 15, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3, textAlign: "left" }}
+          style={TEXT_BUTTON}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
         >
           Play now, sign in later
         </button>
@@ -61,8 +79,6 @@ function SentScreen({ email, onBack }: { email: string; onBack: () => void }) {
     </div>
   );
 }
-
-// ─── Error message normaliser ─────────────────────────────────────────────────
 
 function friendlyError(msg: string): string {
   const lower = msg.toLowerCase();
@@ -77,13 +93,9 @@ function friendlyError(msg: string): string {
   return msg;
 }
 
-// ─── Main auth screen ─────────────────────────────────────────────────────────
-
 export function AuthScreen({ initialError }: { initialError?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError ?? null);
   const [sent, setSent] = useState(false);
@@ -103,29 +115,6 @@ export function AuthScreen({ initialError }: { initialError?: string }) {
     setSent(true);
   }
 
-  async function handlePassword(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email || !password) { setError("Enter your email and password."); return; }
-    setError(null);
-    setLoading(true);
-    const supabase = createClient();
-    // Try sign in first; if user not found, sign up
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (signInError) {
-      if (signInError.message.toLowerCase().includes("invalid login credentials") || signInError.message.toLowerCase().includes("user not found")) {
-        const { error: signUpError } = await supabase.auth.signUp({ email, password });
-        if (signUpError) { setError(friendlyError(signUpError.message)); setLoading(false); return; }
-      } else {
-        setError(friendlyError(signInError.message));
-        setLoading(false);
-        return;
-      }
-    }
-    setLoading(false);
-    router.push("/");
-    router.refresh();
-  }
-
   if (sent) {
     return <SentScreen email={email} onBack={() => setSent(false)} />;
   }
@@ -133,103 +122,49 @@ export function AuthScreen({ initialError }: { initialError?: string }) {
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "64px 24px 40px" }}>
-        <Logo size={24} />
 
-        <div style={{ marginTop: 48 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", lineHeight: 1.3, whiteSpace: "pre-line" }}>
-            {"A quiet puzzle,\nevery day."}
-          </h1>
-          <p style={{ marginTop: 14, fontSize: 16, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: 300 }}>
-            Sign in to keep your streak and sync across devices.
-          </p>
-        </div>
+        <Link href="/" style={{ display: "inline-block", textDecoration: "none" }}>
+          <Logo size={24} />
+        </Link>
 
-        {/* Magic link form (default) */}
-        {!showPassword && (
-          <form onSubmit={handleMagicLink} style={{ marginTop: 36, display: "flex", flexDirection: "column", gap: 12 }}>
-            <div>
-              <label style={LABEL_STYLE}>Email</label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoFocus
-                style={INPUT_STYLE}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
-              />
-            </div>
-
-            {error && <p style={{ fontSize: 14, color: "var(--wrong)", margin: 0 }}>{error}</p>}
-
-            <Button variant="primary" full type="submit" disabled={loading} style={{ marginTop: 4 }}>
-              {loading ? "Sending…" : "Send me a link"}
-            </Button>
-          </form>
+        {error && (
+          <p style={{ marginTop: 32, marginBottom: 0, fontSize: 14, color: "var(--wrong)" }}>{error}</p>
         )}
 
-        {/* Password form (secondary) */}
-        {showPassword && (
-          <form onSubmit={handlePassword} style={{ marginTop: 36, display: "flex", flexDirection: "column", gap: 12 }}>
-            <div>
-              <label style={LABEL_STYLE}>Email</label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoFocus
-                style={INPUT_STYLE}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
-              />
-            </div>
-            <div>
-              <label style={LABEL_STYLE}>Password</label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={INPUT_STYLE}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
-              />
-            </div>
+        <form onSubmit={handleMagicLink} style={{ marginTop: error ? 16 : 40, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div>
+            <label style={LABEL_STYLE}>Email</label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoFocus
+              style={INPUT_STYLE}
+              onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
+            />
+          </div>
 
-            {error && <p style={{ fontSize: 14, color: "var(--wrong)", margin: 0 }}>{error}</p>}
-
-            <Button variant="primary" full type="submit" disabled={loading} style={{ marginTop: 4 }}>
-              {loading ? "…" : "Continue"}
-            </Button>
-          </form>
-        )}
-
-        {/* Toggle between magic link and password */}
-        <div style={{ marginTop: 16, textAlign: "center" }}>
-          <button
-            onClick={() => { setShowPassword(!showPassword); setError(null); }}
-            style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0, textDecoration: "underline", textUnderlineOffset: 3 }}
-          >
-            {showPassword ? "Send a magic link instead" : "Use a password instead"}
-          </button>
-        </div>
+          <Button variant="primary" full type="submit" disabled={loading} style={{ marginTop: 4 }}>
+            {loading ? "Sending…" : "Send me a link"}
+          </Button>
+        </form>
 
         <div style={{ flex: 1 }} />
 
-        {/* Guest path */}
         <div style={{ textAlign: "center", paddingBottom: 8 }}>
           <button
             onClick={() => router.push("/play")}
-            style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0 }}
+            style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: "12px 4px" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
           >
-            Continue without account →
+            Continue without account
           </button>
         </div>
+
       </div>
     </div>
   );
