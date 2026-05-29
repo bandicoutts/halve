@@ -80,16 +80,15 @@ function WinScreen({ time, solution, dayNo, onHome, onStats }: WinScreenProps) {
         title={<span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)" }}>Complete</span>}
         right={<span style={{ width: 40 }} />}
       />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 24px", gap: 4 }}>
+      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", padding: "20px 24px 40px", gap: 4 }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 8, animation: "lm-settle 0.5s cubic-bezier(0.34,1.4,0.5,1)" }}>
-          <Mark size={64} />
+          <Mark size={56} />
         </div>
         <h1 style={{ fontSize: 46, fontWeight: 500, letterSpacing: "-0.02em", textAlign: "center", color: "var(--fg-1)", lineHeight: 1.1, margin: 0 }}>
           Solved
         </h1>
-        <p style={{ textAlign: "center", color: "var(--fg-2)", marginTop: 10, marginBottom: 28, fontSize: 16 }}>
+        <p style={{ textAlign: "center", color: "var(--fg-2)", marginTop: 10, marginBottom: 24, fontSize: 16 }}>
           in <span className="tnum" style={{ color: "var(--fg-1)", fontWeight: 600 }}>{time}</span>
-          {dayNo ? null : null}
         </p>
 
         {/* Share card */}
@@ -98,17 +97,17 @@ function WinScreen({ time, solution, dayNo, onHome, onStats }: WinScreenProps) {
             background: "var(--surface)",
             border: "1px solid var(--hairline)",
             borderRadius: "var(--radius-xl)",
-            padding: "20px 22px",
+            padding: "18px 20px",
             boxShadow: "var(--shadow-md)",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
             <Logo size={17} />
             {dayNo && <span className="tnum" style={{ fontSize: 12, color: "var(--fg-3)" }}>No. {dayNo}</span>}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 4, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 3, marginBottom: 14 }}>
             {solution.flat().map((sym, i) => (
-              <div key={i} style={{ aspectRatio: "1", borderRadius: 3, background: sym === 0 ? "var(--symbol-fire)" : "var(--symbol-water)", opacity: 0.9 }} />
+              <div key={i} style={{ height: 28, borderRadius: 3, background: sym === 0 ? "var(--symbol-fire)" : "var(--symbol-water)", opacity: 0.9 }} />
             ))}
           </div>
           <div style={{ display: "flex", gap: 26 }}>
@@ -119,7 +118,7 @@ function WinScreen({ time, solution, dayNo, onHome, onStats }: WinScreenProps) {
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 26 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 20 }}>
           <Button variant="primary" full onClick={handleShare}>
             <ShareIcon />
             Share result
