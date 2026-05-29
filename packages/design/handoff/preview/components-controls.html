@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:30px 32px; background:var(--bg); display:flex; align-items:center; gap:40px; justify-content:center; }
+  .iconbtn { width:48px; height:48px; border-radius:var(--radius-full); border:1.5px solid var(--hairline-2); background:transparent; display:flex; align-items:center; justify-content:center; color:var(--fg-2); cursor:pointer; }
+  .iconbtn svg { width:21px; height:21px; }
+  .stack { display:flex; flex-direction:column; align-items:center; gap:9px; }
+  .seg { display:inline-flex; background:var(--bg-sunken); border-radius:var(--radius-full); padding:4px; gap:2px; }
+  .seg button { font-family:var(--font-sans); border:none; background:transparent; font-size:14px; font-weight:500; color:var(--fg-2); padding:9px 20px; border-radius:var(--radius-full); cursor:pointer; }
+  .seg button.active { background:var(--surface-raised); color:var(--fg-1); box-shadow:var(--shadow-sm); }
+  .state { font-size:10px; color:var(--fg-3); font-weight:600; letter-spacing:0.05em; text-transform:uppercase; }
+</style>
+</head>
+<body>
+  <div class="stack"><button class="iconbtn"><i data-lucide="rotate-ccw"></i></button><span class="state">Undo</span></div>
+  <div class="stack"><button class="iconbtn"><i data-lucide="lightbulb"></i></button><span class="state">Hint</span></div>
+  <div class="stack">
+    <div class="seg">
+      <button>Easy</button>
+      <button class="active">Medium</button>
+      <button>Hard</button>
+    </div>
+    <span class="state">Difficulty</span>
+  </div>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

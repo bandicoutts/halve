@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:28px 34px; background:var(--bg); display:flex; align-items:center; gap:40px; }
+  .big { display:flex; flex-direction:column; gap:6px; }
+  .stat-row { display:flex; gap:30px; }
+  .stat .num { font-size:34px; font-weight:500; color:var(--fg-1); font-variant-numeric:tabular-nums; line-height:1; }
+  .stat .cap { margin-top:8px; }
+  .note { font-size:11px; color:var(--fg-3); margin-top:14px; }
+</style>
+</head>
+<body>
+  <div class="big">
+    <span class="label">Live timer</span>
+    <div class="timer" style="color:var(--accent)">02:47</div>
+    <div class="note">Tabular numerals &mdash; digits never shift width</div>
+  </div>
+  <div>
+    <div class="stat-row">
+      <div class="stat"><div class="num">128</div><span class="label cap">Solved</span></div>
+      <div class="stat"><div class="num">41</div><span class="label cap">Streak</span></div>
+      <div class="stat"><div class="num">3:12</div><span class="label cap">Avg</span></div>
+    </div>
+  </div>
+</body>
+</html>

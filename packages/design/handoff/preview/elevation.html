@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:30px 32px; background:var(--bg); display:flex; gap:14px; }
+  .panel { flex:1; padding:26px 24px; border-radius:var(--radius-lg); }
+  .panel.dk { background:var(--bg); border:1px solid var(--hairline); }
+  .row { display:flex; gap:20px; align-items:center; justify-content:center; }
+  .e { width:88px; height:64px; border-radius:var(--radius-md); background:var(--surface-raised); display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px; }
+  .e span { font-size:10px; color:var(--fg-3); font-weight:600; }
+  .hd { margin-bottom:18px; }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="hd"><span class="label">Elevation · Paper</span></div>
+    <div class="row">
+      <div class="e" style="box-shadow:var(--shadow-sm)"><span>sm</span></div>
+      <div class="e" style="box-shadow:var(--shadow-md)"><span>md</span></div>
+      <div class="e" style="box-shadow:var(--shadow-lg)"><span>lg</span></div>
+    </div>
+  </div>
+  <div class="panel dk dark">
+    <div class="hd"><span class="label">Elevation · Ink</span></div>
+    <div class="row">
+      <div class="e" style="box-shadow:var(--shadow-sm); border:1px solid var(--hairline)"><span>sm</span></div>
+      <div class="e" style="box-shadow:var(--shadow-md); border:1px solid var(--hairline)"><span>md</span></div>
+      <div class="e" style="box-shadow:var(--shadow-lg); border:1px solid var(--hairline)"><span>lg</span></div>
+    </div>
+  </div>
+</body>
+</html>

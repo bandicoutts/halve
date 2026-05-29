@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:26px 32px; background:var(--bg); }
+  .head { margin-bottom:18px; }
+  .row { display:flex; gap:18px; }
+  .item { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .box { width:84px; height:64px; background:var(--accent-tint); border:1.5px solid var(--accent); }
+  .v { font-size:11px; color:var(--fg-2); font-weight:600; font-variant-numeric:tabular-nums; }
+  .t { font-size:10px; color:var(--fg-3); }
+</style>
+</head>
+<body>
+  <div class="head"><span class="label">Corner radii</span></div>
+  <div class="row">
+    <div class="item"><div class="box" style="border-radius:6px"></div><span class="v">6</span><span class="t">sm</span></div>
+    <div class="item"><div class="box" style="border-radius:10px"></div><span class="v">10</span><span class="t">md</span></div>
+    <div class="item"><div class="box" style="border-radius:12px"></div><span class="v">12</span><span class="t">cell</span></div>
+    <div class="item"><div class="box" style="border-radius:16px"></div><span class="v">16</span><span class="t">lg</span></div>
+    <div class="item"><div class="box" style="border-radius:22px"></div><span class="v">22</span><span class="t">xl</span></div>
+    <div class="item"><div class="box" style="border-radius:999px"></div><span class="v">full</span><span class="t">pill</span></div>
+  </div>
+</body>
+</html>

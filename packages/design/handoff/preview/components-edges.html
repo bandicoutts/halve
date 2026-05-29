@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:30px 32px; background:var(--bg); display:flex; gap:48px; align-items:center; justify-content:center; }
+  .group { display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .pair { display:flex; align-items:center; }
+  .cell { width:54px; height:54px; border-radius:var(--radius-cell); background:var(--surface-raised); border:1px solid var(--hairline); display:flex; align-items:center; justify-content:center; }
+  .cell svg { width:30px; height:30px; }
+  .sign { width:22px; height:22px; margin:0 -4px; z-index:2; border-radius:var(--radius-full); background:var(--bg); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:600; color:var(--fg-1); box-shadow:var(--shadow-sm); }
+  .meaning { font-size:11px; color:var(--fg-3); font-weight:500; }
+  .meaning b { color:var(--fg-2); font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="group">
+    <div class="pair">
+      <div class="cell"><svg viewBox="0 0 100 100"><path d="M50 8 C57 18 74 34 74 54 C74 70 63 84 50 84 C37 84 26 70 26 54 C26 34 43 18 50 8 Z" fill="var(--symbol-fire)"/></svg></div>
+      <div class="sign">=</div>
+      <div class="cell"><svg viewBox="0 0 100 100"><path d="M50 8 C57 18 74 34 74 54 C74 70 63 84 50 84 C37 84 26 70 26 54 C26 34 43 18 50 8 Z" fill="var(--symbol-fire)"/></svg></div>
+    </div>
+    <div class="meaning"><b>Equal</b> &mdash; same symbol</div>
+  </div>
+  <div class="group">
+    <div class="pair">
+      <div class="cell"><svg viewBox="0 0 100 100"><path d="M50 8 C57 18 74 34 74 54 C74 70 63 84 50 84 C37 84 26 70 26 54 C26 34 43 18 50 8 Z" fill="var(--symbol-fire)"/></svg></div>
+      <div class="sign">&#8800;</div>
+      <div class="cell"><svg viewBox="0 0 100 100"><path d="M50 92 C43 82 26 66 26 46 C26 30 37 16 50 16 C63 16 74 30 74 46 C74 66 57 82 50 92 Z" fill="var(--symbol-water)"/></svg></div>
+    </div>
+    <div class="meaning"><b>Unequal</b> &mdash; opposites</div>
+  </div>
+</body>
+</html>

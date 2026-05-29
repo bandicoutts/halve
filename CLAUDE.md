@@ -3,9 +3,9 @@
 Premium daily logic-puzzle web app — a 6×6 binary Latin-square puzzle (two opposite pieces, **fire & water**; adjacency + balance + `=`/`≠` edge constraints; unique deduction-only solutions). The name comes from the balance rule. Web-first (Next.js + Supabase + Vercel); Flutter mobile later.
 
 ## Repo map (pnpm monorepo)
-- `apps/web` — Next.js 16 app (only frontend for now)
+- `apps/web` — Next.js 16 app (stub until Phase 2/3; the only planned frontend)
 - `packages/engine` — pure TS puzzle generator + solver + validators (no deps, no DOM)
-- `packages/design` — design tokens (color/space/type); single source of truth for styling
+- `packages/design` — design tokens (color/space/type); single source of truth for styling. Vendored design handoff (pixel/voice reference) at `packages/design/handoff/`
 - `supabase/` — migrations, edge functions, seed
 - `docs/` — context docs (read on demand, see below)
 

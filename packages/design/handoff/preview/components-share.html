@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:24px 30px; background:var(--bg); display:flex; gap:16px; }
+  .card { flex:1; border-radius:var(--radius-xl); padding:22px 24px; }
+  .card.lt { background:var(--surface); border:1px solid var(--hairline); box-shadow:var(--shadow-md); }
+  .card.dk { background:var(--night-850); border:1px solid var(--night-700); }
+  .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .brand { display:flex; align-items:center; gap:8px; }
+  .brand img { width:28px; height:20px; }
+  .brand .nm { font-size:15px; font-weight:600; letter-spacing:-0.01em; }
+  .no { font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .grid { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-bottom:16px; }
+  .dot { aspect-ratio:1; border-radius:3px; background:var(--accent); opacity:0.9; }
+  .meta { display:flex; gap:22px; }
+  .meta .v { font-size:20px; font-weight:500; font-variant-numeric:tabular-nums; line-height:1; }
+</style>
+</head>
+<body>
+  <div class="card lt">
+    <div class="top">
+      <div class="brand"><img src="../assets/mark.svg" alt=""><span class="nm" style="color:var(--ink-900)">Parity</span></div>
+      <span class="no" style="color:var(--clay-500)">No. 142</span>
+    </div>
+    <div class="grid">
+      <script>for(let i=0;i<36;i++)document.write('<div class="dot"></div>')</script>
+    </div>
+    <div class="meta">
+      <div><div class="v" style="color:var(--ink-900)">2:47</div><span class="label">Time</span></div>
+      <div><div class="v" style="color:var(--accent)">41</div><span class="label">Streak</span></div>
+    </div>
+  </div>
+  <div class="card dk dark">
+    <div class="top">
+      <div class="brand"><img src="../assets/mark.svg" alt=""><span class="nm" style="color:var(--dust-100)">Parity</span></div>
+      <span class="no" style="color:var(--dust-500)">No. 142</span>
+    </div>
+    <div class="grid">
+      <script>for(let i=0;i<36;i++)document.write('<div class="dot"></div>')</script>
+    </div>
+    <div class="meta">
+      <div><div class="v" style="color:var(--dust-100)">2:47</div><span class="label">Time</span></div>
+      <div><div class="v" style="color:var(--accent)">41</div><span class="label">Streak</span></div>
+    </div>
+  </div>
+</body>
+</html>

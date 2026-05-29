@@ -59,3 +59,11 @@ No purple/blue gradients · no glassmorphism · no everything-centered layouts �
 
 ## Screens (v1)
 Onboarding/how-to-play · Home (daily entry + streak) · Puzzle board · Solve/win + shareable card · Practice (difficulty select) · Stats/profile · Auth. The full Claude Design wireframe prompt is in the build plan.
+
+## Reference: vendored design handoff
+The Claude Design handoff is vendored (read-only) at `packages/design/handoff/` — see its `VENDORED.md`. Use it as the pixel + component reference for Phase 2:
+- `handoff/ui_kits/app/*.jsx` — working React recreation of all 7 screens + the board, primitives, symbols, and game hook (the component spec).
+- `handoff/preview/*.html` — foundation cards (colors, type, spacing, components).
+- `handoff/README.md` — **voice & content rules** (sentence case everywhere; `m:ss` times; no emoji; tone words; microcopy examples) — the source of truth for UI copy.
+
+Canonical tokens remain `packages/design` (`styles/tokens.css` + `src/tokens.ts`), never the handoff's copies.

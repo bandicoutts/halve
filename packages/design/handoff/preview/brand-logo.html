@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:30px 32px; background:var(--bg); display:flex; gap:14px; }
+  .panel { flex:1; border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; gap:50px; padding:30px; }
+  .panel.lt { background:var(--surface); border:1px solid var(--hairline); }
+  .panel.dk { background:var(--bg); border:1px solid var(--hairline); }
+  .lockup { display:flex; align-items:center; gap:12px; }
+  /* mark viewBox is 140×100 — update dims to match */
+  .lockup img { width:42px; height:30px; }
+  .wm { font-size:30px; font-weight:600; letter-spacing:-0.025em; color:var(--fg-1); }
+  .stacked { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .stacked img { width:46px; height:33px; }
+  .stacked .wm { font-size:20px; }
+</style>
+</head>
+<body>
+  <div class="panel lt">
+    <div class="lockup"><img src="../assets/mark.svg" alt=""><span class="wm">Parity</span></div>
+    <div class="stacked"><img src="../assets/mark.svg" alt=""><span class="wm">Parity</span></div>
+  </div>
+  <div class="panel dk dark">
+    <div class="lockup"><img src="../assets/mark.svg" alt=""><span class="wm">Parity</span></div>
+  </div>
+</body>
+</html>

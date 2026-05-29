@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:28px 32px; background:var(--bg); }
+  .row { display:flex; gap:14px; }
+  .panel { flex:1; border-radius:var(--radius-lg); padding:26px; display:flex; align-items:center; justify-content:center; gap:34px; border:1px solid var(--hairline); background:var(--surface); }
+  .piece { display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .piece img { width:76px; height:76px; display:block; }
+  .piece .label { color:var(--fg-3); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="panel">
+      <div class="piece"><img src="../assets/symbol-fire.svg" alt="Fire"><span class="label">Fire</span></div>
+      <div class="piece"><img src="../assets/symbol-water.svg" alt="Water"><span class="label">Water</span></div>
+    </div>
+    <div class="panel dark" style="background:var(--bg);">
+      <div class="piece"><img src="../assets/symbol-fire.svg" alt="Fire"><span class="label">Fire</span></div>
+      <div class="piece"><img src="../assets/symbol-water.svg" alt="Water"><span class="label">Water</span></div>
+    </div>
+  </div>
+</body>
+</html>

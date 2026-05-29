@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:26px 30px; background:var(--bg); }
+  .tiles { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:22px; }
+  .tile { background:var(--surface); border:1px solid var(--hairline); border-radius:var(--radius-lg); padding:16px 18px; }
+  .tile .num { font-size:30px; font-weight:500; color:var(--fg-1); font-variant-numeric:tabular-nums; line-height:1; }
+  .tile .num .accent { color:var(--accent); }
+  .tile .lab { margin-top:10px; }
+  .dist { display:flex; align-items:flex-end; gap:8px; height:62px; }
+  .dist .col { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .dist .barwrap { width:100%; display:flex; align-items:flex-end; height:46px; }
+  .dist .bar { width:100%; background:var(--accent-tint); border-radius:4px 4px 0 0; }
+  .dist .bar.peak { background:var(--accent); }
+  .dist .t { font-size:9.5px; color:var(--fg-3); font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="tiles">
+    <div class="tile"><div class="num"><span class="accent">41</span></div><span class="label lab">Streak</span></div>
+    <div class="tile"><div class="num">128</div><span class="label lab">Solved</span></div>
+    <div class="tile"><div class="num">3:12</div><span class="label lab">Avg time</span></div>
+    <div class="tile"><div class="num">1:48</div><span class="label lab">Best</span></div>
+  </div>
+  <div class="dist">
+    <div class="col"><div class="barwrap"><div class="bar" style="height:18%"></div></div><span class="t">&lt;2m</span></div>
+    <div class="col"><div class="barwrap"><div class="bar" style="height:44%"></div></div><span class="t">2&ndash;3</span></div>
+    <div class="col"><div class="barwrap"><div class="bar peak" style="height:100%"></div></div><span class="t">3&ndash;4</span></div>
+    <div class="col"><div class="barwrap"><div class="bar" style="height:62%"></div></div><span class="t">4&ndash;5</span></div>
+    <div class="col"><div class="barwrap"><div class="bar" style="height:30%"></div></div><span class="t">5&ndash;6</span></div>
+    <div class="col"><div class="barwrap"><div class="bar" style="height:14%"></div></div><span class="t">6m+</span></div>
+  </div>
+</body>
+</html>

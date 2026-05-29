@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; width:700px; box-sizing:border-box; padding:0; background:var(--bg); }
+  .split { display:flex; height:200px; }
+  .half { flex:1; display:flex; flex-direction:column; justify-content:center; gap:14px; padding:30px 34px; }
+  .half.lt { background:var(--paper-100); }
+  .half.dk { background:var(--night-950); }
+  .half .nm { font-size:13px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; }
+  .half .big { font-size:24px; font-weight:500; letter-spacing:-0.02em; }
+  .toggle { width:62px; height:32px; border-radius:999px; padding:3px; display:flex; align-items:center; }
+  .knob { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .knob svg { width:16px; height:16px; }
+  .lt .nm { color:var(--clay-500); } .lt .big { color:var(--ink-900); }
+  .lt .toggle { background:var(--paper-300); }
+  .lt .knob { background:#fff; box-shadow:var(--shadow-sm); }
+  .dk .nm { color:var(--dust-500); } .dk .big { color:var(--dust-100); }
+  .dk .toggle { background:var(--night-700); justify-content:flex-end; }
+  .dk .knob { background:var(--night-850); }
+</style>
+</head>
+<body>
+  <div class="split">
+    <div class="half lt">
+      <span class="nm">Light &middot; Paper</span>
+      <span class="big">A warm, calm start.</span>
+      <!-- Fire symbol in toggle knob -->
+      <div class="toggle"><div class="knob">
+        <svg viewBox="0 0 100 100">
+          <path d="M50 8 C57 18 74 34 74 54 C74 70 63 84 50 84 C37 84 26 70 26 54 C26 34 43 18 50 8 Z" fill="var(--fire-disc)"/>
+        </svg>
+      </div></div>
+    </div>
+    <div class="half dk">
+      <span class="nm">Dark &middot; Ink</span>
+      <span class="big">The same puzzle, after dusk.</span>
+      <!-- Water drop symbol in toggle knob -->
+      <div class="toggle"><div class="knob">
+        <svg viewBox="0 0 100 100">
+          <path d="M50 92 C43 82 26 66 26 46 C26 30 37 16 50 16 C63 16 74 30 74 46 C74 66 57 82 50 92 Z" fill="var(--water-bright)"/>
+        </svg>
+      </div></div>
+    </div>
+  </div>
+</body>
+</html>
