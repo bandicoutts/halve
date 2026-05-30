@@ -197,6 +197,8 @@ export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/", isOffline
     })();
   }, [solved, puzzleId, secs, usedHint]);
 
+  const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
+
   const [cellSize, setCellSize] = useState(48);
   useEffect(() => {
     const compute = () =>
@@ -208,7 +210,25 @@ export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/", isOffline
   }, []);
   const gap = Math.max(6, Math.floor(cellSize * 0.16));
 
-  const handleBack = useCallback(() => router.push(backHref), [router, backHref]);
+  // Cmd/Ctrl+Z keyboard shortcut for undo
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === "z") {
+        if (canUndo && !solved) { e.preventDefault(); undo(); }
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [canUndo, solved, undo]);
+
+  const handleBack = useCallback(() => {
+    if (canUndo && !solved) {
+      setShowAbandonConfirm(true);
+    } else {
+      router.push(backHref);
+    }
+  }, [router, backHref, canUndo, solved]);
+
   const handleStats = useCallback(() => router.push("/stats"), [router]);
 
   return (
@@ -263,24 +283,38 @@ export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/", isOffline
         />
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 36, padding: "8px 24px 16px" }}>
-        <ControlButton label="Undo" disabled={!canUndo} onClick={undo}>
-          <UndoIcon />
-        </ControlButton>
-        <ControlButton label="Hint" onClick={hint}>
-          <HintIcon />
-        </ControlButton>
-      </div>
-      <div style={{ textAlign: "center", paddingBottom: 32 }}>
-        <Link
-          href="/tutorial"
-          style={{ fontSize: 13, color: "var(--fg-2)", textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 44, padding: "0 8px" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
-        >
-          How to play
-        </Link>
-      </div>
+      {showAbandonConfirm ? (
+        <div style={{ padding: "16px 24px 40px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, animation: "fade-up 0.18s cubic-bezier(0.4,0,0.2,1)" }}>
+          <p style={{ fontSize: 15, color: "var(--fg-2)", margin: 0, textAlign: "center" }}>
+            Leave this puzzle?
+          </p>
+          <div style={{ display: "flex", gap: 10, width: "100%" }}>
+            <Button variant="secondary" full onClick={() => setShowAbandonConfirm(false)}>Keep playing</Button>
+            <Button variant="primary" full onClick={() => router.push(backHref)}>Leave</Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 36, padding: "8px 24px 16px" }}>
+            <ControlButton label="Undo" disabled={!canUndo} onClick={undo}>
+              <UndoIcon />
+            </ControlButton>
+            <ControlButton label="Hint" onClick={hint}>
+              <HintIcon />
+            </ControlButton>
+          </div>
+          <div style={{ textAlign: "center", paddingBottom: 32 }}>
+            <Link
+              href="/tutorial"
+              style={{ fontSize: 13, color: "var(--fg-2)", textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 44, padding: "0 8px" }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+            >
+              How to play
+            </Link>
+          </div>
+        </>
+      )}
 
       {showWin && (
         <WinScreen

@@ -13,6 +13,10 @@ interface BoardProps {
   readOnly?: boolean;
 }
 
+const ARROW_DELTA: Record<string, [number, number]> = {
+  ArrowRight: [0, 1], ArrowLeft: [0, -1], ArrowDown: [1, 0], ArrowUp: [-1, 0],
+};
+
 export function Board({
   cells,
   givens,
@@ -26,12 +30,28 @@ export function Board({
   const N = cells.length;
   const total = N * cellSize + (N - 1) * gap;
   const span = (i: number) => i * (cellSize + gap);
-
   const edgeSignSize = Math.max(20, cellSize * 0.42);
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    const delta = ARROW_DELTA[e.key];
+    if (!delta) return;
+    const wrapper = (e.target as HTMLElement).closest("[data-row]");
+    if (!wrapper) return;
+    const r = parseInt(wrapper.getAttribute("data-row") ?? "0");
+    const c = parseInt(wrapper.getAttribute("data-col") ?? "0");
+    const nr = Math.min(N - 1, Math.max(0, r + delta[0]));
+    const nc = Math.min(N - 1, Math.max(0, c + delta[1]));
+    if (nr === r && nc === c) return;
+    e.preventDefault();
+    const target = e.currentTarget.querySelector(
+      `[data-row="${nr}"][data-col="${nc}"] button`
+    ) as HTMLElement | null;
+    target?.focus();
+  }
 
   return (
     <div style={{ position: "relative", width: total, height: total }}>
-      {/* Grid of cells */}
+      {/* Grid of cells — data-row/col wrappers enable arrow-key navigation */}
       <div
         style={{
           display: "grid",
@@ -40,17 +60,19 @@ export function Board({
           position: "relative",
           zIndex: 1,
         }}
+        onKeyDown={handleKeyDown}
       >
         {cells.map((row, r) =>
           row.map((v, c) => (
-            <Cell
-              key={`${r}-${c}`}
-              value={v}
-              isGiven={!!givens[r][c]}
-              isError={errors.has(`${r}-${c}`)}
-              size={cellSize}
-              onClick={readOnly ? undefined : () => onCellTap?.(r, c)}
-            />
+            <div key={`${r}-${c}`} data-row={r} data-col={c} style={{ display: "contents" }}>
+              <Cell
+                value={v}
+                isGiven={!!givens[r][c]}
+                isError={errors.has(`${r}-${c}`)}
+                size={cellSize}
+                onClick={readOnly ? undefined : () => onCellTap?.(r, c)}
+              />
+            </div>
           ))
         )}
       </div>
@@ -60,17 +82,10 @@ export function Board({
         const { orientation: o, r, c } = edge;
         const cx = o === "h" ? span(c) + cellSize + gap / 2 : span(c) + cellSize / 2;
         const cy = o === "h" ? span(r) + cellSize / 2 : span(r) + cellSize + gap / 2;
-
         return (
           <div
             key={i}
-            style={{
-              position: "absolute",
-              left: cx,
-              top: cy,
-              transform: "translate(-50%, -50%)",
-              zIndex: 3,
-            }}
+            style={{ position: "absolute", left: cx, top: cy, transform: "translate(-50%, -50%)", zIndex: 3 }}
           >
             <EdgeSign sign={edge.kind} size={edgeSignSize} />
           </div>
