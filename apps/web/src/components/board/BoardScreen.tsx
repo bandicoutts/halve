@@ -1,10 +1,11 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Puzzle } from "@parity/engine";
+import type { Grid, Puzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { useTimer } from "@/hooks/useTimer";
 import { createClient } from "@/lib/supabase/client";
+import { recordSolve } from "@/app/actions/record-solve";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { Board } from "./Board";
 import { TopBar } from "@/components/ui/TopBar";
@@ -162,12 +163,17 @@ export function BoardScreen({
     nextIn: string;
   } | null>(null);
   const solveRecorded = useRef(false);
+  // Kept current on every render so the solve-recording effect always reads the
+  // latest cells without needing cells in its dep array.
+  const cellsRef = useRef<Grid>([]);
 
   const { cells, errors, solved, canUndo, usedHint, tap, undo, hint } = useGame({
     givens: puzzle.givens,
     solution: puzzle.solution,
     edges: puzzle.edges,
   });
+
+  cellsRef.current = cells;
 
   const { secs, formatted } = useTimer(!solved);
 
@@ -185,34 +191,29 @@ export function BoardScreen({
   useEffect(() => {
     if (!solved || solveRecorded.current || !puzzleId) return;
     solveRecorded.current = true;
-    // Clamp to 1ms minimum — the DB rejects duration_ms = 0 (check constraint),
-    // and the timer only ticks whole seconds so sub-second solves land at 0.
     const durationMs = Math.max(1, secs * 1000);
     const hintUsed = usedHint;
     const pid = puzzleId;
+    const finalGrid = cellsRef.current;
     void (async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase.from("solves").insert({
-        user_id: user.id,
-        puzzle_id: pid,
-        duration_ms: durationMs,
-        used_hint: hintUsed,
-        local_date: new Date().toLocaleDateString("en-CA"),
+      const result = await recordSolve({
+        puzzleId: pid,
+        grid: finalGrid,
+        durationMs,
+        usedHint: hintUsed,
+        localDate: new Date().toLocaleDateString("en-CA"),
       });
 
-      // 23505 = unique_violation — already solved this puzzle, treat as success.
-      if (error && error.code !== "23505") {
-        console.error("Failed to record solve:", error.message);
+      if (!result.ok && !result.alreadySolved) {
+        console.error("Failed to record solve");
         return;
       }
 
       if (kind === "daily") {
         const today = new Date().toLocaleDateString("en-CA");
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
         const { data: solveDays } = await supabase
           .from("solves")
           .select("solved_at, local_date")
@@ -224,7 +225,7 @@ export function BoardScreen({
                 r.local_date ?? r.solved_at.slice(0, 10)
             )
           ),
-        ];
+        ] as string[];
         setStreakData({
           streak: computeStreakClient(days, today),
           nextIn: computeNextIn(),
