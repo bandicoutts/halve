@@ -44,8 +44,8 @@ export function HomeScreen({ difficulty, puzzleNumber, fetchError, userContent }
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "0 24px 40px" }}>
 
-        {/* Streamed user content — streak badge or null */}
-        <div style={{ marginTop: 32, minHeight: 0 }}>
+        {/* Fixed-height slot — reserves exactly 24px so heading never shifts */}
+        <div style={{ marginTop: 32, height: 24, display: "flex", alignItems: "center" }}>
           {userContent}
         </div>
 
@@ -84,6 +84,9 @@ export function HomeScreen({ difficulty, puzzleNumber, fetchError, userContent }
             style={{ display: "flex", alignItems: "center", padding: "16px 0", fontSize: 17, fontWeight: 500, color: "var(--fg-1)", textDecoration: "none", borderBottom: "1px solid var(--hairline)" }}
             onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
+            onTouchStart={(e) => { e.currentTarget.style.opacity = "0.6"; }}
+            onTouchEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
+            onTouchCancel={(e) => { e.currentTarget.style.opacity = "1"; }}
           >
             Practice
           </Link>
@@ -92,6 +95,9 @@ export function HomeScreen({ difficulty, puzzleNumber, fetchError, userContent }
             style={{ display: "flex", alignItems: "center", padding: "16px 0", fontSize: 17, fontWeight: 500, color: "var(--fg-1)", textDecoration: "none" }}
             onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
+            onTouchStart={(e) => { e.currentTarget.style.opacity = "0.6"; }}
+            onTouchEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
+            onTouchCancel={(e) => { e.currentTarget.style.opacity = "1"; }}
           >
             Archive
           </Link>

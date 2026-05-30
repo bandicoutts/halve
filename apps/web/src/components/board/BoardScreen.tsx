@@ -13,6 +13,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Logo } from "@/components/symbols/Logo";
 import { Mark } from "@/components/symbols/Mark";
 import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 function UndoIcon() {
   return (
@@ -232,7 +233,15 @@ export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/", isOffline
 
       {isOffline && (
         <p style={{ margin: "8px 24px 0", fontSize: 13, color: "var(--fg-3)", textAlign: "center" }}>
-          {"Today's puzzle is unavailable — playing a practice puzzle instead."}
+          {"Today's puzzle is unavailable — playing a practice puzzle instead. "}
+          <button
+            onClick={() => window.location.reload()}
+            style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 13, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3, fontFamily: "var(--font-sans)", padding: 0 }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
+          >
+            Retry
+          </button>
         </p>
       )}
       <div style={{ textAlign: "center", paddingTop: 8 }}>
@@ -254,13 +263,23 @@ export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/", isOffline
         />
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 36, padding: "8px 24px 40px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 36, padding: "8px 24px 16px" }}>
         <ControlButton label="Undo" disabled={!canUndo} onClick={undo}>
           <UndoIcon />
         </ControlButton>
         <ControlButton label="Hint" onClick={hint}>
           <HintIcon />
         </ControlButton>
+      </div>
+      <div style={{ textAlign: "center", paddingBottom: 32 }}>
+        <Link
+          href="/tutorial"
+          style={{ fontSize: 12, color: "var(--fg-3)", textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 44, padding: "0 8px" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
+        >
+          How to play
+        </Link>
       </div>
 
       {showWin && (

@@ -34,7 +34,7 @@ export default async function Home() {
       puzzleNumber={puzzleNumber}
       fetchError={fetchError}
       userContent={
-        <Suspense>
+        <Suspense fallback={<div style={{ height: 24 }} />}>
           <HomeUserContent puzzleId={todayPuzzleId} />
         </Suspense>
       }

@@ -42,19 +42,28 @@ export function Button({ variant = "primary", full, children, style, ...rest }: 
 
   const s = variant === "primary" ? primary : secondary;
 
+  const disabledStyle: React.CSSProperties = rest.disabled
+    ? { opacity: 0.55, cursor: "default" }
+    : {};
+
   return (
     <button
-      style={s}
+      style={{ ...s, ...disabledStyle }}
       onMouseEnter={(e) => {
+        if (rest.disabled) return;
         if (variant === "primary") e.currentTarget.style.background = "var(--accent-strong)";
         else e.currentTarget.style.borderColor = "var(--fg-3)";
       }}
       onMouseLeave={(e) => {
+        if (rest.disabled) return;
         if (variant === "primary") e.currentTarget.style.background = "var(--accent)";
         else e.currentTarget.style.borderColor = "var(--hairline)";
       }}
-      onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.98)"; }}
-      onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+      onMouseDown={(e) => { if (!rest.disabled) e.currentTarget.style.transform = "scale(0.98)"; }}
+      onMouseUp={(e) => { if (!rest.disabled) e.currentTarget.style.transform = "scale(1)"; }}
+      onTouchStart={(e) => { if (!rest.disabled) e.currentTarget.style.transform = "scale(0.97)"; }}
+      onTouchEnd={(e) => { if (!rest.disabled) e.currentTarget.style.transform = "scale(1)"; }}
+      onTouchCancel={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
       {...rest}
     >
       {children}

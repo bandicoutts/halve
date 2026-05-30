@@ -19,14 +19,6 @@ function BackIcon() {
   );
 }
 
-function UserIcon() {
-  return (
-    <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
 
 const DIST_LABELS = ["<2m", "2–3", "3–4", "4–5", "5–6", "6+m"];
 
@@ -63,20 +55,15 @@ export function StatsScreen({ stats }: StatsScreenProps) {
       />
       <div style={{ flex: 1, padding: "0 24px", overflowY: "auto" }}>
         {/* Profile row */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 6, marginBottom: 26 }}>
-          <div style={{ width: 50, height: 50, borderRadius: "50%", background: "var(--accent-tint)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <UserIcon />
+        <div style={{ marginTop: 12, marginBottom: 26 }}>
+          <div style={{ fontSize: 22, fontWeight: 500, letterSpacing: "-0.01em", color: "var(--fg-1)" }}>
+            {stats ? stats.displayName : "Guest"}
           </div>
-          <div>
-            <div style={{ fontSize: 17, fontWeight: 600, color: "var(--fg-1)" }}>
-              {stats ? stats.displayName : "Guest"}
+          {stats && (
+            <div style={{ fontSize: 14, color: "var(--fg-3)", marginTop: 4 }}>
+              {`${stats.totalSolved} puzzle${stats.totalSolved !== 1 ? "s" : ""} solved`}
             </div>
-            {stats && (
-              <div style={{ fontSize: 14, color: "var(--fg-3)", marginTop: 2 }}>
-                {`${stats.totalSolved} puzzle${stats.totalSolved !== 1 ? "s" : ""} solved`}
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
         {stats ? (

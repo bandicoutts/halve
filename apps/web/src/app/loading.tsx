@@ -19,7 +19,10 @@ export default function HomeLoading() {
       </header>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "0 24px 40px" }}>
-        <div style={{ marginTop: 40 }}>
+        {/* Streak slot — matches fixed 24px height in HomeScreen */}
+        <div style={{ marginTop: 32, height: 24 }} />
+
+        <div style={{ marginTop: 8 }}>
           <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
             <div style={{ ...SKEL, width: 80, height: 12 }} />
             <div style={{ ...SKEL, width: 50, height: 12 }} />

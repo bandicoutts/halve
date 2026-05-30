@@ -67,6 +67,9 @@ function PuzzleRow({ puzzle }: { puzzle: ArchivePuzzle }) {
     <Link
       href={`/play/${puzzle.date}`}
       style={{ textDecoration: "none", display: "block" }}
+      onTouchStart={(e) => { e.currentTarget.style.opacity = "0.65"; }}
+      onTouchEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
+      onTouchCancel={(e) => { e.currentTarget.style.opacity = "1"; }}
     >
       <div
         style={{
