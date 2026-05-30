@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ArchiveScreen } from "@/components/screens/ArchiveScreen";
 import type { ArchiveDayEntry, ArchiveMonth } from "@/components/screens/ArchiveScreen";
 
-export const revalidate = 3600;
+// revalidate is omitted: cookies()/getUser() force dynamic rendering anyway.
 
 export default async function ArchivePage() {
   const today = new Date().toISOString().slice(0, 10);

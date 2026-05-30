@@ -1,15 +1,11 @@
 import { generatePuzzle } from "@parity/engine";
-import type { Grid, Edge, Solution } from "@parity/engine";
+import type { Difficulty } from "@parity/engine";
 import { createClient } from "@/lib/supabase/server";
+import { parseGridSpec } from "@/lib/grid-spec";
 import { BoardScreen } from "@/components/board/BoardScreen";
 
-export const revalidate = 3600;
-
-interface StoredGridSpec {
-  solution: number[][];
-  givens: (number | null)[][];
-  edges: { orientation: "h" | "v"; r: number; c: number; kind: "eq" | "ne" }[];
-}
+// revalidate is omitted: cookies()/getUser() force dynamic rendering anyway,
+// so the value had no effect.
 
 export default async function PlayPage() {
   const today = new Date().toISOString().slice(0, 10);
@@ -21,23 +17,19 @@ export default async function PlayPage() {
     const supabase = await createClient();
     const { data } = await supabase
       .from("puzzles")
-      .select("*")
+      .select("id, difficulty, grid_spec")
       .eq("date", today)
       .maybeSingle();
 
     if (data) {
-      const spec = data.grid_spec as unknown as StoredGridSpec;
-      puzzle = {
-        size: 6,
-        givens: spec.givens as Grid,
-        edges: spec.edges as Edge[],
-        solution: spec.solution as Solution,
-        difficulty: data.difficulty,
-      };
-      puzzleId = data.id;
+      const spec = parseGridSpec(data.grid_spec);
+      if (spec) {
+        puzzle = { size: 6, ...spec, difficulty: data.difficulty as Difficulty };
+        puzzleId = data.id;
+      }
     }
   } catch {
-    // DB unavailable — fall back to generated puzzle
+    // DB unavailable — serve generated fallback
   }
 
   return (
