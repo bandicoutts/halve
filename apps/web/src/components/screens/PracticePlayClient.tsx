@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { generatePuzzle } from "@parity/engine";
 import type { Difficulty, Puzzle } from "@parity/engine";
 import { BoardScreen } from "@/components/board/BoardScreen";
+import { BoardSkeleton } from "@/components/board/BoardSkeleton";
 
 const VALID: Difficulty[] = ["easy", "medium", "hard"];
 
@@ -18,15 +19,7 @@ export function PracticePlayClient() {
     setPuzzle(generatePuzzle({ size: 6, difficulty }));
   }, [difficulty]);
 
-  if (!puzzle) {
-    return (
-      <div style={{ minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}>
-        <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)" }}>
-          Generating…
-        </div>
-      </div>
-    );
-  }
+  if (!puzzle) return <BoardSkeleton />;
 
   return <BoardScreen puzzle={puzzle} backHref="/practice" />;
 }

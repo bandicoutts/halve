@@ -274,9 +274,9 @@ export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/", isOffline
       <div style={{ textAlign: "center", paddingBottom: 32 }}>
         <Link
           href="/tutorial"
-          style={{ fontSize: 12, color: "var(--fg-3)", textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 44, padding: "0 8px" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
+          style={{ fontSize: 13, color: "var(--fg-2)", textDecoration: "none", display: "inline-flex", alignItems: "center", minHeight: 44, padding: "0 8px" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
         >
           How to play
         </Link>

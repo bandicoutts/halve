@@ -86,7 +86,7 @@ export function StatsScreen({ stats }: StatsScreenProps) {
                   return (
                     <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
                       <div style={{ width: "100%", display: "flex", alignItems: "flex-end", height: 84 }}>
-                        <div style={{ width: "100%", height: `${Math.max(h, count > 0 ? 8 : 0)}%`, borderRadius: "5px 5px 0 0", background: isPeak ? "var(--accent)" : "var(--accent-tint)", transition: "height 0.3s" }} />
+                        <div style={{ width: "100%", height: `${Math.max(h, count > 0 ? 8 : 0)}%`, borderRadius: "5px 5px 0 0", background: isPeak ? "var(--accent)" : "var(--accent-tint)" }} />
                       </div>
                       <span className="tnum" style={{ fontSize: 11, color: "var(--fg-3)" }}>{DIST_LABELS[i]}</span>
                     </div>

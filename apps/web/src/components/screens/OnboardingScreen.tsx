@@ -97,7 +97,9 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
       <div style={{ textAlign: "center", paddingBottom: 8 }}>
         <button
           onClick={() => { router.push(next); }}
-          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: 0 }}
+          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: "0 8px", height: 44, display: "flex", alignItems: "center" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
         >
           Skip for now
         </button>
