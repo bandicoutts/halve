@@ -21,5 +21,5 @@ export function PracticePlayClient() {
 
   if (!puzzle) return <BoardSkeleton />;
 
-  return <BoardScreen puzzle={puzzle} backHref="/practice" />;
+  return <BoardScreen puzzle={puzzle} kind="practice" backHref="/practice" />;
 }

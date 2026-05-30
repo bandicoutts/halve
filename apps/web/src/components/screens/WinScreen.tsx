@@ -1,0 +1,378 @@
+"use client";
+import { useTheme } from "@/components/providers/ThemeProvider";
+import { TopBar } from "@/components/ui/TopBar";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { IconButton } from "@/components/ui/IconButton";
+import { Button } from "@/components/ui/Button";
+import { Mark } from "@/components/symbols/Mark";
+import { Logo } from "@/components/symbols/Logo";
+import { Fire } from "@/components/symbols/Fire";
+import { Water } from "@/components/symbols/Water";
+
+function CloseIcon() {
+  return (
+    <svg
+      width={20}
+      height={20}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+function ShareIcon() {
+  return (
+    <svg
+      width={18}
+      height={18}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+      <polyline points="16 6 12 2 8 6" />
+      <line x1="12" y1="2" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+function formatDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y!, m! - 1, d!).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function SolvedBoard({
+  solution,
+  gridSize,
+}: {
+  solution: number[][];
+  gridSize: number;
+}) {
+  const flat = solution.flat();
+  const cell = 44;
+  const gap = 6;
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${gridSize}, ${cell}px)`,
+        gap,
+        justifyContent: "center",
+      }}
+    >
+      {flat.map((s, i) => (
+        <div
+          key={i}
+          style={{
+            width: cell,
+            height: cell,
+            borderRadius: "var(--radius-sm)",
+            background: "var(--bg-sunken)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            animation: "cell-pop .4s cubic-bezier(0.34,1.4,0.5,1)",
+            animationDelay: `${(i % gridSize) * 16 + Math.floor(i / gridSize) * 20}ms`,
+          }}
+        >
+          {s === 0 ? (
+            <Fire size={cell * 0.64} fill="var(--symbol-a)" />
+          ) : (
+            <Water size={cell * 0.64} fill="var(--symbol-b)" />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export interface WinScreenProps {
+  kind: "daily" | "archive" | "practice";
+  time: string;
+  solution: number[][];
+  gridSize?: number;
+  dayNo?: number;
+  date?: string;
+  difficulty: string;
+  streak?: number;
+  nextIn?: string;
+  onClose: () => void;
+  onSecondary: () => void;
+}
+
+export function WinScreen({
+  kind,
+  time,
+  solution,
+  gridSize = 6,
+  dayNo,
+  date,
+  difficulty,
+  streak,
+  nextIn,
+  onClose,
+  onSecondary,
+}: WinScreenProps) {
+  const { theme, toggle } = useTheme();
+
+  const eyebrow =
+    kind === "practice"
+      ? "Practice"
+      : dayNo !== undefined
+      ? `Puzzle No. ${dayNo}`
+      : "Halve";
+
+  const secondaryLabel =
+    kind === "daily"
+      ? "See your stats"
+      : kind === "archive"
+      ? "Back to archive"
+      : "New puzzle";
+
+  const displayDate = date ? formatDate(date) : undefined;
+
+  function handleShare() {
+    const text =
+      kind !== "practice" && dayNo
+        ? `Halve No. ${dayNo} · ${time}`
+        : `Halve · ${time}`;
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+  }
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        background: "var(--bg)",
+        zIndex: 50,
+      }}
+    >
+      <TopBar
+        left={
+          <IconButton label="Close" size={40} onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        }
+        title={
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--fg-3)",
+            }}
+          >
+            Complete
+          </span>
+        }
+        right={<ThemeToggle theme={theme} onToggle={toggle} />}
+      />
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "8px 24px 36px",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 384,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          {/* Mark entrance */}
+          <div
+            style={{
+              marginTop: 8,
+              animation: "win-mark .6s cubic-bezier(0.34,1.56,0.64,1)",
+            }}
+          >
+            <Mark size={48} />
+          </div>
+
+          {/* Puzzle identity */}
+          <div
+            style={{
+              marginTop: 18,
+              fontSize: 12,
+              fontWeight: 600,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "var(--fg-3)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {eyebrow}
+          </div>
+
+          {/* Solve time hero */}
+          <div
+            style={{
+              marginTop: 14,
+              fontSize: 13,
+              color: "var(--fg-3)",
+              letterSpacing: "0.01em",
+            }}
+          >
+            Solved in
+          </div>
+          <div
+            className="tnum"
+            style={{
+              fontSize: 64,
+              fontWeight: 500,
+              letterSpacing: "-0.035em",
+              color: "var(--fg-1)",
+              lineHeight: 1,
+              marginTop: 4,
+            }}
+          >
+            {time}
+          </div>
+
+          {/* Keepsake card */}
+          <div
+            style={{
+              marginTop: 28,
+              width: "100%",
+              background: "var(--surface)",
+              border: "1px solid var(--hairline)",
+              borderRadius: "var(--radius-xl)",
+              padding: "18px 18px 20px",
+              boxShadow: "var(--shadow-md)",
+              animation: "win-settle .5s cubic-bezier(0.34,1.4,0.5,1)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 16,
+              }}
+            >
+              <Logo size={16} />
+              {displayDate && (
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "var(--fg-3)",
+                    letterSpacing: "0.02em",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {displayDate}
+                </span>
+              )}
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <SolvedBoard solution={solution} gridSize={gridSize} />
+            </div>
+          </div>
+
+          {/* Meta: difficulty + streak */}
+          <div
+            style={{
+              marginTop: 16,
+              fontSize: 13,
+              color: "var(--fg-3)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span style={{ textTransform: "capitalize" }}>{difficulty}</span>
+            {kind === "daily" && streak !== undefined && streak > 0 && (
+              <>
+                <span aria-hidden="true" style={{ color: "var(--hairline-2)" }}>
+                  ·
+                </span>
+                <span>
+                  <span
+                    className="tnum"
+                    style={{ color: "var(--accent)", fontWeight: 600 }}
+                  >
+                    {streak}
+                  </span>
+                  -day streak
+                </span>
+              </>
+            )}
+          </div>
+
+          <div style={{ flex: 1, minHeight: 24 }} />
+
+          {/* Actions */}
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+              marginTop: 24,
+            }}
+          >
+            <Button variant="primary" full onClick={handleShare}>
+              <ShareIcon /> Share result
+            </Button>
+            <Button variant="secondary" full onClick={onSecondary}>
+              {secondaryLabel}
+            </Button>
+          </div>
+
+          {/* Next puzzle countdown — daily only */}
+          {kind === "daily" && nextIn && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 7,
+                color: "var(--fg-3)",
+                marginTop: 18,
+              }}
+            >
+              <span style={{ fontSize: 13 }}>Next puzzle in</span>
+              <span
+                className="tnum"
+                style={{ fontSize: 13, fontWeight: 600, color: "var(--fg-2)" }}
+              >
+                {nextIn}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

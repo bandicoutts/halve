@@ -1,26 +1,59 @@
-const SKEL: React.CSSProperties = {
-  background: "var(--bg-sunken)",
-  borderRadius: "var(--radius-md)",
-  animation: "skeleton-pulse 1.8s ease-in-out infinite",
-};
+import { Skel } from "@/components/ui/Skel";
 
 export default function OnboardingLoading() {
   return (
-    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", padding: "64px 24px 40px" }}>
-      {/* Logo */}
-      <div style={{ ...SKEL, width: 96, height: 24, borderRadius: "var(--radius-sm)" }} />
-
-      {/* Heading + subtext */}
-      <div style={{ marginTop: 48 }}>
-        <div style={{ ...SKEL, width: "70%", height: 32, borderRadius: "var(--radius-md)" }} />
-        <div style={{ ...SKEL, width: "45%", height: 14, borderRadius: "var(--radius-sm)", marginTop: 16 }} />
+    <div
+      style={{
+        minHeight: "100dvh",
+        display: "flex",
+        flexDirection: "column",
+        background: "var(--bg)",
+      }}
+    >
+      {/* Logo top-left */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: "22px 24px 0",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <Skel w={26} h={26} r="999px" />
+        <Skel w={52} h={15} />
       </div>
 
-      {/* Form */}
-      <div style={{ marginTop: 36, display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ ...SKEL, width: 96, height: 13, borderRadius: "var(--radius-sm)" }} />
-        <div style={{ ...SKEL, width: "100%", height: 50, borderRadius: "var(--radius-md)" }} />
-        <div style={{ ...SKEL, width: "100%", height: 52, borderRadius: 999, marginTop: 4 }} />
+      {/* Centered form area */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 24px",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: 340 }}>
+          <Skel w="70%" h={30} r="var(--radius-md)" />
+          <Skel w="52%" h={13} delay={120} style={{ marginTop: 14 }} />
+          <Skel w={80} h={11} delay={220} style={{ marginTop: 24 }} />
+          <Skel h={50} r="var(--radius-md)" delay={280} style={{ marginTop: 8 }} />
+          <Skel h={52} r="999px" delay={340} style={{ marginTop: 16 }} />
+        </div>
+      </div>
+
+      {/* Footer ghost link */}
+      <div
+        style={{
+          flexShrink: 0,
+          display: "flex",
+          justifyContent: "center",
+          padding: "0 24px 30px",
+        }}
+      >
+        <Skel w={100} h={13} delay={400} />
       </div>
     </div>
   );

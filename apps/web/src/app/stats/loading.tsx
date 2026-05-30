@@ -1,54 +1,74 @@
-const SKEL: React.CSSProperties = {
-  background: "var(--bg-sunken)",
-  borderRadius: "var(--radius-md)",
-  animation: "skeleton-pulse 1.8s ease-in-out infinite",
-};
+import { Skel } from "@/components/ui/Skel";
 
 export default function StatsLoading() {
   return (
-    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+    <div
+      style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}
+    >
       {/* TopBar */}
-      <header style={{ height: 56, flexShrink: 0, display: "flex", alignItems: "center", padding: "0 16px", gap: 8 }}>
+      <header
+        style={{
+          height: 56,
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 16px",
+          gap: 8,
+        }}
+      >
         <div style={{ flex: 1 }}>
-          <div style={{ ...SKEL, width: 40, height: 40 }} />
+          <Skel w={40} h={40} r="999px" />
         </div>
-        <div style={{ ...SKEL, width: 36, height: 13 }} />
+        <Skel w={72} h={14} />
         <div style={{ flex: 1 }} />
       </header>
 
-      <div style={{ flex: 1, padding: "24px 24px 40px", display: "flex", flexDirection: "column", gap: 24 }}>
-        {/* Profile — matches two-line layout (name + solve count) */}
+      <div
+        style={{
+          flex: 1,
+          padding: "0 24px 40px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+        }}
+      >
+        {/* Profile row */}
         <div style={{ marginTop: 12 }}>
-          <div style={{ ...SKEL, width: "42%", height: 26, borderRadius: "var(--radius-sm)" }} />
-          <div style={{ ...SKEL, width: 110, height: 13, borderRadius: "var(--radius-sm)", marginTop: 8 }} />
+          <Skel w="42%" h={24} r="var(--radius-sm)" />
+          <Skel w={110} h={13} delay={80} style={{ marginTop: 8 }} />
         </div>
 
-        {/* Stat tiles row */}
+        {/* 2×2 stat tiles */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          {Array.from({ length: 4 }, (_, i) => (
-            <div key={i} style={{ ...SKEL, height: 80, borderRadius: "var(--radius-xl)", animationDelay: `${i * 60}ms` }} />
+          {[0, 1, 2, 3].map((i) => (
+            <Skel key={i} h={80} r="var(--radius-xl)" delay={i * 60} />
           ))}
-        </div>
-
-        {/* Calendar strip */}
-        <div>
-          <div style={{ ...SKEL, width: 100, height: 11, marginBottom: 12 }} />
-          <div style={{ display: "flex", gap: 5 }}>
-            {Array.from({ length: 14 }, (_, i) => (
-              <div key={i} style={{ ...SKEL, width: 18, height: 18, borderRadius: 4, flex: 1, animationDelay: `${i * 30}ms` }} />
-            ))}
-          </div>
         </div>
 
         {/* Time distribution */}
         <div>
-          <div style={{ ...SKEL, width: 120, height: 11, marginBottom: 16 }} />
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {Array.from({ length: 5 }, (_, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ ...SKEL, width: 28, height: 10, flexShrink: 0 }} />
-                <div style={{ ...SKEL, height: 8, borderRadius: 999, flex: 1, maxWidth: `${30 + i * 12}%`, animationDelay: `${i * 60}ms` }} />
+          <Skel w={140} h={11} style={{ marginBottom: 16 }} />
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: 110 }}>
+            {[60, 80, 100, 75, 50, 35].map((pct, i) => (
+              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                <Skel
+                  h={Math.round((pct / 100) * 84)}
+                  r="5px 5px 0 0"
+                  delay={i * 50}
+                  style={{ width: "100%", alignSelf: "flex-end" }}
+                />
+                <Skel w={22} h={10} delay={i * 50} />
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Last 14 days */}
+        <div>
+          <Skel w={88} h={11} style={{ marginBottom: 14 }} />
+          <div style={{ display: "flex", gap: 6 }}>
+            {Array.from({ length: 14 }, (_, i) => (
+              <Skel key={i} h={30} r="5px" delay={i * 25} style={{ flex: 1 }} />
             ))}
           </div>
         </div>

@@ -8,17 +8,23 @@ export default async function Home() {
   let difficulty: string | undefined;
   let puzzleNumber: number | undefined;
   let todayPuzzleId: string | undefined;
+  let isAuthenticated = false;
 
   try {
     const supabase = await createClient();
     const today = new Date().toISOString().slice(0, 10);
 
-    // Only public data here — user data streams in via Suspense below
-    const [{ data: todayPuzzle }, { count }] = await Promise.all([
+    const [
+      { data: { user } },
+      { data: todayPuzzle },
+      { count },
+    ] = await Promise.all([
+      supabase.auth.getUser(),
       supabase.from("puzzles").select("id, difficulty").eq("date", today).maybeSingle(),
       supabase.from("puzzles").select("*", { count: "exact", head: true }).lte("date", today),
     ]);
 
+    isAuthenticated = !!user;
     if (todayPuzzle) {
       difficulty = todayPuzzle.difficulty;
       todayPuzzleId = todayPuzzle.id;
@@ -33,10 +39,13 @@ export default async function Home() {
       difficulty={difficulty}
       puzzleNumber={puzzleNumber}
       fetchError={fetchError}
-      userContent={
-        <Suspense fallback={<div style={{ height: 24 }} />}>
-          <HomeUserContent puzzleId={todayPuzzleId} />
-        </Suspense>
+      isAuthenticated={isAuthenticated}
+      streakBand={
+        isAuthenticated ? (
+          <Suspense fallback={<div style={{ height: 66 }} />}>
+            <HomeUserContent puzzleId={todayPuzzleId} />
+          </Suspense>
+        ) : null
       }
     />
   );

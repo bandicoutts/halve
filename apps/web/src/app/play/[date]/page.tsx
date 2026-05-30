@@ -65,7 +65,9 @@ export default async function PlayDatePage({ params }: Props) {
       <BoardScreen
         puzzle={puzzle}
         puzzleId={data.id}
-        dayNo={dayNo}
+        dayNo={dayNo ?? undefined}
+        date={date}
+        kind="archive"
         backHref="/archive"
       />
     );

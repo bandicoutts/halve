@@ -1,32 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/symbols/Logo";
 import { Button } from "@/components/ui/Button";
-
-const INPUT_STYLE: React.CSSProperties = {
-  width: "100%",
-  height: 50,
-  borderRadius: "var(--radius-md)",
-  border: "1.5px solid var(--hairline)",
-  background: "var(--surface)",
-  color: "var(--fg-1)",
-  fontSize: 16,
-  padding: "0 14px",
-  fontFamily: "var(--font-sans)",
-  outline: "none",
-  transition: "border-color 0.15s",
-  boxSizing: "border-box",
-};
-
-const LABEL_STYLE: React.CSSProperties = {
-  display: "block",
-  fontSize: 13,
-  fontWeight: 500,
-  color: "var(--fg-2)",
-  marginBottom: 6,
-};
+import { Input } from "@/components/ui/Input";
+import { GhostLink } from "@/components/ui/GhostLink";
 
 interface OnboardingScreenProps {
   next: string;
@@ -41,68 +21,113 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = name.trim();
-    if (!trimmed) { setError("Enter a name, or skip."); return; }
+    if (!trimmed) {
+      setError("Enter a name, or skip.");
+      return;
+    }
     setError(null);
     setLoading(true);
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push("/auth"); return; }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      router.push("/auth");
+      return;
+    }
     const { error: updateError } = await supabase
       .from("profiles")
       .update({ display_name: trimmed })
       .eq("id", user.id);
     setLoading(false);
-    if (updateError) { setError("Couldn't save — try again."); return; }
+    if (updateError) {
+      setError("Couldn't save — try again.");
+      return;
+    }
     router.push(next);
     router.refresh();
   }
 
   return (
-    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", padding: "64px 24px 40px", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
-      <Logo size={24} />
-
-      <div style={{ marginTop: 48 }}>
-        <h1 style={{ fontSize: 32, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", lineHeight: 1.2 }}>
-          What should we call you?
-        </h1>
-        <p style={{ marginTop: 14, fontSize: 16, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: 300 }}>
-          Shown on your stats page.
-        </p>
+    <div
+      style={{
+        minHeight: "100dvh",
+        display: "flex",
+        flexDirection: "column",
+        background: "var(--bg)",
+      }}
+    >
+      <div style={{ flexShrink: 0, padding: "22px 24px 0" }}>
+        <Link href="/" style={{ display: "inline-block", textDecoration: "none" }}>
+          <Logo size={20} />
+        </Link>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ marginTop: 36, display: "flex", flexDirection: "column", gap: 12 }}>
-        <div>
-          <label style={LABEL_STYLE}>Display name</label>
-          <input
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoFocus
-            style={INPUT_STYLE}
-            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
-            onBlur={(e) => { e.currentTarget.style.borderColor = "var(--hairline)"; }}
-          />
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 24px",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: 340 }}>
+          <h1
+            style={{
+              fontSize: 32,
+              fontWeight: 500,
+              letterSpacing: "-0.025em",
+              color: "var(--fg-1)",
+              margin: 0,
+              lineHeight: 1.05,
+            }}
+          >
+            What should we call you?
+          </h1>
+          <p
+            style={{
+              fontSize: 14.5,
+              lineHeight: 1.5,
+              color: "var(--fg-2)",
+              margin: "10px 0 24px",
+            }}
+          >
+            Shown on your stats page.
+          </p>
+
+          <form
+            onSubmit={handleSubmit}
+            style={{ display: "flex", flexDirection: "column", gap: 16 }}
+          >
+            <Input
+              label="Display name"
+              type="text"
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              error={error}
+              autoFocus
+              autoComplete="name"
+            />
+            <Button variant="primary" full type="submit" disabled={loading}>
+              {loading ? "Saving…" : "Save name"}
+            </Button>
+          </form>
         </div>
+      </div>
 
-        {error && <p style={{ fontSize: 14, color: "var(--wrong)", margin: 0 }}>{error}</p>}
-
-        <Button variant="primary" full type="submit" disabled={loading} style={{ marginTop: 4 }}>
-          {loading ? "Saving…" : "Save name"}
-        </Button>
-      </form>
-
-      <div style={{ flex: 1 }} />
-
-      <div style={{ textAlign: "center", paddingBottom: 8 }}>
-        <button
-          onClick={() => { router.push(next); }}
-          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font-sans)", padding: "0 8px", height: 44, display: "flex", alignItems: "center" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
-        >
-          Skip for now
-        </button>
+      <div
+        style={{
+          flexShrink: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "0 24px 26px",
+        }}
+      >
+        <GhostLink onClick={() => router.push(next)}>Skip for now</GhostLink>
       </div>
     </div>
   );
