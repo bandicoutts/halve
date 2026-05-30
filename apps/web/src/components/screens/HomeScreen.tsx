@@ -125,6 +125,8 @@ interface HomeScreenProps {
   puzzleNumber?: number;
   fetchError?: boolean;
   isAuthenticated?: boolean;
+  archiveCount?: number;
+  lastDifficulty?: string;
   /** Streamed server slot: renders StreakBand when user data resolves */
   streakBand?: ReactNode;
 }
@@ -134,6 +136,8 @@ export function HomeScreen({
   puzzleNumber,
   fetchError,
   isAuthenticated,
+  archiveCount,
+  lastDifficulty,
   streakBand,
 }: HomeScreenProps) {
   const { theme, toggle } = useTheme();
@@ -317,7 +321,11 @@ export function HomeScreen({
             <DestCard
               motif={<Mark size={28} />}
               title="Archive"
-              sub="Every past puzzle, at your pace"
+              sub={
+                archiveCount !== undefined && lastDifficulty
+                  ? `${archiveCount} puzzles · last ${lastDifficulty.toLowerCase()}`
+                  : "Every past puzzle, at your pace"
+              }
               href="/archive"
             />
           </div>

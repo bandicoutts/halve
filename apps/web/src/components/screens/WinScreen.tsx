@@ -63,8 +63,8 @@ function SolvedBoard({
   gridSize: number;
 }) {
   const flat = solution.flat();
-  const cell = 44;
-  const gap = 6;
+  const cell = 46;
+  const gap = 7;
   return (
     <div
       style={{
@@ -170,7 +170,7 @@ export function WinScreen({
     >
       <TopBar
         left={
-          <IconButton label="Close" size={40} onClick={onClose}>
+          <IconButton label="Close" size={44} onClick={onClose}>
             <CloseIcon />
           </IconButton>
         }

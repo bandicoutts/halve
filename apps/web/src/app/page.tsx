@@ -9,6 +9,8 @@ export default async function Home() {
   let puzzleNumber: number | undefined;
   let todayPuzzleId: string | undefined;
   let isAuthenticated = false;
+  let archiveCount: number | undefined;
+  let lastDifficulty: string | undefined;
 
   try {
     const supabase = await createClient();
@@ -17,11 +19,13 @@ export default async function Home() {
     const [
       { data: { user } },
       { data: todayPuzzle },
-      { count },
+      { count: totalCount },
+      { data: lastPast },
     ] = await Promise.all([
       supabase.auth.getUser(),
       supabase.from("puzzles").select("id, difficulty").eq("date", today).maybeSingle(),
       supabase.from("puzzles").select("*", { count: "exact", head: true }).lte("date", today),
+      supabase.from("puzzles").select("difficulty").lt("date", today).order("date", { ascending: false }).limit(1).maybeSingle(),
     ]);
 
     isAuthenticated = !!user;
@@ -29,7 +33,12 @@ export default async function Home() {
       difficulty = todayPuzzle.difficulty;
       todayPuzzleId = todayPuzzle.id;
     }
-    if (count !== null && count > 0) puzzleNumber = count;
+    if (totalCount !== null && totalCount > 0) puzzleNumber = totalCount;
+    const pastCount = (totalCount ?? 0) - (todayPuzzle ? 1 : 0);
+    if (pastCount > 0) {
+      archiveCount = pastCount;
+      lastDifficulty = lastPast?.difficulty ?? undefined;
+    }
   } catch {
     fetchError = true;
   }
@@ -40,6 +49,8 @@ export default async function Home() {
       puzzleNumber={puzzleNumber}
       fetchError={fetchError}
       isAuthenticated={isAuthenticated}
+      archiveCount={archiveCount}
+      lastDifficulty={lastDifficulty}
       streakBand={
         isAuthenticated ? (
           <Suspense fallback={<div style={{ height: 66 }} />}>
