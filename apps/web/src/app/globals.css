@@ -95,10 +95,10 @@ body {
   to   { opacity: 1;   transform: scale(1); }
 }
 
-/* Screen fade-in */
+/* Screen fade-in — pure opacity, no translate, so skeleton→content is seamless */
 @keyframes fade-up {
-  from { opacity: 0.5; transform: translateY(7px); }
-  to   { opacity: 1;   transform: none; }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Skeleton loading pulse */

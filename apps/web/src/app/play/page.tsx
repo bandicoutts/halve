@@ -40,5 +40,5 @@ export default async function PlayPage() {
     // DB unavailable — fall back to generated puzzle
   }
 
-  return <BoardScreen puzzle={puzzle} puzzleId={puzzleId} backHref="/" />;
+  return <BoardScreen puzzle={puzzle} puzzleId={puzzleId} backHref="/" isOffline={!puzzleId} />;
 }

@@ -147,9 +147,11 @@ export interface BoardScreenProps {
   dayNo?: number;
   /** Back navigation — defaults to "/" */
   backHref?: string;
+  /** True when DB was unavailable and a generated fallback is being played */
+  isOffline?: boolean;
 }
 
-export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/" }: BoardScreenProps) {
+export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/", isOffline }: BoardScreenProps) {
   const router = useRouter();
   const { theme, toggle: toggleTheme } = useTheme();
   const [showWin, setShowWin] = useState(false);
@@ -228,6 +230,11 @@ export function BoardScreen({ puzzle, puzzleId, dayNo, backHref = "/" }: BoardSc
         right={<ThemeToggle theme={theme} onToggle={toggleTheme} />}
       />
 
+      {isOffline && (
+        <p style={{ margin: "8px 24px 0", fontSize: 13, color: "var(--fg-3)", textAlign: "center" }}>
+          {"Today's puzzle is unavailable — playing a practice puzzle instead."}
+        </p>
+      )}
       <div style={{ textAlign: "center", paddingTop: 8 }}>
         <div className="tnum" style={{ fontSize: 44, fontWeight: 500, letterSpacing: "-0.01em", lineHeight: 1, color: solved ? "var(--correct)" : "var(--fg-1)", transition: "color 0.2s" }}>
           {formatted}

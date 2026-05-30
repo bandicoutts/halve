@@ -2,7 +2,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
-const LS_KEY = "parity-theme";
+const LS_KEY = "halve-theme";
 
 interface ThemeCtx {
   theme: Theme;
