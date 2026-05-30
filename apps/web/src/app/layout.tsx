@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { LocalDateSetter } from "@/components/providers/LocalDateSetter";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -23,7 +24,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${spaceGrotesk.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <LocalDateSetter />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

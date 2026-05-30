@@ -34,6 +34,7 @@ export interface Database {
           solved_at: string;
           duration_ms: number;
           used_hint: boolean;
+          local_date: string | null;
         };
         Insert: Omit<Database["public"]["Tables"]["solves"]["Row"], "id" | "solved_at">;
         Update: Partial<Database["public"]["Tables"]["solves"]["Insert"]>;

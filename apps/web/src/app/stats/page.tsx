@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getLocalToday, solveDay } from "@/lib/local-date";
 import { StatsScreen } from "@/components/screens/StatsScreen";
 
 export interface UserStats {
@@ -15,13 +16,20 @@ export interface UserStats {
   timeDist: number[];
 }
 
+/** Offset a YYYY-MM-DD string by `delta` days without timezone conversion. */
+function offsetDay(date: string, delta: number): string {
+  const d = new Date(date + "T00:00:00");
+  d.setDate(d.getDate() + delta);
+  return d.toLocaleDateString("en-CA");
+}
+
 function computeStreak(days: string[], today: string): number {
   const set = new Set(days);
   let n = 0;
-  const d = new Date(today);
-  while (set.has(d.toISOString().slice(0, 10))) {
+  let cur = today;
+  while (set.has(cur)) {
     n++;
-    d.setDate(d.getDate() - 1);
+    cur = offsetDay(cur, -1);
   }
   return n;
 }
@@ -43,9 +51,7 @@ function computeLongestStreak(days: string[]): number {
 function computeLast14(days: string[], today: string): boolean[] {
   const set = new Set(days);
   return Array.from({ length: 14 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (13 - i));
-    return set.has(d.toISOString().slice(0, 10));
+    return set.has(offsetDay(today, -(13 - i)));
   });
 }
 
@@ -71,15 +77,15 @@ export default async function StatsPage() {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user) {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = await getLocalToday();
 
       const [{ data: solves }, { data: profile }] = await Promise.all([
-        supabase.from("solves").select("*").eq("user_id", user.id).order("solved_at"),
-        supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+        supabase.from("solves").select("solved_at, duration_ms, local_date").eq("user_id", user.id).order("solved_at"),
+        supabase.from("profiles").select("display_name, created_at").eq("id", user.id).maybeSingle(),
       ]);
 
       const rows = solves ?? [];
-      const days = [...new Set(rows.map((r) => r.solved_at.slice(0, 10)))];
+      const days = [...new Set(rows.map(solveDay))];
       const durations = rows.map((r) => r.duration_ms);
       const avg = durations.length ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length / 1000) : null;
       const best = durations.length ? Math.round(Math.min(...durations) / 1000) : null;

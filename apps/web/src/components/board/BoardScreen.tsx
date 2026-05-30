@@ -202,6 +202,7 @@ export function BoardScreen({
         puzzle_id: pid,
         duration_ms: durationMs,
         used_hint: hintUsed,
+        local_date: new Date().toLocaleDateString("en-CA"),
       });
 
       // 23505 = unique_violation — already solved this puzzle, treat as success.
@@ -211,15 +212,16 @@ export function BoardScreen({
       }
 
       if (kind === "daily") {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = new Date().toLocaleDateString("en-CA");
         const { data: solveDays } = await supabase
           .from("solves")
-          .select("solved_at")
+          .select("solved_at, local_date")
           .eq("user_id", user.id);
         const days = [
           ...new Set(
             (solveDays ?? []).map(
-              (r: { solved_at: string }) => r.solved_at.slice(0, 10)
+              (r: { solved_at: string; local_date: string | null }) =>
+                r.local_date ?? r.solved_at.slice(0, 10)
             )
           ),
         ];

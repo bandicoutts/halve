@@ -1,23 +1,27 @@
 import { createClient } from "@/lib/supabase/server";
+import { getLocalToday, solveDay } from "@/lib/local-date";
+
+/** Offset a YYYY-MM-DD string by `delta` days without timezone conversion. */
+function offsetDay(date: string, delta: number): string {
+  const d = new Date(date + "T00:00:00");
+  d.setDate(d.getDate() + delta);
+  return d.toLocaleDateString("en-CA");
+}
 
 function computeStreak(days: string[], today: string): number {
   const set = new Set(days);
   let streak = 0;
-  const d = new Date(today + "T00:00:00");
-  while (set.has(d.toISOString().slice(0, 10))) {
+  let cur = today;
+  while (set.has(cur)) {
     streak++;
-    d.setDate(d.getDate() - 1);
+    cur = offsetDay(cur, -1);
   }
   return streak;
 }
 
 function computeLast7(days: string[], today: string): boolean[] {
   const set = new Set(days);
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today + "T00:00:00");
-    d.setDate(d.getDate() - (6 - i));
-    return set.has(d.toISOString().slice(0, 10));
-  });
+  return Array.from({ length: 7 }, (_, i) => set.has(offsetDay(today, -(6 - i))));
 }
 
 function FlameIcon() {
@@ -100,7 +104,7 @@ interface Props {
 export async function HomeUserContent({ puzzleId: _puzzleId }: Props) {
   try {
     const supabase = await createClient();
-    const today = new Date().toISOString().slice(0, 10);
+    const today = await getLocalToday();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -108,12 +112,12 @@ export async function HomeUserContent({ puzzleId: _puzzleId }: Props) {
 
     const { data } = await supabase
       .from("solves")
-      .select("solved_at")
+      .select("solved_at, local_date")
       .eq("user_id", user.id)
       .order("solved_at", { ascending: false });
 
     const rows = data ?? [];
-    const days = [...new Set(rows.map((r) => r.solved_at.slice(0, 10)))];
+    const days = [...new Set(rows.map(solveDay))];
     const streak = computeStreak(days, today);
     if (streak <= 0) return null;
 
