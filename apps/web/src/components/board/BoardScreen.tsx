@@ -185,7 +185,9 @@ export function BoardScreen({
   useEffect(() => {
     if (!solved || solveRecorded.current || !puzzleId) return;
     solveRecorded.current = true;
-    const durationMs = secs * 1000;
+    // Clamp to 1ms minimum — the DB rejects duration_ms = 0 (check constraint),
+    // and the timer only ticks whole seconds so sub-second solves land at 0.
+    const durationMs = Math.max(1, secs * 1000);
     const hintUsed = usedHint;
     const pid = puzzleId;
     void (async () => {
@@ -195,12 +197,18 @@ export function BoardScreen({
       } = await supabase.auth.getUser();
       if (!user) return;
 
-      await supabase.from("solves").insert({
+      const { error } = await supabase.from("solves").insert({
         user_id: user.id,
         puzzle_id: pid,
         duration_ms: durationMs,
         used_hint: hintUsed,
       });
+
+      // 23505 = unique_violation — already solved this puzzle, treat as success.
+      if (error && error.code !== "23505") {
+        console.error("Failed to record solve:", error.message);
+        return;
+      }
 
       if (kind === "daily") {
         const today = new Date().toISOString().slice(0, 10);
