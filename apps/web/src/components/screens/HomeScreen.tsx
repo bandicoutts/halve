@@ -36,9 +36,10 @@ interface HomeScreenProps {
   solvedToday?: boolean;
   difficulty?: string;
   puzzleNumber?: number;
+  fetchError?: boolean;
 }
 
-export function HomeScreen({ streak, isSignedIn, solvedToday, difficulty, puzzleNumber }: HomeScreenProps) {
+export function HomeScreen({ streak, isSignedIn, solvedToday, difficulty, puzzleNumber, fetchError }: HomeScreenProps) {
   const { theme, toggle } = useTheme();
   const hasStreak = isSignedIn && streak !== undefined && streak > 0;
 
@@ -84,6 +85,12 @@ export function HomeScreen({ streak, isSignedIn, solvedToday, difficulty, puzzle
             {"Today's puzzle"}
           </h1>
         </div>
+
+        {fetchError && (
+          <p style={{ marginTop: 12, fontSize: 13, color: "var(--fg-3)", lineHeight: 1.5 }}>
+            {"Today's puzzle is unavailable — try again shortly."}
+          </p>
+        )}
 
         <div style={{ marginTop: 24 }}>
           {solvedToday ? (

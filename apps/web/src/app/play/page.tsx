@@ -3,7 +3,7 @@ import type { Grid, Edge, Solution } from "@parity/engine";
 import { createClient } from "@/lib/supabase/server";
 import { BoardScreen } from "@/components/board/BoardScreen";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 interface StoredGridSpec {
   solution: number[][];

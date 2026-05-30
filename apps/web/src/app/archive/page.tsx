@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ArchiveScreen } from "@/components/screens/ArchiveScreen";
 import type { ArchivePuzzle } from "@/components/screens/ArchiveScreen";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function ArchivePage() {
   const today = new Date().toISOString().slice(0, 10);

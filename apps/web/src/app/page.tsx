@@ -20,25 +20,20 @@ export default async function Home() {
   let solvedToday = false;
   let difficulty: string | undefined;
   let puzzleNumber: number | undefined;
+  let fetchError = false;
 
   try {
     const supabase = await createClient();
     const today = new Date().toISOString().slice(0, 10);
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    // Public puzzle metadata — fetched for all users
-    const [{ data: todayPuzzle }, { count }] = await Promise.all([
-      supabase
-        .from("puzzles")
-        .select("id, difficulty")
-        .eq("date", today)
-        .maybeSingle(),
-      supabase
-        .from("puzzles")
-        .select("*", { count: "exact", head: true })
-        .lte("date", today),
+    // Fire auth + both puzzle queries simultaneously
+    const [authResult, { data: todayPuzzle }, { count }] = await Promise.all([
+      supabase.auth.getUser(),
+      supabase.from("puzzles").select("id, difficulty").eq("date", today).maybeSingle(),
+      supabase.from("puzzles").select("*", { count: "exact", head: true }).lte("date", today),
     ]);
+
+    const user = authResult.data.user;
 
     if (todayPuzzle) difficulty = todayPuzzle.difficulty;
     if (count !== null && count > 0) puzzleNumber = count;
@@ -61,8 +56,8 @@ export default async function Home() {
       }
     }
   } catch {
-    // Supabase unavailable — render guest state
+    fetchError = true;
   }
 
-  return <HomeScreen streak={streak} isSignedIn={isSignedIn} solvedToday={solvedToday} difficulty={difficulty} puzzleNumber={puzzleNumber} />;
+  return <HomeScreen streak={streak} isSignedIn={isSignedIn} solvedToday={solvedToday} difficulty={difficulty} puzzleNumber={puzzleNumber} fetchError={fetchError} />;
 }
