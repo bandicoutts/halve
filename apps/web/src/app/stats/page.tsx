@@ -3,6 +3,8 @@ import { StatsScreen } from "@/components/screens/StatsScreen";
 
 export interface UserStats {
   displayName: string;
+  /** e.g. "January 2026" */
+  since: string;
   streak: number;
   longestStreak: number;
   totalSolved: number;
@@ -82,8 +84,14 @@ export default async function StatsPage() {
       const avg = durations.length ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length / 1000) : null;
       const best = durations.length ? Math.round(Math.min(...durations) / 1000) : null;
 
+      const firstSolveDate = rows[0]?.solved_at
+        ? new Date(rows[0].solved_at)
+        : new Date(user.created_at);
+      const since = firstSolveDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
       stats = {
         displayName: profile?.display_name ?? user.email?.split("@")[0] ?? "You",
+        since,
         streak: computeStreak(days, today),
         longestStreak: computeLongestStreak(days),
         totalSolved: rows.length,
