@@ -1,6 +1,6 @@
-# Parity
+# Halve
 
-Premium daily logic-puzzle web app — a 6×6 binary Latin-square puzzle (two opposite pieces, **fire & water**; adjacency + balance + `=`/`≠` edge constraints; unique deduction-only solutions). The name comes from the balance rule. Web-first (Next.js + Supabase + Vercel); Flutter mobile later.
+Premium daily logic-puzzle web app — a 6×6 binary Latin-square puzzle (two abstract symbols, **solid circle & ring**; adjacency + balance + `=`/`≠` edge constraints; unique deduction-only solutions). The name comes from the balance rule (each symbol fills exactly half the grid). Web-first (Next.js + Supabase + Vercel); Flutter mobile later. Domain: `halve.today`.
 
 ## Repo map (pnpm monorepo)
 - `apps/web` — Next.js 16 app (stub until Phase 2/3; the only planned frontend)

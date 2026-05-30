@@ -1,5 +1,5 @@
 /* ============================================================
-   PARITY — Colors & Type Foundations
+   HALVE — Colors & Type Foundations
    A premium daily logic-puzzle app. Light/dark duality is the
    brand device: warm "paper" light mode, deep "ink" dark mode.
    Single characterful grotesque (Space Grotesk) + tabular nums.
@@ -31,18 +31,18 @@
   --dust-300:  #A79D89;   /* secondary fg */
   --dust-100:  #EFE8D9;   /* primary fg on ink */
 
-  /* Fire — the hero accent, warm amber-red flame */
-  --fire-disc:    #D45220;  /* the solid game symbol */
-  --fire:         #B03E12;  /* accent on paper (AA on paper) */
-  --fire-strong:  #943210;  /* pressed / strong */
-  --fire-bright:  #E86B38;  /* accent on ink */
-  --fire-tint:    #F8E4DC;  /* soft amber-red fill on paper */
-  --fire-tint-dk: #38180E;  /* soft amber-red fill on ink */
+  /* Amber — the hero accent */
+  --amber-disc:    #D45220;  /* the solid game symbol (A) */
+  --amber:         #B03E12;  /* accent on paper (AA on paper) */
+  --amber-strong:  #943210;  /* pressed / strong */
+  --amber-bright:  #E86B38;  /* accent on ink */
+  --amber-tint:    #F8E4DC;  /* soft fill on paper */
+  --amber-tint-dk: #38180E;  /* soft fill on ink */
 
-  /* Water — cool teal droplet */
-  --water:        #2A7A6E;  /* the game symbol on paper */
-  --water-bright: #6EC8BC;  /* the game symbol on ink */
-  --water-ink:    #1E5C52;
+  /* Teal — the ring game symbol (B) */
+  --teal:        #2A7A6E;  /* game symbol B on paper */
+  --teal-bright: #6EC8BC;  /* game symbol B on ink */
+  --teal-strong: #1E5C52;
 
   /* Semantic feedback (warm-leaning) */
   --correct-l:  #4E8A66;  --correct-tint-l: #E2EFE5;
@@ -63,13 +63,13 @@
   --hairline:      var(--paper-300);
   --hairline-2:    var(--paper-400);
 
-  --accent:        var(--fire);
-  --accent-strong: var(--fire-strong);
-  --accent-tint:   var(--fire-tint);
+  --accent:        var(--amber);
+  --accent-strong: var(--amber-strong);
+  --accent-tint:   var(--amber-tint);
   --on-accent:     #FFFFFF;
 
-  --symbol-fire:   var(--fire-disc);
-  --symbol-water:  var(--water);
+  --symbol-a:   var(--amber-disc);
+  --symbol-b:   var(--teal);
 
   --correct:       var(--correct-l);
   --correct-tint:  var(--correct-tint-l);
@@ -96,13 +96,13 @@
   --hairline:      var(--night-700);
   --hairline-2:    var(--night-600);
 
-  --accent:        var(--fire-bright);
-  --accent-strong: var(--fire-disc);
-  --accent-tint:   var(--fire-tint-dk);
+  --accent:        var(--amber-bright);
+  --accent-strong: var(--amber-disc);
+  --accent-tint:   var(--amber-tint-dk);
   --on-accent:     #1A160F;
 
-  --symbol-fire:   var(--fire-disc);
-  --symbol-water:  var(--water-bright);
+  --symbol-a:   var(--amber-disc);
+  --symbol-b:   var(--teal-bright);
 
   --correct:       var(--correct-d);
   --correct-tint:  var(--correct-tint-d);

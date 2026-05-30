@@ -21,8 +21,8 @@
   --color-accent-strong: var(--accent-strong);
   --color-accent-tint: var(--accent-tint);
   --color-on-accent: var(--on-accent);
-  --color-symbol-fire: var(--symbol-fire);
-  --color-symbol-water: var(--symbol-water);
+  --color-symbol-a: var(--symbol-a);
+  --color-symbol-b: var(--symbol-b);
   --color-correct: var(--correct);
   --color-correct-tint: var(--correct-tint);
   --color-wrong: var(--wrong);

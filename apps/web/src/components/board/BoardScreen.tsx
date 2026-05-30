@@ -54,8 +54,8 @@ interface WinScreenProps {
 function WinScreen({ time, solution, dayNo, onHome, onStats }: WinScreenProps) {
   function handleShare() {
     const text = dayNo
-      ? `Parity No. ${dayNo} · ${time}`
-      : `Parity · ${time}`;
+      ? `Halve No. ${dayNo} · ${time}`
+      : `Halve · ${time}`;
     if (navigator.share) {
       navigator.share({ text }).catch(() => {});
     } else {
@@ -107,7 +107,7 @@ function WinScreen({ time, solution, dayNo, onHome, onStats }: WinScreenProps) {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 3, marginBottom: 14 }}>
             {solution.flat().map((sym, i) => (
-              <div key={i} style={{ height: 28, borderRadius: 3, background: sym === 0 ? "var(--symbol-fire)" : "var(--symbol-water)", opacity: 0.9 }} />
+              <div key={i} style={{ height: 28, borderRadius: 3, background: sym === 0 ? "var(--symbol-a)" : "var(--symbol-b)", opacity: 0.9 }} />
             ))}
           </div>
           <div style={{ display: "flex", gap: 26 }}>

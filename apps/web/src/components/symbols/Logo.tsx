@@ -15,7 +15,7 @@ export function Logo({ size = 26, style }: LogoProps) {
         ...style,
       }}
     >
-      <Mark size={size * 1.8} />
+      <Mark size={size * 1.3} />
       <span
         aria-hidden="true"
         style={{
@@ -26,7 +26,7 @@ export function Logo({ size = 26, style }: LogoProps) {
           color: "var(--fg-1)",
         }}
       >
-        Parity
+        Halve
       </span>
     </span>
   );

@@ -11,7 +11,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Parity",
+  title: "Halve",
   description: "A premium daily logic puzzle. Fill the grid. Find the balance.",
 };
 

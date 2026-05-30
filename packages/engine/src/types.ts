@@ -1,9 +1,9 @@
 /**
- * Core puzzle types for Parity — a binary Latin-square puzzle.
- * Two symbols are encoded as 0 = fire, 1 = water (matches @parity/design SYMBOL).
+ * Core puzzle types for Halve — a binary Latin-square puzzle.
+ * Two symbols are encoded as 0 = A (solid), 1 = B (ring) (matches @parity/design SYMBOL).
  */
 
-/** A placed symbol. 0 = fire, 1 = water. */
+/** A placed symbol. 0 = A (solid circle), 1 = B (ring). */
 export type Sym = 0 | 1;
 
 /** A board cell: a placed symbol, or null when empty. */

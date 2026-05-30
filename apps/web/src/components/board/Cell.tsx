@@ -43,7 +43,7 @@ export function Cell({ value, isGiven, isError, size, onClick }: CellProps) {
     <button
       onClick={onClick}
       disabled={isGiven}
-      aria-label={value === 0 ? "fire" : value === 1 ? "water" : "empty"}
+      aria-label={value === 0 ? "solid" : value === 1 ? "open" : "empty"}
       style={{
         width: size,
         height: size,

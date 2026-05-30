@@ -41,9 +41,9 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
         }}
       >
         {dark ? (
-          <Water size={16} fill="var(--symbol-water)" />
+          <Water size={16} fill="var(--symbol-b)" />
         ) : (
-          <Fire size={16} fill="var(--symbol-fire)" />
+          <Fire size={16} fill="var(--symbol-a)" />
         )}
       </span>
     </button>

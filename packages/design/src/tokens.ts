@@ -1,7 +1,7 @@
 /**
- * Parity design tokens — single source of truth (TS mirror of styles/tokens.css).
+ * Halve design tokens — single source of truth (TS mirror of styles/tokens.css).
  * Light/dark duality is the brand device: warm "paper" light, deep "ink" dark.
- * Fire (amber-red) is the one hero accent; water (teal) is the secondary identity color.
+ * Amber is the hero accent (symbol A); teal is the secondary symbol color (symbol B).
  */
 
 /** Raw palette — reference values; theme via the semantic tokens, not these. */
@@ -28,18 +28,18 @@ export const palette = {
   dust300: '#A79D89', // secondary fg
   dust100: '#EFE8D9', // primary fg on ink
 
-  // Fire — the hero accent (warm amber-red flame)
-  fireDisc: '#D45220', // the solid game symbol
-  fire: '#B03E12', // accent on paper
-  fireStrong: '#943210', // pressed / strong
-  fireBright: '#E86B38', // accent on ink
-  fireTint: '#F8E4DC', // soft fill on paper
-  fireTintDk: '#38180E', // soft fill on ink
+  // Amber — the hero accent
+  amberDisc: '#D45220', // the solid game symbol (A)
+  amber: '#B03E12', // accent on paper
+  amberStrong: '#943210', // pressed / strong
+  amberBright: '#E86B38', // accent on ink
+  amberTint: '#F8E4DC', // soft fill on paper
+  amberTintDk: '#38180E', // soft fill on ink
 
-  // Water — cool teal droplet
-  water: '#2A7A6E', // game symbol on paper
-  waterBright: '#6EC8BC', // game symbol on ink
-  waterInk: '#1E5C52',
+  // Teal — the ring game symbol (B)
+  teal: '#2A7A6E', // game symbol B on paper
+  tealBright: '#6EC8BC', // game symbol B on ink
+  tealStrong: '#1E5C52',
 
   // Semantic feedback (warm-leaning)
   correctL: '#4E8A66',
@@ -64,12 +64,12 @@ export const colors = {
     fg3: palette.clay500,
     hairline: palette.paper300,
     hairline2: palette.paper400,
-    accent: palette.fire,
-    accentStrong: palette.fireStrong,
-    accentTint: palette.fireTint,
+    accent: palette.amber,
+    accentStrong: palette.amberStrong,
+    accentTint: palette.amberTint,
     onAccent: '#FFFFFF',
-    symbolFire: palette.fireDisc,
-    symbolWater: palette.water,
+    symbolA: palette.amberDisc,
+    symbolB: palette.teal,
     correct: palette.correctL,
     correctTint: palette.correctTintL,
     wrong: palette.wrongL,
@@ -85,12 +85,12 @@ export const colors = {
     fg3: palette.dust500,
     hairline: palette.night700,
     hairline2: palette.night600,
-    accent: palette.fireBright,
-    accentStrong: palette.fireDisc,
-    accentTint: palette.fireTintDk,
+    accent: palette.amberBright,
+    accentStrong: palette.amberDisc,
+    accentTint: palette.amberTintDk,
     onAccent: '#1A160F',
-    symbolFire: palette.fireDisc,
-    symbolWater: palette.waterBright,
+    symbolA: palette.amberDisc,
+    symbolB: palette.tealBright,
     correct: palette.correctD,
     correctTint: palette.correctTintD,
     wrong: palette.wrongD,
@@ -168,21 +168,21 @@ export const radius = {
 } as const;
 
 /**
- * Brand symbol geometry — bespoke vector art, 100×100 viewBox.
- * Fire is a teardrop pointing up; water a teardrop pointing down (genuine opposites).
- * The master mark places them either side of a warm→cool bridge to express equilibrium.
+ * Brand symbol geometry — 100×100 viewBox.
+ * Symbol A is a filled circle; symbol B is an outlined ring (same outer radius).
+ * The mark is a single circle split vertically: left half A, right half B.
  */
 export const symbols = {
   viewBox: '0 0 100 100',
-  fire: {
-    path: 'M50 8 C57 18 74 34 74 54 C74 70 63 84 50 84 C37 84 26 70 26 54 C26 34 43 18 50 8 Z',
-    fill: palette.fireDisc,
+  a: {
+    circle: { cx: 50, cy: 50, r: 42 },
+    fill: palette.amberDisc,
   },
-  water: {
-    path: 'M50 92 C43 82 26 66 26 46 C26 30 37 16 50 16 C63 16 74 30 74 46 C74 66 57 82 50 92 Z',
-    fill: palette.water,
+  b: {
+    circle: { cx: 50, cy: 50, r: 36, strokeWidth: 12 },
+    stroke: palette.teal,
   },
 } as const;
 
-/** The two playable symbols, encoded as the engine encodes them (0 = fire, 1 = water). */
-export const SYMBOL = { fire: 0, water: 1 } as const;
+/** The two playable symbols, encoded as the engine encodes them (0 = A, 1 = B). */
+export const SYMBOL = { a: 0, b: 1 } as const;

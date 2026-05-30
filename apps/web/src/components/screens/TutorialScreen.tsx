@@ -98,7 +98,7 @@ function Demo3() {
 const STEPS = [
   {
     title: "Two symbols",
-    body: "Every cell holds either fire or water. Tap a cell to place one, tap again to switch.",
+    body: "Every cell holds one of two symbols. Tap a cell to place one, tap again to switch.",
     Demo: Demo0,
   },
   {
@@ -108,7 +108,7 @@ const STEPS = [
   },
   {
     title: "Balanced lines",
-    body: "Each row and each column must hold an equal count of fire and water.",
+    body: "Each row and each column must hold an equal count of each symbol.",
     Demo: Demo2,
   },
   {
@@ -308,7 +308,7 @@ function TutorialWin({ time, solution }: { time: string; solution: number[][] })
         {/* Mini solved board */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 5, marginBottom: 32 }}>
           {solution.flat().map((sym, i) => (
-            <div key={i} style={{ width: 40, height: 40, borderRadius: "var(--radius-cell)", background: sym === 0 ? "var(--symbol-fire)" : "var(--symbol-water)", opacity: 0.9 }} />
+            <div key={i} style={{ width: 40, height: 40, borderRadius: "var(--radius-cell)", background: sym === 0 ? "var(--symbol-a)" : "var(--symbol-b)", opacity: 0.9 }} />
           ))}
         </div>
 
@@ -327,7 +327,7 @@ export function TutorialScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    localStorage.setItem("parity-tutorial-seen", "1");
+    localStorage.setItem("halve-tutorial-seen", "1");
   }, []);
 
   return (
