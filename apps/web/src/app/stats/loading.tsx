@@ -17,8 +17,11 @@ export default function StatsLoading() {
       </header>
 
       <div style={{ flex: 1, padding: "24px 24px 40px", display: "flex", flexDirection: "column", gap: 24 }}>
-        {/* Name */}
-        <div style={{ ...SKEL, width: 120, height: 32, borderRadius: "var(--radius-lg)", marginTop: 8 }} />
+        {/* Profile — matches two-line layout (name + solve count) */}
+        <div style={{ marginTop: 12 }}>
+          <div style={{ ...SKEL, width: "42%", height: 26, borderRadius: "var(--radius-sm)" }} />
+          <div style={{ ...SKEL, width: 110, height: 13, borderRadius: "var(--radius-sm)", marginTop: 8 }} />
+        </div>
 
         {/* Stat tiles row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

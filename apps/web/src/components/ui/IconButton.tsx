@@ -46,6 +46,15 @@ export function IconButton({ label, onClick, disabled, size = 48, children }: Ic
       onMouseUp={(e) => {
         e.currentTarget.style.transform = "scale(1)";
       }}
+      onTouchStart={(e) => {
+        if (!disabled) e.currentTarget.style.transform = "scale(0.91)";
+      }}
+      onTouchEnd={(e) => {
+        e.currentTarget.style.transform = "scale(1)";
+      }}
+      onTouchCancel={(e) => {
+        e.currentTarget.style.transform = "scale(1)";
+      }}
     >
       {children}
     </button>

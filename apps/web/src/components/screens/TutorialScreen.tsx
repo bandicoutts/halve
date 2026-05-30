@@ -183,7 +183,7 @@ function TutorialSteps({ onPlay, onBack }: TutorialStepsProps) {
         }
         title={<span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)" }}>How to play</span>}
         right={
-          <button onClick={onPlay} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "var(--fg-3)", padding: "0 4px" }}>
+          <button onClick={onPlay} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "var(--fg-3)", padding: "0 8px", height: 44, display: "flex", alignItems: "center", fontFamily: "var(--font-sans)" }}>
             Skip
           </button>
         }

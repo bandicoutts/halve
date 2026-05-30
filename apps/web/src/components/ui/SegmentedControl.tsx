@@ -40,6 +40,9 @@ export function SegmentedControl({ options, value, onChange }: SegmentedControlP
               transition: "all 0.15s",
               padding: "0 16px",
             }}
+            onTouchStart={(e) => { e.currentTarget.style.transform = "scale(0.96)"; }}
+            onTouchEnd={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+            onTouchCancel={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
           >
             {opt}
           </button>
