@@ -366,6 +366,12 @@ authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
 
+# Internal cron-only minter. No gateway JWT: it's idempotent, exposes no data,
+# and only ever writes today's puzzle row. It authenticates to the DB via the
+# auto-injected SUPABASE_SERVICE_ROLE_KEY, not a caller token.
+[functions.daily-puzzle]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.
