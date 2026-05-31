@@ -15,6 +15,7 @@ export default async function Home() {
   let solvedToday = false;
   let solveDurationMs: number | undefined;
   let displayName: string | undefined;
+  let userId: string | undefined;
 
   // Gate "today" by the user's local calendar day — the SAME source streaks use
   // (getLocalToday reads the tz_date cookie). Computed on the server and the hero
@@ -39,15 +40,7 @@ export default async function Home() {
     ]);
 
     isAuthenticated = !!user;
-    if (user) {
-      // Initial for the account avatar in the TopBar; falls back to the email.
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("display_name")
-        .eq("id", user.id)
-        .maybeSingle();
-      displayName = profile?.display_name ?? user.email ?? undefined;
-    }
+    userId = user?.id;
     if (todayPuzzle) {
       difficulty = todayPuzzle.difficulty;
       todayPuzzleId = todayPuzzle.id;
@@ -59,18 +52,26 @@ export default async function Home() {
       lastDifficulty = lastPast?.difficulty ?? undefined;
     }
 
-    // Has the user already solved today's puzzle? Checked by puzzle_id so it's
-    // timezone-agnostic. Drives the home hero's solved-confirmation state.
-    if (user && todayPuzzleId) {
-      const { data: solveRow } = await supabase
-        .from("solves")
-        .select("duration_ms")
-        .eq("user_id", user.id)
-        .eq("puzzle_id", todayPuzzleId)
-        .maybeSingle();
-      if (solveRow) {
+    // Round 2: the profile (account avatar initial) and today's solve check both
+    // depend only on `user` (+ the puzzle id we now have), so run them in one
+    // parallel batch instead of serially (NXT-3). The solve is keyed by puzzle_id
+    // so it's timezone-agnostic; it drives the hero's solved-confirmation state.
+    if (user) {
+      const [{ data: profile }, solve] = await Promise.all([
+        supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
+        todayPuzzleId
+          ? supabase
+              .from("solves")
+              .select("duration_ms")
+              .eq("user_id", user.id)
+              .eq("puzzle_id", todayPuzzleId)
+              .maybeSingle()
+          : Promise.resolve({ data: null }),
+      ]);
+      displayName = profile?.display_name ?? user.email ?? undefined;
+      if (solve.data) {
         solvedToday = true;
-        solveDurationMs = solveRow.duration_ms ?? undefined;
+        solveDurationMs = solve.data.duration_ms ?? undefined;
       }
     }
   } catch {
@@ -90,9 +91,9 @@ export default async function Home() {
       solvedToday={solvedToday}
       solveDurationMs={solveDurationMs}
       streakBand={
-        isAuthenticated ? (
+        isAuthenticated && userId ? (
           <Suspense fallback={<div style={{ height: 66 }} />}>
-            <HomeUserContent puzzleId={todayPuzzleId} solvedToday={solvedToday} />
+            <HomeUserContent userId={userId} today={today} solvedToday={solvedToday} />
           </Suspense>
         ) : null
       }

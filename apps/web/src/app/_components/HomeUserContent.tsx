@@ -1,28 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { getLocalToday, solveDay } from "@/lib/local-date";
-
-/** Offset a YYYY-MM-DD string by `delta` days without timezone conversion. */
-function offsetDay(date: string, delta: number): string {
-  const d = new Date(date + "T00:00:00");
-  d.setDate(d.getDate() + delta);
-  return d.toLocaleDateString("en-CA");
-}
-
-function computeStreak(days: string[], today: string): number {
-  const set = new Set(days);
-  let streak = 0;
-  let cur = today;
-  while (set.has(cur)) {
-    streak++;
-    cur = offsetDay(cur, -1);
-  }
-  return streak;
-}
-
-function computeLast7(days: string[], today: string): boolean[] {
-  const set = new Set(days);
-  return Array.from({ length: 7 }, (_, i) => set.has(offsetDay(today, -(6 - i))));
-}
+import { solveDay } from "@/lib/local-date";
+import { computeStreak, computeLastDays } from "@/lib/streak";
 
 function FlameIcon() {
   return (
@@ -106,23 +84,22 @@ function StreakBand({
 }
 
 interface Props {
-  puzzleId?: string;
+  /** Authenticated user id, resolved once by the parent (page.tsx) — avoids a
+   *  redundant getUser() round-trip inside this streamed Suspense child (NXT-2). */
+  userId: string;
+  /** The user's local calendar day, already resolved by the parent (NXT-2). */
+  today: string;
   solvedToday?: boolean;
 }
 
-export async function HomeUserContent({ puzzleId: _puzzleId, solvedToday }: Props) {
+export async function HomeUserContent({ userId, today, solvedToday }: Props) {
   try {
     const supabase = await createClient();
-    const today = await getLocalToday();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return null;
 
     const { data } = await supabase
       .from("solves")
       .select("solved_at, local_date")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("solved_at", { ascending: false });
 
     const rows = data ?? [];
@@ -130,7 +107,7 @@ export async function HomeUserContent({ puzzleId: _puzzleId, solvedToday }: Prop
     const streak = computeStreak(days, today);
     if (streak <= 0) return null;
 
-    const last7 = computeLast7(days, today);
+    const last7 = computeLastDays(days, today, 7);
     return <StreakBand streak={streak} last7={last7} solvedToday={solvedToday} />;
   } catch {
     return null;

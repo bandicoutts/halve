@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getLocalToday, solveDay } from "@/lib/local-date";
+import { computeStreak, computeLongestStreak, computeLastDays } from "@/lib/streak";
 import { StatsScreen } from "@/components/screens/StatsScreen";
 
 export interface UserStats {
@@ -14,45 +15,6 @@ export interface UserStats {
   last14Days: boolean[];
   /** Counts per bucket: <2m, 2–3m, 3–4m, 4–5m, 5–6m, 6+m */
   timeDist: number[];
-}
-
-/** Offset a YYYY-MM-DD string by `delta` days without timezone conversion. */
-function offsetDay(date: string, delta: number): string {
-  const d = new Date(date + "T00:00:00");
-  d.setDate(d.getDate() + delta);
-  return d.toLocaleDateString("en-CA");
-}
-
-function computeStreak(days: string[], today: string): number {
-  const set = new Set(days);
-  let n = 0;
-  let cur = today;
-  while (set.has(cur)) {
-    n++;
-    cur = offsetDay(cur, -1);
-  }
-  return n;
-}
-
-function computeLongestStreak(days: string[]): number {
-  if (!days.length) return 0;
-  const sorted = [...days].sort();
-  let longest = 1, cur = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    const diff = Math.round(
-      (new Date(sorted[i]).getTime() - new Date(sorted[i - 1]).getTime()) / 86400000
-    );
-    if (diff === 1) { cur++; if (cur > longest) longest = cur; }
-    else if (diff > 1) cur = 1;
-  }
-  return longest;
-}
-
-function computeLast14(days: string[], today: string): boolean[] {
-  const set = new Set(days);
-  return Array.from({ length: 14 }, (_, i) => {
-    return set.has(offsetDay(today, -(13 - i)));
-  });
 }
 
 function computeTimeDist(durations: number[]): number[] {
@@ -103,7 +65,7 @@ export default async function StatsPage() {
         totalSolved: rows.length,
         avgTimeSecs: avg,
         bestTimeSecs: best,
-        last14Days: computeLast14(days, today),
+        last14Days: computeLastDays(days, today, 14),
         timeDist: computeTimeDist(durations),
       };
     }

@@ -17,7 +17,8 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 2. ✅ **Accessibility P1s** — A11Y-1 (grid semantics), A11Y-2 (live regions), A11Y-3 (modal focus-trap). Shipped — see entries below.
 3. ✅ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Consumer pages + hero label now use the single `getLocalToday()` clock; `local-date.ts` unit-tested. *(Edge-function minting side stays under EPIC-A; BE-3 backfill migration written + applied 2026-05-31.)*
 4. ✅ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-2, CQ-1/3 (+CQ-5, BE-5). One canonical `generateDaily(date)` policy in `@parity/engine` now drives every producer; redundant web seeder deleted; edge function + `/play` fallback are date-deterministic; cron-failure monitor added. *(Edge function deployed + monitor migration applied 2026-05-31; cron re-verified.)*
-5. ⬜ **Remaining P2/P3** — SEC-2/3/4, NXT-2/3/4, BE-4, DS-1 (+DS-2/3/4), CQ-2/5/6, A11Y-7/9/10/11, ENG-2/4, SEC-5/6/7, BE-5, NXT-5/6.
+5. ✅ **Streak + home perf** — CQ-2 (extract tested `lib/streak.ts`), NXT-2 (home redundant getUser + unbounded fetch), NXT-3 (sequential→parallel home queries). Shipped — see entries below.
+6. ⬜ **Remaining P2/P3** — SEC-2/3/4, NXT-4, BE-4, DS-1 (+DS-2/3/4), CQ-6, A11Y-7/9/10/11, ENG-2/4, SEC-5/6/7, NXT-5/6.
 
 **Guardrail (don't auto-do):** `git push`, applying DB migrations to the live DB, deploying the edge function, Vercel/Supabase config. Write the code; surface these for sign-off.
 
@@ -31,8 +32,8 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 | Design system | 🟢 strong | 0 | 1 | 3 |
 | Security | 🟡 adequate | 1 | 3 | 3 |
 | Backend / data | 🟢 strong | 0 | 1 | 1 |
-| Next.js / performance | 🟡 adequate | 0 | 3 | 2 |
-| Code quality / tests | 🟡 adequate | 0 | 1 | 1 |
+| Next.js / performance | 🟡 adequate | 0 | 1 | 2 |
+| Code quality / tests | 🟢 strong | 0 | 0 | 1 |
 | Accessibility | 🟠 needs-work | 0 | 4 | 4 |
 
 **Independent engine verification (2026-05-31):** a from-scratch rule-checker + backtracking solution-counter (no engine internals) over **360 puzzles** (120 each easy/medium/hard) found 0 rule violations, 0 non-unique, 0 givens-not-⊆-solution, 0 non-deterministic, correct difficulty distribution. Puzzle correctness is confirmed.
@@ -96,8 +97,8 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 
 ## Next.js / performance 🟡
 - [x] **NXT-1 · P1** — **Done.** Removed the client-side `todayLabel()` (`new Date()` at render) from `HomeScreen`; the label is now computed server-side via `formatDateLabel(await getLocalToday())` in `page.tsx` and passed as the `todayLabel` prop. Deterministic, UTC-pinned → no SSR/CSR mismatch. Verified live (hero "SUNDAY, MAY 31", clean reload).
-- [ ] **NXT-2 · P2** — Home: redundant `getUser()` + unbounded all-solves fetch in the Suspense child. `HomeUserContent.tsx:117-126` vs `page.tsx:35-68`.
-- [ ] **NXT-3 · P2** — Home shell blocks on sequential queries, undercutting Suspense streaming. `page.tsx:35-68`. Fold profile query into the `Promise.all`.
+- [x] **NXT-2 · P2** — **Done.** The streamed `HomeUserContent` Suspense child ran its own `getUser()` + `getLocalToday()`, both already resolved by `page.tsx`. It now takes `userId` + `today` as props (no second auth round-trip on the streamed path); the slow all-solves fetch stays in the child so it still streams after the shell. `_components/HomeUserContent.tsx`, `page.tsx`.
+- [x] **NXT-3 · P2** — **Done.** The home shell ran the `profiles` lookup and today's-solve check as two *sequential* round-trips after the main `Promise.all`; both depend only on `user` (+ the already-known puzzle id), so they're now a single parallel `Promise.all` — three serial DB hops → two. `page.tsx`.
 - [ ] **NXT-4 · P2** — No `error.tsx` / `not-found.tsx` anywhere; render throws hit React's default overlay. `apps/web/src/app/`. Add branded boundaries; `notFound()` for missing puzzles.
 - [ ] **NXT-5 · P3** — Board layout shift: default `cellSize=48` then post-mount resize. `BoardScreen.tsx:256-266`. Size via CSS `clamp()`/aspect-ratio.
 - [ ] **NXT-6 · P3** — `proxy` runs `getUser()` on `/api` + server-action requests. `proxy.ts:5-8`. Narrow the matcher to exclude `/api`.
@@ -110,7 +111,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 
 ## Code quality / tests 🟡
 - [x] **CQ-1 · P1** — **Done (EPIC-A).** Deleted the divergent `apps/web/scripts/seed-puzzles.mts`; the sole remaining seeder `scripts/seed-puzzles.ts` shares the `generateDaily` policy with the edge function and `/play`, so all producers agree.
-- [ ] **CQ-2 · P2** — Streak logic duplicated verbatim across two files, zero tests (the core metric). `stats/page.tsx:19-56`, `HomeUserContent.tsx:4-25`. Extract to tested `lib/streak.ts`.
+- [x] **CQ-2 · P2** — **Done.** Streak math extracted to `apps/web/src/lib/streak.ts` (`offsetDay`, `computeStreak`, `computeLongestStreak`, `computeLastDays`) — the single source for both the home band and stats. 20 vitest cases (`streak.test.ts`): build-up, gaps, today-safe, longest-across-gaps, last-N windowing, and `solveDay` local-date bucketing (stored + legacy-null paths). `computeStreak` is now **today-safe** (counts from yesterday when today isn't solved yet) — a deliberate correctness fix so the streak/band no longer reads 0 before you've solved on a given day. 30 web tests pass.
 - [x] **CQ-3 · P2** — **Done (EPIC-A).** `/play` fallback now uses `generateDaily(today).puzzle` (deterministic, canonical for the date) and logs loudly when the DB row is missing. `puzzleId` is still undefined for a genuine offline fallback (no DB row exists to record against — surfaced via `isOffline` + the log), which is correct.
 - [x] **CQ-4 · P3** — **Done.** Removed the empty `apps/web/src/app/auth/callback/` directory.
 - [x] **CQ-5 · P3** — **Done (EPIC-A).** Resolved by deleting `apps/web/scripts/seed-puzzles.mts` — the file holding both `as any` casts no longer exists.
