@@ -13,6 +13,7 @@ export default async function Home() {
   let lastDifficulty: string | undefined;
   let solvedToday = false;
   let solveDurationMs: number | undefined;
+  let displayName: string | undefined;
 
   try {
     const supabase = await createClient();
@@ -31,6 +32,15 @@ export default async function Home() {
     ]);
 
     isAuthenticated = !!user;
+    if (user) {
+      // Initial for the account avatar in the TopBar; falls back to the email.
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      displayName = profile?.display_name ?? user.email ?? undefined;
+    }
     if (todayPuzzle) {
       difficulty = todayPuzzle.difficulty;
       todayPuzzleId = todayPuzzle.id;
@@ -66,6 +76,7 @@ export default async function Home() {
       puzzleNumber={puzzleNumber}
       fetchError={fetchError}
       isAuthenticated={isAuthenticated}
+      displayName={displayName}
       archiveCount={archiveCount}
       lastDifficulty={lastDifficulty}
       solvedToday={solvedToday}

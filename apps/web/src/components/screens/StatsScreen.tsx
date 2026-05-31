@@ -8,6 +8,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
 import { Mark } from "@/components/symbols/Mark";
+import { Monogram } from "@/components/ui/Monogram";
 import Link from "next/link";
 import type { UserStats } from "@/app/stats/page";
 
@@ -27,27 +28,22 @@ function FlameIcon({ size = 18, color = "var(--accent)" }: { size?: number; colo
   );
 }
 
+function SignOutIcon() {
+  return (
+    <svg width={17} height={17} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
+
 const DIST_LABELS = ["<2m", "2–3", "3–4", "4–5", "5–6", "6+m"];
 
 function fmtSecs(s: number | null): string {
   if (s == null) return "—";
   const m = Math.floor(s / 60);
   return `${m}:${String(s % 60).padStart(2, "0")}`;
-}
-
-// ─── Monogram avatar ─────────────────────────────────────────────────────────
-
-function Monogram({ name, size = 48 }: { name: string; size?: number }) {
-  return (
-    <span style={{
-      width: size, height: size, borderRadius: 999, flexShrink: 0,
-      background: "var(--accent-tint)", color: "var(--accent)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.42, fontWeight: 600, textTransform: "uppercase", letterSpacing: "-0.01em",
-    }}>
-      {name.slice(0, 1)}
-    </span>
-  );
 }
 
 // ─── Streak hero card ─────────────────────────────────────────────────────────
@@ -228,14 +224,21 @@ function StatsRecord({ stats, onBack }: { stats: UserStats; onBack: () => void }
         ]} />
       </div>
 
-      {/* Sign out */}
-      <div style={{ paddingTop: 28, textAlign: "center" }}>
+      {/* Sign out — bordered, unmistakable account action (this is the account page) */}
+      <div style={{ paddingTop: 32, display: "flex", justifyContent: "center" }}>
         <button
           onClick={handleSignOut}
-          style={{ background: "none", border: "none", color: "var(--fg-3)", fontSize: 13, cursor: "pointer", fontFamily: "var(--font-sans)", padding: "12px 8px", minHeight: 44, textDecoration: "underline", textUnderlineOffset: 3, transition: "color .15s" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-2)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-3)"; }}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            height: 44, padding: "0 20px",
+            background: "none", border: "1.5px solid var(--hairline-2)", borderRadius: 999,
+            color: "var(--fg-2)", fontSize: 14, fontWeight: 500,
+            cursor: "pointer", fontFamily: "var(--font-sans)", transition: "color .15s, border-color .15s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; e.currentTarget.style.borderColor = "var(--fg-3)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; e.currentTarget.style.borderColor = "var(--hairline-2)"; }}
         >
+          <SignOutIcon />
           Sign out
         </button>
       </div>

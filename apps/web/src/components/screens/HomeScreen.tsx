@@ -11,6 +11,7 @@ import { Fire } from "@/components/symbols/Fire";
 import { Water } from "@/components/symbols/Water";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { Monogram } from "@/components/ui/Monogram";
 import { formatDuration } from "@/lib/format";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -207,6 +208,8 @@ interface HomeScreenProps {
   puzzleNumber?: number;
   fetchError?: boolean;
   isAuthenticated?: boolean;
+  /** Display name (or email) of the signed-in user — drives the account avatar. */
+  displayName?: string;
   archiveCount?: number;
   lastDifficulty?: string;
   /** True once the signed-in user has solved today's puzzle. */
@@ -222,6 +225,7 @@ export function HomeScreen({
   puzzleNumber,
   fetchError,
   isAuthenticated,
+  displayName,
   archiveCount,
   lastDifficulty,
   solvedToday,
@@ -260,24 +264,22 @@ export function HomeScreen({
             {isAuthenticated ? (
               <Link
                 href="/stats"
+                aria-label="Your account and stats"
                 style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: "var(--fg-2)",
-                  textDecoration: "none",
-                  height: 40,
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
-                  padding: "0 4px",
+                  justifyContent: "center",
+                  borderRadius: 999,
+                  transition: "box-shadow .15s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--fg-1)";
+                  e.currentTarget.style.boxShadow = "0 0 0 2px var(--accent-tint)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--fg-2)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                Stats
+                <Monogram name={displayName || "?"} size={32} />
               </Link>
             ) : (
               <Link
