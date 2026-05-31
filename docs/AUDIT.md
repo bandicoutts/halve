@@ -16,7 +16,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 1. ✅ **Quick-wins** — SEC-1, A11Y-4/5/6/8, CQ-4 *(commits `07cc982`, `318bab0`)*
 2. ✅ **Accessibility P1s** — A11Y-1 (grid semantics), A11Y-2 (live regions), A11Y-3 (modal focus-trap). Shipped — see entries below.
 3. ✅ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Consumer pages + hero label now use the single `getLocalToday()` clock; `local-date.ts` unit-tested. *(Edge-function minting side stays under EPIC-A; BE-3 backfill migration written + applied 2026-05-31.)*
-4. ✅ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-2, CQ-1/3 (+CQ-5, BE-5). One canonical `generateDaily(date)` policy in `@parity/engine` now drives every producer; redundant web seeder deleted; edge function + `/play` fallback are date-deterministic; cron-failure monitor migration written. *(Edge-function + monitor migration are write-only — await deploy/apply sign-off.)*
+4. ✅ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-2, CQ-1/3 (+CQ-5, BE-5). One canonical `generateDaily(date)` policy in `@parity/engine` now drives every producer; redundant web seeder deleted; edge function + `/play` fallback are date-deterministic; cron-failure monitor added. *(Edge function deployed + monitor migration applied 2026-05-31; cron re-verified.)*
 5. ⬜ **Remaining P2/P3** — SEC-2/3/4, NXT-2/3/4, BE-4, DS-1 (+DS-2/3/4), CQ-2/5/6, A11Y-7/9/10/11, ENG-2/4, SEC-5/6/7, BE-5, NXT-5/6.
 
 **Guardrail (don't auto-do):** `git push`, applying DB migrations to the live DB, deploying the edge function, Vercel/Supabase config. Write the code; surface these for sign-off.
@@ -41,11 +41,11 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 
 ## ⭐ Cross-cutting epics (fix these as units)
 
-### EPIC-A — Daily-puzzle pipeline: no single source of truth, no monitoring — ✅ done (deploy/apply pending)
+### EPIC-A — Daily-puzzle pipeline: no single source of truth, no monitoring — ✅ done (deployed + applied 2026-05-31)
 Groups SEC-2, BE-1, BE-2, CQ-1, CQ-3, ENG-1, ENG-3. The CLI seeder, the second web seeder, the edge function, and the `/play` fallback each derive "today's puzzle" differently (different seeds, different difficulty, one uses `Math.random`); the cron is fire-and-forget with no alerting; the fallback is non-deterministic with no `puzzleId` so solves silently fail and streaks break unseen.
 - [x] **Consolidate to ONE seed+difficulty policy** — new `packages/engine/src/daily.ts`: `dailyPolicy(date)` (FNV seed + `easy/medium/hard/medium` cadence from the 2026-01-01 epoch) and `generateDaily(date)` (retries on a fresh deterministic seed, returns `usedSeed`). Re-vendored into the Deno engine via `sync-engine.sh`. 12 unit tests in `daily.test.ts` (determinism, cadence, DST-proof day index, reproducibility, rule-valid+unique output).
-- [x] **Edge function: derive seed from the date; retry before 500** — `daily-puzzle/index.ts` now calls `generateDaily(today)` (no more `Math.random`) and stores `usedSeed`; only 500s after `generateDaily` exhausts its retries. *(Write-only — awaits deploy.)*
-- [x] **Cron: capture the response and alert on non-2xx / missing daily row** — migration `20260531040000_monitor_daily_puzzle.sql`: cron now records the pg_net request id; a 00:15 `check_daily_puzzle()` monitor writes to `public.ops_alert` + `RAISE WARNING` when today's row is missing or the call was non-2xx. *(Write-only — awaits apply.)*
+- [x] **Edge function: derive seed from the date; retry before 500** — `daily-puzzle/index.ts` now calls `generateDaily(today)` (no more `Math.random`) and stores `usedSeed`; only 500s after `generateDaily` exhausts its retries. *(Deployed 2026-05-31; POST returns 200.)*
+- [x] **Cron: capture the response and alert on non-2xx / missing daily row** — migration `20260531040000_monitor_daily_puzzle.sql`: cron now records the pg_net request id; a 00:15 `check_daily_puzzle()` monitor writes to `public.ops_alert` + `RAISE WARNING` when today's row is missing or the call was non-2xx. *(Applied 2026-05-31; monitor verified clean.)*
 - [x] **`/play` fallback: deterministic + loud guard** — `play/page.tsx` seeds the offline fallback from `generateDaily(today)` (canonical puzzle, not random) and `console.error`s loudly when the row is genuinely absent vs a DB outage. Verified live: `/play` 200, valid 6×6 grid.
 - [x] **Delete the redundant seed script; correct the stale DECISIONS.md claims** — deleted `apps/web/scripts/seed-puzzles.mts` (+ its `seed` npm script; removes the CQ-5 `as any` casts); `scripts/seed-puzzles.ts` rewired onto `generateDaily`. DECISIONS corrected (EPIC-A entry + inline supersede notes).
 - *Out of scope (stays open):* **SEC-2** (edge fn `verify_jwt=false` + no rate limit) — orthogonal to the seed/monitoring consolidation; tracked under Security.
@@ -61,7 +61,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 ## Engine 🟢
 - [x] **ENG-1 · P2** — **Done (EPIC-A).** All producers now derive seed + difficulty from the single `generateDaily(date)` policy in `packages/engine/src/daily.ts`. The redundant `apps/web/scripts/seed-puzzles.mts` was deleted.
 - [ ] **ENG-2 · P2** — Uniqueness/deduction guarantees are self-referential (generator + tests share `wouldViolate`). Add a committed test that counts solutions with an independent brute-forcer. *(Partially de-risked by the 2026-05-31 independent run; still want it in CI.)* `packages/engine` test suite.
-- [x] **ENG-3 · P3** — **Done (EPIC-A).** Edge function now seeds from the date via `generateDaily(today)` (no `Math.random`). Write-only — awaits deploy.
+- [x] **ENG-3 · P3** — **Done (EPIC-A).** Edge function now seeds from the date via `generateDaily(today)` (no `Math.random`). Deployed + verified 2026-05-31.
 - [ ] **ENG-4 · P3** — `parseGridSpec` doesn't integer-check `r`/`c`, nor cross-check givens⊆solution / edge⇔solution. `apps/web/src/lib/grid-spec.ts:38-45`.
 
 ## Security 🟡
@@ -88,10 +88,10 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 
 ## Backend / data 🟡
 - [x] **BE-1 · P1** — **Done (consumer side).** All three consumer pages (`page.tsx`, `play/page.tsx`, `play/[date]/page.tsx`) now gate by `await getLocalToday()` — the same cookie-backed local-day clock streaks use — so the served puzzle's date == the streak's "today". Covered by `local-date.test.ts`. *The edge function (`daily-puzzle/index.ts:13`) mints by UTC with no user cookie; that producer-side policy is folded into EPIC-A and left unchanged here.*
-- [x] **BE-2 · P1** — **Done (EPIC-A; apply pending).** Migration `20260531040000_monitor_daily_puzzle.sql` captures the cron's pg_net request id and runs a 00:15 `check_daily_puzzle()` monitor that writes to `public.ops_alert` + `RAISE WARNING` on a missing row / non-2xx. `/play` also `console.error`s loudly when today's row is absent. Write-only — awaits manual apply.
+- [x] **BE-2 · P1** — **Done (EPIC-A; apply pending).** Migration `20260531040000_monitor_daily_puzzle.sql` captures the cron's pg_net request id and runs a 00:15 `check_daily_puzzle()` monitor that writes to `public.ops_alert` + `RAISE WARNING` on a missing row / non-2xx. `/play` also `console.error`s loudly when today's row is absent. Applied + verified 2026-05-31 (monitor runs clean, `ops_alert` empty).
 - [x] **BE-3 · P2** — **Done (documented + backfill written; apply needs sign-off).** `solveDay()` now carries an explicit BOUNDARY CAVEAT comment explaining the unrecoverable-local-date limit and why legacy rows stay UTC-bucketed. Backfill migration `20260531030000_backfill_local_date.sql` populates `local_date := (solved_at at time zone 'UTC')::date` for null rows (idempotent) — **awaits manual apply** (see deploy notes). Covered by `solveDay` tests in `local-date.test.ts`.
 - [ ] **BE-4 · P2** — No index on `solves.local_date` (latent; only matters once a date-filtered query is added). Add `(user_id, local_date)` when needed.
-- [x] **BE-5 · P3** — **Done (EPIC-A; deploy pending).** The cron/edge function now mints via `generateDaily`, which applies the `easy/medium/hard/medium` cadence from `dailyPolicy` instead of hardcoding `medium`. Write-only — awaits deploy.
+- [x] **BE-5 · P3** — **Done (EPIC-A).** The cron/edge function now mints via `generateDaily`, which applies the `easy/medium/hard/medium` cadence from `dailyPolicy` instead of hardcoding `medium`. Deployed 2026-05-31.
 
 ## Next.js / performance 🟡
 - [x] **NXT-1 · P1** — **Done.** Removed the client-side `todayLabel()` (`new Date()` at render) from `HomeScreen`; the label is now computed server-side via `formatDateLabel(await getLocalToday())` in `page.tsx` and passed as the `todayLabel` prop. Deterministic, UTC-pinned → no SSR/CSR mismatch. Verified live (hero "SUNDAY, MAY 31", clean reload).
@@ -121,7 +121,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - Confirm `SUPABASE_SERVICE_ROLE_KEY` is **not** in the Vercel prod/preview env. *(Confirmed 2026-05-31: only the two public keys are set — ✅.)*
 - Any new **DB migration** must be reviewed and applied to Supabase manually:
   - **BE-3 backfill** — `20260531030000_backfill_local_date.sql` — ✅ **applied 2026-05-31** (main pushed).
-  - **BE-2 monitor (EPIC-A)** — `20260531040000_monitor_daily_puzzle.sql` — ⏳ written, **awaiting apply** (creates `ops_alert` + `daily_puzzle_cron_run`, re-schedules the cron to capture the request id, adds the 00:15 `check_daily_puzzle` monitor).
+  - **BE-2 monitor (EPIC-A)** — `20260531040000_monitor_daily_puzzle.sql` — ✅ **applied 2026-05-31** (`supabase db push`). Created `ops_alert` + `daily_puzzle_cron_run`, re-scheduled the cron to capture the pg_net request id, added the 00:15 `check_daily_puzzle` monitor. Verified: `check_daily_puzzle()` runs clean (HTTP 204), `ops_alert` empty (no false alarm — today's row present).
   - SEC-3 CHECK, BE-4 index — still to be written.
-- **Edge-function** changes (EPIC-A `daily-puzzle/index.ts`, re-vendored engine) require redeploy + cron re-verification. **Not deployed; not synced to prod** — awaiting sign-off.
+- **Edge-function** changes (EPIC-A `daily-puzzle/index.ts`, re-vendored engine) — ✅ **deployed 2026-05-31** (`supabase functions deploy daily-puzzle`). Verified: POST returns `200 {ok,skipped}` (boots cleanly under Deno → the new `generateDaily` import resolves); the canonical `dailyPolicy('2026-05-31')` reproduces the **exact** seed (3485160892) + difficulty (hard) already in the prod `puzzles` row, so the deploy is consistent with seeded data through 2026-12-31.
 - `npm/pnpm audit` (SEC-7) and bumps should run in an unsandboxed context.
