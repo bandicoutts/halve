@@ -38,11 +38,17 @@ export async function recordSolve(input: RecordSolveInput): Promise<RecordSolveR
   // Load puzzle server-side — the solution never needs to leave the server
   const { data: puzzle } = await supabase
     .from("puzzles")
-    .select("id, grid_spec")
+    .select("id, date, grid_spec")
     .eq("id", puzzleId)
     .maybeSingle();
 
   if (!puzzle) return { ok: false };
+
+  // Reject solves for puzzles dated in the future. Future puzzles are readable
+  // (RLS allows select), so without this a client could pull tomorrow's solution
+  // from grid_spec and pre-record a solve to inflate streaks.
+  const todayUtc = new Date().toISOString().slice(0, 10);
+  if (!puzzle.date || puzzle.date > todayUtc) return { ok: false };
 
   const spec = parseGridSpec(puzzle.grid_spec);
   if (!spec) return { ok: false };

@@ -110,6 +110,10 @@ export interface WinScreenProps {
   difficulty: string;
   streak?: number;
   nextIn?: string;
+  /** True when recording the solve failed — shows a retry prompt. */
+  saveError?: boolean;
+  /** Re-attempts the solve insert. */
+  onRetrySave?: () => void;
   onClose: () => void;
   onSecondary: () => void;
 }
@@ -124,6 +128,8 @@ export function WinScreen({
   difficulty,
   streak,
   nextIn,
+  saveError,
+  onRetrySave,
   onClose,
   onSecondary,
 }: WinScreenProps) {
@@ -331,6 +337,44 @@ export function WinScreen({
           </div>
 
           <div style={{ flex: 1, minHeight: 24 }} />
+
+          {/* Save failure — solve wasn't recorded; offer a retry */}
+          {saveError && (
+            <div
+              style={{
+                width: "100%",
+                marginTop: 16,
+                padding: "12px 14px",
+                background: "var(--surface)",
+                border: "1px solid var(--hairline)",
+                borderRadius: "var(--radius-lg)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <span style={{ fontSize: 13, color: "var(--fg-2)" }}>
+                Couldn&apos;t save your result — check your connection.
+              </span>
+              <button
+                onClick={onRetrySave}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--accent)",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontFamily: "var(--font-sans)",
+                  padding: 0,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
 
           {/* Actions */}
           <div

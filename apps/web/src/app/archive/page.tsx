@@ -31,12 +31,14 @@ export default async function ArchivePage() {
     const solveTimeMap = new Map<string, number>();
 
     if (user && rows.length > 0) {
-      const ids = rows.map((r) => r.id);
+      // Fetch all the user's solves rather than filtering by puzzle id. A
+      // `.in("puzzle_id", ids)` filter encodes every UUID into the request URL,
+      // which silently breaks past ~200 puzzles (PostgREST/proxy URL limits).
+      // RLS already restricts rows to this user; we intersect in memory below.
       const { data: solves } = await supabase
         .from("solves")
         .select("puzzle_id, duration_ms")
-        .eq("user_id", user.id)
-        .in("puzzle_id", ids);
+        .eq("user_id", user.id);
 
       for (const s of solves ?? []) {
         solvedIds.add(s.puzzle_id);

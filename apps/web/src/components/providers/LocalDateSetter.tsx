@@ -11,7 +11,9 @@ import { useEffect } from "react";
 export function LocalDateSetter() {
   useEffect(() => {
     const local = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD in local TZ
-    document.cookie = `tz_date=${local}; path=/; max-age=86400; SameSite=Lax`;
+    // Secure in production (HTTPS); omitted on http://localhost so dev still works.
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = `tz_date=${local}; path=/; max-age=86400; SameSite=Lax${secure}`;
   }, []);
   return null;
 }

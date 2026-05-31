@@ -38,6 +38,11 @@ export function parseGridSpec(raw: unknown, size = 6): StoredGridSpec | null {
     if (orientation !== "h" && orientation !== "v") return null;
     if (typeof r !== "number" || typeof c !== "number") return null;
     if (kind !== "eq" && kind !== "ne") return null;
+    // Bounds: a horizontal edge joins (r,c)-(r,c+1); a vertical edge joins
+    // (r,c)-(r+1,c). Out-of-range coords would index undefined in the renderer.
+    if (r < 0 || c < 0) return null;
+    if (orientation === "h" && (r >= size || c >= size - 1)) return null;
+    if (orientation === "v" && (r >= size - 1 || c >= size)) return null;
   }
 
   return {

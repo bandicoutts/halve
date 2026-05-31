@@ -17,13 +17,22 @@ import Link from "next/link";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+// Step one calendar day from a local YYYY-MM-DD date, staying in local time.
+// Using toLocaleDateString("en-CA") (not toISOString) keeps the date key in the
+// user's timezone — toISOString would roll back a day for any UTC+ user.
+function offsetDay(date: string, delta: number): string {
+  const d = new Date(`${date}T00:00:00`);
+  d.setDate(d.getDate() + delta);
+  return d.toLocaleDateString("en-CA");
+}
+
 function computeStreakClient(days: string[], today: string): number {
   const set = new Set(days);
   let n = 0;
-  const d = new Date(`${today}T00:00:00`);
-  while (set.has(d.toISOString().slice(0, 10))) {
+  let cur = today;
+  while (set.has(cur)) {
     n++;
-    d.setDate(d.getDate() - 1);
+    cur = offsetDay(cur, -1);
   }
   return n;
 }
@@ -162,10 +171,12 @@ export function BoardScreen({
     streak: number;
     nextIn: string;
   } | null>(null);
+  const [saveError, setSaveError] = useState(false);
   const solveRecorded = useRef(false);
   // Kept current on every render so the solve-recording effect always reads the
-  // latest cells without needing cells in its dep array.
+  // latest cells/duration without needing them in its dep array.
   const cellsRef = useRef<Grid>([]);
+  const secsRef = useRef(0);
 
   const { cells, errors, solved, canUndo, usedHint, tap, undo, hint } = useGame({
     givens: puzzle.givens,
@@ -176,6 +187,7 @@ export function BoardScreen({
   cellsRef.current = cells;
 
   const { secs, formatted } = useTimer(!solved);
+  secsRef.current = secs;
 
   useEffect(() => {
     if (solved && !showWin) {
@@ -187,54 +199,57 @@ export function BoardScreen({
     }
   }, [solved, showWin, formatted]);
 
-  // Record solve + fetch streak (daily only)
+  // Record the solve, then (daily only) fetch the streak for the win screen.
+  // Reads duration/grid from refs so it never needs them in a dep array, and is
+  // safe to call again from the win-screen Retry button after a save failure.
+  const recordAndFetch = useCallback(async () => {
+    if (!puzzleId) return;
+    setSaveError(false);
+    // Guests get a silent no-op — no solve to record, no streak to show.
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const result = await recordSolve({
+      puzzleId,
+      grid: cellsRef.current,
+      durationMs: Math.max(1, secsRef.current * 1000),
+      usedHint,
+      localDate: new Date().toLocaleDateString("en-CA"),
+    });
+
+    if (!result.ok && !result.alreadySolved) {
+      setSaveError(true);
+      return;
+    }
+
+    if (kind === "daily") {
+      const today = new Date().toLocaleDateString("en-CA");
+      const { data: solveDays } = await supabase
+        .from("solves")
+        .select("solved_at, local_date")
+        .eq("user_id", user.id);
+      const days = [
+        ...new Set(
+          (solveDays ?? []).map(
+            (r: { solved_at: string; local_date: string | null }) =>
+              r.local_date ?? r.solved_at.slice(0, 10)
+          )
+        ),
+      ] as string[];
+      setStreakData({
+        streak: computeStreakClient(days, today),
+        nextIn: computeNextIn(),
+      });
+    }
+  }, [puzzleId, usedHint, kind]);
+
+  // Record solve once when solved. solveRecorded guards against re-entry.
   useEffect(() => {
     if (!solved || solveRecorded.current || !puzzleId) return;
     solveRecorded.current = true;
-    const durationMs = Math.max(1, secs * 1000);
-    const hintUsed = usedHint;
-    const pid = puzzleId;
-    const finalGrid = cellsRef.current;
-    void (async () => {
-      // Guests get a silent no-op — no solve to record, no streak to show.
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const result = await recordSolve({
-        puzzleId: pid,
-        grid: finalGrid,
-        durationMs,
-        usedHint: hintUsed,
-        localDate: new Date().toLocaleDateString("en-CA"),
-      });
-
-      if (!result.ok && !result.alreadySolved) {
-        console.error("Failed to record solve");
-        return;
-      }
-
-      if (kind === "daily") {
-        const today = new Date().toLocaleDateString("en-CA");
-        const { data: solveDays } = await supabase
-          .from("solves")
-          .select("solved_at, local_date")
-          .eq("user_id", user.id);
-        const days = [
-          ...new Set(
-            (solveDays ?? []).map(
-              (r: { solved_at: string; local_date: string | null }) =>
-                r.local_date ?? r.solved_at.slice(0, 10)
-            )
-          ),
-        ] as string[];
-        setStreakData({
-          streak: computeStreakClient(days, today),
-          nextIn: computeNextIn(),
-        });
-      }
-    })();
-  }, [solved, puzzleId, secs, usedHint, kind]);
+    void recordAndFetch();
+  }, [solved, puzzleId, recordAndFetch]);
 
   const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
 
@@ -463,6 +478,8 @@ export function BoardScreen({
           difficulty={puzzle.difficulty}
           streak={streakData?.streak}
           nextIn={streakData?.nextIn}
+          saveError={saveError}
+          onRetrySave={() => void recordAndFetch()}
           onClose={handleBack}
           onSecondary={handleSecondary}
         />

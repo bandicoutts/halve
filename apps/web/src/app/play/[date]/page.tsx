@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { BoardScreen } from "@/components/board/BoardScreen";
 
-export const revalidate = 86400;
+// revalidate is omitted: cookies()/getUser() in createClient() force dynamic
+// rendering anyway, so an ISR directive here would be silently ignored.
 
 interface Props {
   params: Promise<{ date: string }>;
