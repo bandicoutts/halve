@@ -62,6 +62,11 @@ export default function StatsLoading() {
             <Skel h={76} r="var(--radius-lg)" delay={160} />
           </div>
 
+          {/* Sign out — pill button (paddingTop: 32, height: 44) */}
+          <div style={{ paddingTop: 32, display: "flex", justifyContent: "center" }}>
+            <Skel w={130} h={44} r="999px" delay={220} />
+          </div>
+
         </div>
       </div>
     </div>

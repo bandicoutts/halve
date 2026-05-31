@@ -16,6 +16,8 @@ export default function HomeLoading() {
       </header>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "0 24px 28px" }}>
+       {/* Content is capped + centered to match HomeScreen (HOME_MAX = 480) */}
+       <div style={{ maxWidth: 480, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", flex: 1 }}>
         {/* Hero — meta row + heading + CTA */}
         <div style={{ marginTop: 26 }}>
           <div style={{ display: "flex", gap: 9, marginBottom: 10, alignItems: "center" }}>
@@ -41,9 +43,10 @@ export default function HomeLoading() {
         <div style={{ flex: 1, minHeight: 20 }} />
 
         {/* Footer — "How to play" only */}
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 44 }}>
           <Skel w={80} h={13} delay={360} />
         </div>
+       </div>
       </div>
     </div>
   );
