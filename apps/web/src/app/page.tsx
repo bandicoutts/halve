@@ -11,6 +11,8 @@ export default async function Home() {
   let isAuthenticated = false;
   let archiveCount: number | undefined;
   let lastDifficulty: string | undefined;
+  let solvedToday = false;
+  let solveDurationMs: number | undefined;
 
   try {
     const supabase = await createClient();
@@ -39,6 +41,21 @@ export default async function Home() {
       archiveCount = pastCount;
       lastDifficulty = lastPast?.difficulty ?? undefined;
     }
+
+    // Has the user already solved today's puzzle? Checked by puzzle_id so it's
+    // timezone-agnostic. Drives the home hero's solved-confirmation state.
+    if (user && todayPuzzleId) {
+      const { data: solveRow } = await supabase
+        .from("solves")
+        .select("duration_ms")
+        .eq("user_id", user.id)
+        .eq("puzzle_id", todayPuzzleId)
+        .maybeSingle();
+      if (solveRow) {
+        solvedToday = true;
+        solveDurationMs = solveRow.duration_ms ?? undefined;
+      }
+    }
   } catch {
     fetchError = true;
   }
@@ -51,10 +68,12 @@ export default async function Home() {
       isAuthenticated={isAuthenticated}
       archiveCount={archiveCount}
       lastDifficulty={lastDifficulty}
+      solvedToday={solvedToday}
+      solveDurationMs={solveDurationMs}
       streakBand={
         isAuthenticated ? (
           <Suspense fallback={<div style={{ height: 66 }} />}>
-            <HomeUserContent puzzleId={todayPuzzleId} />
+            <HomeUserContent puzzleId={todayPuzzleId} solvedToday={solvedToday} />
           </Suspense>
         ) : null
       }

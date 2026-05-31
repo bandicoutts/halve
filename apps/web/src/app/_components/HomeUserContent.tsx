@@ -42,7 +42,15 @@ function FlameIcon() {
   );
 }
 
-function StreakBand({ streak, last7 }: { streak: number; last7: boolean[] }) {
+function StreakBand({
+  streak,
+  last7,
+  solvedToday,
+}: {
+  streak: number;
+  last7: boolean[];
+  solvedToday?: boolean;
+}) {
   return (
     <div
       style={{
@@ -77,7 +85,7 @@ function StreakBand({ streak, last7 }: { streak: number; last7: boolean[] }) {
           day streak
         </div>
         <div style={{ fontSize: 12, color: "var(--fg-3)", marginTop: 1 }}>
-          Solve today to keep it going
+          {solvedToday ? "Solved today — streak safe" : "Solve today to keep it going"}
         </div>
       </div>
       <div style={{ display: "flex", gap: 5 }}>
@@ -99,9 +107,10 @@ function StreakBand({ streak, last7 }: { streak: number; last7: boolean[] }) {
 
 interface Props {
   puzzleId?: string;
+  solvedToday?: boolean;
 }
 
-export async function HomeUserContent({ puzzleId: _puzzleId }: Props) {
+export async function HomeUserContent({ puzzleId: _puzzleId, solvedToday }: Props) {
   try {
     const supabase = await createClient();
     const today = await getLocalToday();
@@ -122,7 +131,7 @@ export async function HomeUserContent({ puzzleId: _puzzleId }: Props) {
     if (streak <= 0) return null;
 
     const last7 = computeLast7(days, today);
-    return <StreakBand streak={streak} last7={last7} />;
+    return <StreakBand streak={streak} last7={last7} solvedToday={solvedToday} />;
   } catch {
     return null;
   }

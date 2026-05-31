@@ -120,6 +120,91 @@ function todayLabel(): string {
   });
 }
 
+/** Format a solve duration (ms) as m:ss. */
+function formatDuration(ms: number): string {
+  const total = Math.max(0, Math.round(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      width={20}
+      height={20}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="var(--correct)"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+/** Completed-state hero shown once today's puzzle is solved. */
+function SolvedHero({ durationMs }: { durationMs?: number }) {
+  return (
+    <div style={{ marginTop: 22 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          padding: "16px 18px",
+          background: "var(--surface)",
+          border: "1px solid var(--hairline)",
+          borderRadius: "var(--radius-xl)",
+          boxShadow: "var(--shadow-sm)",
+        }}
+      >
+        <div
+          style={{
+            width: 38,
+            height: 38,
+            borderRadius: 999,
+            background: "var(--correct-tint, var(--accent-tint))",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <CheckIcon />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--fg-1)" }}>
+            {durationMs !== undefined ? (
+              <>
+                Solved in{" "}
+                <span className="tnum" style={{ color: "var(--correct)" }}>
+                  {formatDuration(durationMs)}
+                </span>
+              </>
+            ) : (
+              "Solved today"
+            )}
+          </div>
+          <div style={{ fontSize: 12, color: "var(--fg-3)", marginTop: 1 }}>
+            Next puzzle at midnight
+          </div>
+        </div>
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <Link href="/stats" style={{ textDecoration: "none" }}>
+          <Button variant="secondary" full>
+            See your stats
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 interface HomeScreenProps {
   difficulty?: string;
   puzzleNumber?: number;
@@ -127,6 +212,10 @@ interface HomeScreenProps {
   isAuthenticated?: boolean;
   archiveCount?: number;
   lastDifficulty?: string;
+  /** True once the signed-in user has solved today's puzzle. */
+  solvedToday?: boolean;
+  /** Duration (ms) of today's solve, when known. */
+  solveDurationMs?: number;
   /** Streamed server slot: renders StreakBand when user data resolves */
   streakBand?: ReactNode;
 }
@@ -138,6 +227,8 @@ export function HomeScreen({
   isAuthenticated,
   archiveCount,
   lastDifficulty,
+  solvedToday,
+  solveDurationMs,
   streakBand,
 }: HomeScreenProps) {
   const { theme, toggle } = useTheme();
@@ -284,8 +375,8 @@ export function HomeScreen({
             </p>
           )}
 
-          <div style={{ marginTop: 22 }}>
-            {fetchError ? (
+          {fetchError ? (
+            <div style={{ marginTop: 22 }}>
               <Button
                 variant="primary"
                 full
@@ -293,14 +384,18 @@ export function HomeScreen({
               >
                 Try again
               </Button>
-            ) : (
+            </div>
+          ) : solvedToday ? (
+            <SolvedHero durationMs={solveDurationMs} />
+          ) : (
+            <div style={{ marginTop: 22 }}>
               <Link href="/play" style={{ textDecoration: "none" }}>
                 <Button variant="primary" full>
                   Play today
                 </Button>
               </Link>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Destination cards */}
