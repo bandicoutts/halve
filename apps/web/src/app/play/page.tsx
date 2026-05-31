@@ -1,6 +1,7 @@
 import { generatePuzzle } from "@parity/engine";
 import type { Difficulty } from "@parity/engine";
 import { createClient } from "@/lib/supabase/server";
+import { getLocalToday } from "@/lib/local-date";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { BoardScreen } from "@/components/board/BoardScreen";
 
@@ -8,7 +9,9 @@ import { BoardScreen } from "@/components/board/BoardScreen";
 // so the value had no effect.
 
 export default async function PlayPage() {
-  const today = new Date().toISOString().slice(0, 10);
+  // Gate by the user's local day (same source as streaks) so the served puzzle's
+  // date matches the streak's "today" near the UTC midnight boundary (EPIC-B).
+  const today = await getLocalToday();
 
   let puzzleId: string | undefined;
   let puzzle = generatePuzzle({ size: 6, difficulty: "medium" });

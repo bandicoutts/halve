@@ -15,7 +15,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 **Suggested batch order** (✅ = shipped):
 1. ✅ **Quick-wins** — SEC-1, A11Y-4/5/6/8, CQ-4 *(commits `07cc982`, `318bab0`)*
 2. ✅ **Accessibility P1s** — A11Y-1 (grid semantics), A11Y-2 (live regions), A11Y-3 (modal focus-trap). Shipped — see entries below.
-3. ⬜ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Pure correctness (the UTC-vs-local midnight bug).
+3. ✅ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Consumer pages + hero label now use the single `getLocalToday()` clock; `local-date.ts` unit-tested. *(Edge-function minting side stays under EPIC-A; BE-3 backfill migration written, awaits sign-off.)*
 4. ⬜ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-1/2, CQ-1/3. Highest impact; writes an edge-function change (deploy stays manual).
 5. ⬜ **Remaining P2/P3** — SEC-2/3/4, NXT-2/3/4, BE-4, DS-1 (+DS-2/3/4), CQ-2/5/6, A11Y-7/9/10/11, ENG-2/4, SEC-5/6/7, BE-5, NXT-5/6.
 
@@ -30,8 +30,8 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 | Engine | 🟢 strong | 0 | 2 | 2 |
 | Design system | 🟢 strong | 0 | 1 | 3 |
 | Security | 🟡 adequate | 1 | 3 | 3 |
-| Backend / data | 🟡 adequate | 2 | 2 | 1 |
-| Next.js / performance | 🟡 adequate | 1 | 3 | 2 |
+| Backend / data | 🟡 adequate | 1 | 1 | 1 |
+| Next.js / performance | 🟡 adequate | 0 | 3 | 2 |
 | Code quality / tests | 🟡 adequate | 1 | 2 | 3 |
 | Accessibility | 🟠 needs-work | 0 | 4 | 4 |
 
@@ -49,11 +49,11 @@ Groups SEC-2, BE-1, BE-2, CQ-1, CQ-3, ENG-1, ENG-3. The CLI seeder, the second w
 - [ ] `/play` fallback: seed deterministically from the date; guard loudly when today's row is absent
 - [ ] Delete the redundant seed script; correct the stale DECISIONS.md claims
 
-### EPIC-B — One canonical clock (UTC-vs-local split)
+### EPIC-B — One canonical clock (UTC-vs-local split) — ✅ consumer side done
 Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucket by local date → UTC+ users near midnight get the N-1 puzzle for an N streak; same root cause renders `new Date()` at render → hydration mismatch.
-- [ ] Serve/gate the daily puzzle by the same `getLocalToday()` used for streaks
-- [ ] Compute the home hero date label from the server cookie or post-mount (fix hydration)
-- [ ] Add a test asserting served puzzle date == streak "today"
+- [x] **Serve/gate the daily puzzle by the same `getLocalToday()`** — `page.tsx`, `play/page.tsx`, `play/[date]/page.tsx` all replaced `new Date().toISOString()` with `await getLocalToday()` (the cookie-backed clock streaks already use). *(The edge function mints by UTC with no user cookie — that producer-side policy belongs to EPIC-A and stays as-is here.)*
+- [x] **Compute the home hero label server-side (fix hydration)** — new `formatDateLabel()` (UTC-pinned, deterministic) runs on the server in `page.tsx`; result passed to `HomeScreen` as a `todayLabel` prop. Client no longer calls `new Date()` at render. Verified live: hero reads "SUNDAY, MAY 31", page returns 200, no hydration error on a clean reload.
+- [x] **Test asserting served date == streak "today"** — extracted pure `resolveLocalToday()` from `getLocalToday()`; `apps/web/src/lib/local-date.test.ts` (10 tests, vitest now wired into `apps/web`) covers ±1-day acceptance, forged-future/malformed rejection, the served==streak invariant, `formatDateLabel`, and `solveDay`.
 
 ---
 
@@ -86,14 +86,14 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - [ ] **A11Y-11 · P3** — Fixed-px typography limits text-only zoom (no rem). App-wide; ties to DS-1.
 
 ## Backend / data 🟡
-- [ ] **BE-1 · P1** — Daily puzzle fetched/gated by UTC date while streaks use local date. `page.tsx:20`, `play/page.tsx:11`, `play/[date]/page.tsx:18`, `daily-puzzle/index.ts:13`. → *EPIC-B.*
+- [x] **BE-1 · P1** — **Done (consumer side).** All three consumer pages (`page.tsx`, `play/page.tsx`, `play/[date]/page.tsx`) now gate by `await getLocalToday()` — the same cookie-backed local-day clock streaks use — so the served puzzle's date == the streak's "today". Covered by `local-date.test.ts`. *The edge function (`daily-puzzle/index.ts:13`) mints by UTC with no user cookie; that producer-side policy is folded into EPIC-A and left unchanged here.*
 - [ ] **BE-2 · P1** — Cron fire-and-forget, no alerting; minting failure → unrecordable fallback → silent streak break. `20260531010000_*.sql:18-28`, `daily-puzzle/index.ts:29-38`, `play/page.tsx`. → *EPIC-A.*
-- [ ] **BE-3 · P2** — Mixed `null`/`local_date` rows can create phantom streak gaps for boundary users. `local-date.ts:32-34`. Backfill `local_date` or document the boundary.
+- [x] **BE-3 · P2** — **Done (documented + backfill written; apply needs sign-off).** `solveDay()` now carries an explicit BOUNDARY CAVEAT comment explaining the unrecoverable-local-date limit and why legacy rows stay UTC-bucketed. Backfill migration `20260531030000_backfill_local_date.sql` populates `local_date := (solved_at at time zone 'UTC')::date` for null rows (idempotent) — **awaits manual apply** (see deploy notes). Covered by `solveDay` tests in `local-date.test.ts`.
 - [ ] **BE-4 · P2** — No index on `solves.local_date` (latent; only matters once a date-filtered query is added). Add `(user_id, local_date)` when needed.
 - [ ] **BE-5 · P3** — Cron always mints `medium`, flattening any intended difficulty cadence. `daily-puzzle/index.ts:32`. → ties to EPIC-A.
 
 ## Next.js / performance 🟡
-- [ ] **NXT-1 · P1** — Hydration mismatch: `new Date().toLocaleDateString()` at render in an SSR'd client component. `HomeScreen.tsx:117-122`. → *EPIC-B.*
+- [x] **NXT-1 · P1** — **Done.** Removed the client-side `todayLabel()` (`new Date()` at render) from `HomeScreen`; the label is now computed server-side via `formatDateLabel(await getLocalToday())` in `page.tsx` and passed as the `todayLabel` prop. Deterministic, UTC-pinned → no SSR/CSR mismatch. Verified live (hero "SUNDAY, MAY 31", clean reload).
 - [ ] **NXT-2 · P2** — Home: redundant `getUser()` + unbounded all-solves fetch in the Suspense child. `HomeUserContent.tsx:117-126` vs `page.tsx:35-68`.
 - [ ] **NXT-3 · P2** — Home shell blocks on sequential queries, undercutting Suspense streaming. `page.tsx:35-68`. Fold profile query into the `Promise.all`.
 - [ ] **NXT-4 · P2** — No `error.tsx` / `not-found.tsx` anywhere; render throws hit React's default overlay. `apps/web/src/app/`. Add branded boundaries; `notFound()` for missing puzzles.
@@ -118,6 +118,6 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 
 ## Verification / deploy notes (require explicit sign-off, not auto-done)
 - Confirm `SUPABASE_SERVICE_ROLE_KEY` is **not** in the Vercel prod/preview env. *(Confirmed 2026-05-31: only the two public keys are set — ✅.)*
-- Any new **DB migration** (SEC-3 CHECK, BE-3 backfill, BE-4 index) must be reviewed and applied to Supabase manually.
+- Any new **DB migration** (SEC-3 CHECK, **BE-3 backfill — `20260531030000_backfill_local_date.sql` now written, awaiting apply**, BE-4 index) must be reviewed and applied to Supabase manually.
 - **Edge-function** changes (EPIC-A) require redeploy + cron verification.
 - `npm/pnpm audit` (SEC-7) and bumps should run in an unsandboxed context.

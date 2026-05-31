@@ -114,14 +114,6 @@ function DestCard({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-function todayLabel(): string {
-  return new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-}
-
 function CheckIcon() {
   return (
     <svg
@@ -206,6 +198,9 @@ const HOME_MAX = 480;
 interface HomeScreenProps {
   difficulty?: string;
   puzzleNumber?: number;
+  /** Pre-formatted "today" label, computed server-side from getLocalToday() so
+   *  the client never renders `new Date()` (avoids hydration mismatch — NXT-1). */
+  todayLabel?: string;
   fetchError?: boolean;
   isAuthenticated?: boolean;
   /** Display name (or email) of the signed-in user — drives the account avatar. */
@@ -223,6 +218,7 @@ interface HomeScreenProps {
 export function HomeScreen({
   difficulty,
   puzzleNumber,
+  todayLabel,
   fetchError,
   isAuthenticated,
   displayName,
@@ -314,7 +310,7 @@ export function HomeScreen({
             }}
           >
             <Eyebrow style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-              {todayLabel()}
+              {todayLabel}
             </Eyebrow>
             <span
               aria-hidden="true"

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Difficulty } from "@parity/engine";
 import { createClient } from "@/lib/supabase/server";
+import { getLocalToday } from "@/lib/local-date";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { BoardScreen } from "@/components/board/BoardScreen";
 
@@ -16,7 +17,9 @@ export default async function PlayDatePage({ params }: Props) {
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) redirect("/archive");
 
-  const today = new Date().toISOString().slice(0, 10);
+  // Gate the "future date" guard by the user's local day so a UTC+ user near
+  // midnight can still open their local-today archive entry (EPIC-B).
+  const today = await getLocalToday();
   if (date > today) redirect("/archive");
 
   // Fetch puzzle + day number; DB errors redirect to archive via the catch.

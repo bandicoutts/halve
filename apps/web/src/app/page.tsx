@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { getLocalToday, formatDateLabel } from "@/lib/local-date";
 import { HomeScreen } from "@/components/screens/HomeScreen";
 import { HomeUserContent } from "./_components/HomeUserContent";
 
@@ -15,9 +16,15 @@ export default async function Home() {
   let solveDurationMs: number | undefined;
   let displayName: string | undefined;
 
+  // Gate "today" by the user's local calendar day — the SAME source streaks use
+  // (getLocalToday reads the tz_date cookie). Computed on the server and the hero
+  // label is derived from it + passed as a prop, so the client never calls
+  // `new Date()` at render (avoids the SSR/CSR hydration mismatch — NXT-1).
+  const today = await getLocalToday();
+  const todayLabel = formatDateLabel(today);
+
   try {
     const supabase = await createClient();
-    const today = new Date().toISOString().slice(0, 10);
 
     const [
       { data: { user } },
@@ -74,6 +81,7 @@ export default async function Home() {
     <HomeScreen
       difficulty={difficulty}
       puzzleNumber={puzzleNumber}
+      todayLabel={todayLabel}
       fetchError={fetchError}
       isAuthenticated={isAuthenticated}
       displayName={displayName}
