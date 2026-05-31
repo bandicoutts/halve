@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import type { Grid, Puzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { useTimer } from "@/hooks/useTimer";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { createClient } from "@/lib/supabase/client";
 import { recordSolve } from "@/app/actions/record-solve";
 import { useTheme } from "@/components/providers/ThemeProvider";
@@ -14,6 +15,19 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { WinScreen } from "@/components/screens/WinScreen";
 import Link from "next/link";
+
+// Visually hidden but available to screen readers (for aria-live regions).
+const srOnly: React.CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0 0 0 0)",
+  whiteSpace: "nowrap",
+  border: 0,
+};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -252,6 +266,17 @@ export function BoardScreen({
   }, [solved, puzzleId, recordAndFetch]);
 
   const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
+  const abandonRef = useFocusTrap<HTMLDivElement>(showAbandonConfirm, () =>
+    setShowAbandonConfirm(false)
+  );
+
+  // Announced politely to screen readers: validation conflicts while playing,
+  // then the solve result once the puzzle is complete.
+  const liveMessage = solved
+    ? `Puzzle solved in ${formatted}.`
+    : errors.size > 0
+    ? `${errors.size} cell${errors.size === 1 ? "" : "s"} in conflict.`
+    : "";
 
   const [cellSize, setCellSize] = useState(48);
   useEffect(() => {
@@ -303,6 +328,10 @@ export function BoardScreen({
         animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)",
       }}
     >
+      <div role="status" aria-live="polite" style={srOnly}>
+        {liveMessage}
+      </div>
+
       <TopBar
         left={
           <IconButton label="Back" size={40} onClick={handleBack}>
@@ -363,6 +392,8 @@ export function BoardScreen({
       <div style={{ textAlign: "center", paddingTop: 8 }}>
         <div
           className="tnum"
+          role="timer"
+          aria-label={`Elapsed time ${formatted}`}
           style={{
             fontSize: 44,
             fontWeight: 500,
@@ -399,6 +430,11 @@ export function BoardScreen({
 
       {showAbandonConfirm ? (
         <div
+          ref={abandonRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="abandon-confirm-title"
+          tabIndex={-1}
           style={{
             padding: "16px 24px 40px",
             display: "flex",
@@ -408,7 +444,10 @@ export function BoardScreen({
             animation: "fade-up 0.18s cubic-bezier(0.4,0,0.2,1)",
           }}
         >
-          <p style={{ fontSize: 15, color: "var(--fg-2)", margin: 0, textAlign: "center" }}>
+          <p
+            id="abandon-confirm-title"
+            style={{ fontSize: 15, color: "var(--fg-2)", margin: 0, textAlign: "center" }}
+          >
             Leave this puzzle?
           </p>
           <div style={{ display: "flex", gap: 10, width: "100%" }}>

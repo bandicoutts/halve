@@ -7,6 +7,9 @@ interface CellProps {
   value: CellValue;
   isGiven: boolean;
   isError: boolean;
+  /** Zero-based grid coordinates, used to build the screen-reader label. */
+  rowIndex: number;
+  colIndex: number;
   size: number;
   onClick?: () => void;
 }
@@ -17,8 +20,27 @@ function CellSymbol({ value, size }: { value: CellValue; size: number }) {
   return null;
 }
 
-export function Cell({ value, isGiven, isError, size, onClick }: CellProps) {
+export function Cell({
+  value,
+  isGiven,
+  isError,
+  rowIndex,
+  colIndex,
+  size,
+  onClick,
+}: CellProps) {
   const filled = value !== null;
+
+  // e.g. "Row 2, column 3, solid, given" — position + symbol + given/error context.
+  const symbolLabel = value === 0 ? "solid" : value === 1 ? "open" : "empty";
+  const ariaLabel = [
+    `Row ${rowIndex + 1}, column ${colIndex + 1}`,
+    symbolLabel,
+    isGiven ? "given" : null,
+    isError ? "error" : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   let bg = "var(--surface-raised)";
   let border = "1px solid var(--hairline)";
@@ -43,7 +65,7 @@ export function Cell({ value, isGiven, isError, size, onClick }: CellProps) {
     <button
       onClick={onClick}
       disabled={isGiven}
-      aria-label={value === 0 ? "solid" : value === 1 ? "open" : "empty"}
+      aria-label={ariaLabel}
       style={{
         width: size,
         height: size,
