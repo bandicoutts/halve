@@ -9,11 +9,12 @@
  *   NEXT_PUBLIC_SUPABASE_URL
  *   SUPABASE_SERVICE_ROLE_KEY
  *
- * Difficulty cycles: easy → medium → hard → medium (repeating from day 1).
- * Each date gets a deterministic seed so re-running is idempotent.
+ * Seed + difficulty for each date come from the engine's canonical `generateDaily`
+ * policy (the SAME one the edge function and the /play fallback use), so every
+ * producer agrees on the day's puzzle. Re-running is idempotent.
  */
 
-import { generatePuzzle } from "@parity/engine";
+import { generateDaily } from "@parity/engine";
 import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -62,24 +63,6 @@ async function upsertPuzzle(row: Record<string, unknown>): Promise<void> {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Deterministic u32 seed from a date string (FNV-1a). */
-function dateSeed(dateStr: string): number {
-  let h = 2166136261;
-  for (const ch of dateStr) {
-    h ^= ch.charCodeAt(0);
-    h = Math.imul(h, 16777619) >>> 0;
-  }
-  return h;
-}
-
-const EPOCH = "2026-01-01"; // day 1 of Halve
-const DIFF_CYCLE = ["easy", "medium", "hard", "medium"] as const;
-
-function dayIndex(dateStr: string): number {
-  const ms = new Date(dateStr + "T00:00:00Z").getTime() - new Date(EPOCH + "T00:00:00Z").getTime();
-  return Math.round(ms / 86400000) + 1;
-}
-
 function addDays(dateStr: string, n: number): string {
   const d = new Date(dateStr + "T00:00:00Z");
   d.setUTCDate(d.getUTCDate() + n);
@@ -111,23 +94,20 @@ async function main() {
   let ok = 0, fail = 0;
 
   for (const date of dates) {
-    const idx = dayIndex(date);
-    const difficulty = DIFF_CYCLE[(idx - 1) % DIFF_CYCLE.length]!;
-    const seed = dateSeed(date);
-    const puzzle = generatePuzzle({ size: 6, difficulty, seed });
+    const { puzzle, usedSeed, difficulty } = generateDaily(date);
 
     try {
       await upsertPuzzle({
         date,
-        difficulty: puzzle.difficulty,
+        difficulty,
         grid_spec: {
           solution: puzzle.solution,
           givens: puzzle.givens,
           edges: puzzle.edges,
         },
-        seed,
+        seed: usedSeed,
       });
-      console.log(`  ✓  ${date}  #${idx}  ${puzzle.difficulty}`);
+      console.log(`  ✓  ${date}  ${difficulty}`);
       ok++;
     } catch (err) {
       console.error(`  ✗  ${date}  ${(err as Error).message}`);

@@ -6,3 +6,4 @@ export * from './uniqueness.js';
 export * from './difficulty.js';
 export * from './rng.js';
 export * from './generator.js';
+export * from './daily.js';

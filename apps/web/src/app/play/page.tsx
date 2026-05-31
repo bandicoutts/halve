@@ -1,4 +1,4 @@
-import { generatePuzzle } from "@parity/engine";
+import { generateDaily } from "@parity/engine";
 import type { Difficulty } from "@parity/engine";
 import { createClient } from "@/lib/supabase/server";
 import { getLocalToday } from "@/lib/local-date";
@@ -14,7 +14,10 @@ export default async function PlayPage() {
   const today = await getLocalToday();
 
   let puzzleId: string | undefined;
-  let puzzle = generatePuzzle({ size: 6, difficulty: "medium" });
+  // Deterministic offline fallback: the SAME seed+difficulty policy every other
+  // producer uses (CLI seeder, edge function), so an offline player gets the
+  // canonical puzzle for the date — not a random one — even with no DB row (CQ-3).
+  let puzzle = generateDaily(today).puzzle;
 
   try {
     const supabase = await createClient();
@@ -30,9 +33,17 @@ export default async function PlayPage() {
         puzzle = { size: 6, ...spec, difficulty: data.difficulty as Difficulty };
         puzzleId = data.id;
       }
+    } else {
+      // Row genuinely missing (not a DB outage). The cron/seeder failed to mint
+      // today's puzzle — solves can't be recorded (no puzzleId) so streaks would
+      // silently break. Surface loudly for the operator/monitoring (BE-2).
+      console.error(
+        `[daily-puzzle] no puzzles row for ${today} — serving deterministic offline fallback; solves will NOT record`,
+      );
     }
-  } catch {
-    // DB unavailable — serve generated fallback
+  } catch (err) {
+    // DB unavailable — serve the deterministic fallback above.
+    console.error(`[daily-puzzle] DB unavailable serving ${today}:`, err);
   }
 
   return (

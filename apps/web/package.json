@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "seed": "npx tsx scripts/seed-puzzles.mts"
+    "test": "vitest run"
   },
   "dependencies": {
     "@parity/design": "workspace:*",
