@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { TopBar } from "@/components/ui/TopBar";
@@ -32,6 +32,15 @@ export interface ArchiveScreenProps {
   initialId?: string;
 }
 
+// ─── Layout constants ──────────────────────────────────────────────────────────
+
+/** Calendar day-cell height. Shorter than square — a single number doesn't need
+ *  a 1:1 box; this trims ~25% off the grid's vertical footprint. */
+const CELL_H = 42;
+/** Max content width. Keeps the calendar from ballooning to giant squares on
+ *  desktop; content stays centered, full-bleed padding remains on mobile. */
+const CONTENT_MAX = 460;
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function fmtDateLabel(dateStr: string): string {
@@ -50,6 +59,27 @@ function fmtMs(ms: number): string {
 
 function solvedCount(month: ArchiveMonth): number {
   return month.days.filter((d) => d.solved).length;
+}
+
+interface MonthStats {
+  solved: number;
+  total: number;
+  avgMs?: number;
+  bestMs?: number;
+}
+
+function monthStats(month: ArchiveMonth): MonthStats {
+  const times = month.days
+    .filter((d) => d.solved && d.timeMs !== undefined)
+    .map((d) => d.timeMs as number);
+  return {
+    solved: month.days.filter((d) => d.solved).length,
+    total: month.days.length,
+    avgMs: times.length
+      ? Math.round(times.reduce((a, b) => a + b, 0) / times.length)
+      : undefined,
+    bestMs: times.length ? Math.min(...times) : undefined,
+  };
 }
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -135,89 +165,152 @@ function Legend() {
   );
 }
 
-// ─── Detail card ──────────────────────────────────────────────────────────────
+// ─── Month summary ──────────────────────────────────────────────────────────
 
-function DetailCard({ puzzle, onPlay }: { puzzle: ArchiveDayEntry; onPlay: () => void }) {
-  const [h, setH] = useState(false);
-  const isSolved = puzzle.solved;
+/** A "label · value" cluster for the summary row. */
+function SummaryStat({ label, value }: { label: string; value: string }) {
+  return (
+    <span style={{ display: "inline-flex", alignItems: "baseline", gap: 5 }}>
+      <span
+        className="tnum"
+        style={{ fontSize: 14, fontWeight: 600, color: "var(--fg-1)" }}
+      >
+        {value}
+      </span>
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          color: "var(--fg-3)",
+        }}
+      >
+        {label}
+      </span>
+    </span>
+  );
+}
+
+/** Always-populated progress strip for the visible month. Replaces the old
+ *  per-puzzle detail card — reads from the month in view, so it can't go stale. */
+function MonthSummary({ stats }: { stats: MonthStats }) {
+  const dot = (
+    <span aria-hidden style={{ color: "var(--hairline-2)", fontSize: 12 }}>
+      ·
+    </span>
+  );
   return (
     <div
-      onMouseEnter={() => setH(true)}
-      onMouseLeave={() => setH(false)}
-      onClick={onPlay}
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 16,
-        cursor: "pointer",
-        background: "var(--surface)",
-        borderRadius: "var(--radius-lg)",
-        padding: "16px 18px",
-        border: `1.5px solid ${h ? (isSolved ? "var(--hairline-2)" : "var(--accent)") : "var(--hairline)"}`,
-        boxShadow: h ? "var(--shadow-sm)" : "none",
-        transition: "border-color .15s, box-shadow .15s",
+        justifyContent: "center",
+        flexWrap: "wrap",
+        gap: 12,
       }}
     >
-      {isSolved ? (
+      <SummaryStat label="solved" value={`${stats.solved} / ${stats.total}`} />
+      {stats.avgMs !== undefined && (
+        <>
+          {dot}
+          <SummaryStat label="avg" value={fmtMs(stats.avgMs)} />
+        </>
+      )}
+      {stats.bestMs !== undefined && (
+        <>
+          {dot}
+          <SummaryStat label="best" value={fmtMs(stats.bestMs)} />
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── Hover preview (desktop only) ─────────────────────────────────────────────
+
+interface HoverState {
+  puzzle: ArchiveDayEntry;
+  rect: { left: number; top: number; bottom: number; width: number };
+}
+
+/** Floating, non-interactive preview anchored to a calendar cell. Shown only on
+ *  hover-capable pointers; on touch the cell tap navigates straight to play. */
+function HoverPreview({ hover }: { hover: HoverState }) {
+  const { puzzle, rect } = hover;
+  // Flip below the cell when too close to the top of the viewport.
+  const above = rect.top > 132;
+  const top = above ? rect.top - 10 : rect.bottom + 10;
+  const left = rect.left + rect.width / 2;
+  const solvedTime =
+    puzzle.solved && puzzle.timeMs !== undefined ? fmtMs(puzzle.timeMs) : null;
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top,
+        left,
+        transform: `translate(-50%, ${above ? "-100%" : "0"})`,
+        zIndex: 50,
+        pointerEvents: "none",
+        background: "var(--surface-raised)",
+        border: "1px solid var(--hairline)",
+        borderRadius: "var(--radius-md)",
+        boxShadow: "var(--shadow-lg)",
+        padding: "10px 13px",
+        minWidth: 150,
+        animation: "fade-up 0.12s cubic-bezier(0.4,0,0.2,1)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "baseline", gap: 7 }}>
         <span
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 999,
-            background: "var(--correct-tint)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
+          style={{ fontSize: 14, fontWeight: 600, color: "var(--fg-1)", letterSpacing: "-0.01em" }}
         >
-          <CheckIcon size={20} color="var(--correct)" />
+          {puzzle.isToday ? "Today" : fmtDateLabel(puzzle.date)}
         </span>
-      ) : (
         <span
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 999,
-            border: "2.5px solid var(--accent)",
-            flexShrink: 0,
-          }}
-        />
-      )}
-
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-          <span
-            style={{ fontSize: 16, fontWeight: 600, color: "var(--fg-1)", letterSpacing: "-0.01em" }}
-          >
-            {puzzle.isToday ? "Today" : fmtDateLabel(puzzle.date)}
-          </span>
-          <span className="tnum" style={{ fontSize: 12, fontWeight: 600, color: "var(--fg-3)", letterSpacing: "0.04em" }}>
-            #{puzzle.dayNo}
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-          <DiffDots d={puzzle.difficulty} on />
-          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--fg-3)" }}>
-            {puzzle.difficulty}
-          </span>
-        </div>
-      </div>
-
-      {isSolved && puzzle.timeMs !== undefined ? (
-        <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div className="tnum" style={{ fontSize: 20, fontWeight: 500, color: "var(--fg-1)", lineHeight: 1 }}>
-            {fmtMs(puzzle.timeMs)}
-          </div>
-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--correct)", marginTop: 5 }}>
-            Solved
-          </div>
-        </div>
-      ) : (
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-          Play <ChevronRight size={15} color="var(--accent)" />
+          className="tnum"
+          style={{ fontSize: 11, fontWeight: 600, color: "var(--fg-3)", letterSpacing: "0.04em" }}
+        >
+          #{puzzle.dayNo}
         </span>
-      )}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 7 }}>
+        <DiffDots d={puzzle.difficulty} on />
+        <span
+          style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--fg-3)" }}
+        >
+          {puzzle.difficulty}
+        </span>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          marginTop: 8,
+          paddingTop: 8,
+          borderTop: "1px solid var(--hairline)",
+        }}
+      >
+        {solvedTime ? (
+          <>
+            <CheckIcon size={14} color="var(--correct)" />
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--correct)" }}>
+              Solved
+            </span>
+            <span className="tnum" style={{ fontSize: 12, color: "var(--fg-2)", marginLeft: "auto" }}>
+              {solvedTime}
+            </span>
+          </>
+        ) : (
+          <span
+            style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: 4 }}
+          >
+            Play <ChevronRight size={14} color="var(--accent)" />
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -226,35 +319,44 @@ function DetailCard({ puzzle, onPlay }: { puzzle: ArchiveDayEntry; onPlay: () =>
 
 function CalCell({
   puzzle,
-  selected,
-  onSelect,
+  onPlay,
+  onHover,
+  onLeave,
 }: {
   puzzle: ArchiveDayEntry | null;
-  selected: boolean;
-  onSelect: () => void;
+  onPlay: () => void;
+  onHover: (h: HoverState) => void;
+  onLeave: () => void;
 }) {
   if (!puzzle) {
-    return <span style={{ width: "100%", aspectRatio: "1", display: "block" }} />;
+    return <span style={{ width: "100%", height: CELL_H, display: "block" }} />;
   }
 
-  const title = `${puzzle.isToday ? "Today" : fmtDateLabel(puzzle.date)} · ${puzzle.difficulty}${puzzle.solved && puzzle.timeMs !== undefined ? " · " + fmtMs(puzzle.timeMs) : ""}`;
+  const enter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = "scale(1.06)";
+    e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+    const r = e.currentTarget.getBoundingClientRect();
+    onHover({
+      puzzle,
+      rect: { left: r.left, top: r.top, bottom: r.bottom, width: r.width },
+    });
+  };
+  const leave = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = "scale(1)";
+    e.currentTarget.style.boxShadow = "none";
+    onLeave();
+  };
 
   return (
     <button
-      onClick={onSelect}
-      title={title}
-      onMouseEnter={(e) => {
-        if (!selected) e.currentTarget.style.transform = "scale(1.06)";
-        e.currentTarget.style.boxShadow = "var(--shadow-sm)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
-        e.currentTarget.style.boxShadow = "none";
-      }}
+      onClick={onPlay}
+      aria-label={`Play ${puzzle.isToday ? "today" : fmtDateLabel(puzzle.date)}, ${puzzle.difficulty}${puzzle.solved && puzzle.timeMs !== undefined ? `, solved in ${fmtMs(puzzle.timeMs)}` : ""}`}
+      onMouseEnter={enter}
+      onMouseLeave={leave}
       style={{
         position: "relative",
         width: "100%",
-        aspectRatio: "1",
+        height: CELL_H,
         borderRadius: "var(--radius-sm)",
         display: "flex",
         alignItems: "center",
@@ -263,9 +365,7 @@ function CalCell({
         padding: 0,
         fontFamily: "var(--font-sans)",
         background: puzzle.solved ? "var(--accent)" : "var(--bg-sunken)",
-        border: selected
-          ? "2px solid var(--fg-1)"
-          : puzzle.isToday
+        border: puzzle.isToday
           ? "2px solid var(--accent)"
           : puzzle.solved
           ? "none"
@@ -298,12 +398,14 @@ const DOW = ["S", "M", "T", "W", "T", "F", "S"] as const;
 
 function MonthGrid({
   month,
-  selectedId,
-  onSelect,
+  onPlay,
+  onHover,
+  onLeave,
 }: {
   month: ArchiveMonth;
-  selectedId: string;
-  onSelect: (id: string) => void;
+  onPlay: (date: string) => void;
+  onHover: (h: HoverState) => void;
+  onLeave: () => void;
 }) {
   const firstWeekday = new Date(month.year, month.monthIdx, 1).getDay();
   const cells: (ArchiveDayEntry | null)[] = [
@@ -346,8 +448,9 @@ function MonthGrid({
           <CalCell
             key={i}
             puzzle={p}
-            selected={p?.id === selectedId}
-            onSelect={() => p && onSelect(p.id)}
+            onPlay={() => p && onPlay(p.date)}
+            onHover={onHover}
+            onLeave={onLeave}
           />
         ))}
       </div>
@@ -554,42 +657,26 @@ function MonthNav({
 }) {
   const atNewest = index === 0;
   const atOldest = index === months.length - 1;
-  const cur = months[index]!;
   return (
-    <div style={{ marginBottom: 18 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-        }}
-      >
-        <NavArrow
-          dir="prev"
-          disabled={atOldest}
-          onClick={() => onChange(index + 1)}
-        />
-        <MonthPicker months={months} index={index} onPick={onChange} />
-        <NavArrow
-          dir="next"
-          disabled={atNewest}
-          onClick={() => onChange(index - 1)}
-        />
-      </div>
-      <div
-        className="tnum"
-        style={{
-          textAlign: "center",
-          marginTop: 4,
-          fontSize: 12,
-          fontWeight: 600,
-          letterSpacing: "0.03em",
-          color: "var(--fg-3)",
-        }}
-      >
-        {solvedCount(cur)} / {cur.days.length} solved
-      </div>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 8,
+      }}
+    >
+      <NavArrow
+        dir="prev"
+        disabled={atOldest}
+        onClick={() => onChange(index + 1)}
+      />
+      <MonthPicker months={months} index={index} onPick={onChange} />
+      <NavArrow
+        dir="next"
+        disabled={atNewest}
+        onClick={() => onChange(index - 1)}
+      />
     </div>
   );
 }
@@ -600,7 +687,7 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
   const router = useRouter();
   const { theme, toggle } = useTheme();
 
-  // Find initial month index containing initialId
+  // Find initial month index containing initialId (today, or most recent).
   const initMonthIdx = (() => {
     if (!initialId) return 0;
     const idx = months.findIndex((m) => m.days.some((d) => d.id === initialId));
@@ -608,13 +695,16 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
   })();
 
   const [monthIdx, setMonthIdx] = useState(initMonthIdx);
-  const [selectedId, setSelectedId] = useState(
-    initialId ?? months[0]?.days[months[0].days.length - 1]?.id ?? ""
-  );
+  const [hover, setHover] = useState<HoverState | null>(null);
 
-  const selectedPuzzle = months
-    .flatMap((m) => m.days)
-    .find((d) => d.id === selectedId) ?? null;
+  // Hover preview is desktop-only — gate on a hover-capable, fine pointer so a
+  // touch tap (which fires synthetic mouse events) never flashes a preview.
+  const [canHover, setCanHover] = useState(false);
+  useEffect(() => {
+    setCanHover(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+  }, []);
+
+  const play = (date: string) => router.push(`/play/${date}`);
 
   if (months.length === 0) {
     return (
@@ -712,48 +802,42 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
         right={<ThemeToggle theme={theme} onToggle={toggle} />}
       />
 
-      {/* Pinned context — detail card + legend */}
-      <div
-        style={{
-          flexShrink: 0,
-          padding: "6px 24px 14px",
-          background: "var(--bg)",
-          position: "relative",
-          zIndex: 2,
-        }}
-      >
-        {selectedPuzzle && (
-          <div style={{ marginBottom: 14 }}>
-            <DetailCard
-              puzzle={selectedPuzzle}
-              onPlay={() => router.push(`/play/${selectedPuzzle.date}`)}
-            />
-          </div>
-        )}
-        <Legend />
-      </div>
-
-      <div style={{ height: 1, background: "var(--hairline)", flexShrink: 0 }} />
-
-      {/* Scrollable month view */}
       <div
         style={{
           flex: 1,
           overflowY: "auto",
           WebkitOverflowScrolling: "touch" as const,
-          padding: "18px 24px 40px",
+          padding: "14px 24px 40px",
         }}
       >
-        <MonthNav months={months} index={monthIdx} onChange={setMonthIdx} />
-        <MonthGrid
-          month={currentMonth}
-          selectedId={selectedId}
-          onSelect={(id) => {
-            setSelectedId(id);
-            // If selected id is in a different month, stay — it's already the right month
-          }}
-        />
+        <div style={{ maxWidth: CONTENT_MAX, margin: "0 auto" }}>
+          <MonthNav months={months} index={monthIdx} onChange={setMonthIdx} />
+          <div style={{ marginTop: 6, marginBottom: 18 }}>
+            <MonthSummary stats={monthStats(currentMonth)} />
+          </div>
+          <MonthGrid
+            month={currentMonth}
+            onPlay={play}
+            onHover={setHover}
+            onLeave={() => setHover(null)}
+          />
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: 18,
+              fontSize: 12,
+              color: "var(--fg-3)",
+            }}
+          >
+            {canHover ? "Click any day to play" : "Tap any day to play"}
+          </div>
+          <div style={{ marginTop: 18, display: "flex", justifyContent: "center" }}>
+            <Legend />
+          </div>
+        </div>
       </div>
+
+      {canHover && hover && <HoverPreview hover={hover} />}
     </div>
   );
 }
