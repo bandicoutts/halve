@@ -6,6 +6,7 @@ import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
 import { Mark } from "@/components/symbols/Mark";
+import { formatDuration } from "@/lib/format";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -50,11 +51,6 @@ function fmtDateLabel(dateStr: string): string {
     month: "short",
     day: "numeric",
   });
-}
-
-function fmtMs(ms: number): string {
-  const s = Math.round(ms / 1000);
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
 function solvedCount(month: ArchiveMonth): number {
@@ -161,6 +157,14 @@ function Legend() {
         <span style={{ width: 14, height: 14, borderRadius: 4, background: "var(--bg-sunken)", border: "2px solid var(--accent)", display: "inline-block" }} />,
         "Today"
       )}
+      {item(
+        <span style={{ display: "inline-flex", gap: 2.5, alignItems: "center" }}>
+          {[1, 2, 3].map((i) => (
+            <span key={i} style={{ width: 3, height: 3, borderRadius: 999, background: "var(--fg-3)" }} />
+          ))}
+        </span>,
+        "Difficulty"
+      )}
     </div>
   );
 }
@@ -214,13 +218,13 @@ function MonthSummary({ stats }: { stats: MonthStats }) {
       {stats.avgMs !== undefined && (
         <>
           {dot}
-          <SummaryStat label="avg" value={fmtMs(stats.avgMs)} />
+          <SummaryStat label="avg" value={formatDuration(stats.avgMs)} />
         </>
       )}
       {stats.bestMs !== undefined && (
         <>
           {dot}
-          <SummaryStat label="best" value={fmtMs(stats.bestMs)} />
+          <SummaryStat label="best" value={formatDuration(stats.bestMs)} />
         </>
       )}
     </div>
@@ -243,7 +247,7 @@ function HoverPreview({ hover }: { hover: HoverState }) {
   const top = above ? rect.top - 10 : rect.bottom + 10;
   const left = rect.left + rect.width / 2;
   const solvedTime =
-    puzzle.solved && puzzle.timeMs !== undefined ? fmtMs(puzzle.timeMs) : null;
+    puzzle.solved && puzzle.timeMs !== undefined ? formatDuration(puzzle.timeMs) : null;
   return (
     <div
       style={{
@@ -347,10 +351,19 @@ function CalCell({
     onLeave();
   };
 
+  const numColor = puzzle.solved
+    ? "var(--on-accent)"
+    : puzzle.isToday
+    ? "var(--accent)"
+    : "var(--fg-2)";
+  // Pips are dimmer than the number so they read as a secondary signal.
+  const pipColor = puzzle.solved ? "var(--on-accent)" : "var(--fg-3)";
+  const pipCount = puzzle.difficulty === "easy" ? 1 : puzzle.difficulty === "medium" ? 2 : 3;
+
   return (
     <button
       onClick={onPlay}
-      aria-label={`Play ${puzzle.isToday ? "today" : fmtDateLabel(puzzle.date)}, ${puzzle.difficulty}${puzzle.solved && puzzle.timeMs !== undefined ? `, solved in ${fmtMs(puzzle.timeMs)}` : ""}`}
+      aria-label={`Play ${puzzle.isToday ? "today" : fmtDateLabel(puzzle.date)}, ${puzzle.difficulty}${puzzle.solved && puzzle.timeMs !== undefined ? `, solved in ${formatDuration(puzzle.timeMs)}` : ""}`}
       onMouseEnter={enter}
       onMouseLeave={leave}
       style={{
@@ -359,14 +372,18 @@ function CalCell({
         height: CELL_H,
         borderRadius: "var(--radius-sm)",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        gap: 3,
         cursor: "pointer",
         padding: 0,
         fontFamily: "var(--font-sans)",
         background: puzzle.solved ? "var(--accent)" : "var(--bg-sunken)",
+        // A solved "today" is accent-on-accent — its accent ring would vanish,
+        // so switch to a high-contrast ring there to keep the today marker.
         border: puzzle.isToday
-          ? "2px solid var(--accent)"
+          ? `2px solid ${puzzle.solved ? "var(--fg-1)" : "var(--accent)"}`
           : puzzle.solved
           ? "none"
           : "1px solid var(--hairline)",
@@ -379,14 +396,24 @@ function CalCell({
           fontSize: 13,
           fontWeight: 600,
           lineHeight: 1,
-          color: puzzle.solved
-            ? "var(--on-accent)"
-            : puzzle.isToday
-            ? "var(--accent)"
-            : "var(--fg-2)",
+          color: numColor,
         }}
       >
         {puzzle.day}
+      </span>
+      <span aria-hidden style={{ display: "flex", gap: 2.5 }}>
+        {Array.from({ length: pipCount }, (_, i) => (
+          <span
+            key={i}
+            style={{
+              width: 3,
+              height: 3,
+              borderRadius: 999,
+              background: pipColor,
+              opacity: puzzle.solved ? 0.7 : 1,
+            }}
+          />
+        ))}
       </span>
     </button>
   );

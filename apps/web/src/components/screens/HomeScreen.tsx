@@ -11,6 +11,7 @@ import { Fire } from "@/components/symbols/Fire";
 import { Water } from "@/components/symbols/Water";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { formatDuration } from "@/lib/format";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -118,14 +119,6 @@ function todayLabel(): string {
     month: "long",
     day: "numeric",
   });
-}
-
-/** Format a solve duration (ms) as m:ss. */
-function formatDuration(ms: number): string {
-  const total = Math.max(0, Math.round(ms / 1000));
-  const m = Math.floor(total / 60);
-  const s = total % 60;
-  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
 function CheckIcon() {
