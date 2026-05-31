@@ -18,7 +18,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 3. ✅ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Consumer pages + hero label now use the single `getLocalToday()` clock; `local-date.ts` unit-tested. *(Edge-function minting side stays under EPIC-A; BE-3 backfill migration written + applied 2026-05-31.)*
 4. ✅ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-2, CQ-1/3 (+CQ-5, BE-5). One canonical `generateDaily(date)` policy in `@parity/engine` now drives every producer; redundant web seeder deleted; edge function + `/play` fallback are date-deterministic; cron-failure monitor added. *(Edge function deployed + monitor migration applied 2026-05-31; cron re-verified.)*
 5. ✅ **Streak + home perf** — CQ-2 (extract tested `lib/streak.ts`), NXT-2 (home redundant getUser + unbounded fetch), NXT-3 (sequential→parallel home queries). Shipped — see entries below.
-6. 🔄 **Remaining P2/P3** — ✅ NXT-4 (branded `error.tsx`/`not-found.tsx` + `notFound()` for missing archive puzzles), ✅ A11Y-7 (`<main>` landmark + skip link + one `<h1>` per screen). Still open: SEC-2/3/4, BE-4, DS-1 (+DS-2/3/4), CQ-6, A11Y-9/10/11, ENG-2/4, SEC-5/6/7, NXT-5/6.
+6. 🔄 **Remaining P2/P3** — ✅ NXT-4 (branded `error.tsx`/`not-found.tsx` + `notFound()` for missing archive puzzles), ✅ A11Y-7 (`<main>` landmark + skip link + one `<h1>` per screen), ✅ SEC-3 (`display_name` capped at all three layers; DB migration written, awaiting sign-off). Still open: SEC-2/4, BE-4, DS-1 (+DS-2/3/4), CQ-6, A11Y-9/10/11, ENG-2/4, SEC-5/6/7, NXT-5/6.
 
 **Guardrail (don't auto-do):** `git push`, applying DB migrations to the live DB, deploying the edge function, Vercel/Supabase config. Write the code; surface these for sign-off.
 
@@ -30,7 +30,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 |---|---|---|---|---|
 | Engine | 🟢 strong | 0 | 1 | 1 |
 | Design system | 🟢 strong | 0 | 1 | 3 |
-| Security | 🟡 adequate | 1 | 3 | 3 |
+| Security | 🟡 adequate | 1 | 2 | 3 |
 | Backend / data | 🟢 strong | 0 | 1 | 1 |
 | Next.js / performance | 🟢 strong | 0 | 0 | 2 |
 | Code quality / tests | 🟢 strong | 0 | 0 | 1 |
@@ -68,7 +68,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 ## Security 🟡
 - [x] **SEC-1 · P1** — ~~No HTTP security headers / CSP.~~ **Done** (`next.config.ts` `headers()`): HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-DNS-Prefetch-Control: off`, and a **Report-Only** CSP (allows inline styles + Supabase). Verified live on the dev server. *Next: watch CSP reports, then switch to enforcing.*
 - [ ] **SEC-2 · P2** — daily-puzzle edge fn publicly invocable (`verify_jwt=false`), no rate limit, no failure alerting. `supabase/config.toml:372-373`; `daily-puzzle/index.ts:7-60`. → *EPIC-A.*
-- [ ] **SEC-3 · P2** — `display_name` has no length limit/sanitization at any layer (Input, action, DB). `OnboardingScreen.tsx:23`, `Input.tsx`, `init.sql:26`. Cap at all three (maxLength + 1–40 check + DB `CHECK`).
+- [x] **SEC-3 · P2** — **Done (DB migration awaiting sign-off).** `display_name` is now capped at 40 chars across all three layers. **Client:** `Input.tsx` gained a `maxLength` prop; the onboarding field sets `maxLength={DISPLAY_NAME_MAX}` (+ a client-side `>40` guard). **Server:** the profile write moved off the client into a new `saveDisplayName` server action (`app/actions/save-display-name.ts`) that re-auths, **trims**, and rejects anything outside 1–40 before the `update` — closing the direct-POST bypass. **DB:** migration `20260531050000_display_name_length.sql` adds `check (display_name is null or char_length(display_name) between 1 and 40)`. Shared cap in `lib/display-name.ts`. Verified live: input `maxLength=40`; 62-char value rejected client-side, whitespace-only rejected, `"   Halve Tester   "` persists trimmed (stats shows `"Halve Tester"`). `tsc` clean, 30 tests pass. *Migration NOT applied — needs sign-off.*
 - [ ] **SEC-4 · P2** — Puzzle solution readable client-side via world-readable `grid_spec`. `init.sql:19-20`. Streak-cheat already blocked server-side; residual is self-cheat. Decide: accept+document, or split solution behind service-role-only access.
 - [ ] **SEC-5 · P3** — `record-solve` accepts an unvalidated `local_date` (minor streak-day shaping). `record-solve.ts:36,66-72`. Validate against `puzzle.date` / server ±1-day window.
 - [ ] **SEC-6 · P3** — Live prod project ref hardcoded in a migration. `20260531010000_fix_daily_puzzle_cron.sql:23`. Public anyway; hygiene only.
@@ -124,6 +124,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - Any new **DB migration** must be reviewed and applied to Supabase manually:
   - **BE-3 backfill** — `20260531030000_backfill_local_date.sql` — ✅ **applied 2026-05-31** (main pushed).
   - **BE-2 monitor (EPIC-A)** — `20260531040000_monitor_daily_puzzle.sql` — ✅ **applied 2026-05-31** (`supabase db push`). Created `ops_alert` + `daily_puzzle_cron_run`, re-scheduled the cron to capture the pg_net request id, added the 00:15 `check_daily_puzzle` monitor. Verified: `check_daily_puzzle()` runs clean (HTTP 204), `ops_alert` empty (no false alarm — today's row present).
-  - SEC-3 CHECK, BE-4 index — still to be written.
+  - **SEC-3 CHECK** — `20260531050000_display_name_length.sql` — ⏳ **written 2026-05-31, NOT applied.** Adds a `char_length(display_name) between 1 and 40` CHECK (null allowed) on `public.profiles`. Needs review + `supabase db push`. The client + server-action layers already enforce the cap, so this is the defence-in-depth backstop.
+  - BE-4 index — still to be written.
 - **Edge-function** changes (EPIC-A `daily-puzzle/index.ts`, re-vendored engine) — ✅ **deployed 2026-05-31** (`supabase functions deploy daily-puzzle`). Verified: POST returns `200 {ok,skipped}` (boots cleanly under Deno → the new `generateDaily` import resolves); the canonical `dailyPolicy('2026-05-31')` reproduces the **exact** seed (3485160892) + difficulty (hard) already in the prod `puzzles` row, so the deploy is consistent with seeded data through 2026-12-31.
 - `npm/pnpm audit` (SEC-7) and bumps should run in an unsandboxed context.

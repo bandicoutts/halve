@@ -15,6 +15,7 @@ interface InputProps {
   name?: string;
   required?: boolean;
   autoComplete?: string;
+  maxLength?: number;
   style?: React.CSSProperties;
 }
 
@@ -32,6 +33,7 @@ export function Input({
   name,
   required,
   autoComplete,
+  maxLength,
   style,
 }: InputProps) {
   const [focused, setFocused] = useState(false);
@@ -73,6 +75,7 @@ export function Input({
         name={name}
         required={required}
         autoComplete={autoComplete}
+        maxLength={maxLength}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         onFocus={() => setFocused(true)}

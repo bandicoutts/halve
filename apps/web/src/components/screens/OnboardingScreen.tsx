@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { saveDisplayName } from "@/app/actions/save-display-name";
+import { DISPLAY_NAME_MAX } from "@/lib/display-name";
 import { Logo } from "@/components/symbols/Logo";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -25,23 +26,20 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
       setError("Enter a name, or skip.");
       return;
     }
-    setError(null);
-    setLoading(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      router.push("/auth");
+    if (trimmed.length > DISPLAY_NAME_MAX) {
+      setError(`Keep it to ${DISPLAY_NAME_MAX} characters or fewer.`);
       return;
     }
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({ display_name: trimmed })
-      .eq("id", user.id);
+    setError(null);
+    setLoading(true);
+    const result = await saveDisplayName(trimmed);
     setLoading(false);
-    if (updateError) {
-      setError("Couldn't save — try again.");
+    if (!result.ok) {
+      if (result.invalid) {
+        setError("Enter a name (up to 40 characters).");
+      } else {
+        setError("Couldn't save — try again.");
+      }
       return;
     }
     router.push(next);
@@ -110,6 +108,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
               error={error}
               autoFocus
               autoComplete="name"
+              maxLength={DISPLAY_NAME_MAX}
             />
             <Button variant="primary" full type="submit" disabled={loading}>
               {loading ? "Saving…" : "Save name"}
