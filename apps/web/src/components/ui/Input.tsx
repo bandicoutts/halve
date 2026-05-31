@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 interface InputProps {
   label?: string;
@@ -35,6 +35,8 @@ export function Input({
   style,
 }: InputProps) {
   const [focused, setFocused] = useState(false);
+  const id = useId();
+  const errorId = `${id}-error`;
   const borderColor = error
     ? "var(--wrong)"
     : focused
@@ -45,6 +47,7 @@ export function Input({
     <div style={{ width: full ? "100%" : undefined }}>
       {label && (
         <label
+          htmlFor={id}
           style={{
             display: "block",
             fontSize: 12,
@@ -59,6 +62,7 @@ export function Input({
         </label>
       )}
       <input
+        id={id}
         type={type}
         placeholder={placeholder}
         value={value}
@@ -69,6 +73,8 @@ export function Input({
         name={name}
         required={required}
         autoComplete={autoComplete}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={{
@@ -85,14 +91,19 @@ export function Input({
           fontFamily: "var(--font-sans)",
           letterSpacing: "-0.01em",
           outline: "none",
+          // Visible focus ring (the UA outline is suppressed above); the tint
+          // ring + accent border give a clear, themed focus indicator.
+          boxShadow: focused
+            ? `0 0 0 3px ${error ? "var(--wrong-tint)" : "var(--accent-tint)"}`
+            : "none",
           opacity: disabled ? 0.55 : 1,
           cursor: disabled ? "not-allowed" : "text",
-          transition: "border-color .16s",
+          transition: "border-color .16s, box-shadow .16s",
           ...style,
         }}
       />
       {error && (
-        <p style={{ fontSize: 13, color: "var(--wrong)", margin: "8px 0 0", lineHeight: 1.45 }}>
+        <p id={errorId} role="alert" style={{ fontSize: 13, color: "var(--wrong)", margin: "8px 0 0", lineHeight: 1.45 }}>
           {error}
         </p>
       )}

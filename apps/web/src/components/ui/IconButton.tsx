@@ -9,14 +9,16 @@ interface IconButtonProps {
 }
 
 export function IconButton({ label, onClick, disabled, size = 48, children }: IconButtonProps) {
+  // Floor the hit area at 44px (touch-target minimum) regardless of caller size.
+  const dim = Math.max(size, 44);
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
       style={{
-        width: size,
-        height: size,
+        width: dim,
+        height: dim,
         borderRadius: 999,
         border: "1.5px solid var(--hairline-2)",
         background: "transparent",

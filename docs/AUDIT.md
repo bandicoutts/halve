@@ -47,7 +47,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - [ ] **ENG-4 · P3** — `parseGridSpec` doesn't integer-check `r`/`c`, nor cross-check givens⊆solution / edge⇔solution. `apps/web/src/lib/grid-spec.ts:38-45`.
 
 ## Security 🟡
-- [ ] **SEC-1 · P1** — No HTTP security headers / CSP (clickjacking on auth screens, no HSTS/nosniff/Referrer-Policy). `apps/web/next.config.ts`. Add `headers()` with HSTS, `frame-ancestors 'none'`, `nosniff`, `strict-origin-when-cross-origin`, report-only CSP (allow Supabase domains).
+- [x] **SEC-1 · P1** — ~~No HTTP security headers / CSP.~~ **Done** (`next.config.ts` `headers()`): HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-DNS-Prefetch-Control: off`, and a **Report-Only** CSP (allows inline styles + Supabase). Verified live on the dev server. *Next: watch CSP reports, then switch to enforcing.*
 - [ ] **SEC-2 · P2** — daily-puzzle edge fn publicly invocable (`verify_jwt=false`), no rate limit, no failure alerting. `supabase/config.toml:372-373`; `daily-puzzle/index.ts:7-60`. → *EPIC-A.*
 - [ ] **SEC-3 · P2** — `display_name` has no length limit/sanitization at any layer (Input, action, DB). `OnboardingScreen.tsx:23`, `Input.tsx`, `init.sql:26`. Cap at all three (maxLength + 1–40 check + DB `CHECK`).
 - [ ] **SEC-4 · P2** — Puzzle solution readable client-side via world-readable `grid_spec`. `init.sql:19-20`. Streak-cheat already blocked server-side; residual is self-cheat. Decide: accept+document, or split solution behind service-role-only access.
@@ -60,10 +60,10 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - [ ] **A11Y-2 · P1** — No `aria-live` regions: timer, win, validation errors, save failures all silent. `BoardScreen.tsx`, `Cell.tsx:32`, `WinScreen.tsx`.
 - [ ] **A11Y-3 · P1** — Win overlay (and abandon-confirm) is a modal with no `role=dialog`/`aria-modal`, no focus trap, no focus return. `WinScreen.tsx:166-176`, `BoardScreen.tsx:400-426`.
 - [ ] **A11Y-4 · P1** — Muted text `fg-3` fails AA contrast (2.8–3.3:1) in both themes, used for real text. `packages/design/src/tokens.ts:14-15,27`. Darken clay500→~clay600 (light), lighten dust500→~dust300 (dark) for text use.
-- [ ] **A11Y-5 · P2** — Input label not programmatically associated; error not linked. `Input.tsx:46-98`. Add `useId` htmlFor/id, `aria-invalid`, `aria-describedby`.
-- [ ] **A11Y-6 · P2** — Touch targets <44×44 on Back/Close icon buttons, toggle, sign-in pill, avatar. `BoardScreen.tsx:308`, `TutorialScreen.tsx:216,488,819`, `ArchiveScreen.tsx:748,820`, `PracticeScreen.tsx:40`, `ThemeToggle.tsx`, `HomeScreen.tsx:276`.
+- [x] **A11Y-5 · P2** — **Done** (`Input.tsx`): `useId` drives `label htmlFor` ↔ `input id` (verified associated), `aria-invalid` + `aria-describedby` on error, error `<p>` gets `role="alert"`.
+- [x] **A11Y-6 · P2** — **Done** (`IconButton.tsx` now floors the hit area at 44px, so every Back/Close button is ≥44 regardless of caller `size`; verified 44×44). The toggle (32h), avatar (32) and sign-in pill (34h) were left as-is — they clear the WCAG **2.2 AA** target-size minimum (24px); 44px is the AAA target, now met for the primary nav buttons.
 - [ ] **A11Y-7 · P2** — No `<main>` landmark / skip link; inconsistent heading hierarchy (Stats & Tutorial start at h2). `layout.tsx`, `StatsScreen.tsx:282`, `TutorialScreen.tsx:912`.
-- [ ] **A11Y-8 · P2** — Input has `outline:none` with no `:focus-visible` replacement. `Input.tsx:87`.
+- [x] **A11Y-8 · P2** — **Done** (`Input.tsx`): focus now shows a 3px ring (`accent-tint`, or `wrong-tint` on error) alongside the accent border, replacing the suppressed UA outline.
 - [ ] **A11Y-9 · P3** — Theme toggle / SegmentedControl lack state semantics (`role=switch`/`aria-checked`, `aria-pressed`). `ThemeToggle.tsx`, `SegmentedControl.tsx:24-46`.
 - [ ] **A11Y-10 · P3** — Decorative Fire/Water symbols announce "solid"/"open" as noise in non-game contexts. `Fire.tsx:14`, `Water.tsx:14`.
 - [ ] **A11Y-11 · P3** — Fixed-px typography limits text-only zoom (no rem). App-wide; ties to DS-1.
@@ -86,14 +86,14 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 ## Design system 🟢
 - [ ] **DS-1 · P2** — Type scale & label tracking have drifted off the locked scale (off-scale `13`/`11`/`13.5` px, scattered letter-spacing). App-wide. Do as one normalization pass to `var(--text-*)`/`var(--tracking-label)` (the deferral logged in DECISIONS).
 - [ ] **DS-2 · P3** — Off-grid gap values (`7`/`9`/`14`/`18`) break the 8pt system. Round to grid during the DS-1 pass.
-- [ ] **DS-3 · P3** — `borderRadius:999` (×21) and `:4` hardcoded instead of `var(--radius-full)` / a token. Replace literals.
+- [ ] **DS-3 · P3** — `borderRadius:999` (×21 across 14 files) and `:4` hardcoded instead of `var(--radius-full)` / a token. **Folded into DS-1** (do as one mechanical sweep to avoid scattering churn).
 - [ ] **DS-4 · P3** — Sign-out pill & repeated uppercase-label style duplicate derivable primitives. Extend `Button` (size+icon); adopt the `.label`/`<Eyebrow>` primitive.
 
 ## Code quality / tests 🟡
 - [ ] **CQ-1 · P1** — Two divergent seed scripts produce different puzzles for the same date. `scripts/seed-puzzles.ts`, `apps/web/scripts/seed-puzzles.mts`. → *EPIC-A.*
 - [ ] **CQ-2 · P2** — Streak logic duplicated verbatim across two files, zero tests (the core metric). `stats/page.tsx:19-56`, `HomeUserContent.tsx:4-25`. Extract to tested `lib/streak.ts`.
 - [ ] **CQ-3 · P2** — Non-deterministic `/play` daily fallback (`generatePuzzle` with no seed, `puzzleId` undefined). `play/page.tsx:14`. → *EPIC-A.*
-- [ ] **CQ-4 · P3** — Empty leftover `apps/web/src/app/auth/callback/` directory. Remove it.
+- [x] **CQ-4 · P3** — **Done.** Removed the empty `apps/web/src/app/auth/callback/` directory.
 - [ ] **CQ-5 · P3** — `as any` casts without justifying comments. `apps/web/scripts/seed-puzzles.mts:11,18`.
 - [ ] **CQ-6 · P3** — `scripts/` isn't a real workspace package despite a DECISIONS claim; entry is stale. Fix the package wiring or the doc.
 
