@@ -12,7 +12,8 @@ export const palette = {
   paper200: '#EFE8DA',
   paper300: '#E4DDCD', // hairline
   paper400: '#D6CCB8',
-  clay500: '#9A9080', // muted fg
+  clay500: '#9A9080', // decorative muted (fails AA as text)
+  clay550: '#746B5A', // muted fg — AA text (4.67:1 on bg)
   clay600: '#6B6253', // secondary fg
   clay700: '#463F33',
   ink900: '#211C15', // primary fg on paper
@@ -24,7 +25,8 @@ export const palette = {
   night800: '#2A2418',
   night700: '#352E20', // hairline
   night600: '#4A4030',
-  dust500: '#6E6553', // muted fg
+  dust500: '#6E6553', // decorative muted (fails AA as text)
+  dust400: '#928873', // muted fg — AA text (5.37:1 on bg)
   dust300: '#A79D89', // secondary fg
   dust100: '#EFE8D9', // primary fg on ink
 
@@ -61,7 +63,7 @@ export const colors = {
     surfaceRaised: '#FFFFFF',
     fg1: palette.ink900,
     fg2: palette.clay600,
-    fg3: palette.clay500,
+    fg3: palette.clay550,
     hairline: palette.paper300,
     hairline2: palette.paper400,
     accent: palette.amber,
@@ -82,7 +84,7 @@ export const colors = {
     surfaceRaised: palette.night800,
     fg1: palette.dust100,
     fg2: palette.dust300,
-    fg3: palette.dust500,
+    fg3: palette.dust400,
     hairline: palette.night700,
     hairline2: palette.night600,
     accent: palette.amberBright,

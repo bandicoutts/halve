@@ -15,7 +15,8 @@
   --paper-200: #EFE8DA;
   --paper-300: #E4DDCD;   /* hairline */
   --paper-400: #D6CCB8;
-  --clay-500:  #9A9080;   /* muted fg */
+  --clay-500:  #9A9080;   /* decorative muted (fails AA as text) */
+  --clay-550:  #746B5A;   /* muted fg — AA text (4.67:1 on bg) */
   --clay-600:  #6B6253;   /* secondary fg */
   --clay-700:  #463F33;
   --ink-900:   #211C15;   /* primary fg on paper */
@@ -27,7 +28,8 @@
   --night-800: #2A2418;
   --night-700: #352E20;   /* hairline */
   --night-600: #4A4030;
-  --dust-500:  #6E6553;   /* muted fg */
+  --dust-500:  #6E6553;   /* decorative muted (fails AA as text) */
+  --dust-400:  #928873;   /* muted fg — AA text (5.37:1 on bg) */
   --dust-300:  #A79D89;   /* secondary fg */
   --dust-100:  #EFE8D9;   /* primary fg on ink */
 
@@ -59,7 +61,7 @@
   --surface-raised:#FFFFFF;
   --fg-1:          var(--ink-900);
   --fg-2:          var(--clay-600);
-  --fg-3:          var(--clay-500);
+  --fg-3:          var(--clay-550);
   --hairline:      var(--paper-300);
   --hairline-2:    var(--paper-400);
 
@@ -92,7 +94,7 @@
   --surface-raised:var(--night-800);
   --fg-1:          var(--dust-100);
   --fg-2:          var(--dust-300);
-  --fg-3:          var(--dust-500);
+  --fg-3:          var(--dust-400);
   --hairline:      var(--night-700);
   --hairline-2:    var(--night-600);
 
