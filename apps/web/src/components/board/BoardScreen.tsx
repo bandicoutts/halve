@@ -354,6 +354,8 @@ export function BoardScreen({
         right={<ThemeToggle theme={theme} onToggle={toggleTheme} />}
       />
 
+      <h1 style={srOnly}>{`${puzzle.difficulty} puzzle`}</h1>
+
       {isOffline && (
         <p
           style={{

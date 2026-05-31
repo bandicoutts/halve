@@ -18,7 +18,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 3. ✅ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Consumer pages + hero label now use the single `getLocalToday()` clock; `local-date.ts` unit-tested. *(Edge-function minting side stays under EPIC-A; BE-3 backfill migration written + applied 2026-05-31.)*
 4. ✅ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-2, CQ-1/3 (+CQ-5, BE-5). One canonical `generateDaily(date)` policy in `@parity/engine` now drives every producer; redundant web seeder deleted; edge function + `/play` fallback are date-deterministic; cron-failure monitor added. *(Edge function deployed + monitor migration applied 2026-05-31; cron re-verified.)*
 5. ✅ **Streak + home perf** — CQ-2 (extract tested `lib/streak.ts`), NXT-2 (home redundant getUser + unbounded fetch), NXT-3 (sequential→parallel home queries). Shipped — see entries below.
-6. 🔄 **Remaining P2/P3** — ✅ NXT-4 (branded `error.tsx`/`not-found.tsx` + `notFound()` for missing archive puzzles). Still open: SEC-2/3/4, BE-4, DS-1 (+DS-2/3/4), CQ-6, A11Y-7/9/10/11, ENG-2/4, SEC-5/6/7, NXT-5/6.
+6. 🔄 **Remaining P2/P3** — ✅ NXT-4 (branded `error.tsx`/`not-found.tsx` + `notFound()` for missing archive puzzles), ✅ A11Y-7 (`<main>` landmark + skip link + one `<h1>` per screen). Still open: SEC-2/3/4, BE-4, DS-1 (+DS-2/3/4), CQ-6, A11Y-9/10/11, ENG-2/4, SEC-5/6/7, NXT-5/6.
 
 **Guardrail (don't auto-do):** `git push`, applying DB migrations to the live DB, deploying the edge function, Vercel/Supabase config. Write the code; surface these for sign-off.
 
@@ -34,7 +34,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 | Backend / data | 🟢 strong | 0 | 1 | 1 |
 | Next.js / performance | 🟢 strong | 0 | 0 | 2 |
 | Code quality / tests | 🟢 strong | 0 | 0 | 1 |
-| Accessibility | 🟠 needs-work | 0 | 4 | 4 |
+| Accessibility | 🟠 needs-work | 0 | 3 | 4 |
 
 **Independent engine verification (2026-05-31):** a from-scratch rule-checker + backtracking solution-counter (no engine internals) over **360 puzzles** (120 each easy/medium/hard) found 0 rule violations, 0 non-unique, 0 givens-not-⊆-solution, 0 non-deterministic, correct difficulty distribution. Puzzle correctness is confirmed.
 
@@ -81,7 +81,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - [x] **A11Y-4 · P1** — **Done.** Added `--clay-550 #746B5A` (light) and `--dust-400 #928873` (dark) and repointed `--fg-3` to them; old `clay-500`/`dust-500` retained as decorative-only. Measured: light **4.67:1** bg / 4.96 surface; dark **5.37:1** bg / 4.78 surface — both clear AA 4.5:1 and stay below `fg-2` so the hierarchy holds. Synced `tokens.css` + `tokens.ts` (rebuilt `dist`); verified resolved values + both themes in the preview.
 - [x] **A11Y-5 · P2** — **Done** (`Input.tsx`): `useId` drives `label htmlFor` ↔ `input id` (verified associated), `aria-invalid` + `aria-describedby` on error, error `<p>` gets `role="alert"`.
 - [x] **A11Y-6 · P2** — **Done** (`IconButton.tsx` now floors the hit area at 44px, so every Back/Close button is ≥44 regardless of caller `size`; verified 44×44). The toggle (32h), avatar (32) and sign-in pill (34h) were left as-is — they clear the WCAG **2.2 AA** target-size minimum (24px); 44px is the AAA target, now met for the primary nav buttons.
-- [ ] **A11Y-7 · P2** — No `<main>` landmark / skip link; inconsistent heading hierarchy (Stats & Tutorial start at h2). `layout.tsx`, `StatsScreen.tsx:282`, `TutorialScreen.tsx:912`.
+- [x] **A11Y-7 · P2** — **Done.** `layout.tsx` now wraps `{children}` in `<main id="main-content" tabIndex={-1}>` and adds a `.skip-link` "Skip to content" anchor as the first body child (new `.skip-link`/`.sr-only` utilities + `main:focus{outline:none}` in `globals.css`). Heading hierarchy normalized so **every screen has exactly one `<h1>`**: Stats guest `h2`→`h1`, Tutorial teach-step `h2`→`h1`, and visually-hidden `<h1>`s added where the title only lived in the non-semantic `TopBar` (StatsShell "Statistics", Archive ×2, Tutorial practice/win "How to play", Board "{difficulty} puzzle"). Verified live: `/`, `/stats`, `/tutorial`, `/archive`, `/play` each expose exactly one `<main>` + one `<h1>`; skip link is off-screen until focused, slides into view on focus, and activating it moves focus into `<main>`. `tsc` clean, 30 web tests pass. *Trade-off noted: the per-screen `TopBar` `<header>` now nests in `<main>` → no longer a `banner` landmark (acceptable; it's screen chrome, not a site banner).*
 - [x] **A11Y-8 · P2** — **Done** (`Input.tsx`): focus now shows a 3px ring (`accent-tint`, or `wrong-tint` on error) alongside the accent border, replacing the suppressed UA outline.
 - [ ] **A11Y-9 · P3** — Theme toggle / SegmentedControl lack state semantics (`role=switch`/`aria-checked`, `aria-pressed`). `ThemeToggle.tsx`, `SegmentedControl.tsx:24-46`.
 - [ ] **A11Y-10 · P3** — Decorative Fire/Water symbols announce "solid"/"open" as noise in non-game contexts. `Fire.tsx:14`, `Water.tsx:14`.

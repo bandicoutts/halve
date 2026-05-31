@@ -232,6 +232,7 @@ function TutorialWin({
         }
         right={<span style={{ width: 40 }} />}
       />
+      <h1 className="sr-only">How to play</h1>
       <div
         style={{
           flex: 1,
@@ -505,6 +506,7 @@ function PracticeBoard({
         right={<span style={{ width: 40 }} />}
       />
 
+      <h1 className="sr-only">How to play</h1>
       <div
         style={{
           flex: 1,
@@ -909,7 +911,7 @@ function TutorialFlow({
             {counter}
           </div>
 
-          <h2
+          <h1
             style={{
               fontSize: 30,
               fontWeight: 500,
@@ -920,7 +922,7 @@ function TutorialFlow({
             }}
           >
             {title}
-          </h2>
+          </h1>
 
           <p
             style={{

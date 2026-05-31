@@ -756,6 +756,7 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
           }
           right={<ThemeToggle theme={theme} onToggle={toggle} />}
         />
+        <h1 className="sr-only">Archive</h1>
         <div
           style={{
             flex: 1,
@@ -828,6 +829,8 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
         }
         right={<ThemeToggle theme={theme} onToggle={toggle} />}
       />
+
+      <h1 className="sr-only">Archive</h1>
 
       <div
         style={{

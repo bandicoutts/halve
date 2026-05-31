@@ -24,9 +24,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${spaceGrotesk.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <ThemeProvider>
           <LocalDateSetter />
-          {children}
+          <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col">
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>

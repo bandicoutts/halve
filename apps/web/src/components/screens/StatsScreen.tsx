@@ -166,6 +166,7 @@ function StatsShell({ onBack, children }: { onBack: () => void; children: React.
       />
       <div style={{ flex: 1, overflowY: "auto", padding: "0 24px 36px" }}>
         <div style={{ maxWidth: 560, margin: "0 auto", width: "100%" }}>
+          <h1 className="sr-only">Statistics</h1>
           {children}
         </div>
       </div>
@@ -279,7 +280,7 @@ function StatsGuest({ onBack }: { onBack: () => void }) {
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px", position: "relative", zIndex: 2 }}>
         <div style={{ textAlign: "center", maxWidth: 320 }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}><Mark size={40} /></div>
-          <h2 style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--fg-1)", margin: 0, lineHeight: 1.15 }}>Start your record</h2>
+          <h1 style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--fg-1)", margin: 0, lineHeight: 1.15 }}>Start your record</h1>
           <p style={{ fontSize: 14.5, color: "var(--fg-2)", lineHeight: 1.5, margin: "10px 0 22px" }}>Sign in to keep your streak, track your solve times, and build a history of every puzzle.</p>
           <Link href="/auth" style={{ textDecoration: "none" }}>
             <Button variant="primary" full>Sign in</Button>
