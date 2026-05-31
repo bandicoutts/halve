@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Difficulty } from "@parity/engine";
 import { createClient } from "@/lib/supabase/server";
 import { getLocalToday } from "@/lib/local-date";
@@ -50,10 +50,12 @@ export default async function PlayDatePage({ params }: Props) {
     redirect("/archive");
   }
 
-  if (!puzzleRow) redirect("/archive");
+  // No puzzle exists for this (valid, non-future) date → genuine 404, render the
+  // branded not-found boundary rather than silently bouncing to /archive.
+  if (!puzzleRow) notFound();
 
   const spec = parseGridSpec(puzzleRow.grid_spec);
-  if (!spec) redirect("/archive");
+  if (!spec) notFound();
 
   return (
     <BoardScreen

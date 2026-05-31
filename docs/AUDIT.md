@@ -18,7 +18,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 3. ✅ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Consumer pages + hero label now use the single `getLocalToday()` clock; `local-date.ts` unit-tested. *(Edge-function minting side stays under EPIC-A; BE-3 backfill migration written + applied 2026-05-31.)*
 4. ✅ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-2, CQ-1/3 (+CQ-5, BE-5). One canonical `generateDaily(date)` policy in `@parity/engine` now drives every producer; redundant web seeder deleted; edge function + `/play` fallback are date-deterministic; cron-failure monitor added. *(Edge function deployed + monitor migration applied 2026-05-31; cron re-verified.)*
 5. ✅ **Streak + home perf** — CQ-2 (extract tested `lib/streak.ts`), NXT-2 (home redundant getUser + unbounded fetch), NXT-3 (sequential→parallel home queries). Shipped — see entries below.
-6. ⬜ **Remaining P2/P3** — SEC-2/3/4, NXT-4, BE-4, DS-1 (+DS-2/3/4), CQ-6, A11Y-7/9/10/11, ENG-2/4, SEC-5/6/7, NXT-5/6.
+6. 🔄 **Remaining P2/P3** — ✅ NXT-4 (branded `error.tsx`/`not-found.tsx` + `notFound()` for missing archive puzzles). Still open: SEC-2/3/4, BE-4, DS-1 (+DS-2/3/4), CQ-6, A11Y-7/9/10/11, ENG-2/4, SEC-5/6/7, NXT-5/6.
 
 **Guardrail (don't auto-do):** `git push`, applying DB migrations to the live DB, deploying the edge function, Vercel/Supabase config. Write the code; surface these for sign-off.
 
@@ -32,7 +32,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 | Design system | 🟢 strong | 0 | 1 | 3 |
 | Security | 🟡 adequate | 1 | 3 | 3 |
 | Backend / data | 🟢 strong | 0 | 1 | 1 |
-| Next.js / performance | 🟡 adequate | 0 | 1 | 2 |
+| Next.js / performance | 🟢 strong | 0 | 0 | 2 |
 | Code quality / tests | 🟢 strong | 0 | 0 | 1 |
 | Accessibility | 🟠 needs-work | 0 | 4 | 4 |
 
@@ -99,7 +99,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - [x] **NXT-1 · P1** — **Done.** Removed the client-side `todayLabel()` (`new Date()` at render) from `HomeScreen`; the label is now computed server-side via `formatDateLabel(await getLocalToday())` in `page.tsx` and passed as the `todayLabel` prop. Deterministic, UTC-pinned → no SSR/CSR mismatch. Verified live (hero "SUNDAY, MAY 31", clean reload).
 - [x] **NXT-2 · P2** — **Done.** The streamed `HomeUserContent` Suspense child ran its own `getUser()` + `getLocalToday()`, both already resolved by `page.tsx`. It now takes `userId` + `today` as props (no second auth round-trip on the streamed path); the slow all-solves fetch stays in the child so it still streams after the shell. `_components/HomeUserContent.tsx`, `page.tsx`.
 - [x] **NXT-3 · P2** — **Done.** The home shell ran the `profiles` lookup and today's-solve check as two *sequential* round-trips after the main `Promise.all`; both depend only on `user` (+ the already-known puzzle id), so they're now a single parallel `Promise.all` — three serial DB hops → two. `page.tsx`.
-- [ ] **NXT-4 · P2** — No `error.tsx` / `not-found.tsx` anywhere; render throws hit React's default overlay. `apps/web/src/app/`. Add branded boundaries; `notFound()` for missing puzzles.
+- [x] **NXT-4 · P2** — **Done.** Added branded root boundaries: `apps/web/src/app/error.tsx` (`"use client"`, Mark + "The balance slipped" + a `unstable_retry`-backed *Try again* and *Back home*; logs the error) and `not-found.tsx` (server component, Mark + "404 / Nothing here" + *Back home* / *Browse the archive*). Both render inside the root layout, so they inherit the theme/font/tokens. `play/[date]/page.tsx` now calls `notFound()` (not `redirect("/archive")`) for a valid, non-future date with no puzzle row or a corrupt `grid_spec` — a genuine 404. *Home (`page.tsx`) and the daily `/play` deliberately **keep** graceful degradation — home renders the unavailable-state hero, `/play` serves the deterministic offline fallback (EPIC-A/CQ-3) — so they intentionally do **not** 404; the new boundaries cover their unexpected throws instead.* Verified live: unmatched URL → real `404`; `/play/1999-01-01` → branded not-found UI (200, streamed, per Next docs); a forced render throw → branded error UI with a working *Try again*. `tsc` clean, 30 web tests pass.
 - [ ] **NXT-5 · P3** — Board layout shift: default `cellSize=48` then post-mount resize. `BoardScreen.tsx:256-266`. Size via CSS `clamp()`/aspect-ratio.
 - [ ] **NXT-6 · P3** — `proxy` runs `getUser()` on `/api` + server-action requests. `proxy.ts:5-8`. Narrow the matcher to exclude `/api`.
 
