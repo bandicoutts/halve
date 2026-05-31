@@ -1,7 +1,7 @@
 "use client";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -198,6 +198,10 @@ function SolvedHero({ durationMs }: { durationMs?: number }) {
   );
 }
 
+/** Max content-column width — keeps the hero/CTA/cards readable on desktop,
+ *  matching the constrained-column convention used across the app. */
+const HOME_MAX = 480;
+
 interface HomeScreenProps {
   difficulty?: string;
   puzzleNumber?: number;
@@ -227,6 +231,17 @@ export function HomeScreen({
   const { theme, toggle } = useTheme();
 
   const [signInHovered, setSignInHovered] = useState(false);
+
+  // Stack the destination cards on very narrow screens so subtitles stop
+  // wrapping mid-phrase. Mirrors the matchMedia pattern used in ArchiveScreen.
+  const [stack, setStack] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 380px)");
+    const update = () => setStack(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   return (
     <div
@@ -294,11 +309,10 @@ export function HomeScreen({
       <div
         style={{
           flex: 1,
-          display: "flex",
-          flexDirection: "column",
           padding: "0 24px 28px",
         }}
       >
+       <div style={{ maxWidth: HOME_MAX, margin: "0 auto", width: "100%" }}>
         {/* Hero section */}
         <div style={{ marginTop: 26 }}>
           {/* StreakBand — renders via Suspense when authenticated */}
@@ -394,7 +408,13 @@ export function HomeScreen({
         {/* Destination cards */}
         <div style={{ marginTop: 36 }}>
           <Eyebrow style={{ marginBottom: 12 }}>Keep playing</Eyebrow>
-          <div style={{ display: "flex", gap: 12 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: stack ? "column" : "row",
+              gap: 12,
+            }}
+          >
             <DestCard
               motif={
                 <span style={{ display: "flex", gap: 6 }}>
@@ -419,10 +439,9 @@ export function HomeScreen({
           </div>
         </div>
 
-        <div style={{ flex: 1, minHeight: 20 }} />
-
-        {/* Footer */}
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        {/* Footer — trailing element with a comfortable gap; not pinned to the
+            viewport bottom, which previously left a large void on tall screens. */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 44 }}>
           <Link
             href="/tutorial"
             style={{
@@ -444,6 +463,7 @@ export function HomeScreen({
             How to play
           </Link>
         </div>
+       </div>
       </div>
     </div>
   );
