@@ -53,6 +53,9 @@ export function Board({
     <div style={{ position: "relative", width: total, height: total }}>
       {/* Grid of cells — data-row/col wrappers enable arrow-key navigation */}
       <div
+        role="grid"
+        aria-label={`Puzzle grid, ${N} by ${N}`}
+        aria-readonly={readOnly || undefined}
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${N}, ${cellSize}px)`,
@@ -62,19 +65,29 @@ export function Board({
         }}
         onKeyDown={handleKeyDown}
       >
-        {cells.map((row, r) =>
-          row.map((v, c) => (
-            <div key={`${r}-${c}`} data-row={r} data-col={c} style={{ display: "contents" }}>
-              <Cell
-                value={v}
-                isGiven={!!givens[r][c]}
-                isError={errors.has(`${r}-${c}`)}
-                size={cellSize}
-                onClick={readOnly ? undefined : () => onCellTap?.(r, c)}
-              />
-            </div>
-          ))
-        )}
+        {cells.map((row, r) => (
+          <div key={r} role="row" style={{ display: "contents" }}>
+            {row.map((v, c) => (
+              <div
+                key={c}
+                role="gridcell"
+                data-row={r}
+                data-col={c}
+                style={{ display: "contents" }}
+              >
+                <Cell
+                  value={v}
+                  isGiven={!!givens[r][c]}
+                  isError={errors.has(`${r}-${c}`)}
+                  rowIndex={r}
+                  colIndex={c}
+                  size={cellSize}
+                  onClick={readOnly ? undefined : () => onCellTap?.(r, c)}
+                />
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
 
       {/* Edge signs — positioned over the gap between cells */}

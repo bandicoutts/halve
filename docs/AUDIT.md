@@ -14,7 +14,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 
 **Suggested batch order** (✅ = shipped):
 1. ✅ **Quick-wins** — SEC-1, A11Y-4/5/6/8, CQ-4 *(commits `07cc982`, `318bab0`)*
-2. ⬜ **Accessibility P1s** — A11Y-1 (grid semantics), A11Y-2 (live regions), A11Y-3 (modal focus-trap). Self-contained to `board/` + `WinScreen`; good multi-agent candidate.
+2. ✅ **Accessibility P1s** — A11Y-1 (grid semantics), A11Y-2 (live regions), A11Y-3 (modal focus-trap). Shipped — see entries below.
 3. ⬜ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Pure correctness (the UTC-vs-local midnight bug).
 4. ⬜ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-1/2, CQ-1/3. Highest impact; writes an edge-function change (deploy stays manual).
 5. ⬜ **Remaining P2/P3** — SEC-2/3/4, NXT-2/3/4, BE-4, DS-1 (+DS-2/3/4), CQ-2/5/6, A11Y-7/9/10/11, ENG-2/4, SEC-5/6/7, BE-5, NXT-5/6.
@@ -33,7 +33,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 | Backend / data | 🟡 adequate | 2 | 2 | 1 |
 | Next.js / performance | 🟡 adequate | 1 | 3 | 2 |
 | Code quality / tests | 🟡 adequate | 1 | 2 | 3 |
-| Accessibility | 🟠 needs-work | 4 | 4 | 4 |
+| Accessibility | 🟠 needs-work | 0 | 4 | 4 |
 
 **Independent engine verification (2026-05-31):** a from-scratch rule-checker + backtracking solution-counter (no engine internals) over **360 puzzles** (120 each easy/medium/hard) found 0 rule violations, 0 non-unique, 0 givens-not-⊆-solution, 0 non-deterministic, correct difficulty distribution. Puzzle correctness is confirmed.
 
@@ -73,9 +73,9 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - [ ] **SEC-7 · P3** — Moderate transitive CVE: postcss <8.5.10 (build-time, not exploitable here). Bump `next`/postcss on routine cadence.
 
 ## Accessibility 🟠
-- [ ] **A11Y-1 · P1** — Puzzle grid lacks `grid`/`gridcell` semantics + per-cell position/given/error context (unplayable by SR). `Board.tsx:52-78`, `Cell.tsx:46`.
-- [ ] **A11Y-2 · P1** — No `aria-live` regions: timer, win, validation errors, save failures all silent. `BoardScreen.tsx`, `Cell.tsx:32`, `WinScreen.tsx`.
-- [ ] **A11Y-3 · P1** — Win overlay (and abandon-confirm) is a modal with no `role=dialog`/`aria-modal`, no focus trap, no focus return. `WinScreen.tsx:166-176`, `BoardScreen.tsx:400-426`.
+- [x] **A11Y-1 · P1** — **Done.** `Board.tsx` now renders `role="grid"` (with `aria-label`/`aria-readonly`) → `role="row"` → `role="gridcell"`; `Cell.tsx` builds a per-cell `aria-label` (`Row N, column M, <solid|open|empty>[, given][, error]`). Verified live: grid labelled "Puzzle grid, 6 by 6", 6 rows × 36 gridcells, sample cell reads "Row 1, column 1, open, given".
+- [x] **A11Y-2 · P1** — **Done.** Added a visually-hidden `role="status" aria-live="polite"` region in `BoardScreen` that announces validation conflicts (`N cells in conflict`) and the solve result (`Puzzle solved in …`); timer is `role="timer"` with an `aria-label`; `WinScreen` save-failure block is `role="alert"`. Verified live: timer reads "Elapsed time 0:00", live region updated to "Puzzle solved in 0:14" on completion.
+- [x] **A11Y-3 · P1** — **Done.** New `useFocusTrap` hook (`apps/web/src/hooks/useFocusTrap.ts`): moves focus in, traps Tab, Escape-to-close, restores focus on unmount. Applied to the win overlay (`WinScreen`, `role=dialog`/`aria-modal`/`aria-label`) and the abandon-confirm (`BoardScreen`, `role=dialog`/`aria-modal`/`aria-labelledby`). Verified live: the abandon-confirm opens as an `aria-modal` dialog with focus trapped inside ("Keep playing"), and Escape closes it + restores focus to the Back button. The win overlay was confirmed on a real solve — `dialog "Puzzle complete"` / `aria-modal=true`, focus moved in to the Close button, and the live region announced "Puzzle solved in 4:59."
 - [x] **A11Y-4 · P1** — **Done.** Added `--clay-550 #746B5A` (light) and `--dust-400 #928873` (dark) and repointed `--fg-3` to them; old `clay-500`/`dust-500` retained as decorative-only. Measured: light **4.67:1** bg / 4.96 surface; dark **5.37:1** bg / 4.78 surface — both clear AA 4.5:1 and stay below `fg-2` so the hierarchy holds. Synced `tokens.css` + `tokens.ts` (rebuilt `dist`); verified resolved values + both themes in the preview.
 - [x] **A11Y-5 · P2** — **Done** (`Input.tsx`): `useId` drives `label htmlFor` ↔ `input id` (verified associated), `aria-invalid` + `aria-describedby` on error, error `<p>` gets `role="alert"`.
 - [x] **A11Y-6 · P2** — **Done** (`IconButton.tsx` now floors the hit area at 44px, so every Back/Close button is ≥44 regardless of caller `size`; verified 44×44). The toggle (32h), avatar (32) and sign-in pill (34h) were left as-is — they clear the WCAG **2.2 AA** target-size minimum (24px); 44px is the AAA target, now met for the primary nav buttons.

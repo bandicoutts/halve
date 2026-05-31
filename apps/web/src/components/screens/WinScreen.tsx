@@ -1,5 +1,6 @@
 "use client";
 import { useTheme } from "@/components/providers/ThemeProvider";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
@@ -134,6 +135,8 @@ export function WinScreen({
   onSecondary,
 }: WinScreenProps) {
   const { theme, toggle } = useTheme();
+  // The win screen is a modal overlay: trap focus while shown, restore on close.
+  const dialogRef = useFocusTrap<HTMLDivElement>(true, onClose);
 
   const eyebrow =
     kind === "practice"
@@ -165,6 +168,11 @@ export function WinScreen({
 
   return (
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Puzzle complete"
+      tabIndex={-1}
       style={{
         position: "fixed",
         inset: 0,
@@ -341,6 +349,7 @@ export function WinScreen({
           {/* Save failure — solve wasn't recorded; offer a retry */}
           {saveError && (
             <div
+              role="alert"
               style={{
                 width: "100%",
                 marginTop: 16,
