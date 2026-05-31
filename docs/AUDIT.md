@@ -30,7 +30,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 | Engine | 🟢 strong | 0 | 1 | 1 |
 | Design system | 🟢 strong | 0 | 1 | 3 |
 | Security | 🟡 adequate | 1 | 3 | 3 |
-| Backend / data | 🟢 strong | 0 | 1 | 0 |
+| Backend / data | 🟢 strong | 0 | 1 | 1 |
 | Next.js / performance | 🟡 adequate | 0 | 3 | 2 |
 | Code quality / tests | 🟡 adequate | 0 | 1 | 1 |
 | Accessibility | 🟠 needs-work | 0 | 4 | 4 |
@@ -88,10 +88,11 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 
 ## Backend / data 🟡
 - [x] **BE-1 · P1** — **Done (consumer side).** All three consumer pages (`page.tsx`, `play/page.tsx`, `play/[date]/page.tsx`) now gate by `await getLocalToday()` — the same cookie-backed local-day clock streaks use — so the served puzzle's date == the streak's "today". Covered by `local-date.test.ts`. *The edge function (`daily-puzzle/index.ts:13`) mints by UTC with no user cookie; that producer-side policy is folded into EPIC-A and left unchanged here.*
-- [x] **BE-2 · P1** — **Done (EPIC-A; apply pending).** Migration `20260531040000_monitor_daily_puzzle.sql` captures the cron's pg_net request id and runs a 00:15 `check_daily_puzzle()` monitor that writes to `public.ops_alert` + `RAISE WARNING` on a missing row / non-2xx. `/play` also `console.error`s loudly when today's row is absent. Applied + verified 2026-05-31 (monitor runs clean, `ops_alert` empty).
-- [x] **BE-3 · P2** — **Done (documented + backfill written; apply needs sign-off).** `solveDay()` now carries an explicit BOUNDARY CAVEAT comment explaining the unrecoverable-local-date limit and why legacy rows stay UTC-bucketed. Backfill migration `20260531030000_backfill_local_date.sql` populates `local_date := (solved_at at time zone 'UTC')::date` for null rows (idempotent) — **awaits manual apply** (see deploy notes). Covered by `solveDay` tests in `local-date.test.ts`.
+- [x] **BE-2 · P1** — **Done (EPIC-A; applied 2026-05-31).** Migration `20260531040000_monitor_daily_puzzle.sql` captures the cron's pg_net request id and runs a 00:15 `check_daily_puzzle()` monitor that writes to `public.ops_alert` + `RAISE WARNING` on a missing row / non-2xx. `/play` also `console.error`s loudly when today's row is absent. Applied + verified 2026-05-31 (monitor runs clean, `ops_alert` empty). *Residual → BE-6.*
+- [x] **BE-3 · P2** — **Done (applied 2026-05-31).** `solveDay()` now carries an explicit BOUNDARY CAVEAT comment explaining the unrecoverable-local-date limit and why legacy rows stay UTC-bucketed. Backfill migration `20260531030000_backfill_local_date.sql` populates `local_date := (solved_at at time zone 'UTC')::date` for null rows (idempotent). Covered by `solveDay` tests in `local-date.test.ts`.
 - [ ] **BE-4 · P2** — No index on `solves.local_date` (latent; only matters once a date-filtered query is added). Add `(user_id, local_date)` when needed.
 - [x] **BE-5 · P3** — **Done (EPIC-A).** The cron/edge function now mints via `generateDaily`, which applies the `easy/medium/hard/medium` cadence from `dailyPolicy` instead of hardcoding `medium`. Deployed 2026-05-31.
+- [ ] **BE-6 · P3** — Daily-puzzle failure alerting is **passive**: `check_daily_puzzle()` (the BE-2 monitor) records failures to `public.ops_alert` + `RAISE WARNING` (Postgres logs) but there is **no active push** — nobody is notified unless they poll the table/logs. Add a delivery hook (a Supabase DB webhook on `ops_alert` inserts → email/Slack/PagerDuty, or a scheduled digest) so a missed daily mint actually pages someone. `20260531040000_monitor_daily_puzzle.sql`, `public.ops_alert`.
 
 ## Next.js / performance 🟡
 - [x] **NXT-1 · P1** — **Done.** Removed the client-side `todayLabel()` (`new Date()` at render) from `HomeScreen`; the label is now computed server-side via `formatDateLabel(await getLocalToday())` in `page.tsx` and passed as the `todayLabel` prop. Deterministic, UTC-pinned → no SSR/CSR mismatch. Verified live (hero "SUNDAY, MAY 31", clean reload).
