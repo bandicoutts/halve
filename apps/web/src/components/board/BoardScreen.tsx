@@ -196,6 +196,11 @@ export function BoardScreen({
     const pid = puzzleId;
     const finalGrid = cellsRef.current;
     void (async () => {
+      // Guests get a silent no-op — no solve to record, no streak to show.
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const result = await recordSolve({
         puzzleId: pid,
         grid: finalGrid,
@@ -211,9 +216,6 @@ export function BoardScreen({
 
       if (kind === "daily") {
         const today = new Date().toLocaleDateString("en-CA");
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
         const { data: solveDays } = await supabase
           .from("solves")
           .select("solved_at, local_date")
