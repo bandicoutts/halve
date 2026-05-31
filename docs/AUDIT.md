@@ -6,6 +6,23 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 
 **How we work it:** code changes land in batches, each verified (`tsc`, tests, preview) and committed. Items that mutate prod infra — **applying DB migrations, deploying edge functions, changing Vercel/Supabase config, and `git push`** — are NOT auto-done; they're surfaced for explicit sign-off.
 
+---
+
+## ▶ Resume here (read this first)
+
+**To pick up in a fresh session:** read this file + root `CLAUDE.md`, then do the next batch. To verify logged-in screens, `POST /api/dev-login?secret=<DEV_LOGIN_SECRET from apps/web/.env.local>` (see the `auth-verification-dev-login` memory).
+
+**Suggested batch order** (✅ = shipped):
+1. ✅ **Quick-wins** — SEC-1, A11Y-4/5/6/8, CQ-4 *(commits `07cc982`, `318bab0`)*
+2. ⬜ **Accessibility P1s** — A11Y-1 (grid semantics), A11Y-2 (live regions), A11Y-3 (modal focus-trap). Self-contained to `board/` + `WinScreen`; good multi-agent candidate.
+3. ⬜ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Pure correctness (the UTC-vs-local midnight bug).
+4. ⬜ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-1/2, CQ-1/3. Highest impact; writes an edge-function change (deploy stays manual).
+5. ⬜ **Remaining P2/P3** — SEC-2/3/4, NXT-2/3/4, BE-4, DS-1 (+DS-2/3/4), CQ-2/5/6, A11Y-7/9/10/11, ENG-2/4, SEC-5/6/7, BE-5, NXT-5/6.
+
+**Guardrail (don't auto-do):** `git push`, applying DB migrations to the live DB, deploying the edge function, Vercel/Supabase config. Write the code; surface these for sign-off.
+
+---
+
 ## Scorecard
 
 | Domain | Assessment | P1 | P2 | P3 |
