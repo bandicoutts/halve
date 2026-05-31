@@ -11,7 +11,7 @@ import { Fire } from "@/components/symbols/Fire";
 import { Water } from "@/components/symbols/Water";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { Monogram } from "@/components/ui/Monogram";
+import { AccountMenu } from "@/components/ui/AccountMenu";
 import { formatDuration } from "@/lib/format";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -262,25 +262,7 @@ export function HomeScreen({
         right={
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {isAuthenticated ? (
-              <Link
-                href="/stats"
-                aria-label="Your account and stats"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 999,
-                  transition: "box-shadow .15s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = "0 0 0 2px var(--accent-tint)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                <Monogram name={displayName || "?"} size={32} />
-              </Link>
+              <AccountMenu displayName={displayName || "?"} />
             ) : (
               <Link
                 href="/auth"
