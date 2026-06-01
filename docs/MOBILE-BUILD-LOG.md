@@ -23,7 +23,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 12 | Practice | ✅ done & committed |
 | 13 | Settings | ✅ done & committed |
 | 14 | Auth | ✅ done & committed |
-| 15 | Notifications | ⬜ |
+| 15 | Notifications | ✅ done & committed |
 | 16 | Tablet adaptive layouts | ⬜ |
 | 17 | Android specifics | ⬜ |
 | 18 | Polish | ⬜ |
@@ -640,4 +640,58 @@ Do Phase 15 — Notifications, per plan Phase 15:
 5. Gotcha: flutter_local_notifications doesn't yet support iOS Swift Package Manager — CocoaPods still works (non-blocking deprecation notice persists from Phase 1).
 
 Verify: unit test schedule time computation (given hour + ampm → correct TimeOfDay); manual device test for delivery (iOS simulator + Android emulator); flutter analyze clean + flutter test green (175 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 15 done + add a Phase 16 handoff prompt) and commit/push.
+```
+
+---
+
+## Phase 15 — Notifications ✅ (2026-06-01)
+
+**What shipped:**
+
+- `lib/firebase_options.dart` — placeholder stub (PLACEHOLDER values) so the app compiles. Replace via `flutterfire configure` per `apps/mobile/FIREBASE-SETUP.md`. Firebase init is wrapped in `lib/data/firebase_client.dart` with a try/catch; app runs without push when credentials are absent.
+- `lib/data/firebase_client.dart` — `initFirebase()` (graceful: logs + returns false on placeholder creds) + `isFirebaseInitialized` guard used throughout.
+- `lib/data/notification_service.dart` — `NotificationService.instance` singleton:
+  - `init()`: initialises `flutter_local_notifications`, sets timezone via `flutter_timezone`, creates Android "Daily puzzle" channel (HIGH importance).
+  - `requestPermission()`: iOS provisional authorization (`provisional: true` — quiet delivery, no aggressive banner dialog); Android 13+ `POST_NOTIFICATIONS` dialog; FCM token request gated on `isFirebaseInitialized`.
+  - `reminderTimeOfDay(int hour, String ampm) → TimeOfDay` — pure top-level function for 12→24h conversion (1–12 × am/pm, midnight/noon edge-cases correct).
+  - `scheduleDaily(hour, ampm)`: `zonedSchedule` with `matchDateTimeComponents: DateTimeComponents.time` (daily repeat), `AndroidScheduleMode.exactAllowWhileIdle`, `UILocalNotificationDateInterpretation.absoluteTime`. Copy: `"Today's Halve puzzle is ready."` Title: `'Halve'`. Notification ID 1.
+  - `cancelReminder()`: cancels ID 1.
+  - `rescheduleOnLaunch(prefs)`: called at startup — reschedules if `halve:reminder` is true, ensuring the slot survives app updates.
+  - `showFcmNotification(message)`: shows a local notification (ID 2) for FCM messages received in foreground.
+  - `routeStream`: broadcast stream of route strings emitted on local notification tap.
+  - `firebaseMessagingBackgroundHandler` / `onBackgroundNotificationTap` — required top-level `@pragma('vm:entry-point')` functions.
+- `lib/main.dart` — Firebase init + FCM background handler registered before any stream; `NotificationService.instance.init()` + `rescheduleOnLaunch` at startup; `HalveApp._wireNotifications()` subscribes to `routeStream`, `getInitialMessage`, `onMessageOpenedApp`, `onMessage` — all FCM paths guarded on `isFirebaseInitialized`.
+- `lib/screens/firstrun/firstrun.dart` — `_playFirstPuzzle` now calls `NotificationService.instance.requestPermission()` before marking onboarded (permission gated on Accept = "Play today's puzzle").
+- `lib/screens/settings/settings_screen.dart` — `_setReminder` schedules/cancels on toggle; `_setReminderHour` and `_setReminderAmpm` reschedule when reminder is on.
+- `android/settings.gradle.kts` — `com.google.gms.google-services` plugin added (`apply false`).
+- `android/app/build.gradle.kts` — `com.google.gms.google-services` applied.
+- `apps/mobile/FIREBASE-SETUP.md` — full manual steps: create Firebase project, `flutterfire configure`, iOS Push capability + entitlements, APNs key upload, Android google-services.json, verification notes.
+- `apps/mobile/.gitignore` — `ios/Runner/GoogleService-Info.plist` and `android/app/google-services.json` gitignored.
+- `pubspec.yaml` — `flutter_timezone: ^1.0.0` added; `timezone` promoted to direct dependency (`any`) to satisfy `depend_on_referenced_packages` lint.
+
+**Decisions:**
+- Firebase graceful degradation pattern mirrors Supabase: placeholder `firebase_options.dart` + `isFirebaseInitialized` guard. App runs fully offline (daily reminder still works) without real Firebase credentials.
+- `reminderTimeOfDay` is a top-level function (not a method) so tests import only a pure function — no mock setup.
+- iOS provisional authorization: no aggressive OS dialog on firstrun; users get quiet notifications and can upgrade to full permission in System Settings if they choose.
+- `rescheduleOnLaunch` at every startup: ensures the reminder survives after an app update, which clears pending OS notifications on both platforms.
+- FCM background handler is a no-op (system auto-displays background notifications); only foreground messages need `showFcmNotification`.
+
+**Verification:** `flutter analyze` → No issues found. `flutter test` → **187/187** (175 prior + 12 new in `test/data/notification_service_test.dart`: 12-AM midnight, 12-PM noon, 1–11 AM, 1/6/8/11 PM, 8 AM default, all-24 no-collision, minutes-always-zero).
+
+**Follow-ups:**
+1. Run `flutterfire configure` + complete FIREBASE-SETUP.md steps before any push-notification testing on device.
+2. Real-device test: iOS simulator supports local notifications but NOT APNs/FCM — test FCM on physical device.
+3. The CocoaPods deprecation notice for `flutter_local_notifications` and `flutter_timezone` is non-blocking (same as Phase 1).
+4. Phase 16: tablet adaptive layouts.
+
+---
+
+## Handoff prompt → Phase 16 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 15 section + Phase 16 plan section; skim 0–14). Work on the existing feat/mobile-app branch.
+
+Context in place: design system (lib/theme + lib/widgets), app shell (go_router), data layer (authRepositoryProvider, providers.dart), Settings (Phase 13), Auth (Phase 14 — magic-link, pops on sign-in), Notifications (Phase 15 — local daily reminder + FCM wired, 187 tests green). Firebase credentials are placeholder — see apps/mobile/FIREBASE-SETUP.md for real setup.
+
+Do Phase 16 — Tablet adaptive layouts, per plan Phase 16. Read the plan section for exact requirements before starting.
 ```

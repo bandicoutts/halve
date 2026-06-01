@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/notification_service.dart';
 import '../../data/onboarding.dart';
 import '../../router/app_router.dart';
 import '../tutorial/tutorial_flow.dart';
@@ -32,6 +33,10 @@ class _FirstRunScreenState extends ConsumerState<FirstRunScreen> {
   }
 
   Future<void> _playFirstPuzzle() async {
+    // Request OS notification permission when the user accepts (taps Continue).
+    // iOS: provisional authorization (quiet, no aggressive banner dialog).
+    // Android 13+: POST_NOTIFICATIONS dialog shown by the OS.
+    await NotificationService.instance.requestPermission();
     await _markOnboarded();
     if (mounted) context.go(Routes.play);
   }

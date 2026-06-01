@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../data/notification_service.dart';
 import '../../providers/providers.dart';
 import '../../router/app_router.dart';
 import '../../theme/app_radii.dart';
@@ -491,6 +492,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_reminderKey, on);
+      if (on) {
+        await NotificationService.instance.scheduleDaily(_reminderHour, _reminderAmpm);
+      } else {
+        await NotificationService.instance.cancelReminder();
+      }
     } catch (_) {}
   }
 
@@ -499,6 +505,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_reminderHourKey, hour);
+      if (_reminderOn) {
+        await NotificationService.instance.scheduleDaily(hour, _reminderAmpm);
+      }
     } catch (_) {}
   }
 
@@ -507,6 +516,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_reminderAmpmKey, ampm);
+      if (_reminderOn) {
+        await NotificationService.instance.scheduleDaily(_reminderHour, ampm);
+      }
     } catch (_) {}
   }
 

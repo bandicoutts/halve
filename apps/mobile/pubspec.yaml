@@ -32,6 +32,10 @@ dependencies:
   firebase_core: ^3.13.0
   firebase_messaging: ^15.2.5
   flutter_local_notifications: ^18.0.1
+  # flutter_timezone: gets device IANA timezone name for zonedSchedule accuracy.
+  flutter_timezone: ^1.0.0
+  # timezone: required directly for TZDateTime; also a transitive dep of flutter_local_notifications.
+  timezone: any
 
   # Local storage (settings + offline puzzle cache)
   shared_preferences: ^2.5.3
