@@ -1,29 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'data/supabase_client.dart';
 import 'router/app_router.dart';
 import 'theme/theme.dart';
-
-/// Supabase project credentials, injected at build time via
-/// `--dart-define=SUPABASE_URL=… --dart-define=SUPABASE_ANON_KEY=…`.
-/// Empty until Phase 4 wires the real env / data layer — initialization is
-/// guarded so `flutter run` works without them.
-const _supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-const _supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (_supabaseUrl.isNotEmpty && _supabaseAnonKey.isNotEmpty) {
-    try {
-      await Supabase.initialize(url: _supabaseUrl, anonKey: _supabaseAnonKey);
-    } catch (e) {
-      debugPrint('Supabase init failed (continuing as guest): $e');
-    }
-  } else {
-    debugPrint('Supabase credentials absent — running without a backend '
-        '(Phase 4 wires this).');
+  // Initialise Supabase if build-time creds are present; otherwise run as a
+  // guest with no backend (keeps `flutter run` working until creds are wired).
+  try {
+    final ok = await initSupabase();
+    debugPrint(ok
+        ? 'Supabase initialised.'
+        : 'Supabase credentials absent — running as guest (no backend).');
+  } catch (e) {
+    debugPrint('Supabase init failed (continuing as guest): $e');
   }
 
   runApp(const ProviderScope(child: HalveApp()));

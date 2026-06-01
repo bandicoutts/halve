@@ -12,7 +12,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 1 | Monorepo scaffold | ✅ done & committed |
 | 2 | Design system | ✅ done & committed |
 | 3 | App shell | ✅ done & committed |
-| 4 | Supabase integration | ⬜ |
+| 4 | Supabase integration | ✅ done & committed |
 | 5 | On-device validator | ⬜ |
 | 6 | Home screen | ⬜ |
 | 7 | Play board | ⬜ |
@@ -181,4 +181,44 @@ Do Phase 4 — Supabase integration (lib/data/), per plan Phase 4:
 5. solve_repository.dart — recordSolve({puzzleId, grid, durationMs, usedHint, localDate}) → record_solve RPC (handle alreadySolved + network retry); fetchSolves(userId) for stats/archive/home streak.
 
 Verify: unit tests for model JSON round-trip + mocked (mocktail) repository tests for query shapes and recordSolve error handling; flutter analyze clean + flutter test green (existing 18 pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 4 done + add a Phase 5 handoff prompt) and commit/push to feat/mobile-app. Gotchas: signOut scope:local; never expose service role; streaks derive from solves (never denormalized); design tokens are the source of truth.
+```
+
+---
+
+## Phase 4 — Supabase integration ✅ (2026-06-01)
+
+**What shipped — `lib/data/` + `lib/providers/`:**
+- `data/supabase_client.dart` — `supabaseUrl`/`supabaseAnonKey` (`--dart-define`), `isSupabaseConfigured`, `initSupabase()` (no-op + returns false when unconfigured → guest mode), `supabase` getter, and **`authRedirectUrl = 'halve://auth-callback'`** (custom scheme; must match the Supabase redirect allow-list — see `AUTH-DEEPLINK-SETUP.md`). `main.dart` now calls `initSupabase()`.
+- `data/models/` — `puzzle.dart` (`Difficulty`/`EdgeOrientation`/`EdgeKind` enums, `Edge`, `Puzzle`, typedefs `Cell`/`Grid`/`Solution`). **`Puzzle.tryParse` is a faithful Dart port of the web `parseGridSpec`** (apps/web/src/lib/grid-spec.ts): validates solution 6×6 of 0/1, givens agree with solution, edges in-bounds + consistent with the solution; returns null on any malformation (corrupt row treated like missing). `solve.dart` (`SolveRow`, `RecordSolveResult` with `ok`/`alreadySolved`/`error` + `networkFailure` sentinel for retry). `archive_day.dart` (`ArchiveDay` + `withSolves` join). `stats.dart` (`Stats.fromSolves` — derived current/longest streak by local day, null-`local_date` → UTC-of-`solved_at` fallback per DECISIONS BE-3; **derived, never denormalized**). `models.dart` barrel.
+- `data/repositories/` — `AuthRepository` (magic link via `signInWithMagicLink` → `signInWithOtp(emailRedirectTo: authRedirectUrl)`; `onAuthStateChange`; **`signOut(scope: SignOutScope.local)`** — global rule), `PuzzleRepository` (`fetchDaily(localDate)` eq date maybeSingle, `fetchByDate`, `fetchArchive(today)` date-not-null ≤ today ordered, `withSolves` in-memory intersection, `fetchPracticePuzzle(difficulty, seq?)` via `get_practice_puzzle` RPC — **no client-side daily generation**, offline = cache in Phase 6), `SolveRepository` (`recordSolve` via `record_solve` RPC, catches transport errors → `networkFailure`; `fetchSolves(userId)`). RPC param maps extracted as static helpers for testing.
+- `providers/providers.dart` — Riverpod (manual, no codegen): `supabaseClientProvider` (throws in guest mode), `authRepositoryProvider`, `puzzleRepositoryProvider`, `solveRepositoryProvider`, `authStateProvider` (StreamProvider; empty stream in guest mode), `currentUserProvider`, `isSignedInProvider`. Guest-safe (no read at startup; screens wire these in Phases 6+).
+
+**Decisions / notes:**
+- **Manual Riverpod providers, not codegen** — clearer, zero generated `.g.dart` churn this phase. `@riverpod` codegen is set up (build_runner) and can be adopted later.
+- **Repository test strategy:** rather than mock the brittle PostgREST fluent chain, the pure boundaries are unit-tested — model round-trips, `Puzzle.tryParse` rejection cases (bad difficulty, wrong solution size, given/solution disagreement, out-of-bounds edge, edge inconsistent with solution), `RecordSolveResult.fromRpc`, and the extracted RPC param maps. `AuthRepository` IS mocked (mocktail `GoTrueClient`) to lock the two critical contracts: `signOut` uses **local** scope (never global), and the magic link sends the `halve://auth-callback` redirect.
+- `record_solve`/`get_practice_puzzle` RPCs themselves shipped in Phase 0 (not pushed to the DB yet — see Phase 0 follow-ups). The Dart side mirrors their signatures exactly.
+
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → **45/45** (the 18 prior + 27 new: model parse/round-trip/rejection, Stats streaks, `RecordSolveResult` parsing, param builders, mocked auth scope/redirect). App still boots + navigates on iOS sim + Android emulator (data layer is dormant until Phase 6 wires it).
+
+**Follow-ups:**
+1. Backend must be live for real data: apply Phase 0 migrations + seed the practice pool (Phase 0 follow-ups), then run with `--dart-define SUPABASE_URL=… --dart-define SUPABASE_ANON_KEY=…`.
+2. Deep-link platform config (iOS Associated Domains / Android intent filter) + Supabase allow-list entry still required for magic-link round-trip — `AUTH-DEEPLINK-SETUP.md`, completed in Phase 14.
+3. `Stats.fromSolves` streak rule is provisional; Phase 11 reconciles it against the web's canonical `computeStreak`.
+
+---
+
+## Handoff prompt → Phase 5 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 4 section first; skim 0–3). Work on the existing feat/mobile-app branch.
+
+Context in place: design system (lib/theme + lib/widgets), app shell (go_router + adaptive nav), and the data layer (lib/data: models incl. Puzzle/Edge with Cell=int? typedefs, repositories, providers). analyze + 45 tests green.
+
+Do Phase 5 — On-device move validator (lib/engine/validator.dart), per plan Phase 5:
+1. Pure Dart, NO Flutter imports (engine-agnostic rule). Reuse the model typedefs from lib/data/models/puzzle.dart (Cell = int?, Grid, Solution, Edge with EdgeOrientation/EdgeKind) — do not redefine them; import the model file (it has no Flutter deps).
+2. findViolations(cells, edges) → Set of (row,col) coords: adjacency (3+ same symbol in a row/col run), balance (>3 of a symbol in any line — mark ALL cells of the over-represented symbol in that line), edges (eq/ne violated when BOTH endpoints filled). Adjacency marks all 3 offending cells.
+3. isComplete(cells) (no nulls), isValid (no violations), isSolved (complete && valid). cycle(int? v): empty→0→1→empty. localHint(cells, solution) → (r,c,value) for a RANDOM empty cell (Phase 2 decision: hints are fully local, no endpoint).
+4. Mirror EXACT semantics from packages/engine/src/validators.ts + board.ts. Gotcha: balance marks all cells of the over-represented symbol in the line; adjacency marks all 3 cells of a run.
+
+Verify (thorough — this is the only ported game logic): unit tests for each constraint pass+fail, combined violations, isSolved true/false, cycle, localHint picks only empty cells; cross-check a couple of fixtures against the TS engine's expected output (read packages/engine/src/validators.test.ts for fixtures). flutter analyze clean + flutter test green (45 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 5 done + add a Phase 6 handoff prompt) and commit/push to feat/mobile-app. Gotcha: pure Dart only in lib/engine; design tokens are the source of truth.
 ```
