@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'data/puzzle_cache.dart';
 import 'data/supabase_client.dart';
 import 'router/app_router.dart';
+import 'screens/home/home_provider.dart';
 import 'theme/theme.dart';
 
 Future<void> main() async {
@@ -19,7 +22,16 @@ Future<void> main() async {
     debugPrint('Supabase init failed (continuing as guest): $e');
   }
 
-  runApp(const ProviderScope(child: HalveApp()));
+  // Persistent offline puzzle cache (D3). Falls back to in-memory if prefs fail.
+  final overrides = <Override>[];
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    overrides.add(puzzleCacheProvider.overrideWithValue(PrefsPuzzleCache(prefs)));
+  } catch (e) {
+    debugPrint('SharedPreferences unavailable — using in-memory cache: $e');
+  }
+
+  runApp(ProviderScope(overrides: overrides, child: const HalveApp()));
 }
 
 class HalveApp extends StatefulWidget {

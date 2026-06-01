@@ -14,7 +14,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 3 | App shell | ✅ done & committed |
 | 4 | Supabase integration | ✅ done & committed |
 | 5 | On-device validator | ✅ done & committed |
-| 6 | Home screen | ⬜ |
+| 6 | Home screen | ✅ done & committed |
 | 7 | Play board | ⬜ |
 | 8 | Win screen | ⬜ |
 | 9 | First-run flow | ⬜ |
@@ -255,4 +255,54 @@ Do Phase 6 — Home screen, per plan Phase 6 (replace the HomeScreen placeholder
 5. Offline cache: persist today + recent puzzles to shared_preferences (D3); sync on reconnect.
 
 Verify: widget tests for each Home variant (mock the providers — override puzzleRepositoryProvider/solveRepositoryProvider/currentUserProvider in a ProviderScope); flutter analyze clean + flutter test green (60 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 6 done + add a Phase 7 handoff prompt) and commit/push. Gotchas: no emoji (flame is a line glyph); tabular numerals for streak/times; m:ss time format; sentence case; design tokens are the source of truth; streaks derive from solves.
+```
+
+---
+
+## Phase 6 — Home screen ✅ (2026-06-01)
+
+**What shipped — `lib/screens/home/`:**
+- `home_screen.dart` — `HomeScreen` (`ConsumerWidget`) replacing the placeholder. Scrollable, `RefreshIndicator.adaptive` (pull-to-refresh re-runs the loader). Header = `HalveMark` + "Halve" wordmark + settings gear (→`/settings`). Renders one of these variants off `homeDataProvider`:
+  - **loading** — `Skeleton` blocks for the streak band (66), meta row (52% w), H1 (78% w), and CTA (full pill); the keep-playing cards still render.
+  - **normal / not-solved** — `_MetaRow` (date · difficulty · #number, uppercase tracked), the 44px "Today's puzzle" H1, and a primary **Play today** CTA (→`/play`).
+  - **solved-today** — green `check_circle` + "Solved in m:ss" (tabular), "Next puzzle at midnight", secondary **See your stats** (→`/stats`). The CTA is replaced.
+  - **offline** (D3) — cache-hit → playable CTA + a slim "Offline — showing a saved puzzle" banner; cache-miss → an inline "Puzzle unavailable — try again shortly" notice (wifi-off glyph) + a **Reload** button (`ref.invalidate`).
+  - **empty** — no puzzle row for today → "Today's puzzle isn't ready yet — check back soon."
+  - **streak band** (signed-in & streak>0) — accent-tint disc + **`FlameIcon`** (Lucide flame, traced as a stroked line glyph — no emoji), `N` in accent + tabular figures, "day streak", and 7 mini day-dots (last 7 days, today rightmost). Signed-in & streak==0 → the quiet "Start your streak today" nudge (`HalveMark` in a sunken disc). Signed-out → no band.
+  - **keep-playing** — Practice card (Disc+Ring motif → `/practice`) and Archive card ("N puzzles · last <difficulty>" → `/archive`). Footer "How to play" → `/tutorial`.
+- `home_provider.dart` — `homeDataProvider` (`FutureProvider.autoDispose<HomeData>`) loads in one pass: today's puzzle via `fetchDaily(localToday())` (cached on success), `fetchArchive(today)` for the puzzle number + archive count + **yesterday's difficulty**, and — when signed in — `fetchSolves(user.id)` → streak + last-7 + today's solve duration. Reading the repos throws in guest mode (no creds); that's caught and treated as offline. `puzzleCacheProvider` (defaults in-memory) lives here.
+
+**New shared pieces:**
+- `lib/data/local_date.dart` — `localToday()`, `formatDateLabel()` ("Monday, June 1", no `intl`), `solveDay()`, `formatDay()` — Dart mirror of `apps/web/src/lib/local-date.ts`.
+- `lib/data/streak.dart` — `offsetDay` / `computeStreak` (TODAY-SAFE) / `computeLongestStreak` / `computeLastDays` — faithful port of `apps/web/src/lib/streak.ts`. (`Stats.fromSolves` from Phase 4 is left for the full Stats screen in Phase 11; Home uses these web-mirroring helpers so streak + last-7 match web exactly.)
+- `lib/data/puzzle_cache.dart` — `PuzzleCache` interface, `PrefsPuzzleCache` (shared_preferences, last 7 dailies, re-validated through `Puzzle.tryParse` on read), `InMemoryPuzzleCache` (default + test fake). `Puzzle.toCacheMap()` added to the model. `main.dart` overrides `puzzleCacheProvider` with `PrefsPuzzleCache` after `SharedPreferences.getInstance()`.
+- `lib/widgets/flame_icon.dart` — `FlameIcon`, the Lucide flame path traced 1:1 as a stroked `CustomPainter` (defaults to accent). Exported from the widgets barrel.
+
+**Decisions (logged in `docs/DECISIONS.md`, "MOBILE Phase 6"):** offline cache via shared_preferences with an in-memory default + `main.dart` override; **no `connectivity_plus`** — a failed fetch *is* the offline signal; resync = pull-to-refresh / `ref.invalidate` re-fetch (no background listener); streak/date math is a 1:1 web port and stays derived from `solves`.
+
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → **83/83** (the prior 60 + 8 Home variant widget tests using mocked `puzzleRepositoryProvider`/`solveRepositoryProvider`/`currentUserProvider`/`puzzleCacheProvider`: normal, solved-today, streak band, empty-streak nudge, loading, offline-no-cache, offline-with-cache, empty-no-puzzle; + 5 `local_date` + 10 `streak` unit tests cross-checking the web semantics). The two Phase-3 shell tests were updated (Home now has an "Archive" card that collides with the nav label → nav taps disambiguated via a `HalveBottomNav` descendant finder; the shell test seeds deterministic Home data so "Play today" renders).
+
+**Follow-ups:**
+1. Not yet runtime-verified on a device/simulator this session (widget tests cover all variants). A quick `flutter run` to eyeball the flame glyph + spacing is recommended before shipping; backend must be live (`--dart-define` creds + applied migrations) for non-offline data.
+2. "Puzzle No." and the Archive card count both use `fetchArchive(today).length` (the ordinal of today's daily). If a distinct global sequence number is wanted later, add a column/RPC.
+3. `RefreshIndicator` is the only resync trigger; if a real-time reconnect refresh is wanted, add a lifecycle/connectivity listener in a later polish phase.
+
+---
+
+## Handoff prompt → Phase 7 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 6 + Phase 7 plan section; skim 0–5). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: the mobile wireframes at ~/Downloads/halve (4).zip — unzip and read app/screens/board.jsx + play.jsx (the play board, cell states, header, undo/hint controls) and app/HANDOFF.md (Play/board sections + minimum tap targets). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it. Also read apps/web/src/components/board/BoardScreen.tsx + Board.tsx + Cell.tsx + the useGame reducer for the canonical interaction model to mirror.
+
+Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/HalveIconButton/HalveTopBar/EqNeBadge/SymbolDisc/SymbolRing + context.halveColors/halveShadows), app shell (go_router; /play, /play/:date, /practice/play?difficulty= all route to PlayScreen — currently a placeholder), data layer (Puzzle/Edge models, puzzleRepositoryProvider, solveRepositoryProvider), the on-device validator (lib/engine/validator.dart: findViolations/isComplete/isValid/isSolved/cycle/wouldViolate/localHint), the local-day helpers (lib/data/local_date.dart), and the offline puzzle cache (lib/data/puzzle_cache.dart). analyze + 83 tests green.
+
+Do Phase 7 — Play board, per plan Phase 7 (replace the PlayScreen placeholder in lib/screens/play/):
+1. play_screen.dart + play_provider.dart (a Notifier holding the working Grid + timer + undo stack + usedHint). Load the puzzle: daily via fetchDaily(localToday) / a date via fetchByDate / practice via fetchPracticePuzzle(difficulty, seq) — fall back to the offline cache for the daily when fetch fails. Givens are locked.
+2. The 6×6 board: SymbolDisc/SymbolRing cells, locked-given styling, tap to cycle (validator.cycle: empty→disc→ring→empty), live violation highlighting (validator.findViolations — adjacency/balance/edge), the =/≠ edge badges (EqNeBadge) between cells. Match board.jsx exactly (cell radius, hairlines, given vs entered contrast, violation tint).
+3. Header = back + difficulty label only (no tab bar — Play is full-screen). Controls row: Undo (disabled when the stack is empty) + Hint (validator.localHint → fills a random empty cell, sets usedHint). A monospace tabular timer (AppTypography.timer) running from first interaction.
+4. On solve (validator.isSolved): record via solveRepository.recordSolve({puzzleId, grid, durationMs, usedHint, localDate}) — handle alreadySolved + the network-retry path (RecordSolveResult.networkFailure). Practice puzzles are NOT recorded (Phase 0 decision — no puzzleId write). Then route to the Win screen (Phase 8 — a placeholder hand-off is fine; just navigate with the result/duration).
+
+Verify: widget tests (tap cycles a cell, a forced violation highlights, undo reverts, hint fills an empty cell + flags usedHint, isSolved triggers the record call — mock solveRepository) + a timer test; flutter analyze clean + flutter test green (83 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 7 done + add a Phase 8 handoff prompt) and commit/push. Gotchas: practice solves are never recorded; duration clamped to ≥1ms (web parity, the duration_ms>0 check); tabular numerals for the timer; design tokens are the source of truth; keep validator semantics in lockstep with the engine.
 ```

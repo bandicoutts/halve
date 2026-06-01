@@ -192,4 +192,17 @@ class Puzzle {
       edges: edges,
     );
   }
+
+  /// Serialise back to the backend row shape (`id`, `difficulty`, `grid_spec`)
+  /// for the offline cache (D3). Round-trips through [tryParse], so a cached
+  /// payload is re-validated on read exactly like a fresh row.
+  Map<String, Object?> toCacheMap() => {
+        'id': id,
+        'difficulty': difficulty.wire,
+        'grid_spec': {
+          'solution': solution,
+          'givens': givens,
+          'edges': [for (final e in edges) e.toJson()],
+        },
+      };
 }

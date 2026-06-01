@@ -4,6 +4,7 @@
 library;
 
 export 'eq_ne_badge.dart';
+export 'flame_icon.dart';
 export 'halve_bottom_nav.dart';
 export 'halve_bottom_sheet.dart';
 export 'halve_button.dart';
