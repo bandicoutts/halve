@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'data/onboarding.dart';
 import 'data/puzzle_cache.dart';
 import 'data/supabase_client.dart';
 import 'router/app_router.dart';
@@ -23,19 +24,30 @@ Future<void> main() async {
   }
 
   // Persistent offline puzzle cache (D3). Falls back to in-memory if prefs fail.
+  // Also reads the first-run gate flag to pick the cold-start landing route.
   final overrides = <Override>[];
+  var onboarded = false;
   try {
     final prefs = await SharedPreferences.getInstance();
     overrides.add(puzzleCacheProvider.overrideWithValue(PrefsPuzzleCache(prefs)));
+    onboarded = prefs.getBool(onboardedKey) ?? false;
   } catch (e) {
     debugPrint('SharedPreferences unavailable — using in-memory cache: $e');
   }
 
-  runApp(ProviderScope(overrides: overrides, child: const HalveApp()));
+  runApp(ProviderScope(
+    overrides: overrides,
+    child: HalveApp(
+      initialLocation: firstRunInitialLocation(onboarded: onboarded),
+    ),
+  ));
 }
 
 class HalveApp extends StatefulWidget {
-  const HalveApp({super.key});
+  const HalveApp({super.key, this.initialLocation = Routes.home});
+
+  /// The cold-start route — `/firstrun` for a fresh device, `/` otherwise.
+  final String initialLocation;
 
   @override
   State<HalveApp> createState() => _HalveAppState();
@@ -43,7 +55,7 @@ class HalveApp extends StatefulWidget {
 
 class _HalveAppState extends State<HalveApp> {
   // Built once and held so navigation state survives rebuilds.
-  final _router = createAppRouter();
+  late final _router = createAppRouter(initialLocation: widget.initialLocation);
 
   @override
   Widget build(BuildContext context) {

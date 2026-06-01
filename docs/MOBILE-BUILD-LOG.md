@@ -17,7 +17,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 6 | Home screen | ✅ done & committed |
 | 7 | Play board | ✅ done & committed |
 | 8 | Win screen | ✅ done & committed |
-| 9 | First-run flow | ⬜ |
+| 9 | First-run flow | ✅ done & committed |
 | 10 | Archive | ⬜ |
 | 11 | Stats | ⬜ |
 | 12 | Practice | ⬜ |
@@ -393,4 +393,47 @@ Do Phase 9 — First-run flow, per plan Phase 9 (build out lib/screens/firstrun/
 4. Decide + wire whether first-run also offers sign-in (the magic-link AuthScreen is Phase 14 — a placeholder link is fine), and whether completing the tutorial seeds anything.
 
 Verify: widget tests for the first-run gate (visited flag persists, returning users skip) + the tutorial board interactions (reuse the validator); flutter analyze clean + flutter test green (102 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 9 done + add a Phase 10 handoff prompt) and commit/push. Gotchas: no emoji (brand mark/glyphs); design tokens are the source of truth; persist flags to shared_preferences with the HANDOFF keys; streaks derive from solves; signOut scope:local.
+```
+
+---
+
+## Phase 9 — First-run flow ✅ (2026-06-01)
+
+**What shipped — `lib/screens/tutorial/` + `lib/screens/firstrun/` + the cold-start gate:**
+- `lib/data/onboarding.dart` — the first-run gate flag. `onboardedKey = 'halve:onboarded'`, an `OnboardingStore` interface + `SharedPrefsOnboarding` (guarded, swallows `MissingPluginException`), `onboardingStoreProvider`, and the pure `firstRunInitialLocation({onboarded})` helper (→ `/firstrun` or `/`).
+- `lib/main.dart` — reads `halve:onboarded` alongside the cache prefs at startup and passes `firstRunInitialLocation(...)` to `HalveApp(initialLocation:)` → `createAppRouter(initialLocation:)`. Fresh device cold-starts on `/firstrun`; returning users land on Home (no flash, no live redirect).
+- `lib/screens/tutorial/tut_fixture.dart` — `Tut4`, the hand-authored 4×4 (solution / givens / four `=`/`≠` edges / the one guided forced move), ported 1:1 from the wireframe `TUT4`.
+- `lib/screens/tutorial/teach_board.dart` — `TeachBoard` + `TeachCell`: a size-agnostic square board with absolute edge signs (`EqNeBadge`), per-cell given/entered/empty/**violation** states plus the teaching affordances (accent **highlight** ring, **dim**-the-rest, tappable-**subset**) and a press-scale. `ValueKey('tut-cell-r-c')` per cell for tests.
+- `lib/screens/tutorial/tutorial_flow.dart` — `TutorialFlow` (the 5 beats: two-symbol intro → no-crowding → half-and-half → read-the-edges, each with ✓/✗ rule strips, → guided forced-move → free solve; progress dots + a Skip link throughout) and `TutorialWin` (the quiet "You've got it" beat + a framed keepsake of the solved 4×4, win-mark swell). Live conflict feedback + the "N squares in conflict" footer come from `validator.findViolations`; solve detection compares to `Tut4.solution`.
+- `lib/screens/firstrun/firstrun.dart` — `FirstRunScreen` hosts `TutorialFlow` → `TutorialWin`; marks the device onboarded on skip **and** on completion; **skip → Home**, **"Play today's puzzle" → the real daily (`/play`)**.
+- `lib/screens/tutorial/tutorial_screen.dart` — the footer-launched `/tutorial` (from Home + Play): the same flow, but skip/finish just **pop back** (no gating, no daily re-launch).
+
+**Decisions (logged in `docs/DECISIONS.md`, "MOBILE Phase 9"):** the gate is a one-shot `initialLocation` decision (not a router redirect); one `TutorialFlow` serves both `/firstrun` and `/tutorial` (host decides the exit); the teach board reuses the on-device validator for live feedback (size-agnostic at n=4); the **notification primer + native OS permission prompt are deferred to Phase 15** (they need real `flutter_local_notifications`/permission wiring) — first-run ends by launching the daily instead.
+
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → **111/111** (the prior 102 + 9 new: `test/data/onboarding_test.dart` — gate helper + `SharedPrefsOnboarding` round-trip; `test/screens/firstrun/firstrun_test.dart` — starts on the tutorial, Skip persists onboarded + lands Home; `test/screens/tutorial/tutorial_flow_test.dart` — walks the lesson steps into the guided solve, the guide cell is the only tappable one + advances, the validator tints a forced conflict, completing the solve fires `onComplete`).
+
+**Follow-ups:**
+1. Not yet runtime-verified on a device/simulator this session (widget tests cover the gate + interactions). A `flutter run` (delete the app / clear app data to re-trigger the gate) to eyeball the rule strips, the guided dim/highlight, and the win keepsake is recommended.
+2. **Notification primer + native permission prompt deferred to Phase 15** — the wireframe's post-solve primer (value-forward, iOS provisional / Android "Daily puzzle" channel) and the OS prompt land with the notifications wiring.
+3. **First-run does not yet offer sign-in.** Plan item 4: the magic-link `AuthScreen` is Phase 14; a sign-in offer in first-run (and wiring the guest-streak source that lights up the Phase-8 win nudge) can be revisited then.
+4. The standalone `/tutorial` does not set a separate "tutorial-seen" flag (the web sets `halve-tutorial-seen`); only first-run writes `halve:onboarded`. Add one if a "you've seen this" affordance is wanted later.
+
+---
+
+## Handoff prompt → Phase 10 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 9 + Phase 10 plan section; skim 0–8). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: the mobile wireframes at ~/Downloads/halve (4).zip — unzip and read app/screens/home.jsx (the `Archive` + `MonthPickerSheet` components) and app/HANDOFF.md §5 (Archive — month navigation, day tap, cell visual states, difficulty dots, legend). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it. Also read apps/web/src/components/screens/ArchiveScreen.tsx for the canonical month grid + day-state + solved-intersection logic to mirror.
+
+Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/HalveIconButton/HalveTopBar/HalveMark/SymbolDisc/SymbolRing/SafeScaffold/showHalveBottomSheet + context.halveColors/halveShadows), app shell (go_router; ArchiveScreen is the 2nd tab — currently a PhasePlaceholder), data layer (puzzleRepository.fetchArchive(today) → List<ArchiveDay> ascending + withSolves(days, solves) in-memory intersection; solveRepository.fetchSolves), the local-day helpers (lib/data/local_date.dart), and the on-device validator. analyze + 111 tests green.
+
+Do Phase 10 — Archive, per plan Phase 10 (replace the ArchiveScreen placeholder in lib/screens/archive/):
+1. archive_screen.dart + archive_provider.dart. Load: fetchArchive(today) for the dated dailies (ascending) and — when signed in — fetchSolves(user.id), then withSolves(...) to mark solved days + best durations. Derive the available month range from the data (HANDOFF: March–June 2026 in the prototype window).
+2. The month calendar grid (match home.jsx Archive + HANDOFF §5): a 7-col weekday grid per month, 56px day cells. Cell states — Solved (accent-tint bg, 1.5px accent border, accent number), Missed (dashed hairline border), Today (2px accent border), Future (dashed + opacity 0.3). Past day cells (solved AND missed) show 1–3 monochrome difficulty dots (easy 1 / medium 2 / hard 3; Difficulty.dots) below the number. Legend row beneath.
+3. Month navigation — three equivalent mechanisms: left/right chevrons (muted at the oldest/newest available month), tapping the month label opens a MonthPickerSheet (showHalveBottomSheet; reverse-chronological months, each with solved/total counts, selected month accent-tinted), and a horizontal swipe on the grid (44px threshold; left = older, right = newer).
+4. Day tap: today/past solved → /play/:date (or /play for today); missed past day → a day sheet (or straight to /play/:date) to play that archive puzzle; future → no-op. Practice solves never appear here (Phase 0). Tabular numerals for all counts/dates; streaks/solved-state derive from solves.
+
+Verify: widget tests (month grid renders solved/missed/today/future states from mocked providers, difficulty dots, month nav clamps at range ends, day tap routes to /play/:date) + the month-range derivation; flutter analyze clean + flutter test green (111 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 10 done + add a Phase 11 handoff prompt) and commit/push. Gotchas: no emoji; tabular numerals; sentence case; design tokens are the source of truth; streaks/solved-state derive from solves; signOut scope:local.
 ```
