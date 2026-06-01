@@ -23,7 +23,17 @@ correct; the *naming and the prose* have drifted.
 
 ---
 
-## 2. Native rules (the app-vs-web guardrails)
+## 2. Device coverage convention
+
+Every prototype batch shows **at minimum 2 device sizes**: one phone and one tablet. The
+eventual target is all 4 combinations (iOS phone, iOS tablet, Android phone, Android
+tablet), but to keep early rounds lean, start with **one of each size** before splitting
+by platform. Once layouts are stable, add the second platform per size.
+
+Default starting pair: **iOS phone + iPad** (the most common review targets). Add Android
+phone + Android tablet in the round that finalises layouts.
+
+## 3. Native rules (the app-vs-web guardrails)
 
 These turn the web-isms found in round 1 into positive rules. Every mobile screen holds
 them:
@@ -47,7 +57,7 @@ them:
 
 ---
 
-## 3. Surface inventory & status
+## 4. Surface inventory & status
 
 | Surface | Status | Notes |
 |---|---|---|
@@ -68,7 +78,7 @@ Legend: ✅ done · ⚠️ needs targeted fix · 🟡 partial · 📋 decision l
 
 ---
 
-## 4. Locked decisions
+## 5. Locked decisions
 
 _Resolved 2026-06-01 (round 1). D1 backed by `research/2026-06_notifications.md`._
 
@@ -97,7 +107,7 @@ _Resolved 2026-06-01 (round 1). D1 backed by `research/2026-06_notifications.md`
 
 ---
 
-## 5. Round log
+## 6. Round log
 
 - **Round 1** — Vendored initial mobile prototype (Home / Play / Win / Share, 2 themes,
   iOS + Android, 3 nav variants). Reviewed; native rules + open decisions seeded above.

@@ -57,7 +57,15 @@ emoji** — e.g. `streak 8`).
 
 A static HTML/JSX prototype (same harness style as the current mobile prototype) showing:
 the onboarding tutorial steps with ✓/✗ states, the first-solve moment, and the post-solve
-notification primer — on **both iOS and Android**, in **both themes**. Export a zip.
+notification primer — in **both themes**.
+
+**Device coverage (standing convention from round 2 onwards):** show at minimum **one
+phone and one tablet** per batch. For this batch: **iOS phone + iPad**. The eventual
+target is all 4 (iOS phone, iPad, Android phone, Android tablet), but start with one of
+each size so the layout decisions are visible before splitting by platform. Tablet layouts
+should give the board more room to breathe — don't simply scale up the phone layout.
+
+Export a zip.
 
 ## Not in this batch (coming in batch 2)
 
