@@ -280,6 +280,7 @@ class PlayResult {
     required this.usedHint,
     required this.solution,
     required this.size,
+    required this.localDate,
     this.puzzleId,
     this.date,
     this.saveResult,
@@ -292,6 +293,11 @@ class PlayResult {
   final bool usedHint;
   final Solution solution;
   final int size;
+
+  /// The player's local day (`yyyy-MM-dd`) the solve belongs to — needed to
+  /// re-call `record_solve` on the Win screen's network retry.
+  final String localDate;
+
   final String? puzzleId;
   final String? date;
 

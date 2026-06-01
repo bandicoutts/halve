@@ -46,6 +46,26 @@ class HintGlyph extends StatelessWidget {
   }
 }
 
+/// Lucide `share` — the Share-result action glyph (box with an arrow rising
+/// out of it). Matches the web `ShareIcon`.
+class ShareGlyph extends StatelessWidget {
+  const ShareGlyph({super.key, this.strokeWidth = 1.75});
+
+  final double strokeWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = IconTheme.of(context);
+    return CustomPaint(
+      size: Size.square(theme.size ?? 24),
+      painter: _SharePainter(
+        color: theme.color ?? const Color(0xFF000000),
+        strokeWidth: strokeWidth,
+      ),
+    );
+  }
+}
+
 Paint _stroke(Color color, double strokeWidth) => Paint()
   ..color = color
   ..style = PaintingStyle.stroke
@@ -128,5 +148,47 @@ class _HintPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_HintPainter old) =>
+      old.color != color || old.strokeWidth != strokeWidth;
+}
+
+class _SharePainter extends CustomPainter {
+  _SharePainter({required this.color, required this.strokeWidth});
+
+  final Color color;
+  final double strokeWidth;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 24, size.height / 24);
+
+    // Lucide share: box "M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8",
+    //   arrow head "16 6 12 2 8 6", shaft "12 2 → 12 15".
+    final box = Path()
+      ..moveTo(4, 12)
+      ..relativeLineTo(0, 8)
+      ..arcToPoint(const Offset(6, 22),
+          radius: const Radius.circular(2), clockwise: false)
+      ..relativeLineTo(12, 0)
+      ..arcToPoint(const Offset(20, 20),
+          radius: const Radius.circular(2), clockwise: false)
+      ..relativeLineTo(0, -8);
+    final head = Path()
+      ..moveTo(16, 6)
+      ..lineTo(12, 2)
+      ..lineTo(8, 6);
+    final shaft = Path()
+      ..moveTo(12, 2)
+      ..lineTo(12, 15);
+
+    final paint = _stroke(color, strokeWidth);
+    canvas.drawPath(box, paint);
+    canvas.drawPath(head, paint);
+    canvas.drawPath(shaft, paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_SharePainter old) =>
       old.color != color || old.strokeWidth != strokeWidth;
 }

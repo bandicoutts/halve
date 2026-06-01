@@ -16,7 +16,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 5 | On-device validator | ✅ done & committed |
 | 6 | Home screen | ✅ done & committed |
 | 7 | Play board | ✅ done & committed |
-| 8 | Win screen | ⬜ |
+| 8 | Win screen | ✅ done & committed |
 | 9 | First-run flow | ⬜ |
 | 10 | Archive | ⬜ |
 | 11 | Stats | ⬜ |
@@ -349,4 +349,48 @@ Do Phase 8 — Win screen, per plan Phase 8 (build out lib/screens/win/win_scree
 5. Share: a platform-native share sheet (share_plus) with the spoiler-free payload "Halve No. <n> · <time> · <difficulty> · streak <n>\nNo spoilers — play at halve.today" — match ShareSheet in play.jsx. Primary "Share result" + secondary "See your stats" (→/stats); Close → home.
 
 Verify: widget tests for the win states (keepsake renders the solution, streak line, signed-out nudge appears at streak≥3 and dismiss persists, signed-in Synced dot, network-retry re-calls recordSolve — mock solveRepository) + the share payload string; flutter analyze clean + flutter test green (90 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 8 done + add a Phase 9 handoff prompt) and commit/push. Gotchas: no emoji (use the brand mark/glyphs); tabular numerals for time/streak/countdown; m:ss; share text must stay spoiler-free; signOut scope:local; streaks derive from solves; design tokens are the source of truth.
+```
+
+---
+
+## Phase 8 — Win screen ✅ (2026-06-01)
+
+**What shipped — `lib/screens/win/`:**
+- `win_screen.dart` — the full keepsake, replacing the Phase-7 placeholder. A `ConsumerStatefulWidget` consuming the handed-off `PlayResult`:
+  - **Keepsake** — the `win-mark` brand-mark swell (scale 0.7→1, back-out), the uppercase eyebrow (`PUZZLE NO. <n>` / `PRACTICE` / `HALVE`), "Solved in" + the big tabular `display` time, and the framed **SolvedBoard card** (`win-settle` translate-up; a "Halve" logo lockup + the keepsake date header; the full solution rendered as sunken Disc/Ring cells with the staggered **cell-pop** opacity+scale). Matches `play.jsx` `HalveWin` + `WinScreen.tsx`.
+  - **Metadata line** — `<difficulty> · <N>-day streak` (streak in accent, tabular) + (signed-in & saved) a green `●` **Synced** dot. Shown for daily when streak > 0.
+  - **Streak nudge** (signed-out, daily, streak ≥ 3, not dismissed) — the tappable "Your N-day streak lives on this device — sign in to keep it safe" row (→ `/auth`) + a 44×44 dismiss × that persists `halve:streak-nudge-dismissed` to `shared_preferences`.
+  - **Network retry** — when `saveResult.isNetworkError`, a "Couldn't save — Retry" row re-runs `record_solve` (grid == solution, so it re-records straight from the `PlayResult`). `alreadySolved` is success.
+  - **Share** — primary **Share result** (Lucide `ShareGlyph`) fires the native `share_plus` sheet with the spoiler-free `buildShareText` payload; secondary kind-aware action (`See your stats` / `Back to archive` / `New puzzle`); Close (×) → home. Daily also shows a "Next puzzle in <h>m" countdown (computed once at build, no timer).
+- `win_provider.dart` — `winInfoProvider` (`FutureProvider.autoDispose.family<WinInfo, WinQuery>`) resolves `dayNo` (daily = `fetchArchive(today).length`; archive = the date's 1-based position; practice = null) + `streak` (`computeStreak` over `fetchSolves`, signed-in only). `streakNudgePrefsProvider` (real `shared_preferences` impl that swallows `MissingPluginException`; injectable fake for tests). Pure helpers: `buildShareText`, `difficultyLabel`, `formatKeepsakeDate`, `formatCountdownToMidnight`.
+- `lib/widgets/play_glyphs.dart` — added `ShareGlyph` (Lucide `share`, traced 1:1 as a stroked painter, like the Undo/Hint glyphs); exported via the widgets barrel.
+- `lib/screens/play/play_provider.dart` — `PlayResult` gained `localDate` (threaded from `PlayLoad.localDate` in `play_screen.dart`) so the win-screen retry can re-call `record_solve`.
+
+**Decisions (logged in `docs/DECISIONS.md`, "MOBILE Phase 8"):** win-metadata is a separate FutureProvider overlaid on the synchronous `PlayResult` (backend never blocks the keepsake); native share via `share_plus` with an extracted, unit-tested spoiler-free payload; the streak-nudge UI + `shared_preferences` persistence are built now but the **guest device-streak source is deferred** (no on-device guest solve log yet → `winInfoProvider` returns streak 0 for guests, so the nudge stays dormant in production until that store lands); retry re-records from the `PlayResult` (solved grid = solution); entrance motion via `TweenAnimationBuilder` + one staggered `AnimationController`, all zero-duration under `reduceMotion`, and the countdown computed once (no periodic timer) so the win screen leaves no pending ticker/timer.
+
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → **102/102** (the prior 90 + 12 new in `test/screens/win/win_screen_test.dart`: keepsake renders all 36 solution cells as 18 Disc + 18 Ring, difficulty+streak meta, nudge appears at streak≥3 / hidden below 3 / hidden when already dismissed / dismiss-persists-to-prefs, signed-in Synced dot, network-retry re-calls `recordSolve` with the right args, practice eyebrow with no streak/nudge, + 3 `buildShareText` payload cases).
+
+**Follow-ups:**
+1. Not yet runtime-verified on a device/simulator this session (widget tests cover the states). A `flutter run` to eyeball the win-mark swell, the staggered cell-pop, the keepsake card shadow, and the real native share sheet is recommended before shipping; the backend must be live for `dayNo`/`streak`/`Synced`.
+2. **Guest streak nudge is dormant** until a local guest solve log exists (Phase 9 first-run / later persistence work). The nudge UI, gating (≥3), and dismissal persistence are all wired — only the guest-streak *source* is missing.
+3. Practice/archive secondary CTAs route to `/practice` and `/archive`; revisit once those screens (Phases 10/12) are real.
+
+---
+
+## Handoff prompt → Phase 9 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 8 + Phase 9 plan section; skim 0–7). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: the mobile wireframes at ~/Downloads/halve (4).zip — unzip and read app/screens/firstrun.jsx + tutorial.jsx (the first-run / how-to-play flow, the symbol intro, the practice-tutorial board) and app/HANDOFF.md (first-run + tutorial sections; the persistence keys table). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it. Also read apps/web/src/components/screens/ for the canonical tutorial/first-run flow to mirror.
+
+Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/HalveIconButton/HalveTopBar/HalveMark/SymbolDisc/SymbolRing/EqNeBadge/SafeScaffold + context.halveColors/halveShadows), app shell (go_router; /firstrun and /tutorial route to placeholders), data layer, the on-device validator, the Play board (Phase 7), and the Win screen (Phase 8). analyze + 102 tests green. NOTE: the Win-screen streak nudge is wired for guests but currently dormant — there is no on-device guest solve log yet; if Phase 9 introduces local first-run/guest persistence, wire the guest streak source so the nudge activates.
+
+Do Phase 9 — First-run flow, per plan Phase 9 (build out lib/screens/firstrun/ + lib/screens/tutorial/):
+1. The first-run gate: on cold start with no prior visit, route to /firstrun (persist a halve:visited-style flag to shared_preferences; mirror the HANDOFF persistence keys). Returning users skip straight to Home.
+2. The first-run sequence (match firstrun.jsx): brand/symbol intro (Disc = fills space, Ring = defines space), the core rules in plain language, a "Play your first puzzle" CTA → today's daily, and a low-friction "skip" → Home.
+3. The tutorial / how-to-play (match tutorial.jsx): a guided interactive mini-board teaching adjacency + balance + the =/≠ edges, reachable from the "How to play" footers already wired on Home + Play. Reuse the validator for live feedback.
+4. Decide + wire whether first-run also offers sign-in (the magic-link AuthScreen is Phase 14 — a placeholder link is fine), and whether completing the tutorial seeds anything.
+
+Verify: widget tests for the first-run gate (visited flag persists, returning users skip) + the tutorial board interactions (reuse the validator); flutter analyze clean + flutter test green (102 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 9 done + add a Phase 10 handoff prompt) and commit/push. Gotchas: no emoji (brand mark/glyphs); design tokens are the source of truth; persist flags to shared_preferences with the HANDOFF keys; streaks derive from solves; signOut scope:local.
 ```

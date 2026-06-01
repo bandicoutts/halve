@@ -291,6 +291,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
         usedHint: state.usedHint,
         solution: _puzzle.solution,
         size: _puzzle.size,
+        localDate: widget.load.localDate,
         puzzleId: widget.load.puzzleId,
         date: widget.load.date,
         saveResult: saveResult,
