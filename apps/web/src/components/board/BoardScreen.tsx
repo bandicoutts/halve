@@ -278,18 +278,19 @@ export function BoardScreen({
     ? `${errors.size} cell${errors.size === 1 ? "" : "s"} in conflict.`
     : "";
 
-  const [cellSize, setCellSize] = useState(48);
+  const boardWrapRef = useRef<HTMLDivElement>(null);
+  const [cellSize, setCellSize] = useState<number | null>(null);
   useEffect(() => {
-    const compute = () =>
-      Math.floor(
-        Math.min((window.innerWidth - 48) / 6, (window.innerHeight * 0.55) / 6)
-      );
-    setCellSize(compute());
-    const handler = () => setCellSize(compute());
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
+    const el = boardWrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => {
+      // 6 cells + 5 gaps (gap ≈ 0.16×cellSize) → total ≈ 6.8×cellSize
+      setCellSize(Math.floor(entry.contentRect.width / 6.8));
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
-  const gap = Math.max(6, Math.floor(cellSize * 0.16));
+  const gap = cellSize ? Math.max(6, Math.floor(cellSize * 0.16)) : 8;
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -418,16 +419,24 @@ export function BoardScreen({
           padding: "24px 16px",
         }}
       >
-        <Board
-          cells={cells}
-          givens={puzzle.givens}
-          edges={puzzle.edges}
-          errors={errors}
-          onCellTap={tap}
-          cellSize={cellSize}
-          gap={gap}
-          readOnly={solved}
-        />
+        {/* CSS-sized container eliminates layout shift; cellSize is derived via ResizeObserver */}
+        <div
+          ref={boardWrapRef}
+          style={{ width: "min(calc(100vw - 48px), 55vh)", aspectRatio: "1" }}
+        >
+          {cellSize !== null && (
+            <Board
+              cells={cells}
+              givens={puzzle.givens}
+              edges={puzzle.edges}
+              errors={errors}
+              onCellTap={tap}
+              cellSize={cellSize}
+              gap={gap}
+              readOnly={solved}
+            />
+          )}
+        </div>
       </div>
 
       {showAbandonConfirm ? (

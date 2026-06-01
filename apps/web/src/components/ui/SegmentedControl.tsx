@@ -4,11 +4,14 @@ interface SegmentedControlProps {
   options: string[];
   value: string;
   onChange: (v: string) => void;
+  label?: string;
 }
 
-export function SegmentedControl({ options, value, onChange }: SegmentedControlProps) {
+export function SegmentedControl({ options, value, onChange, label }: SegmentedControlProps) {
   return (
     <div
+      role="group"
+      aria-label={label}
       style={{
         display: "flex",
         background: "var(--bg-sunken)",
@@ -23,6 +26,7 @@ export function SegmentedControl({ options, value, onChange }: SegmentedControlP
         return (
           <button
             key={opt}
+            aria-pressed={active}
             onClick={() => onChange(opt)}
             style={{
               flex: 1,

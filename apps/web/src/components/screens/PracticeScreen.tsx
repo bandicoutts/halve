@@ -53,7 +53,7 @@ export function PracticeScreen() {
 
         <div style={{ marginTop: 32 }}>
           <Eyebrow style={{ marginBottom: 12 }}>Difficulty</Eyebrow>
-          <SegmentedControl options={["Easy", "Medium", "Hard"]} value={diff} onChange={setDiff} />
+          <SegmentedControl options={["Easy", "Medium", "Hard"]} value={diff} onChange={setDiff} label="Difficulty" />
         </div>
 
         <div key={diff} style={{ marginTop: 22, background: "var(--surface)", border: "1px solid var(--hairline)", borderRadius: "var(--radius-xl)", padding: 24, animation: "lm-fade 0.22s ease" }}>

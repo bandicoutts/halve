@@ -10,8 +10,7 @@ export function Fire({ size = 32, fill = "var(--symbol-a)", style }: FireProps) 
       width={size}
       height={size}
       viewBox="0 0 100 100"
-      aria-label="solid"
-      role="img"
+      aria-hidden={true}
       style={style}
     >
       <circle cx="50" cy="50" r="42" fill={fill} />

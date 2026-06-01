@@ -11,6 +11,8 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
   const dark = theme === "dark";
   return (
     <button
+      role="switch"
+      aria-checked={dark}
       onClick={onToggle}
       aria-label={dark ? "Switch to light" : "Switch to dark"}
       style={{
