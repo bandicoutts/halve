@@ -10,7 +10,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 |------:|-------|--------|
 | 0 | Backend parity (record_solve RPC, practice pool, web align, auth deep-link) | ✅ done & committed |
 | 1 | Monorepo scaffold | ✅ done & committed |
-| 2 | Design system | ⬜ |
+| 2 | Design system | ✅ done & committed |
 | 3 | App shell | ⬜ |
 | 4 | Supabase integration | ⬜ |
 | 5 | On-device validator | ⬜ |
@@ -92,4 +92,50 @@ Do Phase 2 — Design system (lib/theme/ + widgets/), per plan Phase 2:
 6. widgets/ primitives: HalveButton (press-scale 0.97, 160–220ms, no hover), HalveIconButton (Lucide-style, 1.75px stroke), HalveBottomSheet (platform-aware), Skeleton (calm fade, no shimmer), SymbolDisc/SymbolRing CustomPainters (disc r=42; ring outer 42 stroke 12 → inner r36), EqNeBadge (typographic =/≠ capsule).
 
 Read packages/design/styles/tokens.css and docs/DESIGN.md (+ BRAND-CANON.md guardrails) before coding. Verify: golden tests for HalveButton, SymbolDisc/Ring, EqNeBadge in both themes + a widget test that HalveColors resolves per brightness; flutter analyze clean + flutter test green. Then update docs/MOBILE-BUILD-LOG.md (mark Phase 2 done + add a Phase 3 handoff prompt) and commit/push to feat/mobile-app. Gotcha: design tokens in packages/design are the source of truth — never hardcode colors/spacing.
+```
+
+---
+
+## Phase 2 — Design system ✅ (2026-06-01)
+
+**New reference used:** the user supplied a mobile-specific design handoff (`~/Downloads/halve (4).zip`) — HTML/JSX wireframes of all app screens in the **correct disc/ring brand** (the vendored `packages/design/handoff/` kit is the older fire/water build and is now superseded for mobile visuals). Key files: `app/HANDOFF.md` (screen specs, tap targets, nav z-stack, persistence keys), `app/halve.css` (token mirror), `app/screens/symbols.jsx` (Disc/Ring/Mark/Button/IconButton primitives, ported 1:1 here). The zip lives in Downloads, not the repo — it informs Phase 2 **and Phase 3 (app shell)** and beyond; pull it back in next session.
+
+**What shipped — `lib/theme/`:**
+- `app_colors.dart` — `HalvePalette` (raw reference values) + `HalveColors` `ThemeExtension` with **every** semantic token from `tokens.css` (surfaces, fg-1/2/3, hairlines, accent + strong/tint/on, symbol-a/b, correct/wrong + tints) as `const light`/`dark`. `symbolA` identical both themes; `symbolB` shifts (teal `#2A7A6E` → teal-bright `#6EC8BC`). **Repo `tokens.css` wins over the wireframe's drifted `halve.css`:** light fg-3 = `clay-550 #746B5A`, dark fg-3 = `dust-400 #928873` (AA-compliant), not the wireframe's `clay-500`/`dust-500`.
+- `app_spacing.dart` (`AppSpacing.s0…s11`, 8-pt) · `app_radii.dart` (`sm6/md10/cell12/lg16/xl22/full999` + `*R` `BorderRadius` helpers).
+- `app_typography.dart` — Space Grotesk styles (display56/h1 36/h2 26/h3 20 w500; body16; small14; label12 w600 +0.08em; timer44 w500 tabular). em→px letter-spacing pre-multiplied. `tabular()` helper (tnum + ss01). `textTheme(HalveColors)` maps onto Material slots. **Weight driven via `FontVariation('wght', …)` on the bundled variable font** (see decision below).
+- `app_shadows.dart` — `HalveShadows` `ThemeExtension` (sm/md/lg/cell `List<BoxShadow>` per theme), CSS box-shadow → BoxShadow offset/blur/spread.
+- `app_theme.dart` — `AppTheme.light()/dark()`: M3 `ColorScheme` from tokens, `scaffoldBackgroundColor=bg`, `textTheme`, **no ripple** (`NoSplash` + transparent splash/highlight — primitives confirm with a press-scale, per motion rules), registers both extensions. `context.halveColors` / `context.halveShadows` accessors.
+- `theme.dart` — barrel export.
+
+**What shipped — `lib/widgets/`:**
+- `symbols.dart` — `SymbolDisc` (CustomPainter, r=0.42·size fill), `SymbolRing` (stroke 0.12·size at r=0.36 → outer 0.42 matches disc), `HalveMark` (circle bisected by vertical hairline, left amber / right teal). All default to theme symbol colors, accept overrides.
+- `halve_button.dart` — `HalveButton` (primary/secondary, press-scale 0.97 @120ms, `full`, `leadingIcon`, disabled→opacity 0.4). `halve_icon_button.dart` — `HalveIconButton` (48px circular, press-scale 0.94, `active` accent ring, `Semantics`). `eq_ne_badge.dart` — `EqNeBadge` (`=`/`≠` glyph in bg-filled capsule + sm shadow). `skeleton.dart` — `Skeleton` (opacity 1↔0.42 breathing fade, **no shimmer**). `halve_bottom_sheet.dart` — `showHalveBottomSheet()` (surfaceRaised, 24px top radius, scrim; iOS drag handle).
+- `widgets.dart` — barrel. `main.dart` now boots the real light/dark themes (`ThemeMode.system`) with a holding screen exercising Mark + Disc + Ring (full shell is Phase 3).
+
+**Decision (logged in `docs/DECISIONS.md`): Space Grotesk bundled, `google_fonts` dropped.** `google_fonts` now hard-throws with `allowRuntimeFetching=false` and wants per-weight static assets (`SpaceGrotesk-Medium.ttf` …), but upstream ships only the variable font. Bundled `assets/fonts/SpaceGrotesk-VariableFont_wght.ttf` (+ `OFL.txt`) as a normal Flutter font family, weight via `FontVariation`. Offline, deterministic, no FOUT, one fewer dep. `pubspec.yaml`: removed `google_fonts`, added `flutter.fonts` entry.
+
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → **16/16 pass** (12 goldens: HalveButton primary/secondary, SymbolDisc/Ring, EqNeBadge eq/ne — each light+dark; 3 HalveColors-per-brightness; 1 Phase-1 smoke). `dart run build_runner build` → 0 outputs (no annotations). Goldens generated with the bundled font loaded via `test/flutter_test_config.dart` (real glyphs, not tofu) inside a `Material` harness (no debug underline). Visually eyeballed: amber pill, teal-bright ring on ink, `≠` capsule, hairline secondary button — all faithful.
+
+**Follow-ups / heads-up:**
+1. Goldens are committed under `test/widgets/goldens/`; regenerate with `flutter test --update-goldens` if the font or primitives change. They render with the bundled font so they're stable cross-machine, but CI runs on Linux — if antialiasing differs, re-baseline on CI once.
+2. `flutter_local_notifications` SwiftPM deprecation notice persists (non-blocking; Phase 15).
+
+---
+
+## Handoff prompt → Phase 3 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 2 section first; skim Phase 0–1). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: a mobile design handoff is at ~/Downloads/halve (4).zip — unzip it and read app/HANDOFF.md + app/screens/*.jsx. These are the CORRECT disc/ring wireframes for the whole app (the repo's packages/design/handoff/ is the older fire/water build — do NOT use it for mobile visuals). HANDOFF.md §"Navigation architecture" gives the exact z-index screen stack, entry points, and tap-target minimums; app/screens/nav.jsx + home.jsx (HalveApp shell) + frames/*.jsx show the intended shell. The Phase 2 design system (lib/theme + lib/widgets, both themes, analyze+test green) is in place — reuse HalveButton/HalveIconButton/HalveBottomSheet/Skeleton/Symbol*/EqNeBadge and the context.halveColors/halveShadows accessors; never hardcode colors/spacing.
+
+Do Phase 3 — App shell, per plan Phase 3:
+1. main.dart — ProviderScope → Supabase.initialize → MaterialApp.router. themeMode: ThemeMode.system (Settings override comes in Phase 13). (Supabase init can be a stub/guarded until Phase 4 wires real env — keep flutter run working.)
+2. router/app_router.dart — go_router routes: / (home), /play, /play/:date, /archive, /stats, /practice, /practice/play?difficulty=, /settings, /auth, /tutorial, /firstrun. StatefulShellRoute for the Home/Archive/Stats bottom-tab branches.
+3. Platform-adaptive bottom tab bar (anchored, not floating): iOS = bare labelled icons; Android = M3 NavigationBar with accent-pill active indicator. Auto-hide nav during Play (Play is a full-screen route outside the shell; its header = back + difficulty only). Match app/screens/nav.jsx.
+4. SafeScaffold wrapper using MediaQuery.viewPadding (status bar + home indicator); reduced-motion aware via MediaQuery.disableAnimations.
+5. Screens stay as placeholders (filled in Phases 6–14) — this phase is navigation + chrome only.
+
+Verify: widget test that tabs switch branches and that the Play route hides the tab bar; flutter analyze clean + flutter test green (existing 16 tests still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 3 done + add a Phase 4 handoff prompt) and commit/push to feat/mobile-app. Gotcha: signOut must use scope:local; design tokens are the source of truth.
 ```
