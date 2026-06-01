@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -9,34 +8,24 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../router/app_router.dart';
-import 'firebase_client.dart';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const _channelId = 'daily_puzzle';
 const _channelName = 'Daily puzzle';
 const _reminderId = 1; // stable ID for the daily reminder slot
-const _fcmForegroundId = 2; // throwaway ID for FCM foreground messages
 
 // Prefs keys — must match settings_screen.dart
 const _reminderKey = 'halve:reminder';
 const _reminderHourKey = 'halve:reminder_hour';
 const _reminderAmpmKey = 'halve:reminder_ampm';
 
-// ─── Background FCM handler (top-level — required by firebase_messaging) ──────
-
-@pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // System displays the notification automatically when the app is backgrounded.
-  // No additional action is required here.
-}
-
 // ─── Background local-notification tap handler (top-level — required) ─────────
 
 @pragma('vm:entry-point')
 void onBackgroundNotificationTap(NotificationResponse response) {
-  // Cannot navigate here (separate isolate). The app will handle navigation
-  // via getInitialMessage when it resumes.
+  // Cannot navigate here (separate isolate). Navigation is handled when the
+  // app resumes and routeStream emits via the foreground tap handler.
 }
 
 // ─── Public helper — pure function, easy to unit-test ─────────────────────────
@@ -132,9 +121,6 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
-    if (isFirebaseInitialized) {
-      await FirebaseMessaging.instance.requestPermission(provisional: true);
-    }
   }
 
   // ── Daily reminder ──────────────────────────────────────────────────────────
@@ -189,33 +175,5 @@ class NotificationService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
     return scheduled;
-  }
-
-  // ── FCM foreground ──────────────────────────────────────────────────────────
-
-  /// Show a local notification for an FCM message received while the app is in
-  /// the foreground (FCM doesn't auto-display in foreground on either platform).
-  Future<void> showFcmNotification(RemoteMessage message) async {
-    final n = message.notification;
-    if (n == null) return;
-    await _plugin.show(
-      _fcmForegroundId,
-      n.title ?? 'Halve',
-      n.body,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: false,
-          presentSound: true,
-        ),
-      ),
-    );
   }
 }

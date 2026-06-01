@@ -1,10 +1,8 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'data/firebase_client.dart';
 import 'data/notification_service.dart';
 import 'data/onboarding.dart';
 import 'data/puzzle_cache.dart';
@@ -15,12 +13,6 @@ import 'theme/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Firebase (graceful: placeholder credentials → skipped, no crash).
-  await initFirebase();
-
-  // Register background FCM handler before any Firebase stream is set up.
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   // Supabase (graceful: absent build-time creds → guest mode).
   try {
@@ -80,36 +72,8 @@ class _HalveAppState extends State<HalveApp> {
   void initState() {
     super.initState();
     _router = createAppRouter(initialLocation: widget.initialLocation);
-    _wireNotifications();
-  }
-
-  void _wireNotifications() {
-    // Local notification tap → /play (always active, no Firebase required)
-    NotificationService.instance.routeStream.listen(
-      (route) => _router.go(route),
-    );
-
-    // FCM streams are only available when Firebase is initialized.
-    if (!isFirebaseInitialized) return;
-
-    // FCM: app launched by tapping a notification while terminated
-    FirebaseMessaging.instance.getInitialMessage().then((message) {
-      if (message != null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _router.go(Routes.play);
-        });
-      }
-    });
-
-    // FCM: notification tapped while app was in background
-    FirebaseMessaging.onMessageOpenedApp.listen((_) {
-      _router.go(Routes.play);
-    });
-
-    // FCM: message received while app is in foreground → show local notification
-    FirebaseMessaging.onMessage.listen(
-      NotificationService.instance.showFcmNotification,
-    );
+    // Route to /play when the user taps a local notification.
+    NotificationService.instance.routeStream.listen(_router.go);
   }
 
   @override

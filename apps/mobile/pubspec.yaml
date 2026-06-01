@@ -28,9 +28,7 @@ dependencies:
   # Typography: Space Grotesk is bundled as a variable font asset
   # (see flutter.fonts below) — no runtime font fetching.
 
-  # Notifications
-  firebase_core: ^3.13.0
-  firebase_messaging: ^15.2.5
+  # Notifications (local only — FCM/Firebase deferred until backend push is needed)
   flutter_local_notifications: ^18.0.1
   # flutter_timezone: gets device IANA timezone name for zonedSchedule accuracy.
   flutter_timezone: ^1.0.0
