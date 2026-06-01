@@ -22,7 +22,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 11 | Stats | ✅ done & committed |
 | 12 | Practice | ✅ done & committed |
 | 13 | Settings | ✅ done & committed |
-| 14 | Auth | ⬜ |
+| 14 | Auth | ✅ done & committed |
 | 15 | Notifications | ⬜ |
 | 16 | Tablet adaptive layouts | ⬜ |
 | 17 | Android specifics | ⬜ |
@@ -600,19 +600,44 @@ At the very end of your response, after the commit/push, paste the next session'
 ## Handoff prompt → Phase 14 (paste into a fresh session)
 
 ```
-Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 13 + Phase 14 plan section; skim 0–12). Work on the existing feat/mobile-app branch.
+[Phase 14 prompt — already executed]
+```
 
-IMPORTANT design reference: the mobile wireframes are already unzipped at ~/Downloads/halve (4)/ — read app/screens/auth.jsx and app/HANDOFF.md §1 (Auth / Sign-in flow — email input step, link-sent step, signed-in state). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it. Also read apps/mobile/AUTH-DEEPLINK-SETUP.md for the deep-link scheme decision and Supabase redirect allow-list requirements.
+---
 
-Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/HalveIconButton/HalveTopBar/SafeScaffold + context.halveColors/halveShadows), app shell (go_router; /auth route → AuthScreen placeholder), data layer (authRepositoryProvider → AuthRepository.signInWithMagicLink(email), isSignedInProvider, currentUserProvider, authStateProvider), Settings screen (the only entry point for sign-in per the design — Settings → Account → "Sign in"), and 162 tests green.
+## Phase 14 — Auth ✅ (2026-06-01)
 
-Do Phase 14 — Auth, per plan Phase 14:
-1. auth_screen.dart. Two steps: email input (validate, "Continue" CTA, disabled until valid email) → link-sent ("Check your email" + resend with 2.5s cooldown). Matches HANDOFF.md §1 exactly — HalveMark 30px anchor, 26px h2 heading, 15px fg-2 body copy, 54px-tall email input with accent focus border, sentence-case copy.
-2. AuthRepository.signInWithMagicLink(email) is already wired (Phase 4) — call it on Continue. The deep link callback (halve://auth-callback) is handled by supabase_flutter's session restore on app resume; no extra handling needed in Phase 14 (AUTH-DEEPLINK-SETUP.md covers the native wiring steps you'll do manually before launch).
-3. Signed-in state detection: when authStateProvider emits a sign-in event, pop back to wherever the user came from (Settings). The auth screen must NOT push to a new destination — it's a modal that returns control.
-4. Error handling: show an inline error below the email field when signInWithMagicLink throws (rate-limit, network error, etc.).
+**What shipped — `lib/screens/auth/auth_screen.dart`:**
+- `AuthScreen` (`ConsumerStatefulWidget`, two-step magic-link flow). Entered only from Settings → Account → "Sign in"; pops (not navigates) on sign-in — is a modal returning control to the caller.
+- **Email step:** 44px top padding, `HalveMark(30px)` anchor, `AppTypography.h2` heading "Sign in to keep your streak safe", 15px/1.55 body copy, `AppTypography.label` eyebrow "EMAIL", `_EmailInput` (54px-tall `TextField`, accent border on focus via `Focus.onFocusChange`, `radius-lg`), inline error below the field, `HalveButton(full: true)` Continue — disabled (`onPressed == null` → opacity 0.4) until `\S+@\S+\.\S+` matches. Uses `ValueListenableBuilder` on the `TextEditingController` so the button state re-evaluates on each keystroke without rebuilding the whole tree. Enter key submits when valid.
+- **Sent step:** 52px accent-tint check circle with `_CheckPainter` (custom polyline checkmark from wireframe SVG `points="20 6 9 17 4 12"` scaled to 22×22), h2 "Check your email", `RichText` body with email highlighted in fg-1/w500, resend text button with a 2.5s cooldown (`Timer`) — "Didn't get it? Resend" → "Link sent again" → resets.
+- **Sign-in listener:** `ref.listen(authStateProvider)` — on `AuthChangeEvent.signedIn` → `context.pop()`. No destination push.
+- **Error handling:** `_friendlyError` maps rate-limit / network / generic exceptions to calm sentence-case copy shown inline below the email field.
+- **`_handleResend`:** calls `signInWithMagicLink` again; swallows errors silently (link already sent; nothing actionable to surface).
+- Two pre-existing unused-import warnings in `app_shell_test.dart` and `home_screen_test.dart` fixed in the same commit.
 
-Verify: widget tests (email input validates, Continue calls signInWithMagicLink with the entered email, link-sent step shows the email, resend cooldown, error display, authStateProvider sign-in event pops the screen); flutter analyze clean + flutter test green (162 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 14 done + add a Phase 15 handoff prompt) and commit/push. Gotchas: signOut scope:local (global rule); design tokens only; no emoji; sentence case; the auth screen is entered only from Settings (not from Home or any other entry point per design); do not push to a destination on sign-in — pop.
+**Decisions / notes:**
+- `_isValidEmail` mirrors the wireframe's regex (`\S+@\S+\.\S+`) — intentionally simple, same as the web auth screen. Not RFC 5322 exhaustive; just guards the CTA.
+- `_EmailInput` is a separate `StatefulWidget` so focus-state rebuilds don't propagate up to `_EmailStep` or the parent `AuthScreen`.
+- Deep-link completion (`halve://auth-callback`) is handled entirely by `supabase_flutter`'s session restore on app resume — no manual `exchangeCodeForSession` call. The auth screen just listens to `authStateProvider` and pops on the resulting `signedIn` event. iOS/Android URL scheme wiring is documented in `AUTH-DEEPLINK-SETUP.md` (manual steps before production launch).
 
-At the very end of your response, after the commit/push, paste the next session's handoff prompt (Phase 15) so the user can copy it directly without asking.
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → **175/175** (162 prior + 13 new auth: disabled state, valid/invalid email gate, `signInWithMagicLink` called with correct address, sent-step transition, email shown in RichText, resend cooldown 2.5s, resend resets, error display for network + rate-limit, `authStateProvider` signedIn pops the screen, non-signedIn events do not pop).
+
+---
+
+## Handoff prompt → Phase 15 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 14 section + Phase 15 plan section; skim 0–13). Work on the existing feat/mobile-app branch.
+
+Context in place: design system (lib/theme + lib/widgets), app shell (go_router), data layer (authRepositoryProvider, providers.dart), Settings screen (reminder on/off + time picker wired, haptics toggle — Phase 13), Auth screen (Phase 14 — magic-link email flow, two-step, pops on sign-in), and 175 tests green.
+
+Do Phase 15 — Notifications, per plan Phase 15:
+1. Firebase init: firebase_core and firebase_messaging are already in pubspec.yaml. Run `flutterfire configure` to generate firebase_options.dart (+ GoogleService-Info.plist / google-services.json). iOS: enable Push capability in Xcode, add aps-environment entitlement to entitlements file, upload APNs key in Firebase console.
+2. One notification channel only: Android "Daily puzzle" channel (importance HIGH); iOS provisional authorization (quiet, no aggressive prompt). Permission is requested ONLY when the user accepts the primer sheet (Phase 9 first-run flow already has the primer — wire the actual OS permission request there, gated on "Accept" tap).
+3. Daily reminder: use flutter_local_notifications (already in pubspec) to schedule a local notification at the user-set time from Settings (halve:reminder_hour + halve:reminder_ampm keys in SharedPreferences). NOT a server push — local scheduling, offline-safe. No streak-loss nudge. Copy neutral/factual: "Today's Halve puzzle is ready." One channel, one notification ID, reschedule on app launch if time changed.
+4. FCM foreground/background/tap: handle foreground messages (show local notification via flutter_local_notifications); background/tap → route to /play. Wire FirebaseMessaging.onMessage, onMessageOpenedApp, getInitialMessage.
+5. Gotcha: flutter_local_notifications doesn't yet support iOS Swift Package Manager — CocoaPods still works (non-blocking deprecation notice persists from Phase 1).
+
+Verify: unit test schedule time computation (given hour + ampm → correct TimeOfDay); manual device test for delivery (iOS simulator + Android emulator); flutter analyze clean + flutter test green (175 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 15 done + add a Phase 16 handoff prompt) and commit/push.
 ```

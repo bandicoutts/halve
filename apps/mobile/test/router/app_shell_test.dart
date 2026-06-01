@@ -6,7 +6,6 @@ import 'package:halve/data/repositories/puzzle_repository.dart';
 import 'package:halve/data/repositories/solve_repository.dart';
 import 'package:halve/main.dart';
 import 'package:halve/providers/providers.dart';
-import 'package:halve/screens/home/home_provider.dart';
 import 'package:halve/widgets/widgets.dart';
 import 'package:mocktail/mocktail.dart';
 
