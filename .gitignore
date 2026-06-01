@@ -40,3 +40,6 @@ coverage/
 **/.dart_tool/
 **/build/
 *.iml
+
+# Design loop — prototype artifacts (design-only, replaced each round; contract docs are tracked)
+packages/design/mobile/prototype/

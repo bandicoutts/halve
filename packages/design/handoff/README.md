@@ -1,5 +1,11 @@
 # Parity — Design System
 
+> **⚠️ Frozen pre-rebrand snapshot (2026-05-29).** The game symbols below are called **fire**
+> and **water** (teardrops) throughout — this was superseded by the Halve rebrand on
+> 2026-05-30. The symbols are now a **solid disc** (A, amber) and a **ring** (B, teal); see
+> `VENDORED.md` and `docs/DESIGN.md` for the current identity. Everything else (voice, type,
+> spacing, layout) is still a valid reference.
+
 Parity is a **premium daily logic-puzzle app**. Each day delivers one hand-tuned binary
 Latin-square puzzle: fill a 6×6 grid with two symbols (**fire** and **water**) so that
 no more than two identical symbols sit adjacent, each row and column holds an equal count
