@@ -66,10 +66,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('No puzzles yet'), findsOneWidget);
 
-    // Switch to Stats.
+    // Switch to Stats — guest state (no signed-in user in this test).
     await tester.tap(navLabel('Stats'));
     await tester.pumpAndSettle();
-    expect(find.text('Your stats'), findsOneWidget);
+    expect(find.text('Statistics'), findsOneWidget);
 
     // The tab bar stays mounted across branch switches.
     expect(find.byType(HalveBottomNav), findsOneWidget);

@@ -167,13 +167,16 @@ void main() {
         );
 
     test('empty', () {
-      expect(Stats.fromSolves([], today: DateTime(2026, 6, 1)), Stats.empty);
+      final result = Stats.fromSolves([], today: '2026-06-01');
+      expect(result.totalSolved, 0);
+      expect(result.currentStreak, 0);
+      expect(result.longestStreak, 0);
     });
 
     test('counts a 3-day current streak ending today', () {
       final stats = Stats.fromSolves(
         [on('2026-05-30'), on('2026-05-31'), on('2026-06-01')],
-        today: DateTime(2026, 6, 1),
+        today: '2026-06-01',
       );
       expect(stats.totalSolved, 3);
       expect(stats.currentStreak, 3);
@@ -186,10 +189,64 @@ void main() {
           on('2026-05-20'), on('2026-05-21'), on('2026-05-22'), // longest = 3
           on('2026-05-31'), on('2026-06-01'), // current = 2
         ],
-        today: DateTime(2026, 6, 1),
+        today: '2026-06-01',
       );
       expect(stats.longestStreak, 3);
       expect(stats.currentStreak, 2);
+    });
+
+    // Reconcile Stats.fromSolves against the web-mirroring computeStreak /
+    // computeLongestStreak functions in streak.dart (Phase 11).
+    test('fromSolves currentStreak matches computeStreak (TODAY-SAFE)', () {
+      final solves = [on('2026-05-30'), on('2026-05-31')];
+      // today not solved yet — streak should survive
+      final stats = Stats.fromSolves(solves, today: '2026-06-01');
+      expect(stats.currentStreak, 2);
+    });
+
+    test('fromSolves currentStreak collapses once a full day elapses', () {
+      final solves = [on('2026-05-29'), on('2026-05-30')];
+      final stats = Stats.fromSolves(solves, today: '2026-06-01');
+      expect(stats.currentStreak, 0);
+    });
+
+    test('fromSolves longestStreak over disjoint runs', () {
+      final solves = [
+        on('2026-04-01'), on('2026-04-02'), on('2026-04-03'), on('2026-04-04'),
+        on('2026-05-10'), on('2026-05-11'),
+      ];
+      final stats = Stats.fromSolves(solves, today: '2026-06-01');
+      expect(stats.longestStreak, 4);
+    });
+
+    test('fromSolves last14Days length is 14', () {
+      final solves = [on('2026-06-01')];
+      final stats = Stats.fromSolves(solves, today: '2026-06-01');
+      expect(stats.last14Days.length, 14);
+      expect(stats.last14Days.last, isTrue); // today solved
+    });
+
+    test('fromSolves timeDist buckets 6 bins', () {
+      final mixed = [
+        // <2m (90s)
+        SolveRow(solvedAt: DateTime.parse('2026-06-01T12:00:00Z'), durationMs: 90000, usedHint: false, localDate: '2026-06-01'),
+        // 2–3m (150s)
+        SolveRow(solvedAt: DateTime.parse('2026-05-31T12:00:00Z'), durationMs: 150000, usedHint: false, localDate: '2026-05-31'),
+        // 6+m (400s)
+        SolveRow(solvedAt: DateTime.parse('2026-05-30T12:00:00Z'), durationMs: 400000, usedHint: false, localDate: '2026-05-30'),
+      ];
+      final stats = Stats.fromSolves(mixed, today: '2026-06-01');
+      expect(stats.timeDist.length, 6);
+      expect(stats.timeDist[0], 1); // <2m
+      expect(stats.timeDist[1], 1); // 2–3m
+      expect(stats.timeDist[5], 1); // 6+m
+      expect(stats.timeDist[2] + stats.timeDist[3] + stats.timeDist[4], 0);
+    });
+
+    test('fromSolves since is the earliest local_date', () {
+      final solves = [on('2026-03-15'), on('2026-05-01'), on('2026-06-01')];
+      final stats = Stats.fromSolves(solves, today: '2026-06-01');
+      expect(stats.since, '2026-03-15');
     });
   });
 }

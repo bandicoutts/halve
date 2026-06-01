@@ -475,3 +475,51 @@ Do Phase 11 — Stats, per plan Phase 11 (replace the StatsScreen placeholder in
 
 Verify: widget tests (signed-in headline tiles from a mocked solveRepository, signed-out sign-in prompt, empty/loading states) + reconcile-with-web unit tests for the streak/stat derivations (cross-check Stats.fromSolves against computeStreak/computeLongestStreak fixtures); flutter analyze clean + flutter test green (123 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 11 done + add a Phase 12 handoff prompt) and commit/push. Gotchas: no emoji; tabular numerals; sentence case; design tokens are the source of truth; streaks/stats derive from solves (never denormalized); signOut scope:local.
 ```
+
+---
+
+## Phase 11 — Stats ✅ (2026-06-01)
+
+**What shipped — `lib/screens/stats/` + model update:**
+- `stats.dart` (model) — **reconciled with web** in Phase 11: `Stats.fromSolves` now accepts `today` as a `yyyy-MM-dd` String (not `DateTime`) and delegates directly to `computeStreak` / `computeLongestStreak` / `computeLastDays` from `streak.dart` (the web-mirroring functions), ensuring the home streak band and stats screen always agree. Added `last14Days` (`List<bool>`, 14-element boolean presence map), `timeDist` (`List<int>`, 6-bucket solve-time histogram: <2m / 2–3 / 3–4 / 4–5 / 5–6 / 6+m), and `since` (earliest solved day for "since [month] [year]" display). `empty` const + `emptyFor(today)` factory for the zero-solve case.
+- `stats_provider.dart` — `StatsData` (signedIn, today, stats?, displayName?) + `statsDataProvider` (`FutureProvider`): signed-out → guest shell; signed-in → `fetchSolves(user.id)` → `Stats.fromSolves`. Display name resolved from auth metadata (`display_name` → `name` → email local-part).
+- `stats_screen.dart` — full `StatsScreen` (`ConsumerWidget`) mirroring the web `StatsScreen.tsx`:
+  - `HalveTopBar("Statistics")` + scrollable content area.
+  - **Identity row**: `_Monogram` (accent-tint circle + initial), displayName, "N solved · since [month] [year]".
+  - **StreakHero card**: `FlameIcon` + "Day streak" eyebrow, 66px tabular current streak in accent, best-ever (longest) right-aligned.
+  - **14-day calendar grid** (`_Cal14`): two 7-cell rows ("Last week" / "This week"), accent-filled solved, today outlined in fg1, empty in bgSunken.
+  - **Solve-time area chart** (`_AreaChart` / `_AreaPainter` `CustomPainter`): catmull-rom smooth curve, area fill in accentTint, peak dot, 6 x-axis labels — matches web `AreaSignature` exactly.
+  - **Avg + best time divided card** (`_StatDivided`): two-cell surface tile, tabular 22px values.
+  - **Sign out** button (secondary, `AuthRepository.signOut()` which uses `scope: local` per global rule).
+  - **Guest state** (`_StatsGuest`): blurred/masked mock backdrop (identity + StreakHero + Cal14 + AreaChart) + "Start your record" CTA + Sign in → `/auth`.
+  - **Empty state** (0 solves): `HalveMark` + "Solve your first puzzle" nudge; streak hero still shown (all zeros).
+  - **Loading state**: `_LoadingSkeleton` (identity row + hero + 14-day + chart + tile bones via `Skeleton`).
+  - **Error state**: calm inline text.
+
+**Decisions (logged in `docs/DECISIONS.md`, "MOBILE Phase 11"):** `Stats.fromSolves` reconciled to use `streak.dart` string-based functions (prior DateTime approach was equivalent but unverified); `today` param changed from `DateTime` to `String` for consistency with `streak.dart` API; guest state mirrors web's blurred-mock pattern exactly; solve-time chart uses catmull-rom (same algorithm as web's `smoothPath`); sign-out routes to `/` via GoRouter.
+
+**Verification:** `flutter analyze` → *2 pre-existing unused-import warnings* (no new issues). `flutter test` → **138/138** (123 prior + 15 new: 9 in `test/screens/stats/stats_screen_test.dart` — guest CTA, auth routing, loading skeleton, streak headline tiles, displayName, avg/best tiles, empty nudge, empty-hides-chart, sign-out button; 6 reconcile unit tests added to `test/data/models_test.dart` — TODAY-SAFE streak survival, full-day-elapsed collapse, disjoint-run longest streak, last14Days length + today-truthy, timeDist 6-bin bucketing, `since` = earliest date).
+
+**Follow-ups:**
+1. Runtime verification on device/simulator recommended (widget tests cover all states but visual review of the area chart + blurred guest backdrop is worthwhile).
+2. `displayName` comes from auth metadata — the `profiles` table `display_name` column (set by `on_auth_user_created` trigger) is not fetched yet; a `profileRepository.fetchProfile(userId)` call in Phase 13 (Settings/Account) can backfill it.
+3. Win % is not shown (web doesn't show it in `StatsScreen.tsx` either — it shows "Played" and "Solved %" in `home.jsx Stats` only); add if a later design revision requests it.
+
+---
+
+## Handoff prompt → Phase 12 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 11 + Phase 12 plan section; skim 0–10). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: the mobile wireframes at ~/Downloads/halve (4).zip — unzip and read app/screens/practice.jsx for the Practice screen design. The correct disc/ring design system is in packages/design/mobile/ (current) — do NOT use packages/design/handoff/ (old fire/water build). Also read apps/web/src/app/practice/ for the web practice flow (if it exists) to understand the server pool approach.
+
+Context in place: design system (lib/theme + lib/widgets), app shell (go_router — /practice and /practice/play routes exist), data layer (puzzleRepository.fetchPracticePuzzle(difficulty, seq?) calls the server pool RPC from Phase 0.2; play board is fully working in lib/screens/play/), and 138 tests green.
+
+Do Phase 12 — Practice, per plan Phase 12:
+1. practice_screen.dart + practice_provider.dart. Difficulty segmented control (Easy / Medium / Hard); card shows givens count + typical time + blurb; "Start [difficulty] puzzle" CTA. Fetches from the server pool (NOT local generation — parity rule).
+2. /practice/play?difficulty= reuses the play board with kind=practice (no streak side-effects; records a solve row since web does the same, but these don't affect daily streak as they have date=null puzzles).
+3. Win screen shows "New puzzle" CTA (instead of daily "Next puzzle at midnight").
+
+Verify: widget test difficulty selection → correct pool fetch param; flutter analyze clean + flutter test green (138 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 12 done + add a Phase 13 handoff prompt) and commit/push. Gotchas: no emoji; tabular numerals; sentence case; design tokens only; practice puzzles come from the server pool (D3); signOut scope:local.
+```
