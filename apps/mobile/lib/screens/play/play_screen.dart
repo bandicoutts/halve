@@ -37,9 +37,17 @@ class PlayScreen extends ConsumerWidget {
     );
     final async = ref.watch(playLoadProvider(args));
 
-    return SafeScaffold(
-      safeBottom: true,
-      body: async.when(
+    // PopScope: on Android, the system back gesture/button navigates home when
+    // Play was opened via context.go() (canPop=false). When opened via push
+    // (archive day), canPop=true so predictive-back previews the previous screen.
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (bool didPop, _) {
+        if (!didPop) context.go(Routes.home);
+      },
+      child: SafeScaffold(
+        safeBottom: true,
+        body: async.when(
         data: (load) => _PlayView(load: load),
         loading: () => _ScaffoldedMessage(
           label: _fallbackLabel(args),
@@ -51,6 +59,7 @@ class PlayScreen extends ConsumerWidget {
           label: _fallbackLabel(args),
           onReload: () => ref.invalidate(playLoadProvider(args)),
         ),
+      ),
       ),
     );
   }

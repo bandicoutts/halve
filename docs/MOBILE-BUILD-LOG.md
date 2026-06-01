@@ -25,7 +25,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 14 | Auth | ✅ done & committed |
 | 15 | Notifications | ✅ done & committed |
 | 16 | Tablet adaptive layouts | ✅ done & committed |
-| 17 | Android specifics | ⬜ |
+| 17 | Android specifics | ✅ done & committed |
 | 18 | Polish | ⬜ |
 | 19 | App store prep | ⬜ |
 
@@ -743,4 +743,41 @@ Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-d
 Context in place: design system (lib/theme + lib/widgets), app shell (go_router), data layer, Settings (13), Auth (14), Notifications — local daily reminder (15), Tablet adaptive layouts (16 — breakpoints.dart + hPagePad on all screens, 195 tests green).
 
 Do Phase 17 — Android specifics, per plan Phase 17. Read the plan section for exact requirements before starting.
+```
+
+---
+
+## Phase 17 — Android specifics ✅ (2026-06-01)
+
+**What shipped:**
+
+**17.1 M3 theming** — Already complete from earlier phases: `useMaterial3: true` in `AppTheme._build`, `ColorScheme` wired to `HalveColors`, `NavigationBar` with `NavigationBarTheme` in `_AndroidNavBar`. `showHalveBottomSheet` uses `shape` / explicit `backgroundColor` compatible with M3. No changes needed.
+
+**17.2 Notification icon** — `android/app/src/main/res/drawable/ic_notification.xml`: monochrome vector (24dp×24dp, white on transparent) showing a solid disc (symbol A) left and outlined ring (symbol B) right — matches the Halve visual language. Updated `notification_service.dart` to use `@drawable/ic_notification` instead of `@mipmap/ic_launcher` in all `AndroidNotificationDetails` blocks.
+
+**17.3 Predictive back (Android 14+)** — `PlayScreen` wrapped in `PopScope(canPop: context.canPop(), onPopInvokedWithResult: ...)`. When Play is entered via `context.go()` (no stack to pop), `canPop=false` intercepts the system back gesture and navigates to `/`. When entered via `context.push()` (archive day), `canPop=true` allows the predictive-back animation to preview the archive screen.
+
+**17.4 Edge-to-edge** — `SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge)` added to `main()` (renders app behind status bar and gesture nav bar on all supported Android versions). Both `values/styles.xml` and `values-night/styles.xml` updated: `NormalTheme` adds `android:windowTranslucentStatus=true` and `android:windowTranslucentNavigation=true` so the Flutter window paints through the system bars. `SafeArea` in `SafeScaffold` and the M3 `NavigationBar`'s automatic bottom-inset handling guard all content.
+
+**Decisions:**
+- No drag handle in `showHalveBottomSheet` on Android — the system back gesture dismisses the sheet (already implemented; no change).
+- `PopScope` only on `PlayScreen` — all other full-screen routes are pushed so `canPop=true` and default back works.
+- `windowTranslucentStatus/Navigation` chosen over `enforceStatusBarContrast=false` (API 29+) for broader compatibility.
+
+**Verification:** `flutter analyze` → No issues. `flutter test` → **195/195** (no regressions). Manual verification on Android emulator/device recommended for: M3 NavigationBar pill, predictive back swipe on Play, notification icon in status bar, edge-to-edge behind gesture nav.
+
+**Follow-ups:**
+1. Adaptive icons (`mipmap-anydpi-v26/ic_launcher.xml`) for Android 8.0+ — deferred to Phase 19 (App store prep).
+2. `PopScope` on other full-screen routes (Tutorial, Auth, Settings) — not needed since they're always pushed, but worth verifying on device.
+
+---
+
+## Handoff prompt → Phase 18 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 17 section + Phase 18 plan section; skim 0–16). Work on the existing feat/mobile-app branch.
+
+Context in place: design system (lib/theme + lib/widgets), app shell (go_router), data layer, Settings (13), Auth (14), Notifications (15), Tablet (16), Android specifics (17 — M3 nav, monochrome notification icon, PopScope on Play, edge-to-edge, 195 tests green).
+
+Do Phase 18 — Polish, per plan Phase 18. Read the plan section for exact requirements before starting.
 ```
