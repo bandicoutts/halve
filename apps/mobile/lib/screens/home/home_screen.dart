@@ -39,8 +39,8 @@ class HomeScreen extends ConsumerWidget {
         onRefresh: () => ref.refresh(homeDataProvider.future),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.s5, AppSpacing.s2, AppSpacing.s5, AppSpacing.s5,
+          padding: EdgeInsets.fromLTRB(
+            context.hPagePad, AppSpacing.s2, context.hPagePad, AppSpacing.s5,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

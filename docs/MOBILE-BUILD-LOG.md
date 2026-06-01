@@ -24,7 +24,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 13 | Settings | ✅ done & committed |
 | 14 | Auth | ✅ done & committed |
 | 15 | Notifications | ✅ done & committed |
-| 16 | Tablet adaptive layouts | ⬜ |
+| 16 | Tablet adaptive layouts | ✅ done & committed |
 | 17 | Android specifics | ⬜ |
 | 18 | Polish | ⬜ |
 | 19 | App store prep | ⬜ |
@@ -694,4 +694,53 @@ Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-d
 Context in place: design system (lib/theme + lib/widgets), app shell (go_router), data layer (authRepositoryProvider, providers.dart), Settings (Phase 13), Auth (Phase 14 — magic-link, pops on sign-in), Notifications (Phase 15 — local daily reminder + FCM wired, 187 tests green). Firebase credentials are placeholder — see apps/mobile/FIREBASE-SETUP.md for real setup.
 
 Do Phase 16 — Tablet adaptive layouts, per plan Phase 16. Read the plan section for exact requirements before starting.
+```
+
+---
+
+## Phase 16 — Tablet adaptive layouts ✅ (2026-06-01)
+
+**What shipped:**
+
+- `lib/theme/breakpoints.dart` — `Breakpoints.tablet = 600` (logical px), `Breakpoints.contentWidth = 560`; `BuildContext` extensions `isTablet` (bool) and `hPagePad` (double: centered column margin on tablet, 20px on phone).
+- `lib/widgets/content_box.dart` — `HvContentBox`: centers child within `Breakpoints.contentWidth` on tablet, passes through on phone. For non-scroll children. Exported from `widgets.dart`.
+- `breakpoints.dart` exported from `lib/theme/theme.dart` barrel.
+
+**Screen changes (single-codebase, `LayoutBuilder`/`MediaQuery`-driven):**
+- **Home**: `SingleChildScrollView.padding` uses `context.hPagePad` for horizontal. On tablet (820px): ~130px side margins, content column ≤560px centered.
+- **Play**: board `Padding` uses `context.hPagePad`. Board max-side capped at 480px (`math.min(..., 480.0)`) so it stays comfortable on 10-inch displays. `Center` already handles centering within the remaining space.
+- **Archive**: both `_ArchiveHeader` padding and `_ArchiveBody` `ListView` padding use `context.hPagePad`.
+- **Stats**: both loading and data `SingleChildScrollView` paddings wrapped with `Builder` to get `context.hPagePad`.
+- **Settings**: `_SettingsContent` `SingleChildScrollView.padding` uses `context.hPagePad`.
+
+**Orientation**: portrait-first. Landscape degrades gracefully — the same centered-column approach limits content width, Play board respects `math.min(width, height)` so it stays square with generous margins.
+
+**Golden tests** (`test/screens/adaptive_golden_test.dart`, 8 new):
+- `HvContentBox` at phone and tablet — directly proves centering logic
+- Home loading skeleton at phone (390×844) and tablet (820×1180)
+- PlayBoard at phone cell-size (52px) and tablet cell-size (70px)
+- Archive loading spinner at phone and tablet
+
+**Decisions:**
+- Breakpoint at 600px (iPad mini is 744px, smallest iPad). Single breakpoint keeps the codebase lean; no intermediate "large phone" tier needed for a puzzle app.
+- `hPagePad` on scroll view padding (not `HvContentBox`) because it's more precise for scroll content — avoids `ConstrainedBox` conflicts with `AlwaysScrollableScrollPhysics`.
+- 480px max board cap: comfortable on 10-inch tablets without being too small. The board uses `math.min(width, height)` so a 480px cap doesn't affect phones (max ~350px anyway).
+
+**Verification:** `flutter analyze` → No issues. `flutter test` → **195/195** (187 prior + 8 new adaptive goldens).
+
+**Follow-ups:**
+1. Runtime test on iPad simulator + Android tablet emulator recommended.
+2. A two-column layout for Archive calendar on very wide displays (> 900px) is a possible future enhancement.
+3. Stats `_StatsGuest` and `_ErrorState` also have `AppSpacing.s5` horizontal padding (lines ~785, ~834) — currently untouched; update if they look unbalanced on tablet.
+
+---
+
+## Handoff prompt → Phase 17 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 16 section + Phase 17 plan section; skim 0–15). Work on the existing feat/mobile-app branch.
+
+Context in place: design system (lib/theme + lib/widgets), app shell (go_router), data layer, Settings (13), Auth (14), Notifications — local daily reminder (15), Tablet adaptive layouts (16 — breakpoints.dart + hPagePad on all screens, 195 tests green).
+
+Do Phase 17 — Android specifics, per plan Phase 17. Read the plan section for exact requirements before starting.
 ```

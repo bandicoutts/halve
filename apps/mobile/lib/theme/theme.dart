@@ -4,6 +4,7 @@
 library;
 
 export 'app_colors.dart';
+export 'breakpoints.dart';
 export 'app_radii.dart';
 export 'app_shadows.dart';
 export 'app_spacing.dart';

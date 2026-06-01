@@ -10,6 +10,7 @@ import '../../theme/app_radii.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_typography.dart';
+import '../../theme/breakpoints.dart';
 import '../../widgets/widgets.dart';
 import 'settings_provider.dart';
 
@@ -613,12 +614,13 @@ class _SettingsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+    final hPad = context.hPagePad;
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
-        AppSpacing.s5,
+        hPad,
         AppSpacing.s4,
-        AppSpacing.s5,
+        hPad,
         AppSpacing.s4 + bottomInset,
       ),
       child: Column(

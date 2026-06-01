@@ -10,6 +10,7 @@ import '../../theme/app_radii.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_typography.dart';
+import '../../theme/breakpoints.dart';
 import '../../widgets/widgets.dart';
 import 'stats_provider.dart';
 
@@ -860,24 +861,27 @@ class StatsScreen extends ConsumerWidget {
           const HalveTopBar(title: 'Statistics'),
           Expanded(
             child: async.when(
-              loading: () => const SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                    AppSpacing.s5, AppSpacing.s4, AppSpacing.s5, AppSpacing.s7),
-                child: _LoadingSkeleton(),
-              ),
+              loading: () => Builder(builder: (context) {
+                final hPad = context.hPagePad;
+                return SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                      hPad, AppSpacing.s4, hPad, AppSpacing.s7),
+                  child: const _LoadingSkeleton(),
+                );
+              }),
               error: (_, _) => const _ErrorState(),
               data: (data) {
                 if (!data.signedIn) {
                   return const _StatsGuest();
                 }
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.s5,
-                      AppSpacing.s4,
-                      AppSpacing.s5,
-                      AppSpacing.s7),
-                  child: _StatsRecord(data: data),
-                );
+                return Builder(builder: (context) {
+                  final hPad = context.hPagePad;
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                        hPad, AppSpacing.s4, hPad, AppSpacing.s7),
+                    child: _StatsRecord(data: data),
+                  );
+                });
               },
             ),
           ),

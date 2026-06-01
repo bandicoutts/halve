@@ -195,14 +195,18 @@ class _PlayViewState extends ConsumerState<_PlayView> {
           ),
         ),
         // Board — sized to a centered square within the available space.
+        // On tablet: generous horizontal padding + 480 px max-side cap so the
+        // board doesn't grow uncomfortably large on a 10-inch display.
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                AppSpacing.s5, AppSpacing.s4, AppSpacing.s5, AppSpacing.s4),
+            padding: EdgeInsets.fromLTRB(
+                context.hPagePad, AppSpacing.s4, context.hPagePad, AppSpacing.s4),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final side =
-                    math.min(constraints.maxWidth, constraints.maxHeight);
+                const maxSide = 480.0;
+                final side = math.min(
+                    math.min(constraints.maxWidth, constraints.maxHeight),
+                    maxSide);
                 // 6 cells + 5 gaps (gap ≈ 0.16·cell) → total ≈ 6.8·cell.
                 final cellSize = (side / 6.8).floorToDouble();
                 final gap = math.max(6.0, (cellSize * 0.16).floorToDouble());

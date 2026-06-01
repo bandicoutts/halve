@@ -71,8 +71,8 @@ class _ArchiveHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-          AppSpacing.s5, AppSpacing.s3, AppSpacing.s5, AppSpacing.s1),
+      padding: EdgeInsets.fromLTRB(
+          context.hPagePad, AppSpacing.s3, context.hPagePad, AppSpacing.s1),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
@@ -106,9 +106,9 @@ class _ArchiveBody extends StatelessWidget {
     final prev = prevMonth(view, oldest);
     final next = nextMonth(view, current);
 
+    final hPad = context.hPagePad;
     return ListView(
-      padding: const EdgeInsets.fromLTRB(
-          AppSpacing.s5, AppSpacing.s1, AppSpacing.s5, AppSpacing.s6),
+      padding: EdgeInsets.fromLTRB(hPad, AppSpacing.s1, hPad, AppSpacing.s6),
       children: [
         _MonthNav(
           view: view,
