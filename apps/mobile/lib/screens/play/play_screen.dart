@@ -310,6 +310,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
     final state = ref.read(playControllerProvider(_puzzle));
     try {
       final repo = ref.read(solveRepositoryProvider);
+      if (repo == null) return RecordSolveResult.networkFailure;
       return await repo.recordSolve(
         puzzleId: puzzleId,
         grid: state.grid,

@@ -396,7 +396,7 @@ class _MetaRow extends StatelessWidget {
     final items = <String>[
       data.dateLabel.toUpperCase(),
       if (data.puzzle != null) _difficultyLabel(data.puzzle!.difficulty).toUpperCase(),
-      if (data.puzzleNumber != null) '#${data.puzzleNumber}',
+      if (data.archiveCount != null) '#${data.archiveCount}',
     ];
 
     final children = <Widget>[];

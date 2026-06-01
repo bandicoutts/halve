@@ -60,13 +60,15 @@ class _WinScreenState extends ConsumerState<WinScreen> {
     try {
       final repo = ref.read(solveRepositoryProvider);
       // A solved grid equals the solution, so we can re-record from the result.
-      result = await repo.recordSolve(
-        puzzleId: r.puzzleId!,
-        grid: r.solution,
-        durationMs: r.durationMs,
-        usedHint: r.usedHint,
-        localDate: r.localDate,
-      );
+      result = repo == null
+          ? RecordSolveResult.networkFailure
+          : await repo.recordSolve(
+              puzzleId: r.puzzleId!,
+              grid: r.solution,
+              durationMs: r.durationMs,
+              usedHint: r.usedHint,
+              localDate: r.localDate,
+            );
     } catch (_) {
       result = RecordSolveResult.networkFailure;
     }

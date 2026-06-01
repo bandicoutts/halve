@@ -1,13 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_date.dart';
 import '../../data/models/models.dart';
-import '../../data/repositories/puzzle_repository.dart';
 import '../../engine/validator.dart' as validator;
 import '../../providers/providers.dart';
-import '../home/home_provider.dart' show puzzleCacheProvider;
 
 /// What the Play route was asked to open. Equality lets the [playLoadProvider]
 /// family de-dupe so the same load isn't re-run on rebuild.
@@ -78,13 +77,8 @@ final playLoadProvider =
   final today = localToday();
   final cache = ref.watch(puzzleCacheProvider);
 
-  // Reading the repo throws in guest mode (no backend creds) — treat as offline.
-  PuzzleRepository? repo;
-  try {
-    repo = ref.watch(puzzleRepositoryProvider);
-  } catch (_) {
-    repo = null;
-  }
+  // Null in guest mode (no backend creds) — treat as offline.
+  final repo = ref.watch(puzzleRepositoryProvider);
 
   if (args.isPractice) {
     final difficulty = args.difficulty ?? Difficulty.medium;
@@ -103,7 +97,7 @@ final playLoadProvider =
   final date = args.date ?? today;
   final kind = args.date == null ? PlayKind.daily : PlayKind.archive;
 
-  PlayLoad cachedOr(void Function() onMiss) {
+  PlayLoad cachedOrUnavailable() {
     final cached = cache.get(date);
     if (cached != null) {
       return PlayLoad(
@@ -115,11 +109,10 @@ final playLoadProvider =
         isOffline: true,
       );
     }
-    onMiss();
     throw const PlayUnavailable();
   }
 
-  if (repo == null) return cachedOr(() {});
+  if (repo == null) return cachedOrUnavailable();
 
   try {
     final puzzle = await repo.fetchByDate(date);
@@ -133,13 +126,14 @@ final playLoadProvider =
         date: args.date,
       );
     }
-  } catch (_) {
+  } catch (e, st) {
     // Network / transport failure — serve the cache if we have it.
-    return cachedOr(() {});
+    debugPrint('playLoadProvider fetch failed: $e\n$st');
+    return cachedOrUnavailable();
   }
 
   // fetch returned null → no row for this date. Try the cache, else unavailable.
-  return cachedOr(() {});
+  return cachedOrUnavailable();
 });
 
 /// The mutable game: the working grid, the undo stack, the hint flag, and a

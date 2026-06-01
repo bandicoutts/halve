@@ -1,9 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_date.dart';
 import '../../data/models/models.dart';
-import '../../data/repositories/puzzle_repository.dart';
-import '../../data/repositories/solve_repository.dart';
 import '../../providers/providers.dart';
 
 /// A `(year, month)` pair — month is 1-based (1 = January). Record value
@@ -69,15 +68,9 @@ class ArchiveData {
 final archiveDataProvider = FutureProvider.autoDispose<ArchiveData>((ref) async {
   final today = localToday();
 
-  PuzzleRepository? puzzleRepo;
-  SolveRepository? solveRepo;
-  try {
-    puzzleRepo = ref.watch(puzzleRepositoryProvider);
-    solveRepo = ref.watch(solveRepositoryProvider);
-  } catch (_) {
-    puzzleRepo = null;
-    solveRepo = null;
-  }
+  // Null in guest mode (no backend creds) — degrade to empty offline state.
+  final puzzleRepo = ref.watch(puzzleRepositoryProvider);
+  final solveRepo = ref.watch(solveRepositoryProvider);
 
   if (puzzleRepo == null) {
     return ArchiveData(days: const [], today: today, offline: true);
@@ -91,7 +84,8 @@ final archiveDataProvider = FutureProvider.autoDispose<ArchiveData>((ref) async 
       days = puzzleRepo.withSolves(days, solves);
     }
     return ArchiveData(days: days, today: today);
-  } catch (_) {
+  } catch (e, st) {
+    debugPrint('archiveDataProvider fetch failed: $e\n$st');
     return ArchiveData(days: const [], today: today, offline: true);
   }
 });

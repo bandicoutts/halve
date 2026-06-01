@@ -1,10 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/local_date.dart';
 import '../../data/models/models.dart';
-import '../../data/repositories/puzzle_repository.dart';
-import '../../data/repositories/solve_repository.dart';
 import '../../data/streak.dart';
 import '../../providers/providers.dart';
 import '../play/play_provider.dart';
@@ -53,17 +52,9 @@ final winInfoProvider =
 
   final today = localToday();
 
-  // Reading the repos throws in guest mode (no backend creds) — treat as
-  // "no info available" rather than an error.
-  PuzzleRepository? puzzleRepo;
-  SolveRepository? solveRepo;
-  try {
-    puzzleRepo = ref.watch(puzzleRepositoryProvider);
-    solveRepo = ref.watch(solveRepositoryProvider);
-  } catch (_) {
-    puzzleRepo = null;
-    solveRepo = null;
-  }
+  // Null in guest mode (no backend creds) — degrade to WinInfo defaults.
+  final puzzleRepo = ref.watch(puzzleRepositoryProvider);
+  final solveRepo = ref.watch(solveRepositoryProvider);
 
   int? dayNo;
   if (puzzleRepo != null) {
@@ -75,7 +66,8 @@ final winInfoProvider =
         final idx = archive.indexWhere((d) => d.date == q.date);
         dayNo = idx >= 0 ? idx + 1 : null;
       }
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('winInfoProvider archive fetch failed: $e\n$st');
       dayNo = null;
     }
   }
@@ -87,7 +79,8 @@ final winInfoProvider =
       final solves = await solveRepo.fetchSolves(user.id);
       final days = {for (final s in solves) solveDay(s)}.toList();
       streak = computeStreak(days, today);
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('winInfoProvider streak fetch failed: $e\n$st');
       streak = 0;
     }
   }

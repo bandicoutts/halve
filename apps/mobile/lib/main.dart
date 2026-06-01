@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'data/onboarding.dart';
 import 'data/puzzle_cache.dart';
 import 'data/supabase_client.dart';
+import 'providers/providers.dart';
 import 'router/app_router.dart';
-import 'screens/home/home_provider.dart';
 import 'theme/theme.dart';
 
 Future<void> main() async {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/models.dart';
@@ -34,8 +35,9 @@ class SolveRepository {
         ),
       );
       return RecordSolveResult.fromRpc(data);
-    } catch (_) {
+    } catch (e, st) {
       // Network / transport / auth error — retryable.
+      debugPrint('recordSolve failed: $e\n$st');
       return RecordSolveResult.networkFailure;
     }
   }

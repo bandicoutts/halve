@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../data/puzzle_cache.dart';
 import '../data/repositories/repositories.dart';
 import '../data/supabase_client.dart';
 
@@ -21,13 +22,25 @@ final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(ref.watch(supabaseClientProvider).auth),
 );
 
-final puzzleRepositoryProvider = Provider<PuzzleRepository>(
-  (ref) => PuzzleRepository(ref.watch(supabaseClientProvider)),
+/// Null in guest mode (no build-time Supabase creds). Consumers read the value
+/// directly and guard on null rather than catching a thrown [StateError].
+final puzzleRepositoryProvider = Provider<PuzzleRepository?>(
+  (ref) => isSupabaseConfigured
+      ? PuzzleRepository(ref.watch(supabaseClientProvider))
+      : null,
 );
 
-final solveRepositoryProvider = Provider<SolveRepository>(
-  (ref) => SolveRepository(ref.watch(supabaseClientProvider)),
+/// Null in guest mode. See [puzzleRepositoryProvider].
+final solveRepositoryProvider = Provider<SolveRepository?>(
+  (ref) => isSupabaseConfigured
+      ? SolveRepository(ref.watch(supabaseClientProvider))
+      : null,
 );
+
+/// The offline puzzle cache. Defaults to in-memory (no persistence) so the app
+/// boots without [SharedPreferences]; `main.dart` overrides it with a
+/// [PrefsPuzzleCache], and widget tests override it with a fake.
+final puzzleCacheProvider = Provider<PuzzleCache>((ref) => InMemoryPuzzleCache());
 
 /// Auth lifecycle stream. In guest mode (no client) it simply never emits.
 final authStateProvider = StreamProvider<AuthState>((ref) {

@@ -1,17 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_date.dart';
 import '../../data/models/models.dart';
-import '../../data/puzzle_cache.dart';
-import '../../data/repositories/puzzle_repository.dart';
-import '../../data/repositories/solve_repository.dart';
 import '../../data/streak.dart';
 import '../../providers/providers.dart';
-
-/// The offline cache. Defaults to an in-memory cache (no persistence) so the
-/// app boots without [SharedPreferences]; `main.dart` overrides it with a
-/// [PrefsPuzzleCache], and widget tests override it with a fake.
-final puzzleCacheProvider = Provider<PuzzleCache>((ref) => InMemoryPuzzleCache());
 
 /// Everything the Home screen needs, resolved in one pass. The screen derives
 /// its visual variant (normal / solved / offline / empty) from these fields.
@@ -21,7 +14,6 @@ class HomeData {
     required this.dateLabel,
     required this.signedIn,
     this.puzzle,
-    this.puzzleNumber,
     this.archiveCount,
     this.yesterdayDifficulty,
     this.solvedTodayMs,
@@ -43,11 +35,8 @@ class HomeData {
   /// has no row for today (the "empty" state) or offline with no cache.
   final Puzzle? puzzle;
 
-  /// Total dated dailies up to & including today — the "Puzzle No.". Null when
-  /// unknown (offline).
-  final int? puzzleNumber;
-
-  /// Count of dated dailies (the Archive card's "N puzzles"). Null offline.
+  /// Count of dated dailies up to & including today — drives both "Puzzle No."
+  /// and the Archive card's "N puzzles" label. Null when unknown (offline).
   final int? archiveCount;
 
   /// Yesterday's difficulty, for the Archive card's "last `difficulty`".
@@ -80,24 +69,18 @@ final homeDataProvider = FutureProvider.autoDispose<HomeData>((ref) async {
   final user = ref.watch(currentUserProvider);
   final signedIn = user != null;
 
-  // Reading the repos throws in guest mode (no backend creds). Treat that the
-  // same as offline: serve a cached puzzle if we have one.
-  PuzzleRepository? puzzleRepo;
-  SolveRepository? solveRepo;
-  try {
-    puzzleRepo = ref.watch(puzzleRepositoryProvider);
-    solveRepo = ref.watch(solveRepositoryProvider);
-  } catch (_) {
-    puzzleRepo = null;
-  }
+  // Null in guest mode (no backend creds) — degrade to the cached puzzle.
+  final puzzleRepo = ref.watch(puzzleRepositoryProvider);
+  final solveRepo = ref.watch(solveRepositoryProvider);
 
   if (puzzleRepo == null) {
+    final cachedPuzzle = cache.get(today);
     return HomeData(
       today: today,
       dateLabel: label,
       signedIn: signedIn,
-      puzzle: cache.get(today),
-      servedFromCache: cache.get(today) != null,
+      puzzle: cachedPuzzle,
+      servedFromCache: cachedPuzzle != null,
       offline: true,
     );
   }
@@ -140,15 +123,15 @@ final homeDataProvider = FutureProvider.autoDispose<HomeData>((ref) async {
       dateLabel: label,
       signedIn: signedIn,
       puzzle: puzzle,
-      puzzleNumber: archive.length,
       archiveCount: archive.length,
       yesterdayDifficulty: yDiff,
       solvedTodayMs: solvedTodayMs,
       streak: streak,
       last7: last7,
     );
-  } catch (_) {
+  } catch (e, st) {
     // Network / transport failure — fall back to the cached puzzle (D3).
+    debugPrint('homeDataProvider fetch failed: $e\n$st');
     final cached = cache.get(today);
     return HomeData(
       today: today,
