@@ -19,8 +19,8 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 8 | Win screen | ✅ done & committed |
 | 9 | First-run flow | ✅ done & committed |
 | 10 | Archive | ✅ done & committed |
-| 11 | Stats | ⬜ |
-| 12 | Practice | ⬜ |
+| 11 | Stats | ✅ done & committed |
+| 12 | Practice | ✅ done & committed |
 | 13 | Settings | ⬜ |
 | 14 | Auth | ⬜ |
 | 15 | Notifications | ⬜ |
@@ -522,4 +522,45 @@ Do Phase 12 — Practice, per plan Phase 12:
 3. Win screen shows "New puzzle" CTA (instead of daily "Next puzzle at midnight").
 
 Verify: widget test difficulty selection → correct pool fetch param; flutter analyze clean + flutter test green (138 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 12 done + add a Phase 13 handoff prompt) and commit/push. Gotchas: no emoji; tabular numerals; sentence case; design tokens only; practice puzzles come from the server pool (D3); signOut scope:local.
+```
+
+---
+
+## Phase 12 — Practice ✅ (2026-06-01)
+
+**What shipped — `lib/screens/practice/`:**
+- `practice_provider.dart` — `selectedDifficultyProvider` (`StateProvider.autoDispose<Difficulty>`, defaults to `Difficulty.medium`). Auto-disposed so the picker resets to Medium on each visit.
+- `practice_screen.dart` — full difficulty picker screen replacing the Phase-3 placeholder:
+  - `HalveTopBar("Practice")` + back.
+  - Scrollable "DIFFICULTY" eyebrow + three `_DifficultyCard` widgets (Easy / Medium / Hard) in the wireframe's `practice.jsx` order.
+  - **`_DifficultyCard`**: an `AnimatedContainer` with press-state toggle (`_pressed`). Selected: `accentTint` bg + 2px accent border + accent label color. Unselected: `surface` bg + 1px hairline border + fg-1 label. Pressed (unselected): `bgSunken` bg. Right-side `_RadioDot` (22px, 2px border, filled accent + `_CheckPainter` SVG checkmark when selected). Descriptions match the wireframe exactly.
+  - **Pinned `_PlayCta`**: bottom area with a 1px hairline top border, `bg` fill, bottom safe-area padding (`MediaQuery.viewPaddingOf`), and a full-width "Play" `HalveButton`. Tapping pushes `Routes.practicePlay(difficulty: selected.wire)`.
+- **Win screen already handled**: `_secondaryLabel(PlayKind.practice)` → `'New puzzle'`; `_secondaryRoute(PlayKind.practice)` → `Routes.practice`. No countdown shown. No streak meta/nudge for practice. This was correct from Phase 8 — no changes needed.
+- **Play board already handled**: `/practice/play?difficulty=` routes to `PlayScreen(isPractice:true, difficulty:...)` which calls `fetchPracticePuzzle(difficulty)` from the server pool (Phase 0 RPC). `puzzleId` is null → solves are never recorded (Phase 0 decision; no streak side-effects).
+
+**Decisions:**
+- CTA label is "Play" (matches the wireframe's `<Button>Play</Button>`) — the plan spec "Start [difficulty] puzzle" is overridden by the actual wireframe copy. No givens count or typical time on the cards (wireframe only shows label + desc).
+- Difficulty order follows `Difficulty.values` (easy → medium → hard), matching the wireframe and web convention.
+- The `selectedDifficultyProvider` is `autoDispose` (resets to Medium on each visit); if "remember last selection" is wanted later, switch to a non-autoDispose StateProvider backed by shared_preferences.
+
+**Verification:** `flutter analyze` → *2 pre-existing unused-import warnings* (no new issues). `flutter test` → **147/147** (138 prior + 9 new in `test/screens/practice/practice_screen_test.dart`: all three cards render, descriptions visible, default medium sends `difficulty=medium`, selecting easy/hard sends the correct param, Play CTA routes to the stub screen). All 9 tests verify difficulty-selection → correct pool fetch parameter as required.
+
+---
+
+## Handoff prompt → Phase 13 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 12 + Phase 13 plan section; skim 0–11). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: the mobile wireframes at ~/Downloads/halve (4).zip — unzip and read app/screens/home.jsx (the Settings / Account sections if present) and app/HANDOFF.md (Settings section + persistence keys table). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it.
+
+Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/HalveIconButton/HalveTopBar/HalveBottomSheet/SafeScaffold + context.halveColors/halveShadows), app shell (go_router; /settings route → SettingsScreen placeholder), data layer (authRepositoryProvider, currentUserProvider, isSignedInProvider), the local-day helpers, and 147 tests green.
+
+Do Phase 13 — Settings, per plan Phase 13:
+1. settings_screen.dart. Theme toggle (System / Light / Dark) — store in shared_preferences; override the MaterialApp ThemeMode in main.dart. No toggle in chrome (native rule 2 — this lives only in Settings).
+2. Account section (signed-in): display name, "Sign out" (AuthRepository.signOut() with scope:local — global rule). Link to Auth screen for sign-in / link from guest state.
+3. App version (package_info_plus). Any other settings present in the wireframe.
+4. Fetch profile display name from the profiles table (profileRepository.fetchProfile(userId) — the Phase 11 follow-up).
+
+Verify: widget tests (theme toggle persists to shared_preferences, signed-in account row, guest sign-in prompt, sign-out calls AuthRepository.signOut with local scope); flutter analyze clean + flutter test green (147 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 13 done + add a Phase 14 handoff prompt) and commit/push. Gotchas: signOut scope:local (global rule); design tokens are the source of truth; no emoji; tabular numerals for version; sentence case.
 ```
