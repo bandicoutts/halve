@@ -42,7 +42,22 @@ export interface Database {
       };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      get_practice_puzzle: {
+        Args: { p_difficulty: string; p_seq?: number | null };
+        Returns: { id: string; difficulty: "easy" | "medium" | "hard"; grid_spec: Json }[];
+      };
+      record_solve: {
+        Args: {
+          p_puzzle_id: string;
+          p_grid: Json;
+          p_duration_ms: number;
+          p_used_hint: boolean;
+          p_local_date: string;
+        };
+        Returns: Json;
+      };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

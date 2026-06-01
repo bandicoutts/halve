@@ -11,7 +11,8 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "seed-puzzles": "tsx --tsconfig scripts/tsconfig.json scripts/seed-puzzles.ts"
+    "seed-puzzles": "tsx --tsconfig scripts/tsconfig.json scripts/seed-puzzles.ts",
+    "seed-practice-pool": "tsx --tsconfig scripts/tsconfig.json scripts/seed-practice-pool.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
