@@ -15,7 +15,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 4 | Supabase integration | ✅ done & committed |
 | 5 | On-device validator | ✅ done & committed |
 | 6 | Home screen | ✅ done & committed |
-| 7 | Play board | ⬜ |
+| 7 | Play board | ✅ done & committed |
 | 8 | Win screen | ⬜ |
 | 9 | First-run flow | ⬜ |
 | 10 | Archive | ⬜ |
@@ -305,4 +305,48 @@ Do Phase 7 — Play board, per plan Phase 7 (replace the PlayScreen placeholder 
 4. On solve (validator.isSolved): record via solveRepository.recordSolve({puzzleId, grid, durationMs, usedHint, localDate}) — handle alreadySolved + the network-retry path (RecordSolveResult.networkFailure). Practice puzzles are NOT recorded (Phase 0 decision — no puzzleId write). Then route to the Win screen (Phase 8 — a placeholder hand-off is fine; just navigate with the result/duration).
 
 Verify: widget tests (tap cycles a cell, a forced violation highlights, undo reverts, hint fills an empty cell + flags usedHint, isSolved triggers the record call — mock solveRepository) + a timer test; flutter analyze clean + flutter test green (83 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 7 done + add a Phase 8 handoff prompt) and commit/push. Gotchas: practice solves are never recorded; duration clamped to ≥1ms (web parity, the duration_ms>0 check); tabular numerals for the timer; design tokens are the source of truth; keep validator semantics in lockstep with the engine.
+```
+
+---
+
+## Phase 7 — Play board ✅ (2026-06-01)
+
+**What shipped — `lib/screens/play/`:**
+- `play_provider.dart` — the game core, ported 1:1 from the web `useGame` + `useTimer`:
+  - `PlayArgs` (date / isPractice / difficulty, with `==`/`hashCode` so the load de-dupes) → `playLoadProvider` (`FutureProvider.autoDispose.family<PlayLoad, PlayArgs>`). Loads **daily** (`fetchByDate(today)`), **archive** (`fetchByDate(date)`), or **practice** (`fetchPracticePuzzle(difficulty)`). Daily/archive **fall back to the offline puzzle cache** when the fetch throws or the row is missing (D3 — a failed fetch is the offline signal, same as Home); a genuinely-absent puzzle throws `PlayUnavailable`. Practice never caches and carries a **null `puzzleId`** (never recorded — Phase 0).
+  - `PlayController` (`AutoDisposeFamilyNotifier<PlayState, Puzzle>`, keyed by the loaded puzzle) holds the working `Grid`, the undo stack (`history`), `usedHint`, and the count-up timer. `tap` cycles empty→disc→ring→empty (`validator.cycle`) on non-given cells; `hint` reveals a random empty cell via `validator.localHint` and flags `usedHint`; `undo` pops history. The timer is a `Timer.periodic(1s)` started on the first interaction, stopped on solve (`validator.isSolved` = complete ∧ no violations), and cancelled via `ref.onDispose`. `PlayResult` + `formatDuration` (`m:ss`) are the Win hand-off payload.
+- `play_board.dart` — `PlayBoard` (6×6) ported faithfully from `Board.tsx`/`Cell.tsx`: `SymbolDisc`/`SymbolRing` cells at `cellSize·0.6`, radius-`cell` corners, the four visual states (**given** = sunken, no border, locked; **error** = `wrongTint` fill + 2px `wrong` border; **filled** = raised surface + cell shadow; **empty** = raised surface + 1px hairline), a press-scale of 0.94, and the `EqNeBadge` `=`/`≠` signs absolutely positioned over the gap between their two cells (`edgeSignSize = max(20, cell·0.42)`). Each cell carries a `ValueKey('cell-$r-$c')` for testability + a screen-reader label.
+- `play_screen.dart` — replaces the placeholder. `async.when` over `playLoadProvider`: **loading** (back bar + spinner), **error** (back bar + "Puzzle unavailable" + Reload), **data** → `_PlayView`. `_PlayView` = back+difficulty top bar, an optional slim "Offline — playing a saved puzzle" banner, the `AppTypography.timer` (tabular, turns `correct`-green on solve), the centered square board (`cellSize = floor(side/6.8)`, `gap = max(6, floor(cell·0.16))` via `LayoutBuilder` — mirrors the web `ResizeObserver` math), the Undo (disabled when the stack is empty)/Hint controls, and a "How to play" footer (→`/tutorial`). On the first solve it records (daily/archive + signed-in only; guests/practice are a silent no-op), clamps `durationMs` to ≥1, waits a brief win-mark beat (skipped under reduced motion), then `context.push('/win', extra: PlayResult)`.
+- `lib/widgets/play_glyphs.dart` — `UndoGlyph` (Lucide `rotate-ccw`) + `HintGlyph` (Lucide `lightbulb`), traced 1:1 as `IconTheme`-aware stroked painters (same pattern as `FlameIcon`), so `HalveIconButton`'s state coloring applies. Exported from the widgets barrel.
+- `lib/screens/win/win_screen.dart` — a **minimal Phase-8 hand-off placeholder**: brand mark + "Solved in m:ss" (tabular display) + difficulty + "See your stats"/"Back to today" CTAs. Accepts the `PlayResult` (null-safe for a cold deep link). The Phase-8 build adds the keepsake card, share sheet, streak nudge, and "next puzzle in" countdown.
+- `router/app_router.dart` — added `Routes.win = '/win'` + the `GoRoute` building `WinScreen` from `state.extra`.
+
+**Decisions (logged in `docs/DECISIONS.md`, "MOBILE Phase 7"):** game state in an autoDispose family Notifier keyed by the puzzle (timer inside it, cancelled on dispose); a separate FutureProvider for loading with the D3 offline-cache fallback on the board itself; solve → record (guests/practice no-op, duration ≥1) → `/win` via `PlayResult`; bespoke Lucide undo/hint glyphs replacing the Phase-3 interim Material chrome.
+
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → **90/90** (the prior 83 + 7 new in `test/screens/play/play_screen_test.dart`: tap-cycle empty→disc→ring→empty, a forced three-in-a-row highlights the offending cells while an uninvolved cell stays raised, undo reverts, hint fills the lone empty + records with `usedHint:true`, completing the grid records the solve and shows `WinScreen`, **practice solves are NOT recorded**, and the timer starts on first interaction and counts up). The Phase-3 shell test was updated (the `/play` route now renders the real board — asserts the timer at `0:00` instead of the old placeholder text — and stubs `fetchByDate`). Tests disable animations to skip the win-mark delay and unmount the tree to cancel the running timer (no pending-timer failures).
+
+**Follow-ups:**
+1. Not yet runtime-verified on a device/simulator this session (widget tests cover the interactions). A `flutter run` to eyeball the board sizing, the disc/ring/edge rendering, the violation tint, and the undo/hint glyphs is recommended before shipping; the backend must be live (`--dart-define` creds + applied migrations + seeded practice pool) for non-offline data.
+2. The Win screen is a placeholder — Phase 8 builds the real keepsake/share/streak/countdown from the `PlayResult` (which already carries `solution`, `size`, `difficulty`, `durationMs`, `usedHint`, `puzzleId`, `date`, and the `RecordSolveResult` for the network-retry path).
+3. No abandon-confirm sheet yet (web shows "Leave this puzzle?" on back with moves in progress). Deferred to polish (Phase 18) — back currently exits directly.
+
+---
+
+## Handoff prompt → Phase 8 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 7 + Phase 8 plan section; skim 0–6). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: the mobile wireframes at ~/Downloads/halve (4).zip — unzip and read app/screens/play.jsx (the `HalveWin` + `ShareSheet` components — keepsake card, streak nudge, signed-in "Synced" state, share payload) and app/HANDOFF.md §4 (Win screen — streak nudge + signed-in state). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it. Also read apps/web/src/components/screens/WinScreen.tsx for the canonical layout/animation/share-text to mirror.
+
+Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/HalveIconButton/HalveTopBar/HalveMark/SymbolDisc/SymbolRing/SafeScaffold + context.halveColors/halveShadows), app shell, data layer, the on-device validator, and the Play board (Phase 7). The Play board already navigates to /win with a PlayResult (lib/screens/play/play_provider.dart: kind, difficulty, durationMs, formattedTime, usedHint, solution, size, puzzleId, date, saveResult:RecordSolveResult?). WinScreen (lib/screens/win/win_screen.dart) is currently a minimal placeholder consuming PlayResult. analyze + 90 tests green.
+
+Do Phase 8 — Win screen, per plan Phase 8 (build out lib/screens/win/win_screen.dart from the PlayResult):
+1. The keepsake: brand mark "win-mark" settle, "Puzzle No." (dayNo — derive/pass it; today's archive ordinal like Home does, or extend PlayResult), "Solved in" + the big tabular time, and the SolvedBoard card (the full solution rendered as Disc/Ring cells with the staggered cell-pop, the Logo + date header) — match play.jsx HalveWin + WinScreen.tsx.
+2. Metadata line: "<difficulty> · <N>-day streak" + (signed-in) a green ● "Synced" dot. Fetch the streak via solveRepository.fetchSolves + the lib/data/streak.dart helpers (daily/archive only; reuse computeStreak). "Next puzzle in <h>m" countdown to local midnight.
+3. Streak nudge (signed-out, streak ≥ 3, never dismissed): the tappable "Your N-day streak lives on this device — sign in to keep it safe" row + a 44×44 dismiss × that persists halve:streak-nudge-dismissed to shared_preferences. Tapping the row → /auth.
+4. Network-retry: if PlayResult.saveResult?.isNetworkError, show a "Couldn't save — Retry" affordance that re-runs recordSolve (thread a retry path; the Play controller still holds the grid, or pass enough in PlayResult to re-call). alreadySolved is success.
+5. Share: a platform-native share sheet (share_plus) with the spoiler-free payload "Halve No. <n> · <time> · <difficulty> · streak <n>\nNo spoilers — play at halve.today" — match ShareSheet in play.jsx. Primary "Share result" + secondary "See your stats" (→/stats); Close → home.
+
+Verify: widget tests for the win states (keepsake renders the solution, streak line, signed-out nudge appears at streak≥3 and dismiss persists, signed-in Synced dot, network-retry re-calls recordSolve — mock solveRepository) + the share payload string; flutter analyze clean + flutter test green (90 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 8 done + add a Phase 9 handoff prompt) and commit/push. Gotchas: no emoji (use the brand mark/glyphs); tabular numerals for time/streak/countdown; m:ss; share text must stay spoiler-free; signOut scope:local; streaks derive from solves; design tokens are the source of truth.
 ```

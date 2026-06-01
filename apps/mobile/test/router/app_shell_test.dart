@@ -31,6 +31,7 @@ void main() {
     final puzzleRepo = MockPuzzleRepository();
     final solveRepo = MockSolveRepository();
     when(() => puzzleRepo.fetchDaily(any())).thenAnswer((_) async => _samplePuzzle());
+    when(() => puzzleRepo.fetchByDate(any())).thenAnswer((_) async => _samplePuzzle());
     when(() => puzzleRepo.fetchArchive(any())).thenAnswer((_) async => <ArchiveDay>[]);
 
     await tester.pumpWidget(
@@ -80,7 +81,8 @@ void main() {
     await tester.tap(find.text('Play today'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Play board'), findsOneWidget);
+    // The play board has loaded (timer at zero) — not the placeholder.
+    expect(find.text('0:00'), findsOneWidget);
     // Play is a full-screen route outside the shell → no bottom nav.
     expect(find.byType(HalveBottomNav), findsNothing);
 

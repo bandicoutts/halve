@@ -8,8 +8,10 @@ import '../screens/home/home_screen.dart';
 import '../screens/play/play_screen.dart';
 import '../screens/practice/practice_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/play/play_provider.dart';
 import '../screens/stats/stats_screen.dart';
 import '../screens/tutorial/tutorial_screen.dart';
+import '../screens/win/win_screen.dart';
 import '../theme/theme.dart';
 import '../widgets/widgets.dart';
 
@@ -20,6 +22,7 @@ abstract final class Routes {
   static const archive = '/archive';
   static const stats = '/stats';
   static const play = '/play';
+  static const win = '/win';
   static const practice = '/practice';
   static const settings = '/settings';
   static const auth = '/auth';
@@ -59,6 +62,12 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
       GoRoute(
         path: '/play/:date',
         builder: (_, state) => PlayScreen(date: state.pathParameters['date']),
+      ),
+      GoRoute(
+        path: Routes.win,
+        builder: (_, state) => WinScreen(
+          result: state.extra is PlayResult ? state.extra! as PlayResult : null,
+        ),
       ),
       GoRoute(path: Routes.practice, builder: (_, _) => const PracticeScreen()),
       GoRoute(
