@@ -61,10 +61,10 @@ void main() {
     expect(find.text("Today's puzzle"), findsOneWidget);
     expect(find.byType(HalveBottomNav), findsOneWidget);
 
-    // Switch to Archive.
+    // Switch to Archive (empty fetch → the Archive screen's empty notice).
     await tester.tap(navLabel('Archive'));
     await tester.pumpAndSettle();
-    expect(find.text('Past puzzles'), findsOneWidget);
+    expect(find.textContaining('No puzzles yet'), findsOneWidget);
 
     // Switch to Stats.
     await tester.tap(navLabel('Stats'));

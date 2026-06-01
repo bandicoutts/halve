@@ -18,7 +18,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 7 | Play board | ✅ done & committed |
 | 8 | Win screen | ✅ done & committed |
 | 9 | First-run flow | ✅ done & committed |
-| 10 | Archive | ⬜ |
+| 10 | Archive | ✅ done & committed |
 | 11 | Stats | ⬜ |
 | 12 | Practice | ⬜ |
 | 13 | Settings | ⬜ |
@@ -436,4 +436,42 @@ Do Phase 10 — Archive, per plan Phase 10 (replace the ArchiveScreen placeholde
 4. Day tap: today/past solved → /play/:date (or /play for today); missed past day → a day sheet (or straight to /play/:date) to play that archive puzzle; future → no-op. Practice solves never appear here (Phase 0). Tabular numerals for all counts/dates; streaks/solved-state derive from solves.
 
 Verify: widget tests (month grid renders solved/missed/today/future states from mocked providers, difficulty dots, month nav clamps at range ends, day tap routes to /play/:date) + the month-range derivation; flutter analyze clean + flutter test green (111 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 10 done + add a Phase 11 handoff prompt) and commit/push. Gotchas: no emoji; tabular numerals; sentence case; design tokens are the source of truth; streaks/solved-state derive from solves; signOut scope:local.
+```
+
+---
+
+## Phase 10 — Archive ✅ (2026-06-01)
+
+**What shipped — `lib/screens/archive/`:**
+- `archive_provider.dart` — `archiveDataProvider` (`FutureProvider.autoDispose<ArchiveData>`) loads `fetchArchive(today)` (dated dailies, ascending) and, when signed in, joins `fetchSolves(user.id)` via `withSolves(...)` for solved-state + best durations. A thrown repo / guest mode degrades to an empty, offline grid. `ArchiveData` derives `byDate`, the available `months` range, `currentMonth`, and `monthStats(ym)` from the data — **nothing is hard-coded**. Pure top-level month helpers (`monthsBetween`, `daysInMonth`, `firstWeekdayOffset`, `prevMonth`/`nextMonth` clampers) are unit-tested.
+- `archive_screen.dart` — `ArchiveScreen` (`ConsumerStatefulWidget`, view-month state defaulting to today's month, clamped to the range). Renders: a left-aligned "Archive" title; the month-nav row (prev/next `HalveIconButton`s disabled at the range ends + a tappable uppercase month label); the 7-column Sunday-first day grid (`GridView.count`, ~56px cells) with the four cell states (Solved = accent-tint + 1.5px accent border + accent number; Today = 2px accent border; Missed/Future = thin hairline, Future also `opacity 0.3`) and 1–3 monochrome **difficulty dots** (`Difficulty.dots`, `fg1` solved / `fg3` missed) on past+today cells; the inline state **legend**; and an empty/offline notice. Month navigation has all three affordances — chevrons, a `showHalveBottomSheet` `_MonthPicker` (reverse-chronological, solved/total counts, accent-tinted selection), and a horizontal swipe. Day tap **pushes** `/play` (today) or `/play/:date` (past day with a puzzle); future / puzzle-less days are inert. Tabular numerals on all day numbers + counts.
+
+**Decisions (logged in `docs/DECISIONS.md`, "MOBILE Phase 10"):** month range + counts derived from the fetched dailies (not the wireframe's static fixtures); solved-state joined in-memory via `withSolves` (derived from `solves`, never denormalized); three equivalent month-nav affordances; swipe direction follows the **prototype's gesture code** (left = newer / right = older) rather than the §5 prose; day tap pushes the play route so Back returns to Archive; **dashed "missed"/"future" borders are approximated with a solid 1px hairline** — Flutter has no native dashed `Border`; a `CustomPainter` dash is a deferred polish item.
+
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → **123/123** (the prior 111 + 12 new in `test/screens/archive/archive_screen_test.dart`: `monthsBetween`/`daysInMonth`/`firstWeekdayOffset`/clamp unit tests + `ArchiveData` range & per-month counts; widget tests for solved/missed/today decorations, difficulty-dot counts, next-clamped-at-current + prev-clamped-at-oldest, the month picker jump, past-day → `/play/:date`, today → `/play`, and the empty notice). The Phase-3 shell test's Archive assertion was updated from the old placeholder text to the real empty notice.
+
+**Follow-ups:**
+1. Not yet runtime-verified on a device/simulator this session (widget tests cover the states + nav + routing). A `flutter run` (with the backend live + a seeded month or two of dailies) to eyeball the grid, the difficulty dots, the picker sheet, and the swipe is recommended.
+2. **Dashed borders are a solid hairline approximation** — add a `CustomPainter` dashed border if the exact wireframe dash matters.
+3. A "missed day" sheet (the HANDOFF mentions an optional day sheet before playing) is not built — a missed/past day taps **straight** into `/play/:date`. Add the intermediate sheet later if wanted.
+4. "Puzzle No." per archive day isn't shown on the cell (only the day number + difficulty dots); the win screen already derives the ordinal if a per-cell number is wanted later.
+
+---
+
+## Handoff prompt → Phase 11 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 10 + Phase 11 plan section; skim 0–9). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: the mobile wireframes at ~/Downloads/halve (4).zip — unzip and read app/screens/home.jsx (the `Stats` component) and app/HANDOFF.md (Stats section, if present). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it. Also read apps/web/src/components/screens/StatsScreen.tsx + apps/web/src/lib/streak.ts for the canonical stat definitions (current/longest streak, win %, distribution) to mirror, and lib/data/models/stats.dart (Stats.fromSolves, from Phase 4) + lib/data/streak.dart (computeStreak/computeLongestStreak) which already port the web math.
+
+Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/HalveTopBar/HalveMark/SafeScaffold/Skeleton + context.halveColors/halveShadows), app shell (go_router; StatsScreen is the 3rd tab — currently a PhasePlaceholder), data layer (solveRepository.fetchSolves(userId) → List<SolveRow>; Stats.fromSolves derives current/longest streak; lib/data/streak.dart), the local-day helpers, and — signed-out — there is NO cloud data (guest stats are empty until a local solve log exists; see the Phase 8 win-nudge note). analyze + 123 tests green.
+
+Do Phase 11 — Stats, per plan Phase 11 (replace the StatsScreen placeholder in lib/screens/stats/):
+1. stats_screen.dart + stats_provider.dart. Signed-in: fetchSolves(user.id) → derive the headline stats via Stats.fromSolves + lib/data/streak.dart (reconcile Stats.fromSolves with the web's canonical computeStreak/computeLongestStreak — the Phase 4 note flagged Stats.fromSolves as provisional; make them agree). Signed-out: a sign-in prompt (stats live on the account) — there's no guest stats store yet.
+2. The headline tiles (match the web StatsScreen + home.jsx Stats): puzzles solved, current streak, longest streak, win % (and/or average/best time as the web defines). Tabular numerals throughout; big numbers in the display/timer face.
+3. Any distribution/visual the web shows (e.g. a difficulty or solve-time breakdown) — mirror it if present; otherwise keep to the headline tiles. Use design tokens only.
+4. Empty state (signed-in, no solves yet): a calm "Solve your first puzzle" nudge. Loading: Skeleton tiles.
+
+Verify: widget tests (signed-in headline tiles from a mocked solveRepository, signed-out sign-in prompt, empty/loading states) + reconcile-with-web unit tests for the streak/stat derivations (cross-check Stats.fromSolves against computeStreak/computeLongestStreak fixtures); flutter analyze clean + flutter test green (123 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 11 done + add a Phase 12 handoff prompt) and commit/push. Gotchas: no emoji; tabular numerals; sentence case; design tokens are the source of truth; streaks/stats derive from solves (never denormalized); signOut scope:local.
 ```
