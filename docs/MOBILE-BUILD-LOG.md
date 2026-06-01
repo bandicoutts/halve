@@ -13,7 +13,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 2 | Design system | ✅ done & committed |
 | 3 | App shell | ✅ done & committed |
 | 4 | Supabase integration | ✅ done & committed |
-| 5 | On-device validator | ⬜ |
+| 5 | On-device validator | ✅ done & committed |
 | 6 | Home screen | ⬜ |
 | 7 | Play board | ⬜ |
 | 8 | Win screen | ⬜ |
@@ -221,4 +221,38 @@ Do Phase 5 — On-device move validator (lib/engine/validator.dart), per plan Ph
 4. Mirror EXACT semantics from packages/engine/src/validators.ts + board.ts. Gotcha: balance marks all cells of the over-represented symbol in the line; adjacency marks all 3 cells of a run.
 
 Verify (thorough — this is the only ported game logic): unit tests for each constraint pass+fail, combined violations, isSolved true/false, cycle, localHint picks only empty cells; cross-check a couple of fixtures against the TS engine's expected output (read packages/engine/src/validators.test.ts for fixtures). flutter analyze clean + flutter test green (45 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 5 done + add a Phase 6 handoff prompt) and commit/push to feat/mobile-app. Gotcha: pure Dart only in lib/engine; design tokens are the source of truth.
+```
+
+---
+
+## Phase 5 — On-device validator ✅ (2026-06-01)
+
+**What shipped — `lib/engine/validator.dart` (pure Dart, no Flutter imports):**
+- `findViolations(grid, edges) → Set<Coord>` where `Coord = (int row, int col)` (record value-equality dedupes the set). Adjacency (3-in-a-run h/v → all 3 marked), balance (>half of a symbol in a line → ALL that symbol's cells in the line marked), edges (`eq` match / `ne` differ, only when both endpoints filled). Bounds-safe edge reads via `_at` (mirrors TS `grid[r]?.[c]`).
+- `isComplete`, `isValid`, `isSolved`; `cycle(int? v)` empty→0→1→empty; `wouldViolate(...)` fast local prune; `localHint(grid, solution, {Random?})` → `(r,c,value)` for a **random empty cell** (Phase-2 decision: fully on-device, no endpoint), null when complete; `edgeCells(edge)` helper.
+- **Reuses the data-layer model types** (`Cell`/`Grid`/`Solution`/`Edge`/`EdgeKind`/`EdgeOrientation` from `lib/data/models/puzzle.dart`, which is pure Dart) rather than redefining them — `lib/engine` imports only that pure file, no Flutter.
+
+**Verification:** ported the canonical 6×6 fixture + assertions straight from `packages/engine/src/validators.test.ts` so the Dart output is **cross-checked against the TS engine**. `flutter analyze` → *No issues found!* · `flutter test` → **60/60** (45 prior + 15 validator: each constraint pass+fail, combined, isSolved/isComplete, eq/ne incl. empty-cell skip, `wouldViolate` triple/balance/edge, `cycle`, `localHint` empty-only + fuzzed + complete→null).
+
+**Note:** keep these semantics in lockstep with `validators.ts`/`board.ts` — any rule change on the engine side must be mirrored here (and vice versa). The generator/solver remain backend-only (no Dart port).
+
+---
+
+## Handoff prompt → Phase 6 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 5 + Phase 6 plan section; skim 0–4). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: the mobile wireframes at ~/Downloads/halve (4).zip — unzip and read app/screens/home.jsx (the `Home` component + its `variant` prop: default/loading/offline/empty) and app/HANDOFF.md §3 (Home additional states). These are the CORRECT disc/ring designs. The repo's packages/design/handoff/ is the OLD fire/water build — do not use it.
+
+Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/Skeleton/HalveMark/SymbolDisc/SymbolRing/HalveTopBar/HalveIconButton + context.halveColors/halveShadows), app shell (go_router, HomeScreen is the first tab — currently a PhasePlaceholder), data layer (lib/data: puzzleRepositoryProvider, solveRepositoryProvider, currentUserProvider/authStateProvider/isSignedInProvider), and the on-device validator (lib/engine/validator.dart). analyze + 60 tests green.
+
+Do Phase 6 — Home screen, per plan Phase 6 (replace the HomeScreen placeholder in lib/screens/home/):
+1. home_screen.dart + home_provider.dart. Load: today's puzzle (id/difficulty via fetchDaily(localToday)), total puzzle count (→ "Puzzle No."), yesterday's difficulty, auth state, today's solve (duration). NOTE: there is no Dart local-day helper yet — add one (mirror apps/web/src/lib/local-date.ts: the device-local yyyy-MM-dd) and use it for fetchDaily + streak bucketing.
+2. Variants (match home.jsx): normal/not-solved (primary "Play today" CTA + difficulty/puzzle number/date label), solved-today (green check, "Solved in m:ss", "Next puzzle at midnight", secondary "See your stats"), loading (Skeleton primitives), offline (D3: serve cached today puzzle + banner; "unavailable — try again shortly" + reload only if no cache), empty (no puzzle yet).
+3. Streak band (signed-in & streak>0): Lucide flame LINE-glyph (no emoji — add the glyph), streak count in accent + tabular numerals, 7 mini-dots (last 7 days). Compute via fetchSolves + the validator-adjacent streak helpers (reuse/extend Stats.fromSolves; mirror web computeStreak/computeLastDays).
+4. Secondary cards: Practice (→/practice), Archive ("N puzzles · last <difficulty>" →/archive). Footer "How to play" →/tutorial. Gear →/settings (already wired).
+5. Offline cache: persist today + recent puzzles to shared_preferences (D3); sync on reconnect.
+
+Verify: widget tests for each Home variant (mock the providers — override puzzleRepositoryProvider/solveRepositoryProvider/currentUserProvider in a ProviderScope); flutter analyze clean + flutter test green (60 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 6 done + add a Phase 7 handoff prompt) and commit/push. Gotchas: no emoji (flame is a line glyph); tabular numerals for streak/times; m:ss time format; sentence case; design tokens are the source of truth; streaks derive from solves.
 ```
