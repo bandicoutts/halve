@@ -9,7 +9,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | Phase | Title | Status |
 |------:|-------|--------|
 | 0 | Backend parity (record_solve RPC, practice pool, web align, auth deep-link) | ✅ done & committed |
-| 1 | Monorepo scaffold | ⬜ not started |
+| 1 | Monorepo scaffold | ✅ done & committed |
 | 2 | Design system | ⬜ |
 | 3 | App shell | ⬜ |
 | 4 | Supabase integration | ⬜ |
@@ -56,19 +56,40 @@ Legend: ⬜ not started · 🔄 in progress · ✅ done & committed · ⚠️ do
 
 ---
 
-## Handoff prompt → Phase 1 (paste into a fresh session)
+## Phase 1 — Monorepo scaffold ✅ (2026-06-01)
+
+**What shipped:**
+- `apps/mobile/` — Flutter project created via `flutter create --org today.halve --project-name halve --platforms ios,android`. Bundle id `today.halve`, package name `halve`, iOS + Android only (no web/desktop). `AUTH-DEEPLINK-SETUP.md` preserved untouched.
+- `pubspec.yaml` — all Phase 1.2 deps (flutter_riverpod 2.6, riverpod_annotation, supabase_flutter 2.12, go_router 14, google_fonts, firebase_core/messaging, flutter_local_notifications, shared_preferences, share_plus, package_info_plus, url_launcher; dev: build_runner, riverpod_generator, custom_lint, riverpod_lint, flutter_lints 6, mocktail). `pub get` resolves clean; `pubspec.lock` committed.
+- `lib/` structure per plan 1.3: `theme/`, `engine/`, `data/{,models,repositories}`, `providers/`, `router/`, `widgets/`, `screens/{home,play,win,archive,stats,practice,settings,auth,tutorial,firstrun}`. Each leaf holds a one-line placeholder `.dart` naming the phase that fills it (keeps the dirs git-tracked + analyzer-clean).
+- `lib/main.dart` — minimal `ProviderScope → MaterialApp` holding screen (real shell is Phase 3). `test/widget_test.dart` — boots `HalveApp`, asserts the holding screen renders.
+- `analysis_options.yaml` — `flutter_lints` + `custom_lint` plugin (surfaces `riverpod_lint`). Excludes `build/**`, `.dart_tool/**`, generated `*.g.dart`/`*.freezed.dart`. A few extra rules (const constructors, avoid_print).
+- Root `package.json` scripts (manual, NOT Melos): `mobile:gen` (build_runner), `mobile:test`, `mobile:analyze` — each `cd apps/mobile && …`.
+- `.github/workflows/mobile.yml` — `mobile` job: `subosito/flutter-action@v2` (stable, pinned 3.44.0, cache) → pub get → build_runner → analyze → test. Path-filtered to `apps/mobile/**`; runs on PRs + push to main/feat/mobile-app. `working-directory: apps/mobile`.
+- `.gitignore` — Flutter block expanded (ios/Pods, .symlinks, android/.gradle, .flutter-plugins*, apps/mobile/.idea); the flutter-generated `apps/mobile/.gitignore` carries the full per-package set.
+
+**Decisions / notes:**
+- **apps/mobile is NOT a pnpm workspace member.** `pnpm-workspace.yaml` globs `apps/*` but matches only dirs with a `package.json`; Flutter has none, so it's auto-excluded — verified via `pnpm ls -r`. No edit to `pnpm-workspace.yaml`.
+- Flutter version pinned to **3.44.0** in CI to match the local toolchain (Dart 3.12); revisit when bumping locally.
+- Analyzer initially flagged 13k errors from a stale `build/ios/SourcePackages/` (vendored Firebase SwiftPM checkout). Fixed by excluding `build/**` and removing the stale dir — `build/` is gitignored, never analyzed.
+- Heads-up (non-blocking): `flutter_local_notifications` doesn't yet support iOS Swift Package Manager — Flutter prints a deprecation notice but CocoaPods still works. Revisit at Phase 15.
+
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → *All tests passed!* · `dart run build_runner build` → succeeds (0 outputs, no annotations yet). All run locally on Flutter 3.44.0.
+
+---
+
+## Handoff prompt → Phase 2 (paste into a fresh session)
 
 ```
-Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read its Phase 0 section first). Work on the existing feat/mobile-app branch.
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read Phase 0 + Phase 1 sections first). Work on the existing feat/mobile-app branch. The apps/mobile Flutter scaffold (deps, lib/ structure, analyze+test green, CI) is in place from Phase 1.
 
-Do Phase 1 — Monorepo scaffold:
-1. flutter create --org today.halve --platforms ios,android apps/mobile  (apps/mobile already contains AUTH-DEEPLINK-SETUP.md — preserve it; create the Flutter project around/alongside it).
-2. pubspec.yaml deps per plan Phase 1.2 (flutter_riverpod, riverpod_annotation, supabase_flutter, go_router, google_fonts, firebase_core, firebase_messaging, flutter_local_notifications, shared_preferences, share_plus, package_info_plus, url_launcher; dev: build_runner, riverpod_generator, custom_lint, riverpod_lint, flutter_lints, mocktail).
-3. lib/ folder structure per plan 1.3.
-4. analysis_options.yaml (flutter_lints + riverpod_lint/custom_lint).
-5. Root convenience scripts (mobile:gen / mobile:test / mobile:analyze) — manual, NOT Melos.
-6. CI: GitHub Actions mobile job (subosito/flutter-action → pub get, build_runner, analyze, test).
-7. Update .gitignore for Flutter build artifacts.
+Do Phase 2 — Design system (lib/theme/ + widgets/), per plan Phase 2:
+1. app_colors.dart — mirror EVERY semantic token from packages/design/styles/tokens.css as light+dark palettes. Expose non-Material tokens (symbol-a/b, correct/wrong, hairline, tints) via a HalveColors ThemeExtension. Gotcha: symbol-a is identical in both themes; symbol-b shifts (light #2A7A6E → dark #6EC8BC).
+2. app_spacing.dart + app_radii.dart — 8-pt scale (0,4,8,12,16,24,32,40,48,64,80,96); radii sm6/md10/cell12/lg16/xl22/full999.
+3. app_typography.dart — GoogleFonts.spaceGrotesk TextTheme (display56/h1 36/h2 26/h3 20 w500; body16; small14; label12 w600 +0.08em UPPERCASE; timer44 w500). tabular() helper applying FontFeature.tabularFigures()+ss01 for timer/streak/stats.
+4. app_theme.dart — ThemeData.light()/dark() wiring colors+type+HalveColors, useMaterial3:true, press-state splash/highlight tuning.
+5. HalveShadows helper (sm/md/lg/cell per theme).
+6. widgets/ primitives: HalveButton (press-scale 0.97, 160–220ms, no hover), HalveIconButton (Lucide-style, 1.75px stroke), HalveBottomSheet (platform-aware), Skeleton (calm fade, no shimmer), SymbolDisc/SymbolRing CustomPainters (disc r=42; ring outer 42 stroke 12 → inner r36), EqNeBadge (typographic =/≠ capsule).
 
-Verify: flutter analyze clean + flutter test green (default smoke test). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 1 done + add a Phase 2 handoff prompt) and commit/push to feat/mobile-app. Use the same rhythm: delegate the bulk, verify yourself, then commit. Gotcha: this is Flutter, not pnpm — apps/mobile is not a pnpm workspace package; don't add it to pnpm-workspace.yaml.
+Read packages/design/styles/tokens.css and docs/DESIGN.md (+ BRAND-CANON.md guardrails) before coding. Verify: golden tests for HalveButton, SymbolDisc/Ring, EqNeBadge in both themes + a widget test that HalveColors resolves per brightness; flutter analyze clean + flutter test green. Then update docs/MOBILE-BUILD-LOG.md (mark Phase 2 done + add a Phase 3 handoff prompt) and commit/push to feat/mobile-app. Gotcha: design tokens in packages/design are the source of truth — never hardcode colors/spacing.
 ```
