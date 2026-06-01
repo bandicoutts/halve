@@ -11,7 +11,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 0 | Backend parity (record_solve RPC, practice pool, web align, auth deep-link) | ✅ done & committed |
 | 1 | Monorepo scaffold | ✅ done & committed |
 | 2 | Design system | ✅ done & committed |
-| 3 | App shell | ⬜ |
+| 3 | App shell | ✅ done & committed |
 | 4 | Supabase integration | ⬜ |
 | 5 | On-device validator | ⬜ |
 | 6 | Home screen | ⬜ |
@@ -138,4 +138,47 @@ Do Phase 3 — App shell, per plan Phase 3:
 5. Screens stay as placeholders (filled in Phases 6–14) — this phase is navigation + chrome only.
 
 Verify: widget test that tabs switch branches and that the Play route hides the tab bar; flutter analyze clean + flutter test green (existing 16 tests still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 3 done + add a Phase 4 handoff prompt) and commit/push to feat/mobile-app. Gotcha: signOut must use scope:local; design tokens are the source of truth.
+```
+
+---
+
+## Phase 3 — App shell ✅ (2026-06-01)
+
+**What shipped — navigation + chrome (screens stay placeholders until Phases 6–14):**
+- `router/app_router.dart` — `createAppRouter()` (go_router). `Routes` constants + helpers (`playDate`, `practicePlay`). **`StatefulShellRoute.indexedStack`** with 3 branches (Home `/`, Archive `/archive`, Stats `/stats`) — each keeps its own nav state. Full-screen routes pushed **outside** the shell: `/play`, `/play/:date`, `/practice`, `/practice/play?difficulty=`, `/settings`, `/auth`, `/tutorial`, `/firstrun`. `AppShell` widget = `Scaffold(body: navigationShell, bottomNavigationBar: HalveBottomNav)`; re-tapping the active tab pops it to root (`goBranch(initialLocation: i==current)`). **Play hides the tab bar by construction** — it's a top-level route, not a shell branch, so the bar is simply absent (no auto-hide logic). Flutter's `Scaffold` lays body above the nav, so no manual content bottom-padding (unlike the web absolute-positioned version).
+- `main.dart` — `WidgetsFlutterBinding.ensureInitialized()` → **guarded** `Supabase.initialize` (only if `SUPABASE_URL`/`SUPABASE_ANON_KEY` `--dart-define`s are present; try/caught; logs + continues as guest otherwise — keeps `flutter run` working until Phase 4) → `ProviderScope` → `MaterialApp.router` with `themeMode: ThemeMode.system` (Settings override = Phase 13). Router built once in `State`.
+- `widgets/halve_bottom_nav.dart` — `HalveBottomNav`, anchored, platform-adaptive (`app/screens/nav.jsx`): **Android** = M3 `NavigationBar`, active glyph in an `accentTint` pill; **iOS** = bare labelled icons row with hairline top border, active in accent.
+- `widgets/nav_glyphs.dart` — `TodayGlyph` (the split-circle brand mark: active fills amber/teal halves, inactive = outlined split circle), `ArchiveGlyph` (calendar), `StatsGlyph` (bars). CustomPainters; active Archive/Stats tint accent, inactive fg-3.
+- `widgets/safe_scaffold.dart` — `SafeScaffold` (paints `bg`, `SafeArea` top by default, `safeBottom` opt-in for full-screen routes), + `context.reduceMotion` extension (`MediaQuery.disableAnimationsOf`).
+- `widgets/halve_top_bar.dart` — `HalveTopBar` (flat, non-Material chrome): leading back / custom leading, title centered on iOS / left on Android, trailing. Back chevron uses `HalveIconButton`.
+- `screens/phase_placeholder.dart` — shared `PhasePlaceholder` (brand mark + title + phase note + action buttons) so every screen is walkable.
+- All 11 screen placeholders filled with `SafeScaffold` + `PhasePlaceholder`, wired with real entry points: Home → Play (`push /play`), Practice (`/practice`), Settings gear (`/settings`); Archive → Play today + a sample `/play/2026-05-31`; Practice → `/practice/play?difficulty=medium`; Settings → Auth; First-run → `go /`. `PlayScreen` is generic (daily / `date` / `isPractice`+`difficulty`), header = back + difficulty label only.
+
+**Android build fix (blocker, made here):** the first `flutter run` on Android failed — `flutter_local_notifications` requires **core library desugaring**. Added `isCoreLibraryDesugaringEnabled = true` + `coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")` to `android/app/build.gradle.kts`. (Strictly a Phase 17 "Android specifics" item, but it blocked all Android builds, so fixed now.) iOS built/ran clean.
+
+**Icon note:** incidental chrome icons (back chevron, settings gear) use Material outline icons (`Icons.chevron_left`, `Icons.settings_outlined`) for now — the bespoke Lucide line glyphs land with the real screens (Phases 6–14) where icons carry weight. The signature tab glyphs ARE custom (`nav_glyphs.dart`).
+
+**Verification:** `flutter analyze` → *No issues found!* · `flutter test` → **18/18** (the 16 Phase-2 tests + 2 new shell tests: tabs switch Home→Archive→Stats with the bar mounted throughout; `/play` hides `HalveBottomNav` and Back restores it). Ran live on the **iOS simulator (iPhone 17 Pro)** and **Android emulator (API 37)** via `flutter run` — both boot the shell, tabs switch, Play covers full-screen.
+
+**Follow-ups:**
+1. `main.dart` runs without Supabase until Phase 4 supplies `--dart-define` creds (or a `.env`/launch config). Auth deep-link wiring is documented in `apps/mobile/AUTH-DEEPLINK-SETUP.md`.
+2. Pushed-route page transitions use go_router defaults; `context.reduceMotion` is available to suppress them later if desired (not yet applied).
+
+---
+
+## Handoff prompt → Phase 4 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 3 section first; skim Phase 0–2). Work on the existing feat/mobile-app branch.
+
+Context in place: the app shell (go_router StatefulShellRoute for Home/Archive/Stats + full-screen Play/Practice/Settings/Auth routes, adaptive bottom nav, SafeScaffold, guarded Supabase.initialize in main.dart) and the Phase 2 design system. analyze + 18 tests green. Backend parity (Phase 0) shipped the record_solve RPC + get_practice_puzzle pool + auth deep-link doc (apps/mobile/AUTH-DEEPLINK-SETUP.md) — read the Phase 0 section.
+
+Do Phase 4 — Supabase integration (lib/data/), per plan Phase 4:
+1. supabase_client.dart — wire the real init (env via --dart-define SUPABASE_URL/SUPABASE_ANON_KEY; the guard already exists in main.dart). createAdminClient NEVER on the client (global rule).
+2. auth_repository.dart — magic-link: signInWithOtp(email, emailRedirectTo: <deep link halve://auth-callback>); handle session via onAuthStateChange; expose authStateProvider (Riverpod) → guest vs signed-in. Gotcha: signOut(scope: SignOutScope.local) ALWAYS, never global. Validate any redirect `next` param against a whitelist. Configure the Supabase redirect allow-list + iOS Universal Link / Android App Link per AUTH-DEEPLINK-SETUP.md.
+3. models/ — Dart models: Puzzle (size, givens, edges, solution, difficulty), Edge, SolveRow, ArchiveDay, Stats. JSON (de)serialize mirroring grid_spec; cells are int?/0/1/null; validate 6×6.
+4. puzzle_repository.dart — fetchDaily(localDate) (puzzles by date, maybeSingle), fetchArchive(today) (date not null, lte today), fetchPracticePuzzle(difficulty, seq?) via get_practice_puzzle RPC. NO client-side daily fallback generation (no Dart generator) — offline = cache (Phase 6), not regeneration.
+5. solve_repository.dart — recordSolve({puzzleId, grid, durationMs, usedHint, localDate}) → record_solve RPC (handle alreadySolved + network retry); fetchSolves(userId) for stats/archive/home streak.
+
+Verify: unit tests for model JSON round-trip + mocked (mocktail) repository tests for query shapes and recordSolve error handling; flutter analyze clean + flutter test green (existing 18 pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 4 done + add a Phase 5 handoff prompt) and commit/push to feat/mobile-app. Gotchas: signOut scope:local; never expose service role; streaks derive from solves (never denormalized); design tokens are the source of truth.
 ```
