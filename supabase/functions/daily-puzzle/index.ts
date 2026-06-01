@@ -4,7 +4,14 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { generateDaily } from "../_shared/engine/index.js";
 
 // Scheduled via Supabase cron (see migrations) — runs daily at 00:05 UTC.
-Deno.serve(async (_req) => {
+Deno.serve(async (req) => {
+  // Guard: reject callers that don't present the shared cron secret.
+  // Fail-open only when CRON_SECRET is not set (local dev / CI without secrets).
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  if (cronSecret && req.headers.get("Authorization") !== `Bearer ${cronSecret}`) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
