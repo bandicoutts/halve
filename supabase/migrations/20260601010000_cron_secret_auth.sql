@@ -1,39 +1,49 @@
 -- Harden the daily-puzzle cron call with a shared secret (SEC-2).
 --
--- The edge function now checks Authorization: Bearer <CRON_SECRET>. This
--- migration (1) creates a random vault secret for the cron to carry, and
--- (2) re-schedules the cron to read that secret from the Vault at runtime.
+-- vault.secrets requires pgsodium internal roles that migrations cannot use.
+-- Instead a plain internal_config table stores the token: RLS enabled with
+-- no policies blocks PostgREST access (anon/authenticated cannot read it),
+-- while pg_cron and SECURITY DEFINER functions can read it normally.
 --
--- IMPORTANT — deploy steps (require sign-off, do not auto-apply):
---   1. Apply this migration:  supabase db push
---   2. Read the generated secret from Vault and set it as a function secret:
---        supabase secrets set CRON_SECRET="$(
---          psql "$DATABASE_URL" -Atc \
---            "select decrypted_secret from vault.decrypted_secrets where name = 'cron_secret'"
---        )"
---   3. Deploy the updated edge function:  supabase functions deploy daily-puzzle
+-- IMPORTANT — after applying this migration you must wire the secret to the
+-- edge function.  Run these two commands separately in your terminal:
 --
--- After step 3 the function will reject any caller that omits or mismatches
--- the Authorization header. The fail-open guard in the function means that
--- during the window between migration and deploy (steps 1 and 3), the cron
--- still works — the new cron body passes the secret, and the old function
--- ignores it (no CRON_SECRET env yet).
+--   1. Extract the generated secret:
+--      supabase db execute --sql \
+--        "select value from public.internal_config where key = 'cron_secret'"
+--
+--   2. Set it as a function secret (replace <VALUE> with the output of step 1):
+--      supabase secrets set CRON_SECRET=<VALUE>
+--
+--   3. Deploy the updated edge function:
+--      supabase functions deploy daily-puzzle
+--
+-- After step 3 the function rejects any caller that omits or mismatches the
+-- Authorization header.  The fail-open guard in the function means the cron
+-- still works during the apply → deploy window.
 
 create extension if not exists pg_cron;
 create extension if not exists pg_net;
 
--- ─── Vault secret (idempotent) ────────────────────────────────────────────────
+-- ─── Internal config table (PostgREST-opaque) ────────────────────────────────
 
--- Generate a new random secret only on first install; never overwrite an
--- existing one (re-running the migration must be safe).
-insert into vault.secrets (name, secret, description)
-select
-  'cron_secret',
-  gen_random_uuid()::text,
-  'Shared bearer token for authenticating the daily-puzzle cron HTTP call'
-where not exists (
-  select 1 from vault.secrets where name = 'cron_secret'
+create table if not exists public.internal_config (
+  key   text primary key,
+  value text not null
 );
+
+alter table public.internal_config enable row level security;
+-- Intentionally no policies — RLS with zero policies blocks all PostgREST
+-- access (anon and authenticated roles) while allowing direct DB access by
+-- pg_cron and SECURITY DEFINER functions.
+comment on table public.internal_config is
+  'Internal key-value store. RLS with no policies blocks PostgREST; '
+  'readable only by pg_cron and SECURITY DEFINER functions.';
+
+-- Idempotent: generate a random cron secret on first install only.
+insert into public.internal_config (key, value)
+values ('cron_secret', gen_random_uuid()::text)
+on conflict (key) do nothing;
 
 -- ─── Re-schedule the cron to carry the secret ────────────────────────────────
 
@@ -45,7 +55,7 @@ begin
 end
 $$;
 
--- 00:05 UTC — reads the cron_secret from Vault at schedule time.
+-- 00:05 UTC — reads cron_secret from internal_config at execution time.
 select cron.schedule(
   'daily-puzzle',
   '5 0 * * *',
@@ -56,9 +66,7 @@ select cron.schedule(
     headers := json_build_object(
       'Content-Type',  'application/json',
       'Authorization', 'Bearer ' || (
-        select decrypted_secret
-          from vault.decrypted_secrets
-         where name = 'cron_secret'
+        select value from public.internal_config where key = 'cron_secret'
       )
     )::jsonb,
     body    := '{}'::jsonb
