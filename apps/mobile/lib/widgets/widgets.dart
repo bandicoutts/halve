@@ -16,3 +16,4 @@ export 'play_glyphs.dart';
 export 'safe_scaffold.dart';
 export 'skeleton.dart';
 export 'symbols.dart';
+export 'tap_fade.dart';

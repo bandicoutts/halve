@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/haptics_service.dart';
 import '../../data/models/models.dart';
 import '../../engine/validator.dart' as validator;
 import '../../providers/providers.dart';
@@ -172,9 +173,16 @@ class _PlayViewState extends ConsumerState<_PlayView> {
     final controller = ref.read(playControllerProvider(_puzzle).notifier);
 
     // Fire the solve hand-off exactly once when the grid first becomes solved.
+    // Also detect new violations for error haptics.
     ref.listen(playControllerProvider(_puzzle), (prev, next) {
       if (next.solved && !(prev?.solved ?? false)) {
         _onSolved(next);
+        return;
+      }
+      if (prev != null && !next.solved) {
+        final prevV = validator.findViolations(prev.grid, _puzzle.edges);
+        final nextV = validator.findViolations(next.grid, _puzzle.edges);
+        if (prevV.isEmpty && nextV.isNotEmpty) hapticsOnError();
       }
     });
 
@@ -228,7 +236,10 @@ class _PlayViewState extends ConsumerState<_PlayView> {
                     cellSize: cellSize,
                     gap: gap,
                     readOnly: state.solved,
-                    onCellTap: controller.tap,
+                    onCellTap: (r, c) {
+                      hapticsOnTap();
+                      controller.tap(r, c);
+                    },
                   ),
                 );
               },
@@ -259,9 +270,8 @@ class _PlayViewState extends ConsumerState<_PlayView> {
         // How to play.
         Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.s2),
-          child: GestureDetector(
+          child: TapFade(
             onTap: () => context.push(Routes.tutorial),
-            behavior: HitTestBehavior.opaque,
             child: Container(
               constraints: const BoxConstraints(minHeight: 44),
               alignment: Alignment.center,
@@ -281,6 +291,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
     if (_handledSolve) return;
     _handledSolve = true;
 
+    hapticsOnWin();
     final reduceMotion = context.reduceMotion;
     final durationMs = math.max(1, state.elapsedSeconds * 1000);
 

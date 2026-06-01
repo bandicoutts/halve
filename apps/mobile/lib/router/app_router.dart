@@ -58,30 +58,72 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
           ),
         ],
       ),
-      GoRoute(path: Routes.play, builder: (_, _) => const PlayScreen()),
+      GoRoute(
+        path: Routes.play,
+        pageBuilder: (_, state) => _fade(state, const PlayScreen()),
+      ),
       GoRoute(
         path: '/play/:date',
-        builder: (_, state) => PlayScreen(date: state.pathParameters['date']),
+        pageBuilder: (_, state) =>
+            _fade(state, PlayScreen(date: state.pathParameters['date'])),
       ),
       GoRoute(
         path: Routes.win,
-        builder: (_, state) => WinScreen(
-          result: state.extra is PlayResult ? state.extra! as PlayResult : null,
+        pageBuilder: (_, state) => _fade(
+          state,
+          WinScreen(
+            result: state.extra is PlayResult ? state.extra! as PlayResult : null,
+          ),
         ),
       ),
-      GoRoute(path: Routes.practice, builder: (_, _) => const PracticeScreen()),
+      GoRoute(
+        path: Routes.practice,
+        pageBuilder: (_, state) => _fade(state, const PracticeScreen()),
+      ),
       GoRoute(
         path: '/practice/play',
-        builder: (_, state) => PlayScreen(
-          isPractice: true,
-          difficulty: state.uri.queryParameters['difficulty'],
+        pageBuilder: (_, state) => _fade(
+          state,
+          PlayScreen(
+            isPractice: true,
+            difficulty: state.uri.queryParameters['difficulty'],
+          ),
         ),
       ),
-      GoRoute(path: Routes.settings, builder: (_, _) => const SettingsScreen()),
-      GoRoute(path: Routes.auth, builder: (_, _) => const AuthScreen()),
-      GoRoute(path: Routes.tutorial, builder: (_, _) => const TutorialScreen()),
-      GoRoute(path: Routes.firstrun, builder: (_, _) => const FirstRunScreen()),
+      GoRoute(
+        path: Routes.settings,
+        pageBuilder: (_, state) => _fade(state, const SettingsScreen()),
+      ),
+      GoRoute(
+        path: Routes.auth,
+        pageBuilder: (_, state) => _fade(state, const AuthScreen()),
+      ),
+      GoRoute(
+        path: Routes.tutorial,
+        pageBuilder: (_, state) => _fade(state, const TutorialScreen()),
+      ),
+      GoRoute(
+        path: Routes.firstrun,
+        pageBuilder: (_, state) => _fade(state, const FirstRunScreen()),
+      ),
     ],
+  );
+}
+
+/// 160ms calm fade — brand-canonical transition for all full-screen routes.
+/// `Cubic(0.4, 0, 0.2, 1)` mirrors `cubic-bezier(0.4,0,0.2,1)` from DESIGN.md.
+CustomTransitionPage<void> _fade(GoRouterState state, Widget child) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 160),
+    reverseTransitionDuration: const Duration(milliseconds: 160),
+    transitionsBuilder: (_, animation, _, child) => FadeTransition(
+      opacity: animation.drive(
+        CurveTween(curve: const Cubic(0.4, 0, 0.2, 1)),
+      ),
+      child: child,
+    ),
   );
 }
 

@@ -620,9 +620,8 @@ class _StreakNudge extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: GestureDetector(
+            child: TapFade(
               onTap: onTap,
-              behavior: HitTestBehavior.opaque,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(14, 13, 4, 13),
                 child: Row(
@@ -656,9 +655,8 @@ class _StreakNudge extends StatelessWidget {
           Semantics(
             button: true,
             label: 'Dismiss',
-            child: GestureDetector(
+            child: TapFade(
               onTap: onDismiss,
-              behavior: HitTestBehavior.opaque,
               child: SizedBox(
                 width: 44,
                 height: 44,
@@ -699,9 +697,8 @@ class _SaveRetry extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.s3),
-          GestureDetector(
+          TapFade(
             onTap: retrying ? null : onRetry,
-            behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: retrying

@@ -26,7 +26,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 15 | Notifications | ✅ done & committed |
 | 16 | Tablet adaptive layouts | ✅ done & committed |
 | 17 | Android specifics | ✅ done & committed |
-| 18 | Polish | ⬜ |
+| 18 | Polish | ✅ done & committed |
 | 19 | App store prep | ⬜ |
 
 Legend: ⬜ not started · 🔄 in progress · ✅ done & committed · ⚠️ done, follow-up needed
@@ -780,4 +780,57 @@ Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-d
 Context in place: design system (lib/theme + lib/widgets), app shell (go_router), data layer, Settings (13), Auth (14), Notifications (15), Tablet (16), Android specifics (17 — M3 nav, monochrome notification icon, PopScope on Play, edge-to-edge, 195 tests green).
 
 Do Phase 18 — Polish, per plan Phase 18. Read the plan section for exact requirements before starting.
+```
+
+---
+
+## Phase 18 — Polish ✅ (2026-06-02)
+
+**What shipped:**
+
+**18.1 Press states audit** — All primary interactive elements already had correct press states from earlier phases (HalveButton 0.97, cells/icon-buttons 0.94, settings rows bgSunken). Three raw `GestureDetector` elements were missing tactile feedback; replaced with new `TapFade`:
+- `_StreakNudge` tappable body in `win_screen.dart` (sign-in row)
+- `_StreakNudge` dismiss × button in `win_screen.dart`
+- `_SaveRetry` "Retry" text in `win_screen.dart`
+- "How to play" inline link in `play_screen.dart`
+
+**18.2 Reduced-motion** — Already fully implemented in earlier phases. Win screen (mark swell, keepsake settle, board pop) all check `context.reduceMotion`; `_onSolved` 520ms delay also zeroes under reduce-motion. No new work needed.
+
+**18.3 Haptics (gated)** — `lib/data/haptics_service.dart` (new): top-level `hapticsOnTap()` / `hapticsOnWin()` / `hapticsOnError()` each read `halve:haptics` pref (default true) then call `HapticFeedback.lightImpact` / `mediumImpact`. Wired in `play_screen.dart`:
+- `onCellTap` wrapper fires `hapticsOnTap()` before forwarding to controller.
+- `_onSolved` fires `hapticsOnWin()` immediately on solve.
+- `ref.listen` detects violation set going from empty → non-empty and fires `hapticsOnError()`.
+
+**18.4 Fade transitions** — `lib/router/app_router.dart`: all non-shell routes (Play, `/play/:date`, Win, Practice, PracticePlay, Settings, Auth, Tutorial, FirstRun) replaced `builder:` with `pageBuilder:` using a `_fade()` helper. `CustomTransitionPage` with 160ms `FadeTransition` driven by `Cubic(0.4, 0, 0.2, 1)` (brand-canonical `cubic-bezier`). Shell tab switches retain default indexed-stack behavior (no cross-fade needed for tab switching).
+
+**18.5 Safe-area + tabular numerals** — Audit confirmed clean:
+- Play timer: `AppTypography.timer` embeds `_tabularFeatures` at definition. ✅
+- Win time, streak, countdown: all wrapped in `AppTypography.tabular(...)`. ✅
+- Stats + home numbers: tabular applied in earlier phases. ✅
+- Safe-area: `SafeScaffold`, `hPagePad`, `viewPaddingOf` patterns in place from Phases 16/17. ✅
+
+**18.6 Anti-AI audit** — No emoji in any string literal (confirmed by Explore agent). Sentence case throughout. No gradients or glassmorphism. No hardcoded colors beyond the designated palette file. Brand canon adherent. ✅
+
+**New files:**
+- `lib/data/haptics_service.dart` — gated `HapticFeedback` helpers
+- `lib/widgets/tap_fade.dart` — press-opacity wrapper (exported via `widgets.dart`)
+- `test/data/haptics_service_test.dart` — 7 unit tests
+
+**Decisions:**
+- `TapFade` uses 100ms opacity fade to 0.65 (not scale) for link-style elements — consistent with "press states not hover" but lighter than the full 0.97 button scale.
+- Haptics implemented as top-level functions (not a class/singleton) matching `reminderTimeOfDay` — easy to unit-test, no mock setup needed.
+- Error haptic fires only on the first violation appearance (empty→non-empty), not on every move — prevents over-triggering when the user is rapidly cycling cells.
+
+**Verification:** `flutter analyze` → No issues found. `flutter test` → **202/202** (195 prior + 7 new haptics service tests).
+
+---
+
+## Handoff prompt → Phase 19 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 18 section + Phase 19 plan section; skim 0–17). Work on the existing feat/mobile-app branch.
+
+Context in place: design system (lib/theme + lib/widgets), app shell (go_router — all full-screen routes now use 160ms FadeTransition), data layer, Settings (13), Auth (14), Notifications (15), Tablet (16), Android specifics (17), Polish (18 — haptics gated on halve:haptics pref, TapFade widget, fade page transitions, 202 tests green).
+
+Do Phase 19 — App store prep, per plan Phase 19. Read the plan section for exact requirements before starting.
 ```
