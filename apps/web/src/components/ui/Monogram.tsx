@@ -6,7 +6,7 @@ export function Monogram({ name, size = 48 }: { name: string; size?: number }) {
       style={{
         width: size,
         height: size,
-        borderRadius: 999,
+        borderRadius: "var(--radius-full)",
         flexShrink: 0,
         background: "var(--accent-tint)",
         color: "var(--accent)",
@@ -16,7 +16,7 @@ export function Monogram({ name, size = 48 }: { name: string; size?: number }) {
         fontSize: size * 0.42,
         fontWeight: 600,
         textTransform: "uppercase",
-        letterSpacing: "-0.01em",
+        letterSpacing: "var(--tracking-snug)",
       }}
     >
       {name.slice(0, 1)}

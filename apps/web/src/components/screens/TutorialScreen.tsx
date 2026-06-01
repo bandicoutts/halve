@@ -123,13 +123,13 @@ function CloseIcon() {
 
 function ProgressDots({ count, active }: { count: number; active: number }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
       {Array.from({ length: count }, (_, i) => (
         <span
           key={i}
           style={{
             height: 7,
-            borderRadius: 999,
+            borderRadius: "var(--radius-full)",
             width: i === active ? 22 : 7,
             background: i === active ? "var(--accent)" : "var(--hairline-2)",
             transition: "width .22s cubic-bezier(0.4,0,0.2,1), background .22s",
@@ -220,9 +220,9 @@ function TutorialWin({
         title={
           <span
             style={{
-              fontSize: 12,
+              fontSize: "var(--text-label)",
               fontWeight: 600,
-              letterSpacing: "0.08em",
+              letterSpacing: "var(--tracking-label)",
               textTransform: "uppercase",
               color: "var(--fg-3)",
             }}
@@ -267,7 +267,7 @@ function TutorialWin({
           <div
             style={{
               marginTop: 18,
-              fontSize: 12,
+              fontSize: "var(--text-label)",
               fontWeight: 600,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
@@ -282,7 +282,7 @@ function TutorialWin({
           <div
             style={{
               marginTop: 14,
-              fontSize: 13,
+              fontSize: "var(--text-small)",
               color: "var(--fg-3)",
               letterSpacing: "0.01em",
             }}
@@ -327,7 +327,7 @@ function TutorialWin({
               <Logo size={16} />
               <span
                 style={{
-                  fontSize: 12,
+                  fontSize: "var(--text-label)",
                   fontWeight: 600,
                   color: "var(--fg-3)",
                   letterSpacing: "0.02em",
@@ -375,7 +375,7 @@ function TutorialWin({
           <div
             style={{
               marginTop: 16,
-              fontSize: 13,
+              fontSize: "var(--text-small)",
               color: "var(--fg-3)",
               textAlign: "center",
               lineHeight: 1.5,
@@ -493,9 +493,9 @@ function PracticeBoard({
         title={
           <span
             style={{
-              fontSize: 12,
+              fontSize: "var(--text-label)",
               fontWeight: 600,
-              letterSpacing: "0.08em",
+              letterSpacing: "var(--tracking-label)",
               textTransform: "uppercase",
               color: "var(--fg-3)",
             }}
@@ -521,9 +521,9 @@ function PracticeBoard({
         <div style={{ textAlign: "center", maxWidth: 300 }}>
           <div
             style={{
-              fontSize: 20,
+              fontSize: "var(--text-h3)",
               fontWeight: 600,
-              letterSpacing: "-0.01em",
+              letterSpacing: "var(--tracking-snug)",
               color: "var(--fg-1)",
             }}
           >
@@ -531,7 +531,7 @@ function PracticeBoard({
           </div>
           <p
             style={{
-              fontSize: 14,
+              fontSize: "var(--text-small)",
               lineHeight: 1.5,
               color: "var(--fg-3)",
               margin: "6px 0 0",
@@ -546,9 +546,9 @@ function PracticeBoard({
         <div
           className="tnum"
           style={{
-            fontSize: 36,
+            fontSize: "var(--text-h1)",
             fontWeight: 500,
-            letterSpacing: "-0.01em",
+            letterSpacing: "var(--tracking-snug)",
             lineHeight: 1,
             color: solved ? "var(--correct)" : "var(--fg-1)",
             transition: "color 0.2s",
@@ -574,15 +574,15 @@ function PracticeBoard({
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 7,
+            gap: 8,
             height: 44,
             padding: "0 16px",
-            borderRadius: 999,
+            borderRadius: "var(--radius-full)",
             border: "1.5px solid var(--hairline-2)",
             background: "transparent",
             color: canUndo && !solved ? "var(--fg-2)" : "var(--hairline-2)",
             fontFamily: "var(--font-sans)",
-            fontSize: 14,
+            fontSize: "var(--text-small)",
             fontWeight: 500,
             cursor: canUndo && !solved ? "pointer" : "default",
             transition: "all .15s",
@@ -779,7 +779,7 @@ function TutorialFlow({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 18,
+            gap: 16,
           }}
         >
           <TeachBoard
@@ -825,9 +825,9 @@ function TutorialFlow({
         title={
           <span
             style={{
-              fontSize: 12,
+              fontSize: "var(--text-label)",
               fontWeight: 600,
-              letterSpacing: "0.08em",
+              letterSpacing: "var(--tracking-label)",
               textTransform: "uppercase",
               color: "var(--fg-3)",
             }}
@@ -842,7 +842,7 @@ function TutorialFlow({
               background: "none",
               border: "none",
               cursor: "pointer",
-              fontSize: 13,
+              fontSize: "var(--text-small)",
               fontWeight: 600,
               color: "var(--fg-2)",
               fontFamily: "var(--font-sans)",

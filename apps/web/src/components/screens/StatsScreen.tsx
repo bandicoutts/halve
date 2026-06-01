@@ -54,13 +54,13 @@ function StreakHero({ streak, longestStreak }: { streak: number; longestStreak: 
       <div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
           <FlameIcon size={18} color="var(--accent)" />
-          <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--fg-3)", whiteSpace: "nowrap" }}>Day streak</span>
+          <span style={{ fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--fg-3)", whiteSpace: "nowrap" }}>Day streak</span>
         </div>
         <div className="tnum" style={{ fontSize: 66, fontWeight: 500, letterSpacing: "-0.03em", color: "var(--accent)", lineHeight: 0.95 }}>{streak}</div>
       </div>
       <div style={{ textAlign: "right", paddingBottom: 6 }}>
         <div className="tnum" style={{ fontSize: 24, fontWeight: 500, color: "var(--fg-2)", lineHeight: 1 }}>{longestStreak}</div>
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--fg-3)", marginTop: 6, whiteSpace: "nowrap" }}>Best ever</div>
+        <div style={{ fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--fg-3)", marginTop: 6, whiteSpace: "nowrap" }}>Best ever</div>
       </div>
     </div>
   );
@@ -77,7 +77,7 @@ function Cal14Weeks({ days }: { days: boolean[] }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {rows.map((row, ri) => (
         <div key={ri} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ width: 76, fontSize: 11, fontWeight: 600, letterSpacing: "0.04em", color: "var(--fg-3)", flexShrink: 0, whiteSpace: "nowrap" }}>{row.label}</span>
+          <span style={{ width: 76, fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "0.04em", color: "var(--fg-3)", flexShrink: 0, whiteSpace: "nowrap" }}>{row.label}</span>
           <div style={{ display: "flex", gap: 6, flex: 1 }}>
             {row.cells.map((solved, i) => {
               const isToday = ri === 1 && i === row.cells.length - 1;
@@ -146,7 +146,7 @@ function StatDivided({ items }: { items: { value: string; label: string; accent?
       {items.map((it, i) => (
         <div key={i} style={{ flex: 1, padding: "16px 12px", textAlign: "center", borderLeft: i ? "1px solid var(--hairline)" : "none" }}>
           <div className="tnum" style={{ fontSize: 22, fontWeight: 500, color: it.accent ? "var(--accent)" : "var(--fg-1)", lineHeight: 1 }}>{it.value}</div>
-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--fg-3)", marginTop: 8 }}>{it.label}</div>
+          <div style={{ fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--fg-3)", marginTop: 8 }}>{it.label}</div>
         </div>
       ))}
     </div>
@@ -161,7 +161,7 @@ function StatsShell({ onBack, children }: { onBack: () => void; children: React.
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
       <TopBar
         left={<IconButton label="Back" size={44} onClick={onBack}><BackIcon /></IconButton>}
-        title={<span style={{ fontWeight: 600, fontSize: 16, color: "var(--fg-1)" }}>Statistics</span>}
+        title={<span style={{ fontWeight: 600, fontSize: "var(--text-body)", color: "var(--fg-1)" }}>Statistics</span>}
         right={<ThemeToggle theme={theme} onToggle={toggle} />}
       />
       <div style={{ flex: 1, overflowY: "auto", padding: "0 24px 36px" }}>
@@ -189,11 +189,11 @@ function StatsRecord({ stats, onBack }: { stats: UserStats; onBack: () => void }
   return (
     <StatsShell onBack={onBack}>
       {/* Identity row */}
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 14, marginBottom: 24 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 16, marginBottom: 24 }}>
         <Monogram name={stats.displayName} size={48} />
         <div>
-          <div style={{ fontSize: 23, fontWeight: 600, letterSpacing: "-0.01em", color: "var(--fg-1)", textTransform: "capitalize" }}>{stats.displayName}</div>
-          <div style={{ fontSize: 13, color: "var(--fg-3)", marginTop: 2 }}>
+          <div style={{ fontSize: 23, fontWeight: 600, letterSpacing: "var(--tracking-snug)", color: "var(--fg-1)", textTransform: "capitalize" }}>{stats.displayName}</div>
+          <div style={{ fontSize: "var(--text-small)", color: "var(--fg-3)", marginTop: 2 }}>
             <span className="tnum">{stats.totalSolved}</span> solved · since {stats.since}
           </div>
         </div>
@@ -212,7 +212,7 @@ function StatsRecord({ stats, onBack }: { stats: UserStats; onBack: () => void }
       <div style={{ marginTop: 28 }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
           <Eyebrow>Solve time</Eyebrow>
-          <span style={{ fontSize: 12, color: "var(--fg-3)" }}>avg {fmtSecs(stats.avgTimeSecs)}</span>
+          <span style={{ fontSize: "var(--text-label)", color: "var(--fg-3)" }}>avg {fmtSecs(stats.avgTimeSecs)}</span>
         </div>
         <AreaSignature dist={stats.timeDist} />
       </div>
@@ -232,8 +232,8 @@ function StatsRecord({ stats, onBack }: { stats: UserStats; onBack: () => void }
           style={{
             display: "inline-flex", alignItems: "center", gap: 8,
             height: 44, padding: "0 20px",
-            background: "none", border: "1.5px solid var(--hairline-2)", borderRadius: 999,
-            color: "var(--fg-2)", fontSize: 14, fontWeight: 500,
+            background: "none", border: "1.5px solid var(--hairline-2)", borderRadius: "var(--radius-full)",
+            color: "var(--fg-2)", fontSize: "var(--text-small)", fontWeight: 500,
             cursor: "pointer", fontFamily: "var(--font-sans)", transition: "color .15s, border-color .15s",
           }}
           onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; e.currentTarget.style.borderColor = "var(--fg-3)"; }}
@@ -257,18 +257,18 @@ function StatsGuest({ onBack }: { onBack: () => void }) {
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", position: "relative", overflow: "hidden" }}>
       <TopBar
         left={<IconButton label="Back" size={44} onClick={onBack}><BackIcon /></IconButton>}
-        title={<span style={{ fontWeight: 600, fontSize: 16, color: "var(--fg-1)" }}>Statistics</span>}
+        title={<span style={{ fontWeight: 600, fontSize: "var(--text-body)", color: "var(--fg-1)" }}>Statistics</span>}
         right={<ThemeToggle theme={theme} onToggle={toggle} />}
       />
 
       {/* Blurred preview backdrop */}
       <div aria-hidden="true" style={{ position: "absolute", inset: "56px 0 0", overflow: "hidden", pointerEvents: "none", filter: "blur(4px)", opacity: 0.45, WebkitMaskImage: "linear-gradient(#000, transparent 86%)", maskImage: "linear-gradient(#000, transparent 86%)" }}>
         <div style={{ padding: "14px 24px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 22 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 22 }}>
             <Monogram name="D" size={48} />
             <div>
               <div style={{ fontSize: 23, fontWeight: 600, color: "var(--fg-1)" }}>david</div>
-              <div style={{ fontSize: 13, color: "var(--fg-3)", marginTop: 2 }}>184 solved · since January 2026</div>
+              <div style={{ fontSize: "var(--text-small)", color: "var(--fg-3)", marginTop: 2 }}>184 solved · since January 2026</div>
             </div>
           </div>
           <StreakHero streak={8} longestStreak={23} />

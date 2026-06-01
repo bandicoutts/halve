@@ -124,7 +124,7 @@ function DiffDots({ d, on = false }: { d: "easy" | "medium" | "hard"; on?: boole
           style={{
             width: 6,
             height: 6,
-            borderRadius: 999,
+            borderRadius: "var(--radius-full)",
             background: i <= n ? (on ? "var(--accent)" : "var(--fg-2)") : "transparent",
             border: i <= n ? "none" : "1.5px solid var(--hairline-2)",
           }}
@@ -140,7 +140,7 @@ function Legend() {
   const item = (node: React.ReactNode, label: string) => (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
       {node}
-      <span style={{ fontSize: 11, color: "var(--fg-3)" }}>{label}</span>
+      <span style={{ fontSize: "var(--text-label)", color: "var(--fg-3)" }}>{label}</span>
     </span>
   );
   return (
@@ -160,7 +160,7 @@ function Legend() {
       {item(
         <span style={{ display: "inline-flex", gap: 2.5, alignItems: "center" }}>
           {[1, 2, 3].map((i) => (
-            <span key={i} style={{ width: 3, height: 3, borderRadius: 999, background: "var(--fg-3)" }} />
+            <span key={i} style={{ width: 3, height: 3, borderRadius: "var(--radius-full)", background: "var(--fg-3)" }} />
           ))}
         </span>,
         "Difficulty"
@@ -177,15 +177,15 @@ function SummaryStat({ label, value }: { label: string; value: string }) {
     <span style={{ display: "inline-flex", alignItems: "baseline", gap: 5 }}>
       <span
         className="tnum"
-        style={{ fontSize: 14, fontWeight: 600, color: "var(--fg-1)" }}
+        style={{ fontSize: "var(--text-small)", fontWeight: 600, color: "var(--fg-1)" }}
       >
         {value}
       </span>
       <span
         style={{
-          fontSize: 11,
+          fontSize: "var(--text-label)",
           fontWeight: 600,
-          letterSpacing: "0.06em",
+          letterSpacing: "var(--tracking-label)",
           textTransform: "uppercase",
           color: "var(--fg-3)",
         }}
@@ -200,7 +200,7 @@ function SummaryStat({ label, value }: { label: string; value: string }) {
  *  per-puzzle detail card — reads from the month in view, so it can't go stale. */
 function MonthSummary({ stats }: { stats: MonthStats }) {
   const dot = (
-    <span aria-hidden style={{ color: "var(--hairline-2)", fontSize: 12 }}>
+    <span aria-hidden style={{ color: "var(--hairline-2)", fontSize: "var(--text-label)" }}>
       ·
     </span>
   );
@@ -266,23 +266,23 @@ function HoverPreview({ hover }: { hover: HoverState }) {
         animation: "fade-up 0.12s cubic-bezier(0.4,0,0.2,1)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", gap: 7 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
         <span
-          style={{ fontSize: 14, fontWeight: 600, color: "var(--fg-1)", letterSpacing: "-0.01em" }}
+          style={{ fontSize: "var(--text-small)", fontWeight: 600, color: "var(--fg-1)", letterSpacing: "var(--tracking-snug)" }}
         >
           {puzzle.isToday ? "Today" : fmtDateLabel(puzzle.date)}
         </span>
         <span
           className="tnum"
-          style={{ fontSize: 11, fontWeight: 600, color: "var(--fg-3)", letterSpacing: "0.04em" }}
+          style={{ fontSize: "var(--text-label)", fontWeight: 600, color: "var(--fg-3)", letterSpacing: "0.04em" }}
         >
           #{puzzle.dayNo}
         </span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 7 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
         <DiffDots d={puzzle.difficulty} on />
         <span
-          style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--fg-3)" }}
+          style={{ fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--fg-3)" }}
         >
           {puzzle.difficulty}
         </span>
@@ -300,16 +300,16 @@ function HoverPreview({ hover }: { hover: HoverState }) {
         {solvedTime ? (
           <>
             <CheckIcon size={14} color="var(--correct)" />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--correct)" }}>
+            <span style={{ fontSize: "var(--text-label)", fontWeight: 600, color: "var(--correct)" }}>
               Solved
             </span>
-            <span className="tnum" style={{ fontSize: 12, color: "var(--fg-2)", marginLeft: "auto" }}>
+            <span className="tnum" style={{ fontSize: "var(--text-label)", color: "var(--fg-2)", marginLeft: "auto" }}>
               {solvedTime}
             </span>
           </>
         ) : (
           <span
-            style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: 4 }}
+            style={{ fontSize: "var(--text-label)", fontWeight: 600, color: "var(--accent)", display: "inline-flex", alignItems: "center", gap: 4 }}
           >
             Play <ChevronRight size={14} color="var(--accent)" />
           </span>
@@ -393,7 +393,7 @@ function CalCell({
       <span
         className="tnum"
         style={{
-          fontSize: 13,
+          fontSize: "var(--text-small)",
           fontWeight: 600,
           lineHeight: 1,
           color: numColor,
@@ -408,7 +408,7 @@ function CalCell({
             style={{
               width: 3,
               height: 3,
-              borderRadius: 999,
+              borderRadius: "var(--radius-full)",
               background: pipColor,
               opacity: puzzle.solved ? 0.7 : 1,
             }}
@@ -454,9 +454,9 @@ function MonthGrid({
             key={i}
             style={{
               textAlign: "center",
-              fontSize: 10,
+              fontSize: "var(--text-label)",
               fontWeight: 600,
-              letterSpacing: "0.06em",
+              letterSpacing: "var(--tracking-label)",
               color: "var(--fg-3)",
             }}
           >
@@ -514,7 +514,7 @@ function NavArrow({
       style={{
         width: 40,
         height: 40,
-        borderRadius: 999,
+        borderRadius: "var(--radius-full)",
         flexShrink: 0,
         border: "1.5px solid var(--hairline-2)",
         background: "transparent",
@@ -561,7 +561,7 @@ function MonthPicker({
         style={{
           display: "inline-flex",
           alignItems: "center",
-          gap: 7,
+          gap: 8,
           padding: "7px 12px",
           borderRadius: "var(--radius-md)",
           border: "none",
@@ -575,7 +575,7 @@ function MonthPicker({
           style={{
             fontSize: 17,
             fontWeight: 600,
-            letterSpacing: "-0.01em",
+            letterSpacing: "var(--tracking-snug)",
             color: "var(--fg-1)",
             whiteSpace: "nowrap",
           }}
@@ -650,7 +650,7 @@ function MonthPicker({
                 >
                   <span
                     style={{
-                      fontSize: 14,
+                      fontSize: "var(--text-small)",
                       fontWeight: active ? 600 : 500,
                       color: "var(--fg-1)",
                     }}
@@ -659,7 +659,7 @@ function MonthPicker({
                   </span>
                   <span
                     className="tnum"
-                    style={{ fontSize: 11, fontWeight: 600, color: "var(--fg-3)" }}
+                    style={{ fontSize: "var(--text-label)", fontWeight: 600, color: "var(--fg-3)" }}
                   >
                     {solvedCount(m)}/{m.days.length}
                   </span>
@@ -750,7 +750,7 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
             </IconButton>
           }
           title={
-            <span style={{ fontWeight: 600, fontSize: 16, color: "var(--fg-1)" }}>
+            <span style={{ fontWeight: 600, fontSize: "var(--text-body)", color: "var(--fg-1)" }}>
               Archive
             </span>
           }
@@ -781,7 +781,7 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
               style={{
                 fontSize: 18,
                 fontWeight: 600,
-                letterSpacing: "-0.01em",
+                letterSpacing: "var(--tracking-snug)",
                 color: "var(--fg-1)",
               }}
             >
@@ -789,7 +789,7 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
             </div>
             <p
               style={{
-                fontSize: 14,
+                fontSize: "var(--text-small)",
                 lineHeight: 1.5,
                 color: "var(--fg-3)",
                 margin: "8px 0 0",
@@ -854,8 +854,8 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
           <div
             style={{
               textAlign: "center",
-              marginTop: 18,
-              fontSize: 12,
+              marginTop: 16,
+              fontSize: "var(--text-label)",
               color: "var(--fg-3)",
             }}
           >

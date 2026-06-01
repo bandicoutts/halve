@@ -21,10 +21,10 @@ export function TopBar({ left, title, right }: TopBarProps) {
       <div style={{ flex: 1, display: "flex", alignItems: "center" }}>{left}</div>
       <div
         style={{
-          fontSize: 16,
+          fontSize: "var(--text-body)",
           fontWeight: 600,
           color: "var(--fg-1)",
-          letterSpacing: "-0.01em",
+          letterSpacing: "var(--tracking-snug)",
           whiteSpace: "nowrap",
         }}
       >

@@ -4,9 +4,9 @@ export function Eyebrow({ children, style }: { children: ReactNode; style?: CSSP
   return (
     <div
       style={{
-        fontSize: 12,
+        fontSize: "var(--text-label)",
         fontWeight: 600,
-        letterSpacing: "0.08em",
+        letterSpacing: "var(--tracking-label)",
         textTransform: "uppercase",
         color: "var(--fg-3)",
         ...style,

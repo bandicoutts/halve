@@ -137,9 +137,9 @@ function ControlButton({
       </IconButton>
       <span
         style={{
-          fontSize: 12,
+          fontSize: "var(--text-label)",
           fontWeight: 600,
-          letterSpacing: "0.08em",
+          letterSpacing: "var(--tracking-label)",
           textTransform: "uppercase",
           color: "var(--fg-3)",
         }}
@@ -361,7 +361,7 @@ export function BoardScreen({
         <p
           style={{
             margin: "8px 24px 0",
-            fontSize: 13,
+            fontSize: "var(--text-small)",
             color: "var(--fg-3)",
             textAlign: "center",
           }}
@@ -373,7 +373,7 @@ export function BoardScreen({
               background: "none",
               border: "none",
               color: "var(--fg-3)",
-              fontSize: 13,
+              fontSize: "var(--text-small)",
               cursor: "pointer",
               textDecoration: "underline",
               textUnderlineOffset: 3,
@@ -398,9 +398,9 @@ export function BoardScreen({
           role="timer"
           aria-label={`Elapsed time ${formatted}`}
           style={{
-            fontSize: 44,
+            fontSize: "var(--text-timer)",
             fontWeight: 500,
-            letterSpacing: "-0.01em",
+            letterSpacing: "var(--tracking-snug)",
             lineHeight: 1,
             color: solved ? "var(--correct)" : "var(--fg-1)",
             transition: "color 0.2s",
@@ -496,7 +496,7 @@ export function BoardScreen({
             <Link
               href="/tutorial"
               style={{
-                fontSize: 13,
+                fontSize: "var(--text-small)",
                 color: "var(--fg-2)",
                 textDecoration: "none",
                 display: "inline-flex",

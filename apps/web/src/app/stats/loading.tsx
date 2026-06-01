@@ -16,7 +16,7 @@ export default function StatsLoading() {
         <div style={{ maxWidth: 560, margin: "0 auto", width: "100%" }}>
 
           {/* Identity row — monogram + name + subtitle */}
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 14, marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 16, marginBottom: 24 }}>
             <Skel w={48} h={48} r="999px" />
             <div>
               <Skel w={120} h={20} />

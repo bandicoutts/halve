@@ -10,11 +10,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export function Button({ variant = "primary", full, children, style, ...rest }: ButtonProps) {
   const base: React.CSSProperties = {
     height: 52,
-    borderRadius: 999,
+    borderRadius: "var(--radius-full)",
     padding: "0 28px",
-    fontSize: 16,
+    fontSize: "var(--text-body)",
     fontWeight: 500,
-    letterSpacing: "-0.01em",
+    letterSpacing: "var(--tracking-snug)",
     fontFamily: "var(--font-sans)",
     cursor: "pointer",
     transition: "background 0.16s, border-color 0.16s, transform 0.12s",

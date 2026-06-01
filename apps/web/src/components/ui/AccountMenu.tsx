@@ -36,7 +36,7 @@ const itemStyle: React.CSSProperties = {
   border: "none",
   borderRadius: "var(--radius-sm)",
   color: "var(--fg-2)",
-  fontSize: 14,
+  fontSize: "var(--text-small)",
   fontWeight: 500,
   fontFamily: "var(--font-sans)",
   textAlign: "left",
@@ -139,7 +139,7 @@ export function AccountMenu({ displayName }: { displayName: string }) {
           background: "none",
           border: "none",
           padding: 0,
-          borderRadius: 999,
+          borderRadius: "var(--radius-full)",
           cursor: "pointer",
           transition: "box-shadow .15s",
           boxShadow: open ? "0 0 0 2px var(--accent-tint)" : "none",
@@ -174,10 +174,10 @@ export function AccountMenu({ displayName }: { displayName: string }) {
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px 10px" }}>
             <Monogram name={name} size={32} />
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg-1)", textTransform: nameCasing, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div style={{ fontSize: "var(--text-small)", fontWeight: 600, color: "var(--fg-1)", textTransform: nameCasing, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {name}
               </div>
-              <div style={{ fontSize: 12, color: "var(--fg-3)", marginTop: 1 }}>Signed in</div>
+              <div style={{ fontSize: "var(--text-label)", color: "var(--fg-3)", marginTop: 1 }}>Signed in</div>
             </div>
           </div>
 

@@ -191,9 +191,9 @@ export function WinScreen({
         title={
           <span
             style={{
-              fontSize: 12,
+              fontSize: "var(--text-label)",
               fontWeight: 600,
-              letterSpacing: "0.08em",
+              letterSpacing: "var(--tracking-label)",
               textTransform: "uppercase",
               color: "var(--fg-3)",
             }}
@@ -237,7 +237,7 @@ export function WinScreen({
           <div
             style={{
               marginTop: 18,
-              fontSize: 12,
+              fontSize: "var(--text-label)",
               fontWeight: 600,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
@@ -252,7 +252,7 @@ export function WinScreen({
           <div
             style={{
               marginTop: 14,
-              fontSize: 13,
+              fontSize: "var(--text-small)",
               color: "var(--fg-3)",
               letterSpacing: "0.01em",
             }}
@@ -298,7 +298,7 @@ export function WinScreen({
               {displayDate && (
                 <span
                   style={{
-                    fontSize: 12,
+                    fontSize: "var(--text-label)",
                     fontWeight: 600,
                     color: "var(--fg-3)",
                     letterSpacing: "0.02em",
@@ -318,7 +318,7 @@ export function WinScreen({
           <div
             style={{
               marginTop: 16,
-              fontSize: 13,
+              fontSize: "var(--text-small)",
               color: "var(--fg-3)",
               display: "inline-flex",
               alignItems: "center",
@@ -363,7 +363,7 @@ export function WinScreen({
                 gap: 12,
               }}
             >
-              <span style={{ fontSize: 13, color: "var(--fg-2)" }}>
+              <span style={{ fontSize: "var(--text-small)", color: "var(--fg-2)" }}>
                 Couldn&apos;t save your result — check your connection.
               </span>
               <button
@@ -372,7 +372,7 @@ export function WinScreen({
                   background: "none",
                   border: "none",
                   color: "var(--accent)",
-                  fontSize: 13,
+                  fontSize: "var(--text-small)",
                   fontWeight: 600,
                   cursor: "pointer",
                   fontFamily: "var(--font-sans)",
@@ -410,15 +410,15 @@ export function WinScreen({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 7,
+                gap: 8,
                 color: "var(--fg-3)",
                 marginTop: 18,
               }}
             >
-              <span style={{ fontSize: 13 }}>Next puzzle in</span>
+              <span style={{ fontSize: "var(--text-small)" }}>Next puzzle in</span>
               <span
                 className="tnum"
-                style={{ fontSize: 13, fontWeight: 600, color: "var(--fg-2)" }}
+                style={{ fontSize: "var(--text-small)", fontWeight: 600, color: "var(--fg-2)" }}
               >
                 {nextIn}
               </span>

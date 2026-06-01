@@ -14,7 +14,7 @@ export function GoodBad({ good, size = 22 }: { good: boolean; size?: number }) {
       style={{
         width: size,
         height: size,
-        borderRadius: 999,
+        borderRadius: "var(--radius-full)",
         flexShrink: 0,
         display: "inline-flex",
         alignItems: "center",

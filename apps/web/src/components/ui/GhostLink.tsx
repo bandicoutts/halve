@@ -19,7 +19,7 @@ export function GhostLink({ children, onClick, strong, style }: GhostLinkProps) 
         background: "none",
         border: "none",
         fontFamily: "var(--font-sans)",
-        fontSize: 13.5,
+        fontSize: "var(--text-small)",
         fontWeight: strong ? 600 : 500,
         color: hovered ? "var(--fg-1)" : "var(--fg-2)",
         cursor: "pointer",

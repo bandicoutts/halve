@@ -108,7 +108,7 @@ body {
   border: 1px solid var(--hairline-2);
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: var(--text-small);
   font-weight: 600;
   text-decoration: none;
   transform: translateY(-150%);

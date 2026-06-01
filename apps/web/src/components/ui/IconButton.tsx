@@ -19,7 +19,7 @@ export function IconButton({ label, onClick, disabled, size = 48, children }: Ic
       style={{
         width: dim,
         height: dim,
-        borderRadius: 999,
+        borderRadius: "var(--radius-full)",
         border: "1.5px solid var(--hairline-2)",
         background: "transparent",
         color: "var(--fg-2)",

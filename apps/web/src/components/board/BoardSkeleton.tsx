@@ -13,20 +13,20 @@ export function BoardSkeleton() {
         </div>
         <div style={{ ...SKEL, width: 52, height: 12, borderRadius: "var(--radius-sm)" }} />
         <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
-          <div style={{ ...SKEL, width: 60, height: 32, borderRadius: 999 }} />
+          <div style={{ ...SKEL, width: 60, height: 32, borderRadius: "var(--radius-full)" }} />
         </div>
       </header>
 
       {/* Timer — static 0:00 reads as a real starting state */}
       <div style={{ textAlign: "center", paddingTop: 8 }}>
-        <div style={{ fontSize: 44, fontWeight: 500, letterSpacing: "-0.01em", lineHeight: 1, color: "var(--fg-3)", fontVariantNumeric: "tabular-nums" }}>
+        <div style={{ fontSize: "var(--text-timer)", fontWeight: 500, letterSpacing: "var(--tracking-snug)", lineHeight: 1, color: "var(--fg-3)", fontVariantNumeric: "tabular-nums" }}>
           0:00
         </div>
       </div>
 
       {/* Board — 6×6 skeleton grid */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 7, width: "min(calc(100vw - 48px), calc(55dvh - 80px))" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8, width: "min(calc(100vw - 48px), calc(55dvh - 80px))" }}>
           {Array.from({ length: 36 }, (_, i) => (
             <div key={i} style={{ ...SKEL, aspectRatio: "1", borderRadius: "var(--radius-cell)", animationDelay: `${(i % 6) * 40}ms` }} />
           ))}

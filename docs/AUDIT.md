@@ -18,7 +18,7 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 3. ✅ **EPIC-B — one clock** — BE-1, BE-3, NXT-1. Consumer pages + hero label now use the single `getLocalToday()` clock; `local-date.ts` unit-tested. *(Edge-function minting side stays under EPIC-A; BE-3 backfill migration written + applied 2026-05-31.)*
 4. ✅ **EPIC-A — puzzle pipeline** — ENG-1/3, BE-2, CQ-1/3 (+CQ-5, BE-5). One canonical `generateDaily(date)` policy in `@parity/engine` now drives every producer; redundant web seeder deleted; edge function + `/play` fallback are date-deterministic; cron-failure monitor added. *(Edge function deployed + monitor migration applied 2026-05-31; cron re-verified.)*
 5. ✅ **Streak + home perf** — CQ-2 (extract tested `lib/streak.ts`), NXT-2 (home redundant getUser + unbounded fetch), NXT-3 (sequential→parallel home queries). Shipped — see entries below.
-6. 🔄 **Remaining P2/P3** — ✅ NXT-4 (branded `error.tsx`/`not-found.tsx` + `notFound()` for missing archive puzzles), ✅ A11Y-7 (`<main>` landmark + skip link + one `<h1>` per screen), ✅ SEC-3 (`display_name` capped at all three layers; DB migration applied 2026-05-31), ✅ SEC-5 (`local_date` clamped via `resolveLocalToday` in `record-solve.ts`), ✅ ENG-4 (`parseGridSpec` now integer-checks edge r/c + validates givens⊆solution + edge⇔solution; 18 new vitest cases), ✅ A11Y-9 (`role="switch"` + `aria-checked` on ThemeToggle; `role="group"` + `aria-pressed` on SegmentedControl), ✅ A11Y-10 (Fire/Water SVGs now `aria-hidden={true}` — decorative everywhere; Cell button `aria-label` is the semantic source in the grid), ✅ NXT-5 (board sized via CSS `min(calc(100vw - 48px), 55vh)` + ResizeObserver — no default-48-then-resize shift), ✅ NXT-6 (`api/` excluded from proxy matcher). Still open: SEC-2, BE-4, DS-1 (+DS-2/3/4), CQ-6, A11Y-11, ENG-2, SEC-6/7.
+6. 🔄 **Remaining P2/P3** — ✅ NXT-4 (branded `error.tsx`/`not-found.tsx` + `notFound()` for missing archive puzzles), ✅ A11Y-7 (`<main>` landmark + skip link + one `<h1>` per screen), ✅ SEC-3 (`display_name` capped at all three layers; DB migration applied 2026-05-31), ✅ SEC-5 (`local_date` clamped via `resolveLocalToday` in `record-solve.ts`), ✅ ENG-4 (`parseGridSpec` now integer-checks edge r/c + validates givens⊆solution + edge⇔solution; 18 new vitest cases), ✅ A11Y-9 (`role="switch"` + `aria-checked` on ThemeToggle; `role="group"` + `aria-pressed` on SegmentedControl), ✅ A11Y-10 (Fire/Water SVGs now `aria-hidden={true}` — decorative everywhere; Cell button `aria-label` is the semantic source in the grid), ✅ NXT-5 (board sized via CSS `min(calc(100vw - 48px), 55vh)` + ResizeObserver — no default-48-then-resize shift), ✅ NXT-6 (`api/` excluded from proxy matcher), ✅ ENG-2 (independent brute-force solution-counter; 7 tests, zero engine rule-logic imports; 60 generated + 30 daily puzzles verified uniquely solvable), ✅ DS-1 (full type-scale normalization to `var(--text-*)` / `var(--tracking-*)` tokens across all 25 web files; off-scale 11/13/13.5/14.5px fixed), ✅ DS-2 (off-grid gaps 7/9/14/18 rounded to 8/8/16/16 across 10 files), ✅ DS-3 (`borderRadius: 999` → `var(--radius-full)` across all 21 occurrences in 14 files), ✅ CQ-6 (DECISIONS.md workspace claim corrected; stale entry annotated). Still open: SEC-2, BE-4, DS-4, A11Y-11, SEC-6/7.
 
 **Guardrail (don't auto-do):** `git push`, applying DB migrations to the live DB, deploying the edge function, Vercel/Supabase config. Write the code; surface these for sign-off.
 
@@ -28,15 +28,17 @@ Multi-agent read-only audit across 7 domains (engine, security, accessibility, b
 
 | Domain | Assessment | P1 | P2 | P3 |
 |---|---|---|---|---|
-| Engine | 🟢 strong | 0 | 1 | 0 |
-| Design system | 🟢 strong | 0 | 1 | 3 |
+| Engine | 🟢 strong | 0 | 0 | 0 |
+| Design system | 🟢 strong | 0 | 0 | 1 |
 | Security | 🟡 adequate | 0 | 1 | 2 |
 | Backend / data | 🟢 strong | 0 | 1 | 1 |
 | Next.js / performance | 🟢 strong | 0 | 0 | 0 |
-| Code quality / tests | 🟢 strong | 0 | 0 | 1 |
+| Code quality / tests | 🟢 strong | 0 | 0 | 0 |
 | Accessibility | 🟡 adequate | 0 | 0 | 1 |
 
 **Independent engine verification (2026-05-31):** a from-scratch rule-checker + backtracking solution-counter (no engine internals) over **360 puzzles** (120 each easy/medium/hard) found 0 rule violations, 0 non-unique, 0 givens-not-⊆-solution, 0 non-deterministic, correct difficulty distribution. Puzzle correctness is confirmed.
+
+**ENG-2 committed brute-force (2026-06-01):** `packages/engine/src/brute-force.test.ts` implements `canPlace()` from scratch (adjacency, balance, edge constraints) with no imports from `validators.ts`/`uniqueness.ts`. Verifies 20 easy + 20 medium + 20 hard generated puzzles + 30 daily dates (2026-01-01 to 2026-01-30) all have exactly 1 solution.
 
 ---
 
@@ -61,7 +63,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 
 ## Engine 🟢
 - [x] **ENG-1 · P2** — **Done (EPIC-A).** All producers now derive seed + difficulty from the single `generateDaily(date)` policy in `packages/engine/src/daily.ts`. The redundant `apps/web/scripts/seed-puzzles.mts` was deleted.
-- [ ] **ENG-2 · P2** — Uniqueness/deduction guarantees are self-referential (generator + tests share `wouldViolate`). Add a committed test that counts solutions with an independent brute-forcer. *(Partially de-risked by the 2026-05-31 independent run; still want it in CI.)* `packages/engine` test suite.
+- [x] **ENG-2 · P2** — **Done.** `packages/engine/src/brute-force.test.ts` implements `canPlace()` from scratch (no engine validator/uniqueness imports), tests 60 generated puzzles (20 each easy/medium/hard) + 30 daily dates — all confirm exactly 1 solution. 7 tests. `tsc` clean; all 50 engine tests pass.
 - [x] **ENG-3 · P3** — **Done (EPIC-A).** Edge function now seeds from the date via `generateDaily(today)` (no `Math.random`). Deployed + verified 2026-05-31.
 - [x] **ENG-4 · P3** — **Done.** `parseGridSpec` now (1) integer-checks edge `r`/`c` via `Number.isInteger` after the `typeof number` guard, (2) cross-checks givens⊆solution (every non-null given must equal `solution[r][c]`), (3) cross-checks each edge's constraint against the solution cells it spans (`eq` → cells must match; `ne` → cells must differ). A corrupt or forged `grid_spec` row that violates any of these is rejected as `null`, same as a malformed shape. 18 new vitest cases in `src/lib/grid-spec.test.ts` cover structural rejects, givens-conflict, float r/c, and eq/ne mismatches. Verified: all 52 web tests pass; `/play` loads the live DB puzzle cleanly through the tightened parser.
 
@@ -104,9 +106,9 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - [x] **NXT-6 · P3** — **Done.** `proxy.ts` matcher now excludes `api/`: `/((?!_next/static|_next/image|favicon.ico|api/|.*\.(?:svg|png|…)$).*)`. `/api/` routes no longer trigger the Supabase `getUser()` session refresh in middleware; they handle their own auth as needed. Only the `/api/dev-login` route exists (dev-only, guarded).`
 
 ## Design system 🟢
-- [ ] **DS-1 · P2** — Type scale & label tracking have drifted off the locked scale (off-scale `13`/`11`/`13.5` px, scattered letter-spacing). App-wide. Do as one normalization pass to `var(--text-*)`/`var(--tracking-label)` (the deferral logged in DECISIONS).
-- [ ] **DS-2 · P3** — Off-grid gap values (`7`/`9`/`14`/`18`) break the 8pt system. Round to grid during the DS-1 pass.
-- [ ] **DS-3 · P3** — `borderRadius:999` (×21 across 14 files) and `:4` hardcoded instead of `var(--radius-full)` / a token. **Folded into DS-1** (do as one mechanical sweep to avoid scattering churn).
+- [x] **DS-1 · P2** — **Done.** Full normalization pass across 25 web files: off-scale 11/13/13.5/14.5px fixed to `var(--text-label)`/`var(--text-small)`; all on-scale raw px values (12/14/16/20/36/44) tokenized to `var(--text-*)`; scattered `0.08em`/`-0.01em` letter-spacing → `var(--tracking-label)`/`var(--tracking-snug)`. `globals.css` skip-link `font-size: 14px` → `var(--text-small)`. Custom off-scale display sizes (28/30/32/64px) and brand-specific tracking (-0.025em/0.14em) left as intentional design choices. `tsc` clean; 52 web tests pass; home/play/archive verified in preview.
+- [x] **DS-2 · P3** — **Done (DS-1 pass).** Off-grid flex/grid gaps rounded to 8pt grid: 7→8 (BoardSkeleton cell grid, WinScreen countdown, TutorialScreen dots/undo-btn, ArchiveScreen hover-preview/picker), 9→8 (HomeScreen meta row, loading.tsx), 14→16 (HomeUserContent streak band, StatsScreen identity row + blur preview, stats/loading), 18→16 (TutorialScreen lines demo). 10 files touched.
+- [x] **DS-3 · P3** — **Done (DS-1 pass).** All 21 `borderRadius: 999` occurrences across 14 files replaced with `borderRadius: "var(--radius-full)"`. Files: Button, IconButton, ThemeToggle, Monogram, SegmentedControl, AccountMenu, HomeScreen, HomeUserContent, BoardSkeleton, TeachBoard, AuthScreen, ArchiveScreen (×3), TutorialScreen (×2), StatsScreen, WinScreen (already had none → confirmed clean).
 - [ ] **DS-4 · P3** — Sign-out pill & repeated uppercase-label style duplicate derivable primitives. Extend `Button` (size+icon); adopt the `.label`/`<Eyebrow>` primitive.
 
 ## Code quality / tests 🟡
@@ -115,7 +117,7 @@ Groups BE-1, BE-3, NXT-1. Puzzle is served/gated by UTC date while streaks bucke
 - [x] **CQ-3 · P2** — **Done (EPIC-A).** `/play` fallback now uses `generateDaily(today).puzzle` (deterministic, canonical for the date) and logs loudly when the DB row is missing. `puzzleId` is still undefined for a genuine offline fallback (no DB row exists to record against — surfaced via `isOffline` + the log), which is correct.
 - [x] **CQ-4 · P3** — **Done.** Removed the empty `apps/web/src/app/auth/callback/` directory.
 - [x] **CQ-5 · P3** — **Done (EPIC-A).** Resolved by deleting `apps/web/scripts/seed-puzzles.mts` — the file holding both `as any` casts no longer exists.
-- [ ] **CQ-6 · P3** — `scripts/` isn't a real workspace package despite a DECISIONS claim; entry is stale. Fix the package wiring or the doc.
+- [x] **CQ-6 · P3** — **Done.** New DECISIONS entry (2026-06-01) documents that `scripts/` was never wired as a pnpm workspace package — it runs via the root `pnpm seed-puzzles` npm script (`tsx --tsconfig scripts/tsconfig.json`) with a `paths` alias. The stale 2026-05-29 archive entry is annotated with a `[Correction]` note. No code change needed; the script works as-is.
 
 ---
 

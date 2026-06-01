@@ -34,7 +34,7 @@ function StreakBand({
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 14,
+        gap: 16,
         background: "var(--surface)",
         border: "1px solid var(--hairline)",
         borderRadius: "var(--radius-lg)",
@@ -45,7 +45,7 @@ function StreakBand({
         style={{
           width: 38,
           height: 38,
-          borderRadius: 999,
+          borderRadius: "var(--radius-full)",
           background: "var(--accent-tint)",
           display: "flex",
           alignItems: "center",
@@ -62,7 +62,7 @@ function StreakBand({
           </span>{" "}
           day streak
         </div>
-        <div style={{ fontSize: 12, color: "var(--fg-3)", marginTop: 1 }}>
+        <div style={{ fontSize: "var(--text-label)", color: "var(--fg-3)", marginTop: 1 }}>
           {solvedToday ? "Solved today — streak safe" : "Solve today to keep it going"}
         </div>
       </div>
@@ -73,7 +73,7 @@ function StreakBand({
             style={{
               width: 7,
               height: 7,
-              borderRadius: 999,
+              borderRadius: "var(--radius-full)",
               background: on ? "var(--accent)" : "var(--hairline-2)",
             }}
           />

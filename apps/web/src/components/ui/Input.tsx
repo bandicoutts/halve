@@ -52,9 +52,9 @@ export function Input({
           htmlFor={id}
           style={{
             display: "block",
-            fontSize: 12,
+            fontSize: "var(--text-label)",
             fontWeight: 600,
-            letterSpacing: "0.06em",
+            letterSpacing: "var(--tracking-label)",
             textTransform: "uppercase",
             color: "var(--fg-3)",
             marginBottom: 8,
@@ -89,10 +89,10 @@ export function Input({
           border: `1.5px solid ${borderColor}`,
           background: "var(--surface)",
           color: "var(--fg-1)",
-          fontSize: 16,
+          fontSize: "var(--text-body)",
           fontWeight: 400,
           fontFamily: "var(--font-sans)",
-          letterSpacing: "-0.01em",
+          letterSpacing: "var(--tracking-snug)",
           outline: "none",
           // Visible focus ring (the UA outline is suppressed above); the tint
           // ring + accent border give a clear, themed focus indicator.
@@ -106,7 +106,7 @@ export function Input({
         }}
       />
       {error && (
-        <p id={errorId} role="alert" style={{ fontSize: 13, color: "var(--wrong)", margin: "8px 0 0", lineHeight: 1.45 }}>
+        <p id={errorId} role="alert" style={{ fontSize: "var(--text-small)", color: "var(--wrong)", margin: "8px 0 0", lineHeight: 1.45 }}>
           {error}
         </p>
       )}

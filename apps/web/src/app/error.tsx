@@ -60,7 +60,7 @@ export default function Error({
 
         <p
           style={{
-            fontSize: 14,
+            fontSize: "var(--text-small)",
             lineHeight: 1.5,
             color: "var(--fg-3)",
             margin: "12px 0 0",

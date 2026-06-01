@@ -81,7 +81,7 @@ function CalloutError({ children }: { children: React.ReactNode }) {
         style={{
           width: 16,
           height: 16,
-          borderRadius: 999,
+          borderRadius: "var(--radius-full)",
           background: "var(--wrong)",
           color: "var(--surface)",
           flexShrink: 0,
@@ -89,13 +89,13 @@ function CalloutError({ children }: { children: React.ReactNode }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 11,
+          fontSize: "var(--text-label)",
           fontWeight: 700,
         }}
       >
         !
       </span>
-      <span style={{ fontSize: 13.5, lineHeight: 1.45, color: "var(--wrong)" }}>
+      <span style={{ fontSize: "var(--text-small)", lineHeight: 1.45, color: "var(--wrong)" }}>
         {children}
       </span>
     </div>
@@ -140,7 +140,7 @@ function SentScreen({ email, onBack }: { email: string; onBack: () => void }) {
       </h1>
       <p
         style={{
-          fontSize: 14.5,
+          fontSize: "var(--text-small)",
           lineHeight: 1.55,
           color: "var(--fg-2)",
           margin: "12px 0 0",
@@ -228,7 +228,7 @@ export function AuthScreen({ initialError }: { initialError?: string }) {
       </h1>
       <p
         style={{
-          fontSize: 14.5,
+          fontSize: "var(--text-small)",
           lineHeight: 1.5,
           color: "var(--fg-2)",
           margin: "10px 0 24px",

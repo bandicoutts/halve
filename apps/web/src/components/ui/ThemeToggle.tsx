@@ -18,7 +18,7 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
       style={{
         width: 60,
         height: 32,
-        borderRadius: 999,
+        borderRadius: "var(--radius-full)",
         border: "none",
         padding: 3,
         display: "flex",

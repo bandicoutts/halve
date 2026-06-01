@@ -98,12 +98,12 @@ function DestCard({
               fontSize: 18,
               fontWeight: 600,
               color: "var(--fg-1)",
-              letterSpacing: "-0.01em",
+              letterSpacing: "var(--tracking-snug)",
             }}
           >
             {title}
           </div>
-          <div style={{ fontSize: 13, color: "var(--fg-3)", marginTop: 3 }}>
+          <div style={{ fontSize: "var(--text-small)", color: "var(--fg-3)", marginTop: 3 }}>
             {sub}
           </div>
         </div>
@@ -152,7 +152,7 @@ function SolvedHero({ durationMs }: { durationMs?: number }) {
           style={{
             width: 38,
             height: 38,
-            borderRadius: 999,
+            borderRadius: "var(--radius-full)",
             background: "var(--correct-tint, var(--accent-tint))",
             display: "flex",
             alignItems: "center",
@@ -265,7 +265,7 @@ export function HomeScreen({
                 onMouseEnter={() => setSignInHovered(true)}
                 onMouseLeave={() => setSignInHovered(false)}
                 style={{
-                  fontSize: 13,
+                  fontSize: "var(--text-small)",
                   fontWeight: 600,
                   color: signInHovered ? "var(--fg-1)" : "var(--fg-2)",
                   height: 34,
@@ -273,7 +273,7 @@ export function HomeScreen({
                   alignItems: "center",
                   padding: "0 14px",
                   border: `1.5px solid ${signInHovered ? "var(--fg-3)" : "var(--hairline-2)"}`,
-                  borderRadius: 999,
+                  borderRadius: "var(--radius-full)",
                   textDecoration: "none",
                   transition: "all .15s",
                 }}
@@ -305,7 +305,7 @@ export function HomeScreen({
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 9,
+              gap: 8,
               flexWrap: "nowrap",
             }}
           >
@@ -425,7 +425,7 @@ export function HomeScreen({
           <Link
             href="/tutorial"
             style={{
-              fontSize: 13,
+              fontSize: "var(--text-small)",
               color: "var(--fg-3)",
               textDecoration: "none",
               minHeight: 44,

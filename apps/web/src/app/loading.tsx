@@ -20,7 +20,7 @@ export default function HomeLoading() {
        <div style={{ maxWidth: 480, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", flex: 1 }}>
         {/* Hero — meta row + heading + CTA */}
         <div style={{ marginTop: 26 }}>
-          <div style={{ display: "flex", gap: 9, marginBottom: 10, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "center" }}>
             <Skel w={92} h={12} />
             <Skel w={56} h={12} delay={80} />
             <Skel w={40} h={12} delay={160} />
