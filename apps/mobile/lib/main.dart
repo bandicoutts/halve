@@ -23,13 +23,17 @@ Future<void> main() async {
     debugPrint('Supabase init failed (continuing as guest): $e');
   }
 
-  // Persistent offline puzzle cache (D3). Falls back to in-memory if prefs fail.
-  // Also reads the first-run gate flag to pick the cold-start landing route.
+  // Persistent offline puzzle cache + theme mode. Falls back to in-memory /
+  // ThemeMode.system if prefs fail. Also reads the first-run gate flag to
+  // pick the cold-start landing route.
   final overrides = <Override>[];
   var onboarded = false;
   try {
     final prefs = await SharedPreferences.getInstance();
     overrides.add(puzzleCacheProvider.overrideWithValue(PrefsPuzzleCache(prefs)));
+    overrides.add(
+      themeModeProvider.overrideWith((ref) => ThemeModeNotifier(prefs)),
+    );
     onboarded = prefs.getBool(onboardedKey) ?? false;
   } catch (e) {
     debugPrint('SharedPreferences unavailable — using in-memory cache: $e');
@@ -59,13 +63,20 @@ class _HalveAppState extends State<HalveApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Halve',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system, // overridable by Settings in Phase 13
-      routerConfig: _router,
+    // Consumer watches themeModeProvider so the MaterialApp rebuilds when the
+    // user changes the theme in Settings, without rebuilding the entire widget.
+    return Consumer(
+      builder: (context, ref, _) {
+        final themeMode = ref.watch(themeModeProvider);
+        return MaterialApp.router(
+          title: 'Halve',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: themeMode,
+          routerConfig: _router,
+        );
+      },
     );
   }
 }

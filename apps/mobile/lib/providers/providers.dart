@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/puzzle_cache.dart';
 import '../data/repositories/repositories.dart';
 import '../data/supabase_client.dart';
+export '../data/theme_store.dart' show themeModeProvider, ThemeModeNotifier, themeModeKey;
 
 /// The active Supabase client. Reading this in guest mode (no build-time creds)
 /// throws — callers gate UI on [isSignedInProvider] / [authStateProvider],
@@ -34,6 +35,13 @@ final puzzleRepositoryProvider = Provider<PuzzleRepository?>(
 final solveRepositoryProvider = Provider<SolveRepository?>(
   (ref) => isSupabaseConfigured
       ? SolveRepository(ref.watch(supabaseClientProvider))
+      : null,
+);
+
+/// Null in guest mode. See [puzzleRepositoryProvider].
+final profileRepositoryProvider = Provider<ProfileRepository?>(
+  (ref) => isSupabaseConfigured
+      ? ProfileRepository(ref.watch(supabaseClientProvider))
       : null,
 );
 

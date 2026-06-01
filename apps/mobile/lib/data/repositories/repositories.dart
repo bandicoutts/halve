@@ -3,5 +3,6 @@
 library;
 
 export 'auth_repository.dart';
+export 'profile_repository.dart';
 export 'puzzle_repository.dart';
 export 'solve_repository.dart';

@@ -21,7 +21,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 10 | Archive | ✅ done & committed |
 | 11 | Stats | ✅ done & committed |
 | 12 | Practice | ✅ done & committed |
-| 13 | Settings | ⬜ |
+| 13 | Settings | ✅ done & committed |
 | 14 | Auth | ⬜ |
 | 15 | Notifications | ⬜ |
 | 16 | Tablet adaptive layouts | ⬜ |
@@ -552,7 +552,7 @@ Verify: widget test difficulty selection → correct pool fetch param; flutter a
 ```
 Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 12 + Phase 13 plan section; skim 0–11). Work on the existing feat/mobile-app branch.
 
-IMPORTANT design reference: the mobile wireframes at ~/Downloads/halve (4).zip — unzip and read app/screens/home.jsx (the Settings / Account sections if present) and app/HANDOFF.md (Settings section + persistence keys table). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it.
+IMPORTANT design reference: the mobile wireframes are already unzipped at ~/Downloads/halve (4)/ — read app/screens/home.jsx (the Settings / Account sections if present) and app/HANDOFF.md (Settings section + persistence keys table). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it.
 
 Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/HalveIconButton/HalveTopBar/HalveBottomSheet/SafeScaffold + context.halveColors/halveShadows), app shell (go_router; /settings route → SettingsScreen placeholder), data layer (authRepositoryProvider, currentUserProvider, isSignedInProvider), the local-day helpers, and 147 tests green.
 
@@ -563,4 +563,56 @@ Do Phase 13 — Settings, per plan Phase 13:
 4. Fetch profile display name from the profiles table (profileRepository.fetchProfile(userId) — the Phase 11 follow-up).
 
 Verify: widget tests (theme toggle persists to shared_preferences, signed-in account row, guest sign-in prompt, sign-out calls AuthRepository.signOut with local scope); flutter analyze clean + flutter test green (147 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 13 done + add a Phase 14 handoff prompt) and commit/push. Gotchas: signOut scope:local (global rule); design tokens are the source of truth; no emoji; tabular numerals for version; sentence case.
+
+At the very end of your response, after the commit/push, paste the next session's handoff prompt (Phase 14) so the user can copy it directly without asking.
+```
+
+---
+
+## Phase 13 — Settings ✅ (2026-06-01)
+
+**What shipped — `lib/screens/settings/`, `lib/data/`, `lib/providers/`, `lib/main.dart`:**
+- `lib/data/theme_store.dart` — `ThemeModeNotifier` (`StateNotifier<ThemeMode>`) wraps `SharedPreferences?` (null = in-memory; `main.dart` passes real prefs). `themeModeProvider` (`StateNotifierProvider`) defaults to `ThemeMode.system`. Key: `halve:theme` → `'system'`/`'light'`/`'dark'`.
+- `lib/data/repositories/profile_repository.dart` — `ProfileRepository.fetchDisplayName(userId)`: reads `profiles.display_name`, returns null if empty. Added to `repositories.dart` barrel and `profileRepositoryProvider` in `providers.dart`.
+- `lib/screens/settings/settings_provider.dart` — `SettingsData` (isSignedIn, email, displayName, version) + `settingsDataProvider` (`FutureProvider.autoDispose`): fetches `ProfileRepository.fetchDisplayName` (falling back to auth metadata then email), and `PackageInfo.fromPlatform()` for the version string.
+- `lib/screens/settings/settings_screen.dart` — full `SettingsScreen` (`ConsumerStatefulWidget`) replacing the Phase-3 placeholder:
+  - **Appearance section**: `_ThemeSegment` — a pill-shaped segmented control (System / Light / Dark) matching `settings.jsx AppearanceControl`. Tapping calls `ref.read(themeModeProvider.notifier).setMode(...)` and persists to prefs.
+  - **Notifications section**: "Daily reminder" row with `_HvSwitch` (51×31 pill toggle, wireframe `HvToggle` style); when on, a `_TimePickerRow` expands beneath with ±hour step buttons and AM/PM toggle. Persists to `halve:reminder` / `halve:reminder_hour` / `halve:reminder_ampm` prefs. Actual scheduling deferred to Phase 15.
+  - **Game section**: "Haptics" row with `_HvSwitch`. Persists to `halve:haptics` prefs. Haptic feedback deferred to Phase 15.
+  - **Account section**: signed-in → `_AvatarInitial` (36px accent-tint circle + initial) + display name/email label + "Streak synced" sublabel + green 7px dot + destructive "Sign out" row (calls `AuthRepository.signOut()` enforcing `scope: local`, then `context.go(Routes.home)`); guest → "Sign in" row with "Keep your streak safe across devices" sublabel → `/auth`.
+  - **About section**: Version (tabular numerals, `'1.0.0 (1)'` format from `PackageInfo`), Privacy policy, Terms of use (tappable rows with `_ChevronIcon`; URL wiring deferred to Phase 19).
+  - Reminder/haptics are local `_State` initialised from prefs in `initState` (not Riverpod — nothing else reads them).
+- `lib/main.dart` — `main()` adds `themeModeProvider.overrideWith((ref) => ThemeModeNotifier(prefs))` alongside the puzzle-cache override. `HalveApp.build` wraps `MaterialApp.router` in `Consumer` to watch `themeModeProvider` — avoids converting `HalveApp` to `ConsumerStatefulWidget`.
+
+**Decisions (logged in `docs/DECISIONS.md`, "MOBILE Phase 13"):** `ThemeModeNotifier` follows the prefs-injectable pattern of `PrefsPuzzleCache`; `Consumer` wrapper preferred over `ConsumerStatefulWidget` for minimal diff; reminder/haptics are local state (not providers); sign-out goes to `/` not `pop` (parity with stats); notification scheduling deferred to Phase 15; URL wiring for policy/terms deferred to Phase 19.
+
+**Verification:** `flutter analyze` → *2 pre-existing unused-import warnings, no new issues*. `flutter test` → **162/162** (147 prior + 15 new in `test/screens/settings/settings_screen_test.dart`: 4 theme-toggle prefs-persistence tests, 3 signed-in account row tests, 3 guest/signed-out tests, 1 sign-out calls-signOut + navigates-home, 2 about-section render tests, 1 notifications render, 1 haptics render).
+
+**Follow-ups:**
+1. Runtime verification on device/simulator recommended (segmented control, toggle animations, avatar, sign-out flow).
+2. Phase 15 (Notifications): wire `flutter_local_notifications` to actually schedule the reminder when `halve:reminder` is true.
+3. Phase 15 (Haptics): wire `HapticFeedback` calls to the `halve:haptics` pref — the play board's cell tap should respect it.
+4. Phase 19 (App store prep): add Privacy policy and Terms of use URLs to the About section rows.
+5. Stats screen identity row still uses auth metadata for `displayName` — a future cleanup can call `profileRepositoryProvider` there too (same pattern as settings).
+
+---
+
+## Handoff prompt → Phase 14 (paste into a fresh session)
+
+```
+Continue the Halve Flutter mobile build. Plan of record: ~/.claude/plans/users-davidcoutts-downloads-halve-4-zip-cached-fairy.md. Progress + decisions: docs/MOBILE-BUILD-LOG.md (read the Phase 13 + Phase 14 plan section; skim 0–12). Work on the existing feat/mobile-app branch.
+
+IMPORTANT design reference: the mobile wireframes are already unzipped at ~/Downloads/halve (4)/ — read app/screens/auth.jsx and app/HANDOFF.md §1 (Auth / Sign-in flow — email input step, link-sent step, signed-in state). These are the CORRECT disc/ring designs — packages/design/handoff/ is the OLD fire/water build, do not use it. Also read apps/mobile/AUTH-DEEPLINK-SETUP.md for the deep-link scheme decision and Supabase redirect allow-list requirements.
+
+Context in place: design system (lib/theme + lib/widgets — reuse HalveButton/HalveIconButton/HalveTopBar/SafeScaffold + context.halveColors/halveShadows), app shell (go_router; /auth route → AuthScreen placeholder), data layer (authRepositoryProvider → AuthRepository.signInWithMagicLink(email), isSignedInProvider, currentUserProvider, authStateProvider), Settings screen (the only entry point for sign-in per the design — Settings → Account → "Sign in"), and 162 tests green.
+
+Do Phase 14 — Auth, per plan Phase 14:
+1. auth_screen.dart. Two steps: email input (validate, "Continue" CTA, disabled until valid email) → link-sent ("Check your email" + resend with 2.5s cooldown). Matches HANDOFF.md §1 exactly — HalveMark 30px anchor, 26px h2 heading, 15px fg-2 body copy, 54px-tall email input with accent focus border, sentence-case copy.
+2. AuthRepository.signInWithMagicLink(email) is already wired (Phase 4) — call it on Continue. The deep link callback (halve://auth-callback) is handled by supabase_flutter's session restore on app resume; no extra handling needed in Phase 14 (AUTH-DEEPLINK-SETUP.md covers the native wiring steps you'll do manually before launch).
+3. Signed-in state detection: when authStateProvider emits a sign-in event, pop back to wherever the user came from (Settings). The auth screen must NOT push to a new destination — it's a modal that returns control.
+4. Error handling: show an inline error below the email field when signInWithMagicLink throws (rate-limit, network error, etc.).
+
+Verify: widget tests (email input validates, Continue calls signInWithMagicLink with the entered email, link-sent step shows the email, resend cooldown, error display, authStateProvider sign-in event pops the screen); flutter analyze clean + flutter test green (162 still pass). Then update docs/MOBILE-BUILD-LOG.md (mark Phase 14 done + add a Phase 15 handoff prompt) and commit/push. Gotchas: signOut scope:local (global rule); design tokens only; no emoji; sentence case; the auth screen is entered only from Settings (not from Home or any other entry point per design); do not push to a destination on sign-in — pop.
+
+At the very end of your response, after the commit/push, paste the next session's handoff prompt (Phase 15) so the user can copy it directly without asking.
 ```
