@@ -50,6 +50,27 @@ describe("formatDateLabel — deterministic, timezone-independent (NXT-1)", () =
   });
 });
 
+describe("resolveLocalToday used in record-solve (SEC-5) — clamps localDate to ±1 day", () => {
+  const UTC = "2026-06-01";
+
+  it("passes through a valid same-day local_date unchanged", () => {
+    expect(resolveLocalToday("2026-06-01", UTC)).toBe("2026-06-01");
+  });
+
+  it("passes through a ±1-day offset (extreme timezone)", () => {
+    expect(resolveLocalToday("2026-06-02", UTC)).toBe("2026-06-02"); // UTC+14
+    expect(resolveLocalToday("2026-05-31", UTC)).toBe("2026-05-31"); // UTC-12
+  });
+
+  it("clamps a backdated local_date to UTC — prevents streak-gap filling", () => {
+    expect(resolveLocalToday("2026-05-20", UTC)).toBe(UTC);
+  });
+
+  it("clamps a future-dated local_date to UTC — prevents streak pre-filling", () => {
+    expect(resolveLocalToday("2026-06-15", UTC)).toBe(UTC);
+  });
+});
+
 describe("solveDay — prefers stored local_date, falls back to UTC (BE-3)", () => {
   it("uses local_date when present", () => {
     expect(

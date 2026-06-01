@@ -1,6 +1,7 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
 import { parseGridSpec } from "@/lib/grid-spec";
+import { resolveLocalToday } from "@/lib/local-date";
 
 interface RecordSolveInput {
   puzzleId: string;
@@ -50,6 +51,11 @@ export async function recordSolve(input: RecordSolveInput): Promise<RecordSolveR
   const todayUtc = new Date().toISOString().slice(0, 10);
   if (!puzzle.date || puzzle.date > todayUtc) return { ok: false };
 
+  // Clamp localDate to ±1 day of server UTC — same window resolveLocalToday uses
+  // for the tz_date cookie. Prevents a client from shaping its streak day by
+  // submitting an arbitrary date (e.g. backdating to fill a streak gap).
+  const validatedLocalDate = resolveLocalToday(localDate, todayUtc);
+
   const spec = parseGridSpec(puzzle.grid_spec);
   if (!spec) return { ok: false };
 
@@ -68,7 +74,7 @@ export async function recordSolve(input: RecordSolveInput): Promise<RecordSolveR
     puzzle_id: puzzleId,
     duration_ms: durationMs,
     used_hint: usedHint,
-    local_date: localDate,
+    local_date: validatedLocalDate,
   });
 
   if (error?.code === "23505") return { ok: true, alreadySolved: true };
