@@ -20,7 +20,7 @@ select cron.schedule(
   '5 0 * * *',
   $$
   select net.http_post(
-    url     := 'https://gyggmmlvgqjnjinbtpvz.supabase.co/functions/v1/daily-puzzle',
+    url     := 'https://gyggmmlvgqjnjinbtpvz.supabase.co/functions/v1/daily-puzzle', -- project URL is public; not a secret
     headers := '{"Content-Type": "application/json"}'::jsonb,
     body    := '{}'::jsonb
   );

@@ -3,16 +3,17 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary";
+  size?: "lg" | "sm";
   full?: boolean;
   children: ReactNode;
 }
 
-export function Button({ variant = "primary", full, children, style, ...rest }: ButtonProps) {
+export function Button({ variant = "primary", size = "lg", full, children, style, ...rest }: ButtonProps) {
   const base: React.CSSProperties = {
-    height: 52,
+    height: size === "sm" ? 44 : 52,
     borderRadius: "var(--radius-full)",
-    padding: "0 28px",
-    fontSize: "var(--text-body)",
+    padding: size === "sm" ? "0 20px" : "0 28px",
+    fontSize: size === "sm" ? "var(--text-small)" : "var(--text-body)",
     fontWeight: 500,
     letterSpacing: "var(--tracking-snug)",
     fontFamily: "var(--font-sans)",

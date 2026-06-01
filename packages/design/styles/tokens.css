@@ -126,15 +126,15 @@
   --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
   --font-num:  'Space Grotesk', ui-monospace, monospace; /* used with tabular-nums */
 
-  /* Type scale (px) — restrained, deliberate jumps */
-  --text-display: 56px;
-  --text-h1:      36px;
-  --text-h2:      26px;
-  --text-h3:      20px;
-  --text-body:    16px;
-  --text-small:   14px;
-  --text-label:   12px;   /* uppercase tracked labels */
-  --text-timer:   44px;   /* tabular numeric display */
+  /* Type scale (rem, 1rem = 16px browser default) — restrained, deliberate jumps */
+  --text-display: 3.5rem;
+  --text-h1:      2.25rem;
+  --text-h2:      1.625rem;
+  --text-h3:      1.25rem;
+  --text-body:    1rem;
+  --text-small:   0.875rem;
+  --text-label:   0.75rem;  /* uppercase tracked labels */
+  --text-timer:   2.75rem;  /* tabular numeric display */
 
   --leading-tight: 1.05;
   --leading-snug:  1.2;

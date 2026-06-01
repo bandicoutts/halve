@@ -1,3 +1,5 @@
+import { Eyebrow } from "@/components/ui/Eyebrow";
+
 interface StatTileProps {
   value: string;
   label: string;
@@ -25,18 +27,7 @@ export function StatTile({ value, label, accent }: StatTileProps) {
       >
         {value}
       </div>
-      <div
-        style={{
-          fontSize: "var(--text-label)",
-          fontWeight: 600,
-          letterSpacing: "var(--tracking-label)",
-          textTransform: "uppercase",
-          color: "var(--fg-3)",
-          marginTop: 8,
-        }}
-      >
-        {label}
-      </div>
+      <Eyebrow style={{ marginTop: 8 }}>{label}</Eyebrow>
     </div>
   );
 }

@@ -227,21 +227,10 @@ function StatsRecord({ stats, onBack }: { stats: UserStats; onBack: () => void }
 
       {/* Sign out — bordered, unmistakable account action (this is the account page) */}
       <div style={{ paddingTop: 32, display: "flex", justifyContent: "center" }}>
-        <button
-          onClick={handleSignOut}
-          style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            height: 44, padding: "0 20px",
-            background: "none", border: "1.5px solid var(--hairline-2)", borderRadius: "var(--radius-full)",
-            color: "var(--fg-2)", fontSize: "var(--text-small)", fontWeight: 500,
-            cursor: "pointer", fontFamily: "var(--font-sans)", transition: "color .15s, border-color .15s",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--fg-1)"; e.currentTarget.style.borderColor = "var(--fg-3)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--fg-2)"; e.currentTarget.style.borderColor = "var(--hairline-2)"; }}
-        >
+        <Button variant="secondary" size="sm" onClick={handleSignOut}>
           <SignOutIcon />
           Sign out
-        </button>
+        </Button>
       </div>
     </StatsShell>
   );

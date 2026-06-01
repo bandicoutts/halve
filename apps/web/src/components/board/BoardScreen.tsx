@@ -13,6 +13,7 @@ import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { WinScreen } from "@/components/screens/WinScreen";
 import Link from "next/link";
 
@@ -135,17 +136,7 @@ function ControlButton({
       <IconButton label={label} onClick={onClick} disabled={disabled} size={48}>
         {children}
       </IconButton>
-      <span
-        style={{
-          fontSize: "var(--text-label)",
-          fontWeight: 600,
-          letterSpacing: "var(--tracking-label)",
-          textTransform: "uppercase",
-          color: "var(--fg-3)",
-        }}
-      >
-        {label}
-      </span>
+      <Eyebrow>{label}</Eyebrow>
     </div>
   );
 }
@@ -339,19 +330,7 @@ export function BoardScreen({
             <BackIcon />
           </IconButton>
         }
-        title={
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "var(--fg-3)",
-            }}
-          >
-            {puzzle.difficulty}
-          </span>
-        }
+        title={<Eyebrow>{puzzle.difficulty}</Eyebrow>}
         right={<ThemeToggle theme={theme} onToggle={toggleTheme} />}
       />
 

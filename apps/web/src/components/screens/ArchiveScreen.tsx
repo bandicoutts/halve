@@ -6,6 +6,7 @@ import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
 import { Mark } from "@/components/symbols/Mark";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { formatDuration } from "@/lib/format";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -181,17 +182,7 @@ function SummaryStat({ label, value }: { label: string; value: string }) {
       >
         {value}
       </span>
-      <span
-        style={{
-          fontSize: "var(--text-label)",
-          fontWeight: 600,
-          letterSpacing: "var(--tracking-label)",
-          textTransform: "uppercase",
-          color: "var(--fg-3)",
-        }}
-      >
-        {label}
-      </span>
+      <Eyebrow as="span">{label}</Eyebrow>
     </span>
   );
 }
@@ -281,11 +272,7 @@ function HoverPreview({ hover }: { hover: HoverState }) {
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
         <DiffDots d={puzzle.difficulty} on />
-        <span
-          style={{ fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--fg-3)" }}
-        >
-          {puzzle.difficulty}
-        </span>
+        <Eyebrow as="span">{puzzle.difficulty}</Eyebrow>
       </div>
       <div
         style={{

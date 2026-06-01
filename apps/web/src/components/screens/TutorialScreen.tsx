@@ -9,6 +9,7 @@ import { Board } from "@/components/board/Board";
 import { TopBar } from "@/components/ui/TopBar";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Mark } from "@/components/symbols/Mark";
 import { Logo } from "@/components/symbols/Logo";
 import { Fire } from "@/components/symbols/Fire";
@@ -217,19 +218,7 @@ function TutorialWin({
             <CloseIcon />
           </IconButton>
         }
-        title={
-          <span
-            style={{
-              fontSize: "var(--text-label)",
-              fontWeight: 600,
-              letterSpacing: "var(--tracking-label)",
-              textTransform: "uppercase",
-              color: "var(--fg-3)",
-            }}
-          >
-            How to play
-          </span>
-        }
+        title={<Eyebrow>How to play</Eyebrow>}
         right={<span style={{ width: 40 }} />}
       />
       <h1 className="sr-only">How to play</h1>
@@ -490,19 +479,7 @@ function PracticeBoard({
             <BackIcon />
           </IconButton>
         }
-        title={
-          <span
-            style={{
-              fontSize: "var(--text-label)",
-              fontWeight: 600,
-              letterSpacing: "var(--tracking-label)",
-              textTransform: "uppercase",
-              color: "var(--fg-3)",
-            }}
-          >
-            Practice puzzle
-          </span>
-        }
+        title={<Eyebrow>Practice puzzle</Eyebrow>}
         right={<span style={{ width: 40 }} />}
       />
 
@@ -822,19 +799,7 @@ function TutorialFlow({
             <BackIcon />
           </IconButton>
         }
-        title={
-          <span
-            style={{
-              fontSize: "var(--text-label)",
-              fontWeight: 600,
-              letterSpacing: "var(--tracking-label)",
-              textTransform: "uppercase",
-              color: "var(--fg-3)",
-            }}
-          >
-            How to play
-          </span>
-        }
+        title={<Eyebrow>How to play</Eyebrow>}
         right={
           <button
             onClick={onPlay}

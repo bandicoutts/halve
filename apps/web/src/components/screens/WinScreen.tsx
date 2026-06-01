@@ -5,6 +5,7 @@ import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Mark } from "@/components/symbols/Mark";
 import { Logo } from "@/components/symbols/Logo";
 import { Fire } from "@/components/symbols/Fire";
@@ -188,19 +189,7 @@ export function WinScreen({
             <CloseIcon />
           </IconButton>
         }
-        title={
-          <span
-            style={{
-              fontSize: "var(--text-label)",
-              fontWeight: 600,
-              letterSpacing: "var(--tracking-label)",
-              textTransform: "uppercase",
-              color: "var(--fg-3)",
-            }}
-          >
-            Complete
-          </span>
-        }
+        title={<Eyebrow>Complete</Eyebrow>}
         right={<ThemeToggle theme={theme} onToggle={toggle} />}
       />
       <div
