@@ -1,11 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { ArchiveScreen } from "@/components/screens/ArchiveScreen";
 import type { ArchiveDayEntry, ArchiveMonth } from "@/components/screens/ArchiveScreen";
+import { getLocalToday } from "@/lib/local-date";
 
 // revalidate is omitted: cookies()/getUser() force dynamic rendering anyway.
 
 export default async function ArchivePage() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = await getLocalToday();
 
   const months: ArchiveMonth[] = [];
   let initialId: string | undefined;
