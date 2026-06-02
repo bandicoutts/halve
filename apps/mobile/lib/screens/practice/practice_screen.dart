@@ -155,7 +155,7 @@ class _DifficultyCardState extends State<_DifficultyCard> {
                       letterSpacing: -0.01 * 17,
                       color: selected ? c.accent : c.fg1,
                     ),
-                    child: Text(_label(widget.difficulty)),
+                    child: Text(widget.difficulty.label),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -231,12 +231,6 @@ class _CheckPainter extends CustomPainter {
   @override
   bool shouldRepaint(_CheckPainter old) => old.color != color;
 }
-
-String _label(Difficulty d) => switch (d) {
-      Difficulty.easy => 'Easy',
-      Difficulty.medium => 'Medium',
-      Difficulty.hard => 'Hard',
-    };
 
 String _desc(Difficulty d) => switch (d) {
       Difficulty.easy => 'More edge signs to guide you. Good for learning the rules.',

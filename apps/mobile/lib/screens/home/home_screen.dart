@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../data/models/models.dart';
 import '../../router/app_router.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
@@ -395,7 +394,7 @@ class _MetaRow extends StatelessWidget {
 
     final items = <String>[
       data.dateLabel.toUpperCase(),
-      if (data.puzzle != null) _difficultyLabel(data.puzzle!.difficulty).toUpperCase(),
+      if (data.puzzle != null) data.puzzle!.difficulty.label.toUpperCase(),
       if (data.archiveCount != null) '#${data.archiveCount}',
     ];
 
@@ -578,7 +577,7 @@ class _KeepPlaying extends StatelessWidget {
         ? 'Past puzzles'
         : last == null
             ? '$count puzzles'
-            : '$count puzzles · last ${_difficultyLabel(last).toLowerCase()}';
+            : '$count puzzles · last ${last.label.toLowerCase()}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -712,12 +711,6 @@ class _HowToPlayFooter extends StatelessWidget {
     );
   }
 }
-
-String _difficultyLabel(Difficulty d) => switch (d) {
-      Difficulty.easy => 'Easy',
-      Difficulty.medium => 'Medium',
-      Difficulty.hard => 'Hard',
-    };
 
 /// Format a duration in ms as `m:ss`.
 String _formatMs(int ms) {

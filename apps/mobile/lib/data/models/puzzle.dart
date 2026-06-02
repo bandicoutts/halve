@@ -35,6 +35,13 @@ enum Difficulty {
 
   /// Number of difficulty dots shown in the archive (easy 1 … hard 3).
   int get dots => index + 1;
+
+  /// Display label shown to the user, e.g. 'Easy'.
+  String get label => switch (this) {
+        Difficulty.easy => 'Easy',
+        Difficulty.medium => 'Medium',
+        Difficulty.hard => 'Hard',
+      };
 }
 
 enum EdgeOrientation { h, v }

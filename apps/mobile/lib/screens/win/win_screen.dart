@@ -84,7 +84,7 @@ class _WinScreenState extends ConsumerState<WinScreen> {
     final text = buildShareText(
       dayNo: r.kind == PlayKind.practice ? null : info?.dayNo,
       time: r.formattedTime,
-      difficulty: difficultyLabel(r.difficulty),
+      difficulty: r.difficulty.label,
       streak: info?.streak,
     );
     // Fire the platform-native share sheet (the #1 native growth lever).
@@ -191,7 +191,7 @@ class _WinScreenState extends ConsumerState<WinScreen> {
                       ),
                       const SizedBox(height: AppSpacing.s4),
                       _MetaLine(
-                        difficulty: difficultyLabel(r.difficulty),
+                        difficulty: r.difficulty.label,
                         streak: showStreakMeta ? streak : null,
                         synced: synced,
                       ),

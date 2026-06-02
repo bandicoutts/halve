@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/local_date.dart';
-import '../../data/models/models.dart';
 import '../../data/streak.dart';
 import '../../providers/providers.dart';
 import '../play/play_provider.dart';
@@ -143,13 +142,6 @@ String buildShareText({
   }
   return 'Halve · $time · $difficulty$tail';
 }
-
-/// Capitalised difficulty label, e.g. "Medium".
-String difficultyLabel(Difficulty d) => switch (d) {
-      Difficulty.easy => 'Easy',
-      Difficulty.medium => 'Medium',
-      Difficulty.hard => 'Hard',
-    };
 
 /// "June 1, 2026" from a `yyyy-MM-dd` string (mirrors the web keepsake date).
 String formatKeepsakeDate(String iso) {
