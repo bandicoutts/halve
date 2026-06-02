@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:halve/data/repositories/auth_repository.dart';
-import 'package:halve/data/theme_store.dart';
 import 'package:halve/providers/providers.dart';
 import 'package:halve/screens/settings/settings_provider.dart';
 import 'package:halve/screens/settings/settings_screen.dart';

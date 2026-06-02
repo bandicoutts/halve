@@ -10,7 +10,6 @@ import 'data/haptics_service.dart';
 import 'data/onboarding.dart';
 import 'data/puzzle_cache.dart';
 import 'data/supabase_client.dart';
-import 'data/theme_store.dart';
 import 'providers/providers.dart';
 import 'router/app_router.dart';
 import 'theme/theme.dart';

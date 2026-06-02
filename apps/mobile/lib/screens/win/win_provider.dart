@@ -99,31 +99,24 @@ abstract interface class StreakNudgePrefs {
 const streakNudgeDismissedKey = 'halve:streak-nudge-dismissed';
 
 class SharedPrefsStreakNudge implements StreakNudgePrefs {
-  const SharedPrefsStreakNudge();
+  const SharedPrefsStreakNudge(this._prefs);
+
+  final SharedPreferences? _prefs;
 
   @override
   Future<bool> isDismissed() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getBool(streakNudgeDismissedKey) ?? false;
-    } catch (_) {
-      return false;
-    }
+    return _prefs?.getBool(streakNudgeDismissedKey) ?? false;
   }
 
   @override
   Future<void> setDismissed() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(streakNudgeDismissedKey, true);
-    } catch (_) {
-      // No persistence available — the nudge simply reappears next session.
-    }
+    // No persistence available — the nudge simply reappears next session.
+    await _prefs?.setBool(streakNudgeDismissedKey, true);
   }
 }
 
 final streakNudgePrefsProvider = Provider<StreakNudgePrefs>(
-  (ref) => const SharedPrefsStreakNudge(),
+  (ref) => SharedPrefsStreakNudge(ref.watch(sharedPreferencesProvider)),
 );
 
 /// The spoiler-free share payload — matches the web `ShareSheet` `SHARE_TEXT`.
