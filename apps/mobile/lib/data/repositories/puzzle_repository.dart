@@ -37,10 +37,11 @@ class PuzzleRepository {
         .select('id, date, difficulty')
         .not('date', 'is', null)
         .lte('date', today)
-        .order('date');
-    return [
+        .order('date', ascending: true);
+    final days = [
       for (final row in rows) ArchiveDay.tryFromRow(row),
     ].whereType<ArchiveDay>().toList();
+    return days;
   }
 
   /// Marks archive days solved by intersecting with the user's solves in

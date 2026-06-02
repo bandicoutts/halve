@@ -21,9 +21,9 @@ Pass: 76 · Fail: 10 · Skip: 5 · Blocked: 22 (auth crash)
 
 | # | Priority | Issue | File(s) |
 |---|---|---|---|
-| M-1 | High | Archive previous-month nav broken — `<` chevron always disabled, 150+ past puzzles unreachable | `archive_screen.dart`, `archive_provider.dart` |
+| ~~M-1~~ | ~~High~~ | ~~Archive previous-month nav broken — `<` chevron always disabled, 150+ past puzzles unreachable~~ | Fixed 2026-06-02 |
 | M-2 | Medium | No date or puzzle number shown on play board header (daily or archive) | Board screen / `PlayScreen` |
-| M-3 | Medium | Archive missing pull-to-refresh (`RefreshIndicator`) — Home has it, Archive doesn't | `archive_screen.dart` |
+| ~~M-3~~ | ~~Medium~~ | ~~Archive missing pull-to-refresh (`RefreshIndicator`) — Home has it, Archive doesn't~~ | Fixed 2026-06-02 |
 | M-4 | Low | No help/feedback link in Settings ABOUT section | Settings screen |
 | M-5 | Low | Android back gesture exits app immediately from Home — no "press back again to exit" toast | App root / `main.dart` or shell |
 
