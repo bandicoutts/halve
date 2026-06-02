@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { AccountMenu } from "@/components/ui/AccountMenu";
 import { formatDuration } from "@/lib/format";
+import { computeNextIn } from "@/components/board/BoardScreen";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -134,6 +135,11 @@ function CheckIcon() {
 
 /** Completed-state hero shown once today's puzzle is solved. */
 function SolvedHero({ durationMs }: { durationMs?: number }) {
+  const [nextIn, setNextIn] = useState(() => computeNextIn());
+  useEffect(() => {
+    const id = setInterval(() => setNextIn(computeNextIn()), 60_000);
+    return () => clearInterval(id);
+  }, []);
   return (
     <div style={{ marginTop: 22 }}>
       <div
@@ -176,7 +182,7 @@ function SolvedHero({ durationMs }: { durationMs?: number }) {
             )}
           </div>
           <div style={{ fontSize: 12, color: "var(--fg-3)", marginTop: 1 }}>
-            Next puzzle at midnight
+            Next puzzle in {nextIn}
           </div>
         </div>
       </div>
