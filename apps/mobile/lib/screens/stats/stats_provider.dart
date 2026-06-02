@@ -45,13 +45,16 @@ final statsDataProvider = FutureProvider<StatsData>((ref) async {
   final solves = await solveRepo.fetchSolves(user.id);
   final stats = Stats.fromSolves(solves, today: today);
 
-  // Display name: prefer auth metadata, fall back to the email local-part.
-  final meta = user.userMetadata;
-  final rawName = (meta?['display_name'] as String?)?.trim() ??
-      (meta?['name'] as String?)?.trim();
+  // Display name: profiles table first, then auth metadata, then email local-part.
+  String? displayName;
+  final profileRepo = ref.read(profileRepositoryProvider);
+  if (profileRepo != null) {
+    displayName = await profileRepo.fetchDisplayName(user.id);
+  }
+  displayName ??= user.userMetadata?['display_name'] as String?;
+  displayName ??= user.userMetadata?['name'] as String?;
   final email = user.email ?? '';
-  final displayName =
-      (rawName != null && rawName.isNotEmpty) ? rawName : email.split('@').first;
+  displayName ??= email.split('@').first;
 
   return StatsData(
     signedIn: true,
