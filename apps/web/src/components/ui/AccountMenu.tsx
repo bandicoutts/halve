@@ -77,6 +77,8 @@ export function AccountMenu({ displayName }: { displayName: string }) {
       if (e.key === "Escape") {
         setOpen(false);
         triggerRef.current?.focus();
+      } else if (e.key === "Tab") {
+        setOpen(false);
       }
     }
     document.addEventListener("mousedown", onPointer);
