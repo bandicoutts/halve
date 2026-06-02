@@ -100,8 +100,9 @@ class NotificationService {
 
   /// Request OS notification permission. Called once on firstrun Accept.
   ///
-  /// iOS: provisional authorization (quiet delivery — no banner/sound until the
-  /// user upgrades to full permission via system settings). No aggressive prompt.
+  /// iOS: shows the standard system permission dialog (full permission — banner
+  /// + sound). Called only after the user taps Continue in FirstRunScreen, so
+  /// the prompt is contextually appropriate.
   /// Android 13+: system POST_NOTIFICATIONS dialog.
   Future<void> requestPermission() async {
     await _plugin
@@ -111,7 +112,6 @@ class NotificationService {
           alert: true,
           badge: true,
           sound: true,
-          provisional: true,
         );
     await _plugin
         .resolvePlatformSpecificImplementation<
