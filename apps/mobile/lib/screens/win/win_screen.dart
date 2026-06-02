@@ -408,7 +408,7 @@ class _KeepsakeCard extends StatelessWidget {
 
 /// The solution rendered as sunken Disc/Ring cells with a staggered cell-pop
 /// (per-cell opacity 0.45→1, scale 0.82→1), mirroring the web `SolvedBoard`.
-class _SolvedBoard extends StatefulWidget {
+class _SolvedBoard extends StatelessWidget {
   const _SolvedBoard({
     required this.solution,
     required this.gridSize,
@@ -419,38 +419,98 @@ class _SolvedBoard extends StatefulWidget {
   final int gridSize;
   final bool reduceMotion;
 
+  static const _gap = 7.0;
+
   @override
-  State<_SolvedBoard> createState() => _SolvedBoardState();
+  Widget build(BuildContext context) {
+    final n = gridSize;
+    final flat = [for (final row in solution) ...row];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cell = (((constraints.maxWidth - _gap * (n - 1)) / n))
+            .clamp(0.0, 46.0)
+            .floorToDouble();
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var rIdx = 0; rIdx < n; rIdx++) ...[
+              if (rIdx > 0) const SizedBox(height: _gap),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (var cIdx = 0; cIdx < n; cIdx++) ...[
+                    if (cIdx > 0) const SizedBox(width: _gap),
+                    _SolvedCell(
+                      value: flat[rIdx * n + cIdx],
+                      size: cell,
+                      row: rIdx,
+                      col: cIdx,
+                      reduceMotion: reduceMotion,
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
 }
 
-class _SolvedBoardState extends State<_SolvedBoard>
+/// Single cell in [_SolvedBoard]. Owns its AnimationController so only this
+/// cell's transform math runs each frame — no sibling rebuilds.
+class _SolvedCell extends StatefulWidget {
+  const _SolvedCell({
+    required this.value,
+    required this.size,
+    required this.row,
+    required this.col,
+    required this.reduceMotion,
+  });
+
+  final int value;
+  final double size;
+  final int row;
+  final int col;
+  final bool reduceMotion;
+
+  @override
+  State<_SolvedCell> createState() => _SolvedCellState();
+}
+
+class _SolvedCellState extends State<_SolvedCell>
     with SingleTickerProviderStateMixin {
-  static const _gap = 7.0;
-  static const _baseMs = 400.0;
+  static const _baseMs = 400;
+  // Clamp to [0,1]: the cubic has y1=1.4 which intentionally overshoots for
+  // the scale pop, but Opacity asserts opacity ≤ 1.0 so we must cap it here.
+  static const _curve = Cubic(0.34, 1.4, 0.5, 1);
 
   late final AnimationController _controller;
-  late final double _totalMs;
+  late final Animation<double> _anim;
 
   @override
   void initState() {
     super.initState();
-    final n = widget.gridSize;
-    final maxDelay = (n - 1) * 16 + (n - 1) * 20;
-    _totalMs = maxDelay + _baseMs;
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: _totalMs.round()),
+      duration: const Duration(milliseconds: _baseMs),
     );
-  }
+    _anim = _controller.drive(
+      CurveTween(curve: _curve),
+    );
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_controller.status == AnimationStatus.dismissed) {
-      if (widget.reduceMotion) {
-        _controller.value = 1.0;
-      } else {
+    if (widget.reduceMotion) {
+      _controller.value = 1.0;
+    } else {
+      final delayMs = widget.col * 16 + widget.row * 20;
+      if (delayMs == 0) {
         _controller.forward();
+      } else {
+        Future.delayed(Duration(milliseconds: delayMs), () {
+          if (mounted) _controller.forward();
+        });
       }
     }
   }
@@ -461,72 +521,34 @@ class _SolvedBoardState extends State<_SolvedBoard>
     super.dispose();
   }
 
-  double _cellPop(int index) {
-    final delay = (index % widget.gridSize) * 16 + (index ~/ widget.gridSize) * 20;
-    final begin = delay / _totalMs;
-    final end = ((delay + _baseMs) / _totalMs).clamp(0.0, 1.0);
-    // Clamp to [0,1]: the cubic has y1=1.4 which intentionally overshoots for
-    // the scale pop, but Opacity asserts opacity ≤ 1.0 so we must cap it here.
-    return const Cubic(0.34, 1.4, 0.5, 1).transform(
-      ((_controller.value - begin) / (end - begin)).clamp(0.0, 1.0),
-    ).clamp(0.0, 1.0);
-  }
-
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    final n = widget.gridSize;
-    final flat = [for (final row in widget.solution) ...row];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final cell = (((constraints.maxWidth - _gap * (n - 1)) / n))
-            .clamp(0.0, 46.0)
-            .floorToDouble();
-        return AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (var rIdx = 0; rIdx < n; rIdx++) ...[
-                  if (rIdx > 0) const SizedBox(height: _gap),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (var cIdx = 0; cIdx < n; cIdx++) ...[
-                        if (cIdx > 0) const SizedBox(width: _gap),
-                        Builder(builder: (context) {
-                          final index = rIdx * n + cIdx;
-                          final v = _cellPop(index);
-                          return Opacity(
-                            opacity: 0.45 + 0.55 * v,
-                            child: Transform.scale(
-                              scale: 0.82 + 0.18 * v,
-                              child: Container(
-                                width: cell,
-                                height: cell,
-                                decoration: BoxDecoration(
-                                  color: c.bgSunken,
-                                  borderRadius: AppRadii.smR,
-                                ),
-                                alignment: Alignment.center,
-                                child: flat[index] == 0
-                                    ? SymbolDisc(size: cell * 0.62)
-                                    : SymbolRing(size: cell * 0.62),
-                              ),
-                            ),
-                          );
-                        }),
-                      ],
-                    ],
-                  ),
-                ],
-              ],
-            );
-          },
+    final s = widget.size;
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (context, child) {
+        final v = _anim.value.clamp(0.0, 1.0);
+        return Opacity(
+          opacity: 0.45 + 0.55 * v,
+          child: Transform.scale(
+            scale: 0.82 + 0.18 * v,
+            child: child,
+          ),
         );
       },
+      child: Container(
+        width: s,
+        height: s,
+        decoration: BoxDecoration(
+          color: c.bgSunken,
+          borderRadius: AppRadii.smR,
+        ),
+        alignment: Alignment.center,
+        child: widget.value == 0
+            ? SymbolDisc(size: s * 0.62)
+            : SymbolRing(size: s * 0.62),
+      ),
     );
   }
 }
