@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../data/haptics_service.dart';
+import '../data/notification_service.dart';
 import '../data/puzzle_cache.dart';
 import '../data/repositories/repositories.dart';
 import '../data/supabase_client.dart';
@@ -68,3 +70,9 @@ final currentUserProvider = Provider<User?>((ref) {
 final isSignedInProvider = Provider<bool>(
   (ref) => ref.watch(currentUserProvider) != null,
 );
+
+final hapticsServiceProvider =
+    Provider<HapticsService>((ref) => HapticsService.instance);
+
+final notificationServiceProvider =
+    Provider<NotificationService>((ref) => NotificationService.instance);

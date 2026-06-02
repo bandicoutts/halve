@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/haptics_service.dart';
-import 'data/notification_service.dart';
 import 'data/onboarding.dart';
 import 'data/puzzle_cache.dart';
 import 'data/supabase_client.dart';
@@ -62,7 +61,7 @@ Future<void> main() async {
   ));
 }
 
-class HalveApp extends StatefulWidget {
+class HalveApp extends ConsumerStatefulWidget {
   const HalveApp({
     super.key,
     this.initialLocation = Routes.home,
@@ -76,10 +75,10 @@ class HalveApp extends StatefulWidget {
   final SharedPreferences? prefsFuture;
 
   @override
-  State<HalveApp> createState() => _HalveAppState();
+  ConsumerState<HalveApp> createState() => _HalveAppState();
 }
 
-class _HalveAppState extends State<HalveApp> {
+class _HalveAppState extends ConsumerState<HalveApp> {
   late final GoRouter _router;
   late final StreamSubscription<String> _routeSub;
 
@@ -92,7 +91,7 @@ class _HalveAppState extends State<HalveApp> {
   void initState() {
     super.initState();
     _router = createAppRouter(initialLocation: widget.initialLocation);
-    _routeSub = NotificationService.instance.routeStream.listen(_router.go);
+    _routeSub = ref.read(notificationServiceProvider).routeStream.listen(_router.go);
 
     // Init and reschedule notifications after the first frame so startup
     // latency (initializeTimeZones + platform channels) doesn't block paint.
@@ -109,10 +108,11 @@ class _HalveAppState extends State<HalveApp> {
 
   Future<void> _initNotifications() async {
     try {
-      await NotificationService.instance.init();
+      final notifications = ref.read(notificationServiceProvider);
+      await notifications.init();
       final prefs = widget.prefsFuture;
       if (prefs != null) {
-        await NotificationService.instance.rescheduleOnLaunch(prefs);
+        await notifications.rescheduleOnLaunch(prefs);
       }
     } catch (e) {
       debugPrint('Notification init failed (non-fatal): $e');

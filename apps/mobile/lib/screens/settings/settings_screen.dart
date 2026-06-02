@@ -4,8 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../data/haptics_service.dart';
-import '../../data/notification_service.dart';
 import '../../data/prefs_keys.dart';
 import '../../providers/providers.dart';
 import '../../router/app_router.dart';
@@ -490,9 +488,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(prefKeyReminder, on);
       if (on) {
-        await NotificationService.instance.scheduleDaily(_reminderHour, _reminderAmpm);
+        await ref.read(notificationServiceProvider).scheduleDaily(_reminderHour, _reminderAmpm);
       } else {
-        await NotificationService.instance.cancelReminder();
+        await ref.read(notificationServiceProvider).cancelReminder();
       }
     } catch (_) {}
   }
@@ -503,7 +501,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(prefKeyReminderHour, hour);
       if (_reminderOn) {
-        await NotificationService.instance.scheduleDaily(hour, _reminderAmpm);
+        await ref.read(notificationServiceProvider).scheduleDaily(hour, _reminderAmpm);
       }
     } catch (_) {}
   }
@@ -514,14 +512,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(prefKeyReminderAmpm, ampm);
       if (_reminderOn) {
-        await NotificationService.instance.scheduleDaily(_reminderHour, ampm);
+        await ref.read(notificationServiceProvider).scheduleDaily(_reminderHour, ampm);
       }
     } catch (_) {}
   }
 
   Future<void> _setHaptics(bool on) async {
     setState(() => _haptics = on);
-    HapticsService.instance.configure(on);
+    ref.read(hapticsServiceProvider).configure(on);
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(prefKeyHaptics, on);
