@@ -36,12 +36,13 @@ class Stats {
   /// Earliest solved day as `yyyy-MM-dd` (for "since [month] [year]" display).
   final String? since;
 
-  static Stats emptyFor(String today) => Stats(
+  static Stats emptyFor(String today, {DateTime? createdAt}) => Stats(
         totalSolved: 0,
         currentStreak: 0,
         longestStreak: 0,
         last14Days: computeLastDays([], today, 14),
         timeDist: [0, 0, 0, 0, 0, 0],
+        since: createdAt != null ? formatDay(createdAt) : null,
       );
 
   static const empty = Stats(
@@ -58,8 +59,8 @@ class Stats {
   /// Uses [computeStreak] / [computeLongestStreak] / [computeLastDays] from
   /// `streak.dart` (the web-mirroring functions) so the home streak band and
   /// the stats screen always agree.
-  static Stats fromSolves(List<SolveRow> solves, {required String today}) {
-    if (solves.isEmpty) return emptyFor(today);
+  static Stats fromSolves(List<SolveRow> solves, {required String today, DateTime? createdAt}) {
+    if (solves.isEmpty) return emptyFor(today, createdAt: createdAt);
 
     // Extract the canonical local day for each solve (local_date preferred,
     // UTC fallback for legacy rows — BE-3).

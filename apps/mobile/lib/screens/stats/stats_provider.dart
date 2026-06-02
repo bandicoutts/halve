@@ -37,13 +37,15 @@ final statsDataProvider = FutureProvider<StatsData>((ref) async {
     return StatsData(signedIn: false, today: today);
   }
 
+  final createdAt = DateTime.tryParse(user.createdAt);
+
   final solveRepo = ref.watch(solveRepositoryProvider);
   if (solveRepo == null) {
-    return StatsData(signedIn: true, today: today, stats: Stats.emptyFor(today));
+    return StatsData(signedIn: true, today: today, stats: Stats.emptyFor(today, createdAt: createdAt));
   }
 
   final solves = await solveRepo.fetchSolves(user.id);
-  final stats = Stats.fromSolves(solves, today: today);
+  final stats = Stats.fromSolves(solves, today: today, createdAt: createdAt);
 
   // Display name: profiles table first, then auth metadata, then email local-part.
   String? displayName;
