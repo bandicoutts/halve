@@ -22,7 +22,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} h-full`}>
+    <html lang="en" className={`${spaceGrotesk.variable} h-full`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("halve-theme");if(t==="dark"||(t==null&&window.matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark")}}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col antialiased">
         <a href="#main-content" className="skip-link">
           Skip to content

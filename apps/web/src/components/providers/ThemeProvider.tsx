@@ -12,15 +12,10 @@ interface ThemeCtx {
 const Ctx = createContext<ThemeCtx>({ theme: "light", toggle: () => {} });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    const stored = localStorage.getItem(LS_KEY) as Theme | null;
-    const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const initial = stored ?? preferred;
-    setTheme(initial);
-    if (initial === "dark") document.documentElement.classList.add("dark");
-  }, []);
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "light";
+    return document.documentElement.classList.contains("dark") ? "dark" : "light";
+  });
 
   const toggle = useCallback(() => {
     setTheme((t) => {
