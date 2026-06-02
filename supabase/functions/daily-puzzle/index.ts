@@ -5,10 +5,8 @@ import { generateDaily } from "../_shared/engine/index.js";
 
 // Scheduled via Supabase cron (see migrations) — runs daily at 00:05 UTC.
 Deno.serve(async (req) => {
-  // Guard: reject callers that don't present the shared cron secret.
-  // Fail-open only when CRON_SECRET is not set (local dev / CI without secrets).
   const cronSecret = Deno.env.get("CRON_SECRET");
-  if (cronSecret && req.headers.get("Authorization") !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || req.headers.get("Authorization") !== `Bearer ${cronSecret}`) {
     return new Response("Unauthorized", { status: 401 });
   }
 
