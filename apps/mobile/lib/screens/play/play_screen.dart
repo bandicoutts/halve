@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import '../../data/haptics_service.dart';
 import '../../data/local_date.dart';
 import '../../data/models/models.dart';
-import '../../engine/validator.dart' as validator;
 import '../../providers/providers.dart';
 import '../../router/app_router.dart';
 import '../../theme/theme.dart';
@@ -206,13 +205,9 @@ class _PlayViewState extends ConsumerState<_PlayView> {
         return;
       }
       if (prev != null && !next.solved) {
-        final prevV = validator.findViolations(prev.grid, _puzzle.edges);
-        final nextV = validator.findViolations(next.grid, _puzzle.edges);
-        if (prevV.isEmpty && nextV.isNotEmpty) hapticsOnError();
+        if (prev.violations.isEmpty && next.violations.isNotEmpty) hapticsOnError();
       }
     });
-
-    final violations = validator.findViolations(state.grid, _puzzle.edges);
 
     return Column(
       children: [
@@ -261,7 +256,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
                     cells: state.grid,
                     givens: _puzzle.givens,
                     edges: _puzzle.edges,
-                    violations: violations,
+                    violations: state.violations,
                     cellSize: cellSize,
                     gap: gap,
                     readOnly: state.solved,

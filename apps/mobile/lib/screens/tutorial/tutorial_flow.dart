@@ -39,6 +39,7 @@ class _TutorialFlowState extends State<TutorialFlow> {
   bool _completed = false;
 
   late final Grid _cells = _clone(Tut4.givens);
+  Set<validator.Coord> _violations = const {};
 
   static Grid _clone(Grid g) => [for (final row in g) List<Cell>.from(row)];
 
@@ -55,12 +56,16 @@ class _TutorialFlowState extends State<TutorialFlow> {
     setState(() {
       _cells[Tut4.guide.r][Tut4.guide.c] = Tut4.guide.val;
       _gphase = 1;
+      _violations = validator.findViolations(_cells, Tut4.edges);
     });
   }
 
   void _tapFree(int r, int c) {
     if (Tut4.givens[r][c] != null) return; // locked given
-    setState(() => _cells[r][c] = validator.cycle(_cells[r][c]));
+    setState(() {
+      _cells[r][c] = validator.cycle(_cells[r][c]);
+      _violations = validator.findViolations(_cells, Tut4.edges);
+    });
     if (_solved && !_completed) {
       _completed = true;
       final delay = context.reduceMotion
@@ -101,6 +106,7 @@ class _TutorialFlowState extends State<TutorialFlow> {
                     step: _step,
                     gphase: _gphase,
                     cells: _cells,
+                    violations: _violations,
                     onTapGuide: _tapGuide,
                     onTapFree: _tapFree,
                   ),
@@ -117,8 +123,7 @@ class _TutorialFlowState extends State<TutorialFlow> {
               child: _StepFooter(
                 step: _step,
                 gphase: _gphase,
-                violationCount:
-                    validator.findViolations(_cells, Tut4.edges).length,
+                violationCount: _violations.length,
                 onNext: () => setState(() => _step++),
               ),
             ),
@@ -135,6 +140,7 @@ class _StepBody extends StatelessWidget {
     required this.step,
     required this.gphase,
     required this.cells,
+    required this.violations,
     required this.onTapGuide,
     required this.onTapFree,
   });
@@ -142,6 +148,7 @@ class _StepBody extends StatelessWidget {
   final int step;
   final int gphase;
   final Grid cells;
+  final Set<validator.Coord> violations;
   final VoidCallback onTapGuide;
   final void Function(int r, int c) onTapFree;
 
@@ -274,8 +281,6 @@ class _StepBody extends StatelessWidget {
 
   Widget _guided(BuildContext context) {
     final guided = gphase == 0;
-    final violations =
-        guided ? const <Coord>{} : validator.findViolations(cells, Tut4.edges);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -293,7 +298,7 @@ class _StepBody extends StatelessWidget {
           edges: Tut4.edges,
           cellSize: AppLayout.tutBoardCell,
           gap: AppSpacing.s4,
-          violations: violations,
+          violations: guided ? const <validator.Coord>{} : violations,
           highlight: guided ? {(Tut4.guide.r, Tut4.guide.c)} : const {},
           dimRest: guided,
           onTap: guided ? (_, _) => onTapGuide() : onTapFree,

@@ -164,6 +164,7 @@ class PlayState {
     required this.elapsedSeconds,
     required this.running,
     required this.solved,
+    required this.violations,
   });
 
   PlayState.initial(Grid givens)
@@ -172,7 +173,8 @@ class PlayState {
         usedHint = false,
         elapsedSeconds = 0,
         running = false,
-        solved = false;
+        solved = false,
+        violations = const {};
 
   final Grid grid;
   final List<Grid> history;
@@ -180,6 +182,10 @@ class PlayState {
   final int elapsedSeconds;
   final bool running;
   final bool solved;
+
+  /// Cached result of [validator.findViolations] — updated only when the grid
+  /// changes (tap/hint/undo), never on timer ticks.
+  final Set<validator.Coord> violations;
 
   bool get canUndo => history.isNotEmpty;
 
@@ -190,6 +196,7 @@ class PlayState {
     int? elapsedSeconds,
     bool? running,
     bool? solved,
+    Set<validator.Coord>? violations,
   }) {
     return PlayState(
       grid: grid ?? this.grid,
@@ -198,6 +205,7 @@ class PlayState {
       elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
       running: running ?? this.running,
       solved: solved ?? this.solved,
+      violations: violations ?? this.violations,
     );
   }
 }
@@ -240,10 +248,13 @@ class PlayController extends AutoDisposeFamilyNotifier<PlayState, Puzzle> {
     if (state.history.isEmpty) return;
     final prev = state.history.last;
     final solved = validator.isSolved(prev, _puzzle.edges);
+    final violations =
+        solved ? const <validator.Coord>{} : validator.findViolations(prev, _puzzle.edges);
     state = state.copyWith(
       grid: prev,
       history: state.history.sublist(0, state.history.length - 1),
       solved: solved,
+      violations: violations,
     );
     if (solved) _stopTimer();
   }
@@ -251,11 +262,14 @@ class PlayController extends AutoDisposeFamilyNotifier<PlayState, Puzzle> {
   void _commit(Grid next, {required bool usedHint}) {
     _startTimer();
     final solved = validator.isSolved(next, _puzzle.edges);
+    final violations =
+        solved ? const <validator.Coord>{} : validator.findViolations(next, _puzzle.edges);
     state = state.copyWith(
       grid: next,
       history: [...state.history, state.grid],
       usedHint: usedHint,
       solved: solved,
+      violations: violations,
     );
     if (solved) _stopTimer();
   }
