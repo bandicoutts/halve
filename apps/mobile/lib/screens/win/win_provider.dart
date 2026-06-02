@@ -62,9 +62,7 @@ final winInfoProvider =
       if (q.kind == PlayKind.daily) {
         dayNo = await puzzleRepo.fetchPuzzleCount(today);
       } else if (q.date != null) {
-        final archive = await puzzleRepo.fetchArchive(today);
-        final idx = archive.indexWhere((d) => d.date == q.date);
-        dayNo = idx >= 0 ? idx + 1 : null;
+        dayNo = await puzzleRepo.fetchPuzzleCount(q.date!);
       }
     } catch (e, st) {
       debugPrint('winInfoProvider fetch failed: $e\n$st');
