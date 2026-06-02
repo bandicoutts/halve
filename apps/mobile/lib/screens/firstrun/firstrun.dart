@@ -34,7 +34,7 @@ class _FirstRunScreenState extends ConsumerState<FirstRunScreen> {
 
   Future<void> _playFirstPuzzle() async {
     // Request OS notification permission when the user accepts (taps Continue).
-    // iOS: provisional authorization (quiet, no aggressive banner dialog).
+    // iOS: requests full authorization (banner + sound + badge) — system permission dialog is shown.
     // Android 13+: POST_NOTIFICATIONS dialog shown by the OS.
     await NotificationService.instance.requestPermission();
     await _markOnboarded();
