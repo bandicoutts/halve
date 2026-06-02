@@ -197,40 +197,11 @@ class _RadioDot extends StatelessWidget {
         color: selected ? c.accent : Colors.transparent,
         border: Border.all(color: borderColor, width: 2),
       ),
-      child: selected
-          ? CustomPaint(painter: _CheckPainter(color: c.onAccent))
-          : null,
+      child: selected ? CheckGlyph(color: c.onAccent, size: 22) : null,
     );
   }
 }
 
-class _CheckPainter extends CustomPainter {
-  const _CheckPainter({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2.2
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke;
-
-    // Checkmark: polyline 20 6 9 17 4 12 (scaled from 24×24 to size)
-    final sx = size.width / 24;
-    final sy = size.height / 24;
-    final path = Path()
-      ..moveTo(20 * sx, 6 * sy)
-      ..lineTo(9 * sx, 17 * sy)
-      ..lineTo(4 * sx, 12 * sy);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(_CheckPainter old) => old.color != color;
-}
 
 String _desc(Difficulty d) => switch (d) {
       Difficulty.easy => 'More edge signs to guide you. Good for learning the rules.',

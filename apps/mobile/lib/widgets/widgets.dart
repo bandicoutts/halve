@@ -3,6 +3,7 @@
 /// never hardcoded.
 library;
 
+export 'check_glyph.dart';
 export 'content_box.dart';
 export 'eq_ne_badge.dart';
 export 'flame_icon.dart';

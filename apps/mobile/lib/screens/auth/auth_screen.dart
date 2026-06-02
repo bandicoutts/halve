@@ -352,10 +352,7 @@ class _SentStepState extends State<_SentStep> {
           height: 52,
           decoration: BoxDecoration(color: c.accentTint, shape: BoxShape.circle),
           alignment: Alignment.center,
-          child: CustomPaint(
-            size: const Size(22, 22),
-            painter: _CheckPainter(color: c.accent),
-          ),
+          child: CheckGlyph(color: c.accent, size: 22),
         ),
         const SizedBox(height: 20),
         Text('Check your email', style: AppTypography.h2.copyWith(color: c.fg1)),
@@ -390,33 +387,3 @@ class _SentStepState extends State<_SentStep> {
   }
 }
 
-// ─── Check icon painter ───────────────────────────────────────────────────────
-
-/// Polyline checkmark matching the wireframe SVG (`points="20 6 9 17 4 12"`
-/// in a 24×24 viewbox), scaled to [size].
-class _CheckPainter extends CustomPainter {
-  const _CheckPainter({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..isAntiAlias = true;
-    final sx = size.width / 24;
-    final sy = size.height / 24;
-    final path = Path()
-      ..moveTo(20 * sx, 6 * sy)
-      ..lineTo(9 * sx, 17 * sy)
-      ..lineTo(4 * sx, 12 * sy);
-    canvas.drawPath(path, p);
-  }
-
-  @override
-  bool shouldRepaint(_CheckPainter old) => old.color != color;
-}
