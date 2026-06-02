@@ -16,6 +16,9 @@ Premium daily logic-puzzle web app — a 6×6 binary Latin-square puzzle (two ab
 - `docs/DECISIONS.md` — decision log; **append a new entry in the same commit as any architectural change**
 - `docs/ROADMAP.md` — phases & milestone checklist
 
+## Mobile (Flutter)
+- Always launch the app with `--dart-define-from-file env.json` (e.g. `flutter run --dart-define-from-file env.json`).
+
 ## Conventions (delta vs global CLAUDE.md)
 Global Next.js 16 / Supabase / TypeScript rules apply and are not repeated here. Project-specific:
 - The **design tokens in `packages/design` are the source of truth** — never hardcode colors/spacing in components.

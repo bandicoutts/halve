@@ -465,9 +465,11 @@ class _SolvedBoardState extends State<_SolvedBoard>
     final delay = (index % widget.gridSize) * 16 + (index ~/ widget.gridSize) * 20;
     final begin = delay / _totalMs;
     final end = ((delay + _baseMs) / _totalMs).clamp(0.0, 1.0);
+    // Clamp to [0,1]: the cubic has y1=1.4 which intentionally overshoots for
+    // the scale pop, but Opacity asserts opacity ≤ 1.0 so we must cap it here.
     return const Cubic(0.34, 1.4, 0.5, 1).transform(
       ((_controller.value - begin) / (end - begin)).clamp(0.0, 1.0),
-    );
+    ).clamp(0.0, 1.0);
   }
 
   @override

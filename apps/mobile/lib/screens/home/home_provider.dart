@@ -86,12 +86,22 @@ final homeDataProvider = FutureProvider.autoDispose<HomeData>((ref) async {
   }
 
   try {
-    final puzzle = await puzzleRepo.fetchDaily(today);
+    // Fire all three calls concurrently — they are independent, so there is
+    // no reason to wait for puzzle before starting archive or solves.
+    final puzzleFuture = puzzleRepo.fetchDaily(today);
+    final archiveFuture = puzzleRepo.fetchArchive(today);
+    final solveFuture = (signedIn && solveRepo != null)
+        ? solveRepo.fetchSolves(user.id)
+        : Future.value(<SolveRow>[]);
+
+    final puzzle = await puzzleFuture;
+    final archive = await archiveFuture;
+    final solves = await solveFuture;
+
     if (puzzle != null) {
       await cache.put(today, puzzle);
     }
 
-    final archive = await puzzleRepo.fetchArchive(today);
     final yesterday = offsetDay(today, -1);
     Difficulty? yDiff;
     for (final d in archive) {
@@ -104,8 +114,7 @@ final homeDataProvider = FutureProvider.autoDispose<HomeData>((ref) async {
     var streak = 0;
     var last7 = const <bool>[];
     int? solvedTodayMs;
-    if (signedIn && solveRepo != null) {
-      final solves = await solveRepo.fetchSolves(user.id);
+    if (signedIn && solves.isNotEmpty) {
       final days = {for (final s in solves) solveDay(s)}.toList();
       streak = computeStreak(days, today);
       last7 = computeLastDays(days, today, 7);

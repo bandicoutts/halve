@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../data/supabase_client.dart';
 import '../../providers/providers.dart';
 import '../../theme/app_radii.dart';
 import '../../theme/app_spacing.dart';
@@ -68,6 +70,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       sending: _sending,
                       error: _error,
                       onContinue: _handleContinue,
+                      onDevSignIn: (kDebugMode && devEmail.isNotEmpty && devPassword.isNotEmpty)
+                          ? _handleDevSignIn
+                          : null,
                     )
                   : _SentStep(
                       email: _sentEmail,
@@ -111,6 +116,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     } catch (_) {}
   }
 
+  Future<void> _handleDevSignIn() async {
+    setState(() {
+      _sending = true;
+      _error = null;
+    });
+    try {
+      await ref
+          .read(authRepositoryProvider)
+          .signInWithPassword(devEmail, devPassword);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _error = _friendlyError(e));
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
   String _friendlyError(Object e) {
     final msg = e.toString().toLowerCase();
     if (msg.contains('rate') || msg.contains('too many')) {
@@ -133,12 +155,17 @@ class _EmailStep extends StatelessWidget {
     required this.sending,
     required this.error,
     required this.onContinue,
+    this.onDevSignIn,
   });
 
   final TextEditingController controller;
   final bool sending;
   final String? error;
   final VoidCallback onContinue;
+
+  /// Dev-only one-tap sign-in. Null in release / when DEV_EMAIL+DEV_PASSWORD
+  /// are not set in env.json.
+  final VoidCallback? onDevSignIn;
 
   @override
   Widget build(BuildContext context) {
@@ -196,6 +223,26 @@ class _EmailStep extends StatelessWidget {
             );
           },
         ),
+        // ── Dev-only one-tap sign-in ─────────────────────────────────────
+        if (onDevSignIn != null) ...[
+          const SizedBox(height: 32),
+          Row(
+            children: [
+              Expanded(child: Divider(color: c.hairline2)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text('DEV', style: AppTypography.label.copyWith(color: c.fg3)),
+              ),
+              Expanded(child: Divider(color: c.hairline2)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          HalveButton(
+            label: sending ? 'Signing in…' : 'Sign in as test user',
+            full: true,
+            onPressed: sending ? null : onDevSignIn,
+          ),
+        ],
       ],
     );
   }
@@ -314,14 +361,10 @@ class _SentStepState extends State<_SentStep> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 44),
-        // Accent-tint circle with checkmark — 52px diameter.
         Container(
           width: 52,
           height: 52,
-          decoration: BoxDecoration(
-            color: c.accentTint,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: c.accentTint, shape: BoxShape.circle),
           alignment: Alignment.center,
           child: CustomPaint(
             size: const Size(22, 22),
@@ -329,33 +372,22 @@ class _SentStepState extends State<_SentStep> {
           ),
         ),
         const SizedBox(height: 20),
-        Text(
-          'Check your email',
-          style: AppTypography.h2.copyWith(color: c.fg1),
-        ),
+        Text('Check your email', style: AppTypography.h2.copyWith(color: c.fg1)),
         const SizedBox(height: 10),
         RichText(
           text: TextSpan(
-            style: AppTypography.small.copyWith(
-              fontSize: 15,
-              color: c.fg2,
-              height: 1.55,
-            ),
+            style: AppTypography.small.copyWith(fontSize: 15, color: c.fg2, height: 1.55),
             children: [
               const TextSpan(text: 'We sent a link to '),
               TextSpan(
                 text: widget.email,
-                style: TextStyle(
-                  color: c.fg1,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(color: c.fg1, fontWeight: FontWeight.w500),
               ),
               const TextSpan(text: '. Tap it on this device to sign in.'),
             ],
           ),
         ),
         const SizedBox(height: 28),
-        // Resend text button — 2.5s cooldown after tap.
         GestureDetector(
           onTap: _resent ? null : _handleResend,
           child: AnimatedDefaultTextStyle(
@@ -364,9 +396,7 @@ class _SentStepState extends State<_SentStep> {
               color: _resent ? c.fg3 : c.accent,
               letterSpacing: -0.14,
             ),
-            child: Text(
-              _resent ? 'Link sent again' : "Didn't get it? Resend",
-            ),
+            child: Text(_resent ? 'Link sent again' : "Didn't get it? Resend"),
           ),
         ),
       ],

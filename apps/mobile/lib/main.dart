@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,27 +46,31 @@ Future<void> main() async {
     debugPrint('SharedPreferences unavailable — using in-memory cache: $e');
   }
 
-  // Local notifications: init channel + timezone.
-  await NotificationService.instance.init();
-
-  // Reschedule daily reminder on every launch (survives app updates that wipe
-  // pending notifications, and picks up time changes made since last launch).
-  if (prefs != null) {
-    await NotificationService.instance.rescheduleOnLaunch(prefs);
-  }
-
+  // Notification init (timezone DB + platform channel) is deferred to after
+  // runApp so it doesn't delay the first frame. The routeStream tap handler in
+  // HalveApp listens to the same singleton, so notifications that arrive
+  // before init completes are queued and handled once the stream is ready.
   runApp(ProviderScope(
     overrides: overrides,
     child: HalveApp(
       initialLocation: firstRunInitialLocation(onboarded: onboarded),
+      prefsFuture: prefs,
     ),
   ));
 }
 
 class HalveApp extends StatefulWidget {
-  const HalveApp({super.key, this.initialLocation = Routes.home});
+  const HalveApp({
+    super.key,
+    this.initialLocation = Routes.home,
+    this.prefsFuture,
+  });
 
   final String initialLocation;
+
+  /// Passed through so notification reschedule can run post-first-frame
+  /// without a second SharedPreferences.getInstance() call.
+  final SharedPreferences? prefsFuture;
 
   @override
   State<HalveApp> createState() => _HalveAppState();
@@ -73,12 +79,34 @@ class HalveApp extends StatefulWidget {
 class _HalveAppState extends State<HalveApp> {
   late final GoRouter _router;
 
+  // Cached once — ThemeData construction is non-trivial; don't rebuild on
+  // every Consumer rebuild triggered by theme-mode changes.
+  static final _lightTheme = AppTheme.light();
+  static final _darkTheme = AppTheme.dark();
+
   @override
   void initState() {
     super.initState();
     _router = createAppRouter(initialLocation: widget.initialLocation);
-    // Route to /play when the user taps a local notification.
     NotificationService.instance.routeStream.listen(_router.go);
+
+    // Init and reschedule notifications after the first frame so startup
+    // latency (initializeTimeZones + platform channels) doesn't block paint.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_initNotifications());
+    });
+  }
+
+  Future<void> _initNotifications() async {
+    try {
+      await NotificationService.instance.init();
+      final prefs = widget.prefsFuture;
+      if (prefs != null) {
+        await NotificationService.instance.rescheduleOnLaunch(prefs);
+      }
+    } catch (e) {
+      debugPrint('Notification init failed (non-fatal): $e');
+    }
   }
 
   @override
@@ -89,8 +117,8 @@ class _HalveAppState extends State<HalveApp> {
         return MaterialApp.router(
           title: 'Halve',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.light(),
-          darkTheme: AppTheme.dark(),
+          theme: _lightTheme,
+          darkTheme: _darkTheme,
           themeMode: themeMode,
           routerConfig: _router,
         );

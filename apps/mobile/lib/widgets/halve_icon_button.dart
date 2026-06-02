@@ -79,7 +79,7 @@ class _HalveIconButtonState extends State<HalveIconButton> {
               color: _pressed ? c.bgSunken : Colors.transparent,
               border: widget.active
                   ? Border.all(color: c.accent, width: 1.5)
-                  : null,
+                  : Border.all(color: c.hairline2, width: 1.5),
             ),
             child: IconTheme.merge(
               data: IconThemeData(color: iconColor, size: widget.size * 0.44),
