@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
-import '../theme/app_typography.dart';
 
-/// The `=` / `≠` edge constraint sign — a typographic glyph in a small
-/// background-filled capsule that sits on the edge between two cells.
-/// Per `docs/DESIGN.md` these are glyphs, not icons.
+/// The `=` / `≠` edge constraint sign — a custom-painted glyph in a small
+/// background-filled circle that sits on the edge between two cells.
+/// Painted rather than typographic so the pixel output is identical across
+/// platforms (eliminates CoreText vs Skia rendering differences in CI).
 enum EdgeSign { eq, ne }
 
 class EqNeBadge extends StatelessWidget {
@@ -20,21 +20,63 @@ class EqNeBadge extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: c.bg, // fills against the board so the glyph reads cleanly
+        color: c.bg,
         shape: BoxShape.circle,
         boxShadow: context.halveShadows.sm,
       ),
-      child: Text(
-        sign == EdgeSign.eq ? '=' : '≠',
-        textAlign: TextAlign.center,
-        style: AppTypography.label.copyWith(
-          fontSize: size * 0.68,
-          letterSpacing: 0, // glyph, not a tracked label
+      child: CustomPaint(
+        painter: _SignPainter(
+          isNotEqual: sign == EdgeSign.ne,
           color: c.fg1,
         ),
       ),
     );
   }
+}
+
+/// Draws `=` (two horizontal bars) or `≠` (two bars + diagonal slash).
+/// All proportions are relative to the paint bounds so the glyph scales
+/// correctly at any [EqNeBadge.size].
+class _SignPainter extends CustomPainter {
+  const _SignPainter({required this.isNotEqual, required this.color});
+
+  final bool isNotEqual;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stroke = size.width * 0.09;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    // Half-width of each bar (= sign proportions).
+    final hw = size.width * 0.24;
+    // Half-gap between the two bars.
+    final hg = size.height * 0.10;
+
+    // Top bar.
+    canvas.drawLine(Offset(cx - hw, cy - hg), Offset(cx + hw, cy - hg), paint);
+    // Bottom bar.
+    canvas.drawLine(Offset(cx - hw, cy + hg), Offset(cx + hw, cy + hg), paint);
+
+    if (isNotEqual) {
+      // Diagonal slash through the bars (bottom-left to top-right).
+      final slashH = hg * 2.6;
+      canvas.drawLine(
+        Offset(cx - hw * 0.55, cy + slashH),
+        Offset(cx + hw * 0.55, cy - slashH),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SignPainter old) =>
+      old.isNotEqual != isNotEqual || old.color != color;
 }
