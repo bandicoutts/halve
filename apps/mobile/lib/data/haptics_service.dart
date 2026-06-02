@@ -1,19 +1,31 @@
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-// Must match settings_screen.dart.
-const _hapticsKey = 'halve:haptics';
+export 'prefs_keys.dart' show prefKeyHaptics;
 
-/// Light impact: cell tap cycle.
-Future<void> hapticsOnTap() => _fire(HapticFeedback.lightImpact);
+/// Synchronous haptics gate — configure once at startup, update on settings change.
+class HapticsService {
+  HapticsService._();
+  static final instance = HapticsService._();
 
-/// Medium impact: puzzle solved.
-Future<void> hapticsOnWin() => _fire(HapticFeedback.mediumImpact);
+  bool _enabled = true;
 
-/// Light impact: new violation appeared.
-Future<void> hapticsOnError() => _fire(HapticFeedback.lightImpact);
+  void configure(bool enabled) => _enabled = enabled;
 
-Future<void> _fire(Future<void> Function() fn) async {
-  final prefs = await SharedPreferences.getInstance();
-  if (prefs.getBool(_hapticsKey) ?? true) await fn();
+  Future<void> _fire(Future<void> Function() fn) async {
+    if (_enabled) await fn();
+  }
+
+  /// Light impact: cell tap cycle.
+  Future<void> onTap() => _fire(HapticFeedback.lightImpact);
+
+  /// Medium impact: puzzle solved.
+  Future<void> onWin() => _fire(HapticFeedback.mediumImpact);
+
+  /// Light impact: new violation appeared.
+  Future<void> onError() => _fire(HapticFeedback.lightImpact);
 }
+
+/// Convenience top-level wrappers (call-site API unchanged).
+Future<void> hapticsOnTap() => HapticsService.instance.onTap();
+Future<void> hapticsOnWin() => HapticsService.instance.onWin();
+Future<void> hapticsOnError() => HapticsService.instance.onError();

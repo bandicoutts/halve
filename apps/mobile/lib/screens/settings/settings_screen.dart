@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../data/haptics_service.dart';
 import '../../data/notification_service.dart';
 import '../../data/prefs_keys.dart';
 import '../../providers/providers.dart';
@@ -520,6 +521,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _setHaptics(bool on) async {
     setState(() => _haptics = on);
+    HapticsService.instance.configure(on);
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(prefKeyHaptics, on);

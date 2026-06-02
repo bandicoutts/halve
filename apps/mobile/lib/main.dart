@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'data/haptics_service.dart';
 import 'data/notification_service.dart';
 import 'data/onboarding.dart';
 import 'data/puzzle_cache.dart';
@@ -42,6 +43,7 @@ Future<void> main() async {
       themeModeProvider.overrideWith((ref) => ThemeModeNotifier(prefs!)),
     );
     onboarded = prefs.getBool(onboardedKey) ?? false;
+    HapticsService.instance.configure(prefs.getBool(prefKeyHaptics) ?? true);
   } catch (e) {
     debugPrint('SharedPreferences unavailable — using in-memory cache: $e');
   }
