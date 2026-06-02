@@ -11,6 +11,7 @@ import 'data/notification_service.dart';
 import 'data/onboarding.dart';
 import 'data/puzzle_cache.dart';
 import 'data/supabase_client.dart';
+import 'data/theme_store.dart';
 import 'providers/providers.dart';
 import 'router/app_router.dart';
 import 'theme/theme.dart';
@@ -40,7 +41,7 @@ Future<void> main() async {
     prefs = await SharedPreferences.getInstance();
     overrides.add(puzzleCacheProvider.overrideWithValue(PrefsPuzzleCache(prefs)));
     overrides.add(
-      themeModeProvider.overrideWith((ref) => ThemeModeNotifier(prefs!)),
+      sharedPreferencesProvider.overrideWithValue(prefs),
     );
     onboarded = prefs.getBool(onboardedKey) ?? false;
     HapticsService.instance.configure(prefs.getBool(prefKeyHaptics) ?? true);

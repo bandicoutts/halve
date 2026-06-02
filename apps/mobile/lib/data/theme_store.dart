@@ -4,15 +4,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const themeModeKey = 'halve:theme';
 
+/// Provides the [SharedPreferences] instance used by [ThemeModeNotifier].
+/// Defaults to null (in-memory / no persistence). `main.dart` overrides this
+/// with the real instance; widget tests override with a mock.
+final sharedPreferencesProvider = Provider<SharedPreferences?>((ref) => null);
+
 /// Persists the user's theme preference to shared_preferences and exposes it as
 /// a [ThemeMode] via Riverpod. The MaterialApp watches this notifier and
 /// rebuilds when the mode changes. Null prefs = in-memory only (test / guest
 /// fallback).
-class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier(this._prefs) : super(_load(_prefs));
-
-  final SharedPreferences? _prefs;
-
+class ThemeModeNotifier extends Notifier<ThemeMode> {
   static ThemeMode _load(SharedPreferences? prefs) {
     if (prefs == null) return ThemeMode.system;
     return switch (prefs.getString(themeModeKey) ?? 'system') {
@@ -22,6 +23,9 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     };
   }
 
+  @override
+  ThemeMode build() => _load(ref.read(sharedPreferencesProvider));
+
   Future<void> setMode(ThemeMode mode) async {
     state = mode;
     final raw = switch (mode) {
@@ -29,14 +33,12 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
       ThemeMode.dark => 'dark',
       _ => 'system',
     };
-    await _prefs?.setString(themeModeKey, raw);
+    await ref.read(sharedPreferencesProvider)?.setString(themeModeKey, raw);
   }
 }
 
 /// Riverpod provider. Defaults to [ThemeMode.system] with no persistence (no
-/// prefs). `main.dart` overrides with a [ThemeModeNotifier] backed by real
-/// [SharedPreferences]; widget tests override with one backed by mock prefs.
+/// prefs). `main.dart` overrides [sharedPreferencesProvider] with real
+/// [SharedPreferences]; widget tests override it with mock prefs.
 final themeModeProvider =
-    StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
-  (ref) => ThemeModeNotifier(null),
-);
+    NotifierProvider<ThemeModeNotifier, ThemeMode>(ThemeModeNotifier.new);
