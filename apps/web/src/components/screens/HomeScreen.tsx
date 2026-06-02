@@ -54,7 +54,7 @@ function DestCard({
 }) {
   const [h, setH] = useState(false);
   return (
-    <Link href={href} style={{ flex: 1, textDecoration: "none" }}>
+    <Link href={href} style={{ flex: "1 1 140px", textDecoration: "none" }}>
       <div
         onMouseEnter={() => setH(true)}
         onMouseLeave={() => setH(false)}
@@ -238,16 +238,6 @@ export function HomeScreen({
 
   const [signInHovered, setSignInHovered] = useState(false);
 
-  // Stack the destination cards on very narrow screens so subtitles stop
-  // wrapping mid-phrase. Mirrors the matchMedia pattern used in ArchiveScreen.
-  const [stack, setStack] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 380px)");
-    const update = () => setStack(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
 
   return (
     <div
@@ -397,7 +387,7 @@ export function HomeScreen({
           <div
             style={{
               display: "flex",
-              flexDirection: stack ? "column" : "row",
+              flexWrap: "wrap",
               gap: 12,
             }}
           >
