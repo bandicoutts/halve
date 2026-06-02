@@ -156,10 +156,14 @@ export function WinScreen({
   const displayDate = date ? formatDate(date) : undefined;
 
   function handleShare() {
-    const text =
-      kind !== "practice" && dayNo
-        ? `Halve No. ${dayNo} · ${time}`
-        : `Halve · ${time}`;
+    const cap = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+    let text: string;
+    if (kind !== "practice" && dayNo) {
+      const streakPart = streak ? ` · streak ${streak}` : "";
+      text = `Halve No. ${dayNo} · ${time} · ${cap}${streakPart}\nNo spoilers — play at halve.today`;
+    } else {
+      text = `Halve · ${time} · ${cap}\nNo spoilers — play at halve.today`;
+    }
     if (navigator.share) {
       navigator.share({ text }).catch(() => {});
     } else {
