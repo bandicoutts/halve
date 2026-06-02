@@ -65,4 +65,4 @@ Pass: 76 · Fail: 10 · Skip: 5 · Blocked: 22 (auth crash)
 | ~~M-2~~ | ~~Medium~~ | ~~No date or puzzle number shown on play board header~~ | Fixed — `PlayLoad.puzzleNumber` + `formatShortDate` |
 | ~~M-3~~ | ~~Medium~~ | ~~Archive missing pull-to-refresh~~ | Fixed `2bff3dc` |
 | ~~M-4~~ | ~~Low~~ | ~~No help/feedback link in Settings ABOUT section~~ | Fixed — `settings_screen.dart` |
-| M-5 | Low | Android back gesture exits app immediately from Home | App root / `main.dart` |
+| ~~M-5~~ | ~~Low~~ | ~~Android back gesture exits app immediately from Home~~ | Fixed — `MainActivity.kt` `OnBackInvokedCallback` |
