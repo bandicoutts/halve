@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive icon foreground — the Halve mark (split circle):
+  a circle bisected vertically, left half amber (#D45220, symbol-a),
+  right half teal (#2A7A6E, symbol-b). Safe-zone centred within 108dp canvas
+  (circle r=32dp, centre 54,54 — 18dp bleed on each side leaves 72dp safe zone).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!--
+      Left amber semicircle: arc from top (54,22) to bottom (54,86)
+      counterclockwise (sweep=0), small arc (large-arc=0), r=32.
+      Close path back through the vertical centre line.
+    -->
+    <path
+        android:fillColor="#D45220"
+        android:pathData="M54,22 A32,32 0 0 0 54,86 Z"/>
+
+    <!--
+      Right teal semicircle: arc from top (54,22) to bottom (54,86)
+      clockwise (sweep=1), small arc (large-arc=0), r=32.
+    -->
+    <path
+        android:fillColor="#2A7A6E"
+        android:pathData="M54,22 A32,32 0 0 1 54,86 Z"/>
+
+</vector>

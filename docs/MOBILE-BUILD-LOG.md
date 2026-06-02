@@ -27,7 +27,7 @@ Progress tracker for the Flutter mobile app build. One row per phase; details + 
 | 16 | Tablet adaptive layouts | ✅ done & committed |
 | 17 | Android specifics | ✅ done & committed |
 | 18 | Polish | ✅ done & committed |
-| 19 | App store prep | ⬜ |
+| 19 | App store prep | ✅ done & committed |
 
 Legend: ⬜ not started · 🔄 in progress · ✅ done & committed · ⚠️ done, follow-up needed
 
@@ -834,3 +834,54 @@ Context in place: design system (lib/theme + lib/widgets), app shell (go_router 
 
 Do Phase 19 — App store prep, per plan Phase 19. Read the plan section for exact requirements before starting.
 ```
+
+---
+
+## Phase 19 — App store prep ✅ (2026-06-02)
+
+**What shipped:**
+
+**19.1 iOS:**
+- **Bundle ID** changed from `today.halve.halve` → `today.halve` in `ios/Runner.xcodeproj/project.pbxproj` (all three Runner build configs: Profile/Debug/Release; RunnerTests updated to `today.halve.RunnerTests`).
+- **`ios/Runner/PrivacyInfo.xcprivacy`** (new) — iOS 17+ privacy manifest: `NSPrivacyTracking = false`, no tracking domains, two data types (Email Address + Gameplay Content — both for App Functionality, linked to identity, not for tracking), required API reasons for UserDefaults (CA92.1) and file timestamps (C617.1). **Must be added to the Xcode project target** before submission (see `IOS-RELEASE.md` step 2 — drag into Runner group in Xcode).
+- **`ios/Runner/Runner.entitlements`** (new) — APNs entitlement (`aps-environment: development`; change to `production` before App Store build). `CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;` added to all three Runner build configurations in `project.pbxproj` via the Python patch.
+- **`ios/Runner/Base.lproj/LaunchScreen.storyboard`** — background color changed from white to Halve light bg `#F6F1E8` (0.965/0.945/0.910 RGB); the Flutter placeholder image removed (clean bg-only launch screen).
+
+**19.2 Android:**
+- **`applicationId`** changed from `today.halve.halve` → `today.halve` in `android/app/build.gradle.kts`. `namespace` left as `today.halve.halve` (Kotlin package namespace; changing it would require Kotlin file refactors — applicationId is what's published to Play).
+- **Release signing config** wired: `build.gradle.kts` reads `android/key.properties` (gitignored) when present; falls back to debug keys when absent so local builds still work. See `ANDROID-RELEASE.md` for setup steps.
+- **Adaptive icons** (Android 8.0+, API 26+):
+  - `android/app/src/main/res/drawable/ic_launcher_background.xml` — `#F6F1E8` fill
+  - `android/app/src/main/res/drawable/ic_launcher_foreground.xml` — the Halve split circle: left amber semicircle (`#D45220`) + right teal semicircle (`#2A7A6E`), SVG arc paths, r=32dp centred in 108dp canvas
+  - `android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml` + `ic_launcher_round.xml` — adaptive icon wrappers
+- **`android:roundIcon="@mipmap/ic_launcher_round"`** added to AndroidManifest.xml.
+- **App label** corrected from `"halve"` → `"Halve"` in AndroidManifest.xml.
+- **Launch backgrounds** (`drawable/` + `drawable-v21/`) updated from white/`?android:colorBackground` to `#F6F1E8`.
+
+**19.3 Store assets:**
+- `apps/mobile/STORE-LISTING.md` (new) — full App Store and Google Play listing copy: name, subtitle, promotional text, description (brand voice: calm, no hype), keywords, URLs, age rating, categories, screenshot captions + size specs (1290×2796 iPhone 15 Pro Max, 2048×2732 iPad Pro 12.9").
+- `apps/mobile/IOS-RELEASE.md` (new) — end-to-end iOS release checklist: Apple Developer setup, PrivacyInfo Xcode wiring, automatic signing, APNs key, TestFlight build, App Store Connect steps, app icon spec, version bumping.
+- `apps/mobile/ANDROID-RELEASE.md` (new) — end-to-end Android release checklist: keystore creation, `key.properties` setup, Play App Signing enrollment, `flutter build appbundle`, Play Console listing + Data Safety form, icon density table, version bumping.
+
+**19.4 Versioning:**
+- `version: 1.0.0+1` was already set in `pubspec.yaml` from Phase 1. `package_info_plus` was already wired in Settings → About (Phase 13). No changes needed.
+
+**Settings URLs:**
+- `lib/screens/settings/settings_screen.dart` — Privacy policy and Terms of use `onTap` callbacks now call `launchUrl(Uri.parse('https://halve.today/privacy|terms'), mode: LaunchMode.externalApplication)` via `url_launcher` (was `{/* Phase 19 — add URL */}`).
+
+**Decisions:**
+- `namespace` left unchanged (`today.halve.halve`) — the Android namespace only affects the generated R class package; changing it requires renaming the Kotlin source package, which is out of scope. The user-visible `applicationId = "today.halve"` is the store identifier.
+- Adaptive icon uses SVG arc paths in a vector drawable — correct on API 26+; legacy mipmap PNGs (still the Flutter placeholder) cover older Android. The legacy PNGs should be replaced with rasterized Halve mark art before submission (noted in `ANDROID-RELEASE.md`).
+- Launch backgrounds use a flat `#F6F1E8` color (light theme) — the app transitions to the correct dark background immediately when Flutter draws its first frame.
+
+**Verification:** `flutter analyze` → No issues found. `flutter test` → **202/202** (no regressions).
+
+**What still requires human action before submission:**
+1. **App icons** — Replace all placeholder PNGs with real Halve brand art (both platforms). See `IOS-RELEASE.md` and `ANDROID-RELEASE.md` for size specs.
+2. **iOS: Add PrivacyInfo.xcprivacy to Xcode project** — Drag `Runner/PrivacyInfo.xcprivacy` into the Runner group and add to the Runner target (see `IOS-RELEASE.md` step 2).
+3. **iOS: Set DEVELOPMENT_TEAM** in Xcode Signing & Capabilities.
+4. **iOS: Switch `aps-environment` to `production`** in `Runner.entitlements` before the App Store archive.
+5. **Android: Create keystore + `key.properties`** per `ANDROID-RELEASE.md`.
+6. **Screenshots** — Capture phone + tablet, both themes (see `STORE-LISTING.md`).
+7. **Backend live** — Apply Phase 0 migrations + seed practice pool before any real testing.
+8. **Firebase** — Complete `FIREBASE-SETUP.md` before push-notification testing.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/notification_service.dart';
 import '../../providers/providers.dart';
@@ -728,12 +729,18 @@ class _SettingsContent extends StatelessWidget {
               _SettingsRow(
                 label: 'Privacy policy',
                 trailing: const _ChevronIcon(),
-                onTap: () {/* Phase 19 — add URL */},
+                onTap: () => launchUrl(
+                  Uri.parse('https://halve.today/privacy'),
+                  mode: LaunchMode.externalApplication,
+                ),
               ),
               _SettingsRow(
                 label: 'Terms of use',
                 trailing: const _ChevronIcon(),
-                onTap: () {/* Phase 19 — add URL */},
+                onTap: () => launchUrl(
+                  Uri.parse('https://halve.today/terms'),
+                  mode: LaunchMode.externalApplication,
+                ),
               ),
             ],
           ),
