@@ -26,8 +26,9 @@ class SolveRow {
 
   static SolveRow fromRow(Map<String, Object?> row) {
     return SolveRow(
-      solvedAt: DateTime.parse(row['solved_at']! as String),
-      durationMs: (row['duration_ms']! as num).toInt(),
+      solvedAt: DateTime.parse(
+          (row['solved_at'] as String?) ?? '1970-01-01T00:00:00Z'),
+      durationMs: (row['duration_ms'] as num?)?.toInt() ?? 0,
       usedHint: (row['used_hint'] as bool?) ?? false,
       localDate: row['local_date'] as String?,
       puzzleId: row['puzzle_id'] as String?,
