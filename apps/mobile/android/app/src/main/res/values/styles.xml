@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Theme applied while the Android process is starting (light mode). -->
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+
+    <!--
+      Theme applied once the Flutter engine starts. Edge-to-edge: status bar
+      and navigation bar are transparent so Flutter draws behind them.
+      SystemChrome.setEnabledSystemUIMode(edgeToEdge) is called from Dart.
+    -->
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">?android:colorBackground</item>
+        <!-- Allow Flutter to draw behind the status + navigation bars -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+</resources>

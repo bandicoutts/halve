@@ -1,0 +1,29 @@
+# Static analysis config for the Halve mobile app.
+# `flutter analyze` is the mobile equivalent of `tsc --noEmit` — run it (clean)
+# before every commit (global rule).
+
+include: package:flutter_lints/flutter.yaml
+
+# Riverpod lints run through the custom_lint plugin. After `flutter pub get`,
+# they surface in `flutter analyze` and `dart run custom_lint`.
+analyzer:
+  plugins:
+    - custom_lint
+  exclude:
+    # Build artifacts and vendored plugin checkouts (never our code).
+    - "build/**"
+    - ".dart_tool/**"
+    # Generated code (build_runner / riverpod_generator).
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  errors:
+    # Treat missing required code-gen parts as analyzable, not fatal, pre-gen.
+    invalid_annotation_target: ignore
+
+linter:
+  rules:
+    # Project leans on const for calm, cheap rebuilds.
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    # Brand/code hygiene.
+    avoid_print: true

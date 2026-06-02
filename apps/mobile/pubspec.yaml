@@ -1,0 +1,71 @@
+name: halve
+description: "Halve — premium daily 6×6 binary logic puzzle (iOS + Android)."
+# Private app; never published to pub.dev.
+publish_to: 'none'
+
+# version (name+build). Wired to Settings → About via package_info_plus (Phase 13/19).
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management (Riverpod + code-gen)
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Backend
+  supabase_flutter: ^2.9.0
+
+  # Navigation
+  go_router: ^17.0.0
+
+  # Typography: Space Grotesk is bundled as a variable font asset
+  # (see flutter.fonts below) — no runtime font fetching.
+
+  # Notifications (local only — FCM/Firebase deferred until backend push is needed)
+  flutter_local_notifications: ^18.0.1
+  # flutter_timezone: gets device IANA timezone name for zonedSchedule accuracy.
+  flutter_timezone: ^5.0.0
+  # timezone: required directly for TZDateTime; also a transitive dep of flutter_local_notifications.
+  timezone: any
+
+  # Local storage (settings + offline puzzle cache)
+  shared_preferences: ^2.5.3
+
+  # Platform integrations
+  share_plus: ^10.1.4
+  package_info_plus: ^8.3.0
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Code generation
+  build_runner: ^2.4.15
+  riverpod_generator: ^2.6.5
+
+  # Linting
+  custom_lint: ^0.7.5
+  riverpod_lint: ^2.6.5
+  flutter_lints: ^6.0.0
+
+  # Testing
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    # Space Grotesk variable font (wght 300–700). The single typeface — no
+    # Inter, no second family (docs/DESIGN.md). Licensed under the OFL
+    # (assets/fonts/OFL.txt). Weights are selected via FontVariation('wght').
+    - family: Space Grotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk-VariableFont_wght.ttf

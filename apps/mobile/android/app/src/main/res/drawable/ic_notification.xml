@@ -1,0 +1,25 @@
+<!--
+  Halve notification icon — monochrome (white on transparent) for Android
+  status bar. Shows the two Halve symbols side-by-side: solid disc (left)
+  and outlined ring (right), matching the game's visual language.
+  System tints this to the appropriate color; no color hardcoding beyond white.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Solid disc (symbol A) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M7,7.5 A4.5,4.5 0 1 0 7,16.5 A4.5,4.5 0 1 0 7,7.5 Z"/>
+
+    <!-- Ring (symbol B) — stroke only, transparent fill -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.75"
+        android:pathData="M17,7.5 A4.5,4.5 0 1 0 17,16.5 A4.5,4.5 0 1 0 17,7.5 Z"/>
+
+</vector>

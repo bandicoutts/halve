@@ -6,6 +6,12 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@parity/web", "dev"],
       "port": 3000
+    },
+    {
+      "name": "halve-wireframe",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8799", "--directory", "/tmp/halve_r2/app"],
+      "port": 8799
     }
   ]
 }

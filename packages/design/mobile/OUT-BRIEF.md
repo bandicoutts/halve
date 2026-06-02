@@ -1,8 +1,11 @@
-# Out-brief → Claude Design · Round 2 · Batch 1: the first-run flow
+# Out-brief → Claude Design · Round 2 · Batch 1 (revision): iPad coverage + theme toggle
 
 > **Paste this whole file into Claude Design** (invoke the `parity-design` skill first).
 > It's self-contained. Output a static HTML prototype in the same style as the existing
 > mobile prototype, then export a zip back for vendoring.
+
+> **This is a revision pass on the batch 1 prototype — two targeted fixes before vendoring.
+> Everything else is correct; don't redesign or restructure anything else.**
 
 ## Context (read once)
 

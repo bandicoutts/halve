@@ -36,10 +36,16 @@ coverage/
 # Claude local settings (machine-specific permissions; shared settings.json is fine to commit)
 .claude/settings.local.json
 
-# Flutter (added in Phase 5)
+# Flutter / Dart (apps/mobile — see apps/mobile/.gitignore for the full set)
 **/.dart_tool/
 **/build/
 *.iml
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+apps/mobile/ios/Pods/
+apps/mobile/ios/.symlinks/
+apps/mobile/android/.gradle/
+apps/mobile/.idea/
 
 # Design loop — prototype artifacts (design-only, replaced each round; contract docs are tracked)
 packages/design/mobile/prototype/
