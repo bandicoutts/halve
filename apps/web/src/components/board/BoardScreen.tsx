@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import type { Grid, Puzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { useTimer } from "@/hooks/useTimer";
+import { computeStreak } from "@/lib/streak";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { createClient } from "@/lib/supabase/client";
 import { recordSolve } from "@/app/actions/record-solve";
@@ -31,26 +32,6 @@ const srOnly: React.CSSProperties = {
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-// Step one calendar day from a local YYYY-MM-DD date, staying in local time.
-// Using toLocaleDateString("en-CA") (not toISOString) keeps the date key in the
-// user's timezone — toISOString would roll back a day for any UTC+ user.
-function offsetDay(date: string, delta: number): string {
-  const d = new Date(`${date}T00:00:00`);
-  d.setDate(d.getDate() + delta);
-  return d.toLocaleDateString("en-CA");
-}
-
-function computeStreakClient(days: string[], today: string): number {
-  const set = new Set(days);
-  let n = 0;
-  let cur = today;
-  while (set.has(cur)) {
-    n++;
-    cur = offsetDay(cur, -1);
-  }
-  return n;
-}
 
 function computeNextIn(): string {
   const now = new Date();
@@ -243,7 +224,7 @@ export function BoardScreen({
         ),
       ] as string[];
       setStreakData({
-        streak: computeStreakClient(days, today),
+        streak: computeStreak(days, today),
         nextIn: computeNextIn(),
       });
     }

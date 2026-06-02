@@ -153,20 +153,14 @@ String difficultyLabel(Difficulty d) => switch (d) {
       Difficulty.hard => 'Hard',
     };
 
-const _months = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
 /// "June 1, 2026" from a `yyyy-MM-dd` string (mirrors the web keepsake date).
 String formatKeepsakeDate(String iso) {
+  final short = formatShortDate(iso); // e.g. "June 1"
   final parts = iso.split('-');
   if (parts.length != 3) return iso;
   final y = int.tryParse(parts[0]);
-  final m = int.tryParse(parts[1]);
-  final d = int.tryParse(parts[2]);
-  if (y == null || m == null || d == null || m < 1 || m > 12) return iso;
-  return '${_months[m - 1]} $d, $y';
+  if (y == null) return iso;
+  return '$short, $y';
 }
 
 /// Whole minutes/hours until the player's next local midnight, formatted like
