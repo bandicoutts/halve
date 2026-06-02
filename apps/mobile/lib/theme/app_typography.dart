@@ -97,6 +97,15 @@ abstract final class AppTypography {
         features: _tabularFeatures,
       );
 
+  /// Sub-label text — 11 px, slightly tracked (0.06em). Used for bottom-nav
+  /// labels, play-control labels, archive weekday initials, and legend text.
+  static TextStyle get micro => _grotesk(
+        size: 11,
+        weight: FontWeight.w500,
+        height: 1.0,
+        letterSpacing: 0.66, // 0.06em
+      );
+
   static final List<FontFeature> _tabularFeatures = [
     const FontFeature.tabularFigures(),
     FontFeature.stylisticSet(1),

@@ -63,7 +63,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           HalveTopBar(onBack: () => context.pop()),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(28, 0, 28, 32),
+              padding: const EdgeInsets.fromLTRB(28, 0, 28, AppSpacing.s6),
               child: _step == _AuthStep.email
                   ? _EmailStep(
                       controller: _emailController,
@@ -197,7 +197,7 @@ class _EmailStep extends StatelessWidget {
           'EMAIL',
           style: AppTypography.label.copyWith(color: c.fg3),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.s2),
         _EmailInput(
           controller: controller,
           enabled: !sending,
@@ -210,7 +210,7 @@ class _EmailStep extends StatelessWidget {
             style: AppTypography.small.copyWith(color: c.wrong),
           ),
         ],
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.s4),
         // Continue — disabled until valid email
         ValueListenableBuilder<TextEditingValue>(
           valueListenable: controller,
@@ -225,7 +225,7 @@ class _EmailStep extends StatelessWidget {
         ),
         // ── Dev-only one-tap sign-in ─────────────────────────────────────
         if (onDevSignIn != null) ...[
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.s6),
           Row(
             children: [
               Expanded(child: Divider(color: c.hairline2)),
@@ -236,7 +236,7 @@ class _EmailStep extends StatelessWidget {
               Expanded(child: Divider(color: c.hairline2)),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.s4),
           HalveButton(
             label: sending ? 'Signing in…' : 'Sign in as test user',
             full: true,

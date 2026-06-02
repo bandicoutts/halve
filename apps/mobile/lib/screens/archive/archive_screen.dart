@@ -293,8 +293,7 @@ class _MonthGrid extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.s1),
             child: Text(
               w,
-              style: AppTypography.label.copyWith(
-                fontSize: 11,
+              style: AppTypography.micro.copyWith(
                 letterSpacing: 0,
                 color: c.fg3,
               ),
@@ -505,8 +504,7 @@ class _Legend extends StatelessWidget {
               icon,
               const SizedBox(width: 5),
               Text(label,
-                  style: AppTypography.small
-                      .copyWith(fontSize: 11, color: c.fg3)),
+                  style: AppTypography.micro.copyWith(color: c.fg3)),
             ],
           ),
       ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_layout.dart';
 import '../theme/app_radii.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
@@ -84,9 +85,9 @@ class _HalveButtonState extends State<HalveButton> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 160),
             curve: Curves.easeInOut,
-            height: 54,
+            height: AppLayout.buttonHeight,
             width: widget.full ? double.infinity : null,
-            padding: const EdgeInsets.symmetric(horizontal: 28),
+            padding: const EdgeInsets.symmetric(horizontal: AppLayout.buttonPadH),
             decoration: BoxDecoration(
               color: bg,
               border: border,

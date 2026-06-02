@@ -406,9 +406,7 @@ class _ControlButton extends StatelessWidget {
         const SizedBox(height: AppSpacing.s1 + 3),
         Text(
           label.toUpperCase(),
-          style: AppTypography.label.copyWith(
-            fontSize: 11,
-            letterSpacing: 0.66, // 0.06em at 11px
+          style: AppTypography.micro.copyWith(
             color: disabled ? c.hairline2 : c.fg3,
           ),
         ),

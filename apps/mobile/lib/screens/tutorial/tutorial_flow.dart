@@ -291,8 +291,8 @@ class _StepBody extends StatelessWidget {
           cells: cells,
           givens: Tut4.givens,
           edges: Tut4.edges,
-          cellSize: 56,
-          gap: 16,
+          cellSize: AppLayout.tutBoardCell,
+          gap: AppSpacing.s4,
           violations: violations,
           highlight: guided ? {(Tut4.guide.r, Tut4.guide.c)} : const {},
           dimRest: guided,
@@ -341,7 +341,7 @@ class _StepFooter extends StatelessWidget {
       status = 'Place a disc or ring in every square';
     }
     return SizedBox(
-      height: 54,
+      height: AppLayout.buttonHeight,
       child: Center(
         child: Text(
           status,
@@ -423,7 +423,7 @@ class TutorialWin extends StatelessWidget {
                           cells: solvedCells,
                           givens: Tut4.solution, // all "given" → no entered shadow
                           edges: const [],
-                          cellSize: 52,
+                          cellSize: AppLayout.tutWinBoardCell,
                           gap: 9,
                         ),
                       ),

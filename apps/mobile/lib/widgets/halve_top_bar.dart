@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_layout.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_typography.dart';
 import 'halve_icon_button.dart';
 
 /// A lightweight screen header: optional leading back button, a title, and an
@@ -44,7 +46,7 @@ class HalveTopBar extends StatelessWidget {
         ? null
         : Text(
             title!,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: c.fg1),
+            style: AppTypography.h3.copyWith(color: c.fg1),
           );
 
     return Padding(
@@ -53,7 +55,7 @@ class HalveTopBar extends StatelessWidget {
         vertical: AppSpacing.s1,
       ),
       child: SizedBox(
-        height: 52,
+        height: AppLayout.topBarHeight,
         child: isAndroid
             ? Row(
                 children: [

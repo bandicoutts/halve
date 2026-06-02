@@ -266,7 +266,7 @@ class _WinTopBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.s2, vertical: AppSpacing.s1),
       child: SizedBox(
-        height: 52,
+        height: AppLayout.topBarHeight,
         child: Stack(
           alignment: Alignment.center,
           children: [

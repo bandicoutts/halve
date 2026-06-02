@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_layout.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
@@ -74,8 +75,7 @@ class _AndroidNavBar extends StatelessWidget {
         elevation: 0,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return AppTypography.label.copyWith(
-            fontSize: 11,
+          return AppTypography.micro.copyWith(
             letterSpacing: 0.11, // 0.01em
             fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
             color: selected ? c.fg1 : c.fg3,
@@ -121,7 +121,7 @@ class _IOSNavBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 52,
+          height: AppLayout.topBarHeight,
           child: Row(
             children: [
               for (var i = 0; i < HalveBottomNav.items.length; i++)
@@ -167,8 +167,7 @@ class _IOSTabItem extends StatelessWidget {
             const SizedBox(height: AppSpacing.s1),
             Text(
               item.label,
-              style: AppTypography.label.copyWith(
-                fontSize: 11,
+              style: AppTypography.micro.copyWith(
                 letterSpacing: 0,
                 fontWeight: active ? FontWeight.w600 : FontWeight.w500,
                 color: active ? c.fg1 : c.fg3,

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/local_date.dart';
 import '../../providers/providers.dart';
+import '../../theme/app_layout.dart';
 import '../../theme/app_radii.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_theme.dart';
@@ -244,7 +245,7 @@ class _AreaChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     return SizedBox(
-      height: 132,
+      height: AppLayout.statsChartHeight,
       child: CustomPaint(
         painter: _AreaPainter(
           dist: dist,
