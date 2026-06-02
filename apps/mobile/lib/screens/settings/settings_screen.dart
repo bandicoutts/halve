@@ -427,22 +427,28 @@ class _StepButtonState extends State<_StepButton> {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: (_) => setState(() => _pressed = true),
       onTapUp: (_) => setState(() => _pressed = false),
       onTapCancel: () => setState(() => _pressed = false),
       onTap: widget.onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        height: 32,
-        constraints: BoxConstraints(minWidth: widget.minWidth),
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s2),
-        decoration: BoxDecoration(
-          color: _pressed ? c.bgSunken : Colors.transparent,
-          border: Border.all(color: c.hairline2),
-          borderRadius: AppRadii.fullR,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+        child: Center(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
+            height: 32,
+            constraints: BoxConstraints(minWidth: widget.minWidth),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s2),
+            decoration: BoxDecoration(
+              color: _pressed ? c.bgSunken : Colors.transparent,
+              border: Border.all(color: c.hairline2),
+              borderRadius: AppRadii.fullR,
+            ),
+            alignment: Alignment.center,
+            child: widget.child,
+          ),
         ),
-        alignment: Alignment.center,
-        child: widget.child,
       ),
     );
   }
