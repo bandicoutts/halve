@@ -7,7 +7,7 @@ import 'models/solve.dart';
 /// matches the day the user actually experienced (EPIC-B). All functions here
 /// are pure and timezone-explicit so they're deterministic in tests.
 
-const _months = [
+const kMonthNames = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
@@ -35,14 +35,14 @@ String localToday() => formatDay(DateTime.now());
 String formatDateLabel(String date) {
   final dt = _parse(date);
   if (dt == null) return date;
-  return '${_weekdays[dt.weekday - 1]}, ${_months[dt.month - 1]} ${dt.day}';
+  return '${_weekdays[dt.weekday - 1]}, ${kMonthNames[dt.month - 1]} ${dt.day}';
 }
 
 /// Short human label for a `yyyy-MM-dd` string, e.g. "June 2".
 String formatShortDate(String date) {
   final dt = _parse(date);
   if (dt == null) return date;
-  return '${_months[dt.month - 1]} ${dt.day}';
+  return '${kMonthNames[dt.month - 1]} ${dt.day}';
 }
 
 /// The best day string for a solve row: prefer the stored local date, falling

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/local_date.dart';
 import '../../providers/providers.dart';
 import '../../theme/app_radii.dart';
 import '../../theme/app_spacing.dart';
@@ -495,11 +496,6 @@ class _SignOutPainter extends CustomPainter {
 
 // ─── Since-date formatter ─────────────────────────────────────────────────────
 
-const _monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
 String _fmtSince(String? iso) {
   if (iso == null) return '';
   final parts = iso.split('-');
@@ -507,7 +503,7 @@ String _fmtSince(String? iso) {
   final month = int.tryParse(parts[1]);
   final year = int.tryParse(parts[0]);
   if (month == null || year == null || month < 1 || month > 12) return '';
-  return 'since ${_monthNames[month - 1]} $year';
+  return 'since ${kMonthNames[month - 1]} $year';
 }
 
 // ─── Empty state ──────────────────────────────────────────────────────────────

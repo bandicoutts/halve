@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/local_date.dart';
 import '../../router/app_router.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import 'archive_provider.dart';
-
-const _monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
 
 const _weekdayInitials = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -220,7 +216,7 @@ class _MonthNav extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.s3, vertical: AppSpacing.s2),
             child: Text(
-              '${_monthNames[view.$2 - 1]} ${view.$1}'.toUpperCase(),
+              '${kMonthNames[view.$2 - 1]} ${view.$1}'.toUpperCase(),
               style: AppTypography.label.copyWith(
                 fontSize: 13,
                 letterSpacing: 0.52, // 0.04em
@@ -549,7 +545,7 @@ class _MonthPicker extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${_monthNames[ym.$2 - 1]} ${ym.$1}',
+                  '${kMonthNames[ym.$2 - 1]} ${ym.$1}',
                   style: AppTypography.body.copyWith(
                     fontSize: 15,
                     fontWeight: isSel ? FontWeight.w600 : FontWeight.w400,
