@@ -126,32 +126,52 @@ class NotificationService {
   // ── Daily reminder ──────────────────────────────────────────────────────────
 
   /// Schedule (or reschedule) the daily reminder. Replaces any existing slot.
+  ///
+  /// Tries exact alarms first (better timing accuracy). Falls back to
+  /// inexact alarms if the SCHEDULE_EXACT_ALARM permission is not granted
+  /// (common on Android 12+ emulators and devices that haven't granted it).
   Future<void> scheduleDaily(int hour, String ampm) async {
     final time = reminderTimeOfDay(hour, ampm);
-    await _plugin.zonedSchedule(
-      _reminderId,
-      'Halve',
-      "Today's Halve puzzle is ready.",
-      _nextOccurrence(time),
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@drawable/ic_notification',
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: false,
-          presentSound: true,
-        ),
+    const details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _channelId,
+        _channelName,
+        importance: Importance.high,
+        priority: Priority.high,
+        icon: '@drawable/ic_notification',
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: false,
+        presentSound: true,
+      ),
     );
+    try {
+      await _plugin.zonedSchedule(
+        _reminderId,
+        'Halve',
+        "Today's Halve puzzle is ready.",
+        _nextOccurrence(time),
+        details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    } catch (_) {
+      // Exact alarms not permitted — fall back to inexact scheduling.
+      await _plugin.zonedSchedule(
+        _reminderId,
+        'Halve',
+        "Today's Halve puzzle is ready.",
+        _nextOccurrence(time),
+        details,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    }
   }
 
   /// Cancel the daily reminder.
