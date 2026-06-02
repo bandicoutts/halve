@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { OnboardingScreen } from "@/components/screens/OnboardingScreen";
-
-const SAFE_PATHS = ["/", "/play", "/practice", "/stats", "/archive"];
+import { SAFE_PATHS } from "@/lib/safe-paths";
 
 function safeNext(raw: string | undefined): string {
   if (!raw) return "/";

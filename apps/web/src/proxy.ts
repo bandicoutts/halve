@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { SAFE_PATHS } from "@/lib/safe-paths";
 
 export const config = {
   matcher: [
@@ -7,13 +8,11 @@ export const config = {
   ],
 };
 
-const SAFE_REDIRECT_PATHS = ["/", "/play", "/practice", "/stats", "/archive"];
-
 function safeRedirect(next: string | null): string {
   if (!next) return "/";
   try {
     const url = new URL(next, "http://localhost");
-    if (SAFE_REDIRECT_PATHS.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"))) {
+    if (SAFE_PATHS.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"))) {
       return url.pathname + url.search;
     }
   } catch {
