@@ -13,17 +13,20 @@ export default async function ArchivePage() {
 
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    // Fetch all puzzles up to today, ascending by date
-    const { data: puzzles } = await supabase
-      .from("puzzles")
-      .select("id, date, difficulty")
-      .not("date", "is", null)
-      .lte("date", today)
-      .order("date", { ascending: true });
+    const [
+      {
+        data: { user },
+      },
+      { data: puzzles },
+    ] = await Promise.all([
+      supabase.auth.getUser(),
+      supabase
+        .from("puzzles")
+        .select("id, date, difficulty")
+        .not("date", "is", null)
+        .lte("date", today)
+        .order("date", { ascending: true }),
+    ]);
 
     const rows = puzzles ?? [];
 

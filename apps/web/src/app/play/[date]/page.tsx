@@ -30,22 +30,21 @@ export default async function PlayDatePage({ params }: Props) {
   try {
     const supabase = await createClient();
 
-    const { data } = await supabase
-      .from("puzzles")
-      .select("id, difficulty, grid_spec")
-      .eq("date", date)
-      .maybeSingle();
-
-    puzzleRow = data;
-
-    if (data) {
-      const { count } = await supabase
+    const [{ data }, { count }] = await Promise.all([
+      supabase
+        .from("puzzles")
+        .select("id, difficulty, grid_spec")
+        .eq("date", date)
+        .maybeSingle(),
+      supabase
         .from("puzzles")
         .select("id", { count: "exact", head: true })
         .not("date", "is", null)
-        .lte("date", date);
-      dayNo = count ?? undefined;
-    }
+        .lte("date", date),
+    ]);
+
+    puzzleRow = data;
+    if (data) dayNo = count ?? undefined;
   } catch {
     redirect("/archive");
   }
