@@ -8,6 +8,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Mark } from "@/components/symbols/Mark";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { formatDuration } from "@/lib/format";
+import { formatDateLabel } from "@/lib/local-date";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -45,14 +46,6 @@ const CONTENT_MAX = 460;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function fmtDateLabel(dateStr: string): string {
-  const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(y!, m! - 1, d!).toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-}
 
 function solvedCount(month: ArchiveMonth): number {
   return month.days.filter((d) => d.solved).length;
@@ -261,7 +254,7 @@ function HoverPreview({ hover }: { hover: HoverState }) {
         <span
           style={{ fontSize: "var(--text-small)", fontWeight: 600, color: "var(--fg-1)", letterSpacing: "var(--tracking-snug)" }}
         >
-          {puzzle.isToday ? "Today" : fmtDateLabel(puzzle.date)}
+          {puzzle.isToday ? "Today" : formatDateLabel(puzzle.date)}
         </span>
         <span
           className="tnum"
@@ -350,7 +343,7 @@ function CalCell({
   return (
     <button
       onClick={onPlay}
-      aria-label={`Play ${puzzle.isToday ? "today" : fmtDateLabel(puzzle.date)}, ${puzzle.difficulty}${puzzle.solved && puzzle.timeMs !== undefined ? `, solved in ${formatDuration(puzzle.timeMs)}` : ""}`}
+      aria-label={`Play ${puzzle.isToday ? "today" : formatDateLabel(puzzle.date)}, ${puzzle.difficulty}${puzzle.solved && puzzle.timeMs !== undefined ? `, solved in ${formatDuration(puzzle.timeMs)}` : ""}`}
       onMouseEnter={enter}
       onMouseLeave={leave}
       style={{

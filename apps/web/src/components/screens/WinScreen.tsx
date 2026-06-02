@@ -10,6 +10,7 @@ import { Mark } from "@/components/symbols/Mark";
 import { Logo } from "@/components/symbols/Logo";
 import { Fire } from "@/components/symbols/Fire";
 import { Water } from "@/components/symbols/Water";
+import { formatDateLabel } from "@/lib/local-date";
 
 function CloseIcon() {
   return (
@@ -48,14 +49,6 @@ function ShareIcon() {
   );
 }
 
-function formatDate(iso: string): string {
-  const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y!, m! - 1, d!).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 function SolvedBoard({
   solution,
@@ -153,7 +146,7 @@ export function WinScreen({
       ? "Back to archive"
       : "New puzzle";
 
-  const displayDate = date ? formatDate(date) : undefined;
+  const displayDate = date ? formatDateLabel(date) : undefined;
 
   function handleShare() {
     const cap = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
