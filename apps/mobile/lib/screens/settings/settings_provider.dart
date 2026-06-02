@@ -33,7 +33,7 @@ final settingsDataProvider = FutureProvider.autoDispose<SettingsData>((ref) asyn
   String? displayName;
   if (isSignedIn && user != null) {
     // Try the profiles table first; fall back to auth metadata.
-    final profileRepo = ref.read(profileRepositoryProvider);
+    final profileRepo = ref.watch(profileRepositoryProvider);
     if (profileRepo != null) {
       displayName = await profileRepo.fetchDisplayName(user.id);
     }

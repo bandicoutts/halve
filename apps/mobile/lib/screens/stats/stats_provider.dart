@@ -49,7 +49,7 @@ final statsDataProvider = FutureProvider<StatsData>((ref) async {
 
   // Display name: profiles table first, then auth metadata, then email local-part.
   String? displayName;
-  final profileRepo = ref.read(profileRepositoryProvider);
+  final profileRepo = ref.watch(profileRepositoryProvider);
   if (profileRepo != null) {
     displayName = await profileRepo.fetchDisplayName(user.id);
   }
