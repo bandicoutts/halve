@@ -50,6 +50,15 @@ String formatShortDate(String date) {
 /// (BE-3). Mirrors the web `solveDay`.
 String solveDay(SolveRow row) => row.localDate ?? formatDay(row.solvedAt.toUtc());
 
+/// Format a solve duration in milliseconds as `m:ss` (e.g. `"1:24"`).
+/// Uses rounding so the displayed time matches the win-screen value.
+String formatMs(int ms) {
+  final totalSeconds = (ms / 1000).round();
+  final m = totalSeconds ~/ 60;
+  final s = (totalSeconds % 60).toString().padLeft(2, '0');
+  return '$m:$s';
+}
+
 DateTime? _parse(String date) {
   final parts = date.split('-');
   if (parts.length != 3) return null;

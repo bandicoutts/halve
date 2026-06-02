@@ -15,15 +15,6 @@ import '../../theme/breakpoints.dart';
 import '../../widgets/widgets.dart';
 import 'stats_provider.dart';
 
-// ─── Time format helper ───────────────────────────────────────────────────────
-
-String _fmtMs(int? ms) {
-  if (ms == null) return '—';
-  final s = (ms / 1000).round();
-  final m = s ~/ 60;
-  return '$m:${(s % 60).toString().padLeft(2, '0')}';
-}
-
 // ─── Monogram avatar ─────────────────────────────────────────────────────────
 
 class _Monogram extends StatelessWidget {
@@ -653,7 +644,7 @@ class _StatsRecord extends ConsumerWidget {
           _Eyebrow(
             'Solve time',
             trailing: Text(
-              'avg ${_fmtMs(stats.averageMs)}',
+              'avg ${stats.averageMs != null ? formatMs(stats.averageMs!) : '—'}',
               style: AppTypography.label
                   .copyWith(color: c.fg3, letterSpacing: 0),
             ),
@@ -665,12 +656,12 @@ class _StatsRecord extends ConsumerWidget {
           const SizedBox(height: AppSpacing.s4),
           _StatDivided(items: [
             (
-              value: _fmtMs(stats.averageMs),
+              value: stats.averageMs != null ? formatMs(stats.averageMs!) : '—',
               label: 'Average',
               accent: false
             ),
             (
-              value: _fmtMs(stats.fastestMs),
+              value: stats.fastestMs != null ? formatMs(stats.fastestMs!) : '—',
               label: 'Best time',
               accent: false
             ),

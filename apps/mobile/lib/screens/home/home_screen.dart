@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/local_date.dart';
 import '../../router/app_router.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
@@ -531,7 +532,7 @@ class _SolvedBlock extends StatelessWidget {
                   ),
                 ),
                 TextSpan(
-                  text: _formatMs(durationMs),
+                  text: formatMs(durationMs),
                   style: AppTypography.tabular(AppTypography.body).copyWith(
                     fontWeight: FontWeight.w600,
                     fontVariations: const [FontVariation('wght', 600)],
@@ -712,10 +713,3 @@ class _HowToPlayFooter extends StatelessWidget {
   }
 }
 
-/// Format a duration in ms as `m:ss`.
-String _formatMs(int ms) {
-  final totalSeconds = (ms / 1000).round();
-  final m = totalSeconds ~/ 60;
-  final s = (totalSeconds % 60).toString().padLeft(2, '0');
-  return '$m:$s';
-}
