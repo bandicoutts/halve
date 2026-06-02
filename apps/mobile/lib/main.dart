@@ -78,6 +78,7 @@ class HalveApp extends StatefulWidget {
 
 class _HalveAppState extends State<HalveApp> {
   late final GoRouter _router;
+  late final StreamSubscription<String> _routeSub;
 
   // Cached once — ThemeData construction is non-trivial; don't rebuild on
   // every Consumer rebuild triggered by theme-mode changes.
@@ -88,13 +89,19 @@ class _HalveAppState extends State<HalveApp> {
   void initState() {
     super.initState();
     _router = createAppRouter(initialLocation: widget.initialLocation);
-    NotificationService.instance.routeStream.listen(_router.go);
+    _routeSub = NotificationService.instance.routeStream.listen(_router.go);
 
     // Init and reschedule notifications after the first frame so startup
     // latency (initializeTimeZones + platform channels) doesn't block paint.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_initNotifications());
     });
+  }
+
+  @override
+  void dispose() {
+    _routeSub.cancel();
+    super.dispose();
   }
 
   Future<void> _initNotifications() async {

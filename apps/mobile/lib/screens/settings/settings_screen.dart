@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/notification_service.dart';
+import '../../data/prefs_keys.dart';
 import '../../providers/providers.dart';
 import '../../router/app_router.dart';
 import '../../theme/app_radii.dart';
@@ -14,13 +15,6 @@ import '../../theme/app_typography.dart';
 import '../../theme/breakpoints.dart';
 import '../../widgets/widgets.dart';
 import 'settings_provider.dart';
-
-// ─── Prefs keys for reminder + haptics ───────────────────────────────────────
-
-const _reminderKey = 'halve:reminder';
-const _reminderHourKey = 'halve:reminder_hour';
-const _reminderAmpmKey = 'halve:reminder_ampm';
-const _hapticsKey = 'halve:haptics';
 
 // ─── Primitive widgets ────────────────────────────────────────────────────────
 
@@ -481,10 +475,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       if (!mounted) return;
       setState(() {
-        _reminderOn = prefs.getBool(_reminderKey) ?? false;
-        _reminderHour = prefs.getInt(_reminderHourKey) ?? 8;
-        _reminderAmpm = prefs.getString(_reminderAmpmKey) ?? 'am';
-        _haptics = prefs.getBool(_hapticsKey) ?? true;
+        _reminderOn = prefs.getBool(prefKeyReminder) ?? false;
+        _reminderHour = prefs.getInt(prefKeyReminderHour) ?? 8;
+        _reminderAmpm = prefs.getString(prefKeyReminderAmpm) ?? 'am';
+        _haptics = prefs.getBool(prefKeyHaptics) ?? true;
       });
     } catch (_) {}
   }
@@ -493,7 +487,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() => _reminderOn = on);
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_reminderKey, on);
+      await prefs.setBool(prefKeyReminder, on);
       if (on) {
         await NotificationService.instance.scheduleDaily(_reminderHour, _reminderAmpm);
       } else {
@@ -506,7 +500,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() => _reminderHour = hour);
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_reminderHourKey, hour);
+      await prefs.setInt(prefKeyReminderHour, hour);
       if (_reminderOn) {
         await NotificationService.instance.scheduleDaily(hour, _reminderAmpm);
       }
@@ -517,7 +511,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() => _reminderAmpm = ampm);
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_reminderAmpmKey, ampm);
+      await prefs.setString(prefKeyReminderAmpm, ampm);
       if (_reminderOn) {
         await NotificationService.instance.scheduleDaily(_reminderHour, ampm);
       }
@@ -528,7 +522,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() => _haptics = on);
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_hapticsKey, on);
+      await prefs.setBool(prefKeyHaptics, on);
     } catch (_) {}
   }
 

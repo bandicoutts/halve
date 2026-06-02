@@ -8,17 +8,13 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../router/app_router.dart';
+import 'prefs_keys.dart';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const _channelId = 'daily_puzzle';
 const _channelName = 'Daily puzzle';
 const _reminderId = 1; // stable ID for the daily reminder slot
-
-// Prefs keys — must match settings_screen.dart
-const _reminderKey = 'halve:reminder';
-const _reminderHourKey = 'halve:reminder_hour';
-const _reminderAmpmKey = 'halve:reminder_ampm';
 
 // ─── Background local-notification tap handler (top-level — required) ─────────
 
@@ -180,10 +176,10 @@ class NotificationService {
   /// On app launch: reschedule the reminder if the user has one set. This keeps
   /// the schedule alive after an app update (which clears pending notifications).
   Future<void> rescheduleOnLaunch(SharedPreferences prefs) async {
-    final on = prefs.getBool(_reminderKey) ?? false;
+    final on = prefs.getBool(prefKeyReminder) ?? false;
     if (!on) return;
-    final hour = prefs.getInt(_reminderHourKey) ?? 8;
-    final ampm = prefs.getString(_reminderAmpmKey) ?? 'am';
+    final hour = prefs.getInt(prefKeyReminderHour) ?? 8;
+    final ampm = prefs.getString(prefKeyReminderAmpm) ?? 'am';
     await scheduleDaily(hour, ampm);
   }
 
