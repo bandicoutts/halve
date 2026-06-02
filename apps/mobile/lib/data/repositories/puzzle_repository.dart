@@ -32,12 +32,22 @@ class PuzzleRepository {
   /// Count of dated dailies published up to and including [date]. Used to
   /// derive the ordinal puzzle number shown in the board header.
   Future<int?> fetchPuzzleCount(String date) async {
-    final rows = await _client
+    return await _client
         .from('puzzles')
-        .select('id')
+        .count()
         .not('date', 'is', null)
         .lte('date', date);
-    return (rows as List).length;
+  }
+
+  /// Yesterday's puzzle difficulty, for the Archive card's "last [difficulty]"
+  /// label. Returns null when there is no row for [yesterday].
+  Future<Difficulty?> fetchYesterdayDifficulty(String yesterday) async {
+    final row = await _client
+        .from('puzzles')
+        .select('difficulty')
+        .eq('date', yesterday)
+        .maybeSingle();
+    return Difficulty.tryParse(row?['difficulty']);
   }
 
   /// All dated puzzles up to and including [today], ascending — the archive

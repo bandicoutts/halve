@@ -59,15 +59,15 @@ final winInfoProvider =
   int? dayNo;
   if (puzzleRepo != null) {
     try {
-      final archive = await puzzleRepo.fetchArchive(today); // ascending by date
       if (q.kind == PlayKind.daily) {
-        dayNo = archive.length;
+        dayNo = await puzzleRepo.fetchPuzzleCount(today);
       } else if (q.date != null) {
+        final archive = await puzzleRepo.fetchArchive(today);
         final idx = archive.indexWhere((d) => d.date == q.date);
         dayNo = idx >= 0 ? idx + 1 : null;
       }
     } catch (e, st) {
-      debugPrint('winInfoProvider archive fetch failed: $e\n$st');
+      debugPrint('winInfoProvider fetch failed: $e\n$st');
       dayNo = null;
     }
   }
