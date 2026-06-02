@@ -17,16 +17,15 @@ export interface UserStats {
   timeDist: number[];
 }
 
+const MS_PER_MIN = 60_000;
+const BUCKET_MINS = [2, 3, 4, 5, 6] as const;
+
 function computeTimeDist(durations: number[]): number[] {
-  const b = [0, 0, 0, 0, 0, 0];
+  const b = new Array<number>(BUCKET_MINS.length + 1).fill(0);
   for (const ms of durations) {
-    const m = ms / 60000;
-    if (m < 2) b[0]++;
-    else if (m < 3) b[1]++;
-    else if (m < 4) b[2]++;
-    else if (m < 5) b[3]++;
-    else if (m < 6) b[4]++;
-    else b[5]++;
+    const m = ms / MS_PER_MIN;
+    const i = BUCKET_MINS.findIndex((boundary) => m < boundary);
+    b[i === -1 ? BUCKET_MINS.length : i]++;
   }
   return b;
 }

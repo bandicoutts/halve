@@ -122,6 +122,10 @@ function ControlButton({
   );
 }
 
+const GRID_SIZE = 6;
+const GAP_RATIO = 0.16;
+const GRID_WIDTH_FACTOR = GRID_SIZE + (GRID_SIZE - 1) * GAP_RATIO; // 6 + 5*0.16 = 6.8
+
 // ─── BoardScreen ──────────────────────────────────────────────────────────────
 
 export interface BoardScreenProps {
@@ -256,8 +260,7 @@ export function BoardScreen({
     const el = boardWrapRef.current;
     if (!el) return;
     const obs = new ResizeObserver(([entry]) => {
-      // 6 cells + 5 gaps (gap ≈ 0.16×cellSize) → total ≈ 6.8×cellSize
-      setCellSize(Math.floor(entry.contentRect.width / 6.8));
+      setCellSize(Math.floor(entry.contentRect.width / GRID_WIDTH_FACTOR));
     });
     obs.observe(el);
     return () => obs.disconnect();

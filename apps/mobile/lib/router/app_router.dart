@@ -72,7 +72,7 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
         pageBuilder: (_, state) => _fade(
           state,
           WinScreen(
-            result: state.extra is PlayResult ? state.extra! as PlayResult : null,
+            result: state.extra is PlayResult ? state.extra as PlayResult : null,
           ),
         ),
       ),

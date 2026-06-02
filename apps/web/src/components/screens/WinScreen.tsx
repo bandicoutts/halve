@@ -78,7 +78,7 @@ function SolvedBoard({
     >
       {flat.map((s, i) => (
         <div
-          key={i}
+          key={`${Math.floor(i / gridSize)}-${i % gridSize}`}
           style={{
             width: cell,
             height: cell,

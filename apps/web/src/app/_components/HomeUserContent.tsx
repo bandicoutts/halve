@@ -69,7 +69,7 @@ function StreakBand({
       <div style={{ display: "flex", gap: 5 }}>
         {last7.map((on, i) => (
           <span
-            key={i}
+            key={`dot-${i}`}
             style={{
               width: 7,
               height: 7,
