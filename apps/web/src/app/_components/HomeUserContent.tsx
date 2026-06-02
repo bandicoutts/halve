@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { solveDay } from "@/lib/local-date";
-import { computeStreak, computeLastDays } from "@/lib/streak";
+import { computeStreak, computeLastDays, offsetDay } from "@/lib/streak";
 
 function FlameIcon() {
   return (
@@ -100,6 +100,7 @@ export async function HomeUserContent({ userId, today, solvedToday }: Props) {
       .from("solves")
       .select("solved_at, local_date")
       .eq("user_id", userId)
+      .gte("local_date", offsetDay(today, -60))
       .order("solved_at", { ascending: false });
 
     const rows = data ?? [];

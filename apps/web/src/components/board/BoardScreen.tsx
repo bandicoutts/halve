@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import type { Grid, Puzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { useTimer } from "@/hooks/useTimer";
-import { computeStreak } from "@/lib/streak";
+import { computeStreak, offsetDay } from "@/lib/streak";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { createClient } from "@/lib/supabase/client";
 import { recordSolve } from "@/app/actions/record-solve";
@@ -219,7 +219,8 @@ export function BoardScreen({
       const { data: solveDays } = await supabase
         .from("solves")
         .select("solved_at, local_date")
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .gte("local_date", offsetDay(today, -60));
       const days = [
         ...new Set(
           (solveDays ?? []).map(
