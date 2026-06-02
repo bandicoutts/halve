@@ -248,8 +248,7 @@ class _EmailStep extends StatelessWidget {
   }
 }
 
-/// Standalone widget so the focus-change state is isolated.
-class _EmailInput extends StatefulWidget {
+class _EmailInput extends StatelessWidget {
   const _EmailInput({
     required this.controller,
     required this.enabled,
@@ -261,61 +260,48 @@ class _EmailInput extends StatefulWidget {
   final VoidCallback onSubmit;
 
   @override
-  State<_EmailInput> createState() => _EmailInputState();
-}
-
-class _EmailInputState extends State<_EmailInput> {
-  bool _focused = false;
-
-  @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
 
-    return Focus(
-      onFocusChange: (f) => setState(() => _focused = f),
-      child: TextField(
-        controller: widget.controller,
-        enabled: widget.enabled,
-        keyboardType: TextInputType.emailAddress,
-        textInputAction: TextInputAction.done,
-        autocorrect: false,
-        enableSuggestions: false,
-        onSubmitted: (_) {
-          if (_isValidEmail(widget.controller.text)) widget.onSubmit();
-        },
-        style: AppTypography.body.copyWith(
-          color: c.fg1,
-          letterSpacing: -0.16,
+    return TextField(
+      controller: controller,
+      enabled: enabled,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.done,
+      autocorrect: false,
+      enableSuggestions: false,
+      onSubmitted: (_) {
+        if (_isValidEmail(controller.text)) onSubmit();
+      },
+      style: AppTypography.body.copyWith(
+        color: c.fg1,
+        letterSpacing: -0.16,
+      ),
+      decoration: InputDecoration(
+        hintText: 'you@example.com',
+        hintStyle: AppTypography.body.copyWith(color: c.fg3),
+        filled: true,
+        fillColor: c.surface,
+        // 15px vertical padding + ~24px line-height ≈ 54px total height.
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.s4,
+          vertical: 15,
         ),
-        decoration: InputDecoration(
-          hintText: 'you@example.com',
-          hintStyle: AppTypography.body.copyWith(color: c.fg3),
-          filled: true,
-          fillColor: c.surface,
-          // 15px vertical padding + ~24px line-height ≈ 54px total height.
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.s4,
-            vertical: 15,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: AppRadii.lgR,
-            borderSide: BorderSide(color: c.hairline2, width: 1.5),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: AppRadii.lgR,
-            borderSide: BorderSide(
-              color: _focused ? c.accent : c.hairline2,
-              width: 1.5,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: AppRadii.lgR,
-            borderSide: BorderSide(color: c.accent, width: 1.5),
-          ),
-          disabledBorder: OutlineInputBorder(
-            borderRadius: AppRadii.lgR,
-            borderSide: BorderSide(color: c.hairline2, width: 1.5),
-          ),
+        border: OutlineInputBorder(
+          borderRadius: AppRadii.lgR,
+          borderSide: BorderSide(color: c.hairline2, width: 1.5),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppRadii.lgR,
+          borderSide: BorderSide(color: c.hairline2, width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppRadii.lgR,
+          borderSide: BorderSide(color: c.accent, width: 1.5),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: AppRadii.lgR,
+          borderSide: BorderSide(color: c.hairline2, width: 1.5),
         ),
       ),
     );
