@@ -20,8 +20,9 @@ const _reminderId = 1; // stable ID for the daily reminder slot
 
 @pragma('vm:entry-point')
 void onBackgroundNotificationTap(NotificationResponse response) {
-  // Cannot navigate here (separate isolate). Navigation is handled when the
-  // app resumes and routeStream emits via the foreground tap handler.
+  // Called when the app was fully terminated and relaunched via a notification
+  // tap. Navigation is handled in initialize() via
+  // onDidReceiveNotificationResponse when the app starts.
 }
 
 // ─── Public helper — pure function, easy to unit-test ─────────────────────────
