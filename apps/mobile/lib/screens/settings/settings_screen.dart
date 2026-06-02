@@ -539,6 +539,63 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (mounted) context.go(Routes.home);
   }
 
+  Future<void> _confirmSignOut() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sign out?'),
+        content: const Text(
+            'You\'ll need to sign in again to sync your streak.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sign out'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await _signOut();
+  }
+
+  Future<void> _editDisplayName(String current) async {
+    final controller = TextEditingController(text: current);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Display name'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Your name'),
+          textCapitalization: TextCapitalization.words,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final newName = controller.text.trim();
+    if (newName.isEmpty) return;
+    final userId = ref.read(currentUserProvider)?.id;
+    if (userId == null) return;
+    try {
+      await ref.read(profileRepositoryProvider)?.updateDisplayName(userId, newName);
+      ref.invalidate(settingsDataProvider);
+    } catch (_) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsDataProvider);
@@ -572,7 +629,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 onReminderAmpmToggle: () =>
                     _setReminderAmpm(_reminderAmpm == 'am' ? 'pm' : 'am'),
                 onHapticsToggle: () => _setHaptics(!_haptics),
-                onSignOut: _signOut,
+                onSignOut: _confirmSignOut,
+                onEditDisplayName: _editDisplayName,
               ),
             ),
           ),
@@ -597,6 +655,7 @@ class _SettingsContent extends StatelessWidget {
     required this.onReminderAmpmToggle,
     required this.onHapticsToggle,
     required this.onSignOut,
+    required this.onEditDisplayName,
   });
 
   final SettingsData data;
@@ -610,6 +669,7 @@ class _SettingsContent extends StatelessWidget {
   final VoidCallback onReminderAmpmToggle;
   final VoidCallback onHapticsToggle;
   final VoidCallback onSignOut;
+  final void Function(String current) onEditDisplayName;
 
   @override
   Widget build(BuildContext context) {
@@ -683,15 +743,10 @@ class _SettingsContent extends StatelessWidget {
                     _SettingsRow(
                       leading: _AvatarInitial(data.accountLabel),
                       label: data.displayName ?? data.email ?? 'Account',
-                      sublabel: 'Streak synced',
-                      trailing: Container(
-                        width: 7,
-                        height: 7,
-                        decoration: BoxDecoration(
-                          color: c.correct,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
+                      sublabel: data.email ?? 'Streak synced',
+                      trailing: const _ChevronIcon(),
+                      onTap: () => onEditDisplayName(
+                          data.displayName ?? data.email ?? ''),
                     ),
                     _SettingsRow(
                       label: 'Sign out',
@@ -739,6 +794,14 @@ class _SettingsContent extends StatelessWidget {
                 trailing: const _ChevronIcon(),
                 onTap: () => launchUrl(
                   Uri.parse('https://halve.today/terms'),
+                  mode: LaunchMode.externalApplication,
+                ),
+              ),
+              _SettingsRow(
+                label: 'Help & feedback',
+                trailing: const _ChevronIcon(),
+                onTap: () => launchUrl(
+                  Uri.parse('mailto:support@halve.today'),
                   mode: LaunchMode.externalApplication,
                 ),
               ),

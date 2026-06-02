@@ -18,4 +18,11 @@ class ProfileRepository {
     final name = row?['display_name'] as String?;
     return (name != null && name.isNotEmpty) ? name : null;
   }
+
+  /// Upserts the `display_name` for [userId] in the `profiles` table.
+  Future<void> updateDisplayName(String userId, String name) async {
+    await _client
+        .from('profiles')
+        .upsert({'id': userId, 'display_name': name});
+  }
 }

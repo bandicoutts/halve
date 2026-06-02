@@ -24,7 +24,7 @@ Pass: 77 · Fail: 8 · Skip: 4
 | # | Priority | Issue | File(s) |
 |---|---|---|---|
 | ~~M-2~~ | ~~Medium~~ | ~~No date or puzzle number shown on play board header (daily or archive)~~ | Fixed — see below |
-| M-4 | Low | No help/feedback link in Settings ABOUT section | `settings_screen.dart` |
+| ~~M-4~~ | ~~Low~~ | ~~No help/feedback link in Settings ABOUT section~~ | Fixed — `settings_screen.dart` |
 | M-5 | Low | Android back gesture exits app immediately from Home — no "press back again to exit" toast | App root / `main.dart` or shell |
 
 ### New bugs found (re-run)
@@ -32,10 +32,10 @@ Pass: 77 · Fail: 8 · Skip: 4
 | # | Priority | Issue | File(s) |
 |---|---|---|---|
 | NEW-1 | Low | Auth screen is magic-link only — no "use password instead" toggle in production; debug-only dev sign-in is not a real fallback | `auth_screen.dart` |
-| NEW-2 | Low | Settings account row (email/display name) is read-only — no way to edit display name from within the app | `settings_screen.dart` |
+| ~~NEW-2~~ | ~~Low~~ | ~~Settings account row (email/display name) is read-only — no way to edit display name from within the app~~ | Fixed — `settings_screen.dart`, `profile_repository.dart` |
 | NEW-3 | Low | Notification permission never requested before showing the reminder toggle — first-time toggle may silently fail | `settings_screen.dart` |
 | NEW-4 | Low | Stats screen has no difficulty breakdown (Easy/Medium/Hard solve counts) | `stats_screen.dart` |
-| NEW-5 | Low | Sign-out happens immediately with no confirmation dialog — easy to trigger by accident | `settings_screen.dart` |
+| ~~NEW-5~~ | ~~Low~~ | ~~Sign-out happens immediately with no confirmation dialog — easy to trigger by accident~~ | Fixed — `settings_screen.dart` |
 
 ### Notes from re-run
 
@@ -64,5 +64,5 @@ Pass: 76 · Fail: 10 · Skip: 5 · Blocked: 22 (auth crash)
 | ~~M-1~~ | ~~High~~ | ~~Archive previous-month nav broken — `<` chevron always disabled~~ | Fixed `2bff3dc` |
 | ~~M-2~~ | ~~Medium~~ | ~~No date or puzzle number shown on play board header~~ | Fixed — `PlayLoad.puzzleNumber` + `formatShortDate` |
 | ~~M-3~~ | ~~Medium~~ | ~~Archive missing pull-to-refresh~~ | Fixed `2bff3dc` |
-| M-4 | Low | No help/feedback link in Settings ABOUT section | Settings screen |
+| ~~M-4~~ | ~~Low~~ | ~~No help/feedback link in Settings ABOUT section~~ | Fixed — `settings_screen.dart` |
 | M-5 | Low | Android back gesture exits app immediately from Home | App root / `main.dart` |
