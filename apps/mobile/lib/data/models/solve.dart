@@ -74,4 +74,17 @@ class RecordSolveResult {
 
   static const RecordSolveResult networkFailure =
       RecordSolveResult(ok: false, error: networkError);
+
+  Map<String, dynamic> toJson() => {
+        'ok': ok,
+        'alreadySolved': alreadySolved,
+        if (error != null) 'error': error,
+      };
+
+  factory RecordSolveResult.fromJson(Map<String, dynamic> j) =>
+      RecordSolveResult(
+        ok: j['ok'] as bool,
+        alreadySolved: (j['alreadySolved'] as bool?) ?? false,
+        error: j['error'] as String?,
+      );
 }

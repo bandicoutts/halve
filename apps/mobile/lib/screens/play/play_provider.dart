@@ -315,6 +315,39 @@ class PlayResult {
   /// (practice, or a guest). Lets the Win screen offer a retry on
   /// [RecordSolveResult.isNetworkError].
   final RecordSolveResult? saveResult;
+
+  Map<String, dynamic> toJson() => {
+        'kind': kind.name,
+        'difficulty': difficulty.name,
+        'durationMs': durationMs,
+        'formattedTime': formattedTime,
+        'usedHint': usedHint,
+        'solution': solution.map((r) => r.toList()).toList(),
+        'size': size,
+        'localDate': localDate,
+        if (puzzleId != null) 'puzzleId': puzzleId,
+        if (date != null) 'date': date,
+        if (saveResult != null) 'saveResult': saveResult!.toJson(),
+      };
+
+  factory PlayResult.fromJson(Map<String, dynamic> j) => PlayResult(
+        kind: PlayKind.values.byName(j['kind'] as String),
+        difficulty: Difficulty.values.byName(j['difficulty'] as String),
+        durationMs: j['durationMs'] as int,
+        formattedTime: j['formattedTime'] as String,
+        usedHint: j['usedHint'] as bool,
+        solution: (j['solution'] as List)
+            .map((r) => (r as List).map((v) => v as int).toList())
+            .toList(),
+        size: j['size'] as int,
+        localDate: j['localDate'] as String,
+        puzzleId: j['puzzleId'] as String?,
+        date: j['date'] as String?,
+        saveResult: j['saveResult'] == null
+            ? null
+            : RecordSolveResult.fromJson(
+                j['saveResult'] as Map<String, dynamic>),
+      );
 }
 
 /// `m:ss` from whole seconds (mirrors the web timer format).

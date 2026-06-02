@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -42,6 +44,7 @@ abstract final class Routes {
 GoRouter createAppRouter({String initialLocation = Routes.home}) {
   return GoRouter(
     initialLocation: initialLocation,
+    extraCodec: const _PlayResultCodec(),
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -72,7 +75,7 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
         pageBuilder: (_, state) => _fade(
           state,
           WinScreen(
-            result: state.extra is PlayResult ? state.extra as PlayResult : null,
+            result: state.extra as PlayResult?,
           ),
         ),
       ),
@@ -125,6 +128,39 @@ CustomTransitionPage<void> _fade(GoRouterState state, Widget child) {
       child: child,
     ),
   );
+}
+
+/// Serialises [PlayResult] through GoRouter's back-stack so Android process
+/// death doesn't lose the win keepsake. Wraps the payload in a type-tagged map
+/// so the decoder can distinguish it from any future extra types.
+class _PlayResultCodec extends Codec<Object?, Object?> {
+  const _PlayResultCodec();
+  @override
+  Converter<Object?, Object?> get encoder => const _PlayResultEncoder();
+  @override
+  Converter<Object?, Object?> get decoder => const _PlayResultDecoder();
+}
+
+class _PlayResultEncoder extends Converter<Object?, Object?> {
+  const _PlayResultEncoder();
+  @override
+  Object? convert(Object? input) {
+    if (input is PlayResult) {
+      return {'type': 'PlayResult', 'data': input.toJson()};
+    }
+    return input;
+  }
+}
+
+class _PlayResultDecoder extends Converter<Object?, Object?> {
+  const _PlayResultDecoder();
+  @override
+  Object? convert(Object? input) {
+    if (input is Map<String, dynamic> && input['type'] == 'PlayResult') {
+      return PlayResult.fromJson(input['data'] as Map<String, dynamic>);
+    }
+    return input;
+  }
 }
 
 /// The tab shell: hosts the active branch and the anchored bottom nav.
