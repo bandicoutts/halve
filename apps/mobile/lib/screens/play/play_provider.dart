@@ -48,6 +48,7 @@ class PlayLoad {
     required this.puzzleId,
     this.date,
     this.isOffline = false,
+    this.puzzleNumber,
   });
 
   final Puzzle puzzle;
@@ -65,6 +66,10 @@ class PlayLoad {
 
   /// True when the puzzle came from the offline cache rather than the network.
   final bool isOffline;
+
+  /// Ordinal position of this puzzle in the published archive (1-based).
+  /// Null for practice puzzles or when the count fetch failed.
+  final int? puzzleNumber;
 }
 
 /// Loads the puzzle for [PlayArgs]:
@@ -115,15 +120,26 @@ final playLoadProvider =
   if (repo == null) return cachedOrUnavailable();
 
   try {
-    final puzzle = await repo.fetchByDate(date);
+    // Fire puzzle + count concurrently — independent queries.
+    final puzzleFuture = repo.fetchByDate(date);
+    final countFuture = repo.fetchPuzzleCount(date);
+
+    final puzzle = await puzzleFuture;
     if (puzzle != null) {
       await cache.put(date, puzzle);
+      // Count is best-effort: a failure hides the puzzle number but doesn't
+      // block the board from loading.
+      int? puzzleNumber;
+      try {
+        puzzleNumber = await countFuture;
+      } catch (_) {}
       return PlayLoad(
         puzzle: puzzle,
         kind: kind,
         localDate: today,
         puzzleId: puzzle.id,
         date: args.date,
+        puzzleNumber: puzzleNumber,
       );
     }
   } catch (e, st) {

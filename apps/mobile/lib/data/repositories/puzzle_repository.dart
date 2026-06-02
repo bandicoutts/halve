@@ -29,6 +29,17 @@ class PuzzleRepository {
   /// A specific archive day's puzzle.
   Future<Puzzle?> fetchByDate(String date) => fetchDaily(date);
 
+  /// Count of dated dailies published up to and including [date]. Used to
+  /// derive the ordinal puzzle number shown in the board header.
+  Future<int?> fetchPuzzleCount(String date) async {
+    final rows = await _client
+        .from('puzzles')
+        .select('id')
+        .not('date', 'is', null)
+        .lte('date', date);
+    return (rows as List).length;
+  }
+
   /// All dated puzzles up to and including [today], ascending — the archive
   /// grid. Solved state is layered on separately (see [withSolves]).
   Future<List<ArchiveDay>> fetchArchive(String today) async {

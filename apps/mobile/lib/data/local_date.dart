@@ -38,6 +38,13 @@ String formatDateLabel(String date) {
   return '${_weekdays[dt.weekday - 1]}, ${_months[dt.month - 1]} ${dt.day}';
 }
 
+/// Short human label for a `yyyy-MM-dd` string, e.g. "June 2".
+String formatShortDate(String date) {
+  final dt = _parse(date);
+  if (dt == null) return date;
+  return '${_months[dt.month - 1]} ${dt.day}';
+}
+
 /// The best day string for a solve row: prefer the stored local date, falling
 /// back to the UTC date of `solved_at` for legacy null-`local_date` rows
 /// (BE-3). Mirrors the web `solveDay`.

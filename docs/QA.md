@@ -23,7 +23,7 @@ Pass: 77 · Fail: 8 · Skip: 4
 
 | # | Priority | Issue | File(s) |
 |---|---|---|---|
-| M-2 | Medium | No date or puzzle number shown on play board header (daily or archive) | Board screen / `PlayScreen` |
+| ~~M-2~~ | ~~Medium~~ | ~~No date or puzzle number shown on play board header (daily or archive)~~ | Fixed — see below |
 | M-4 | Low | No help/feedback link in Settings ABOUT section | `settings_screen.dart` |
 | M-5 | Low | Android back gesture exits app immediately from Home — no "press back again to exit" toast | App root / `main.dart` or shell |
 
@@ -62,7 +62,7 @@ Pass: 76 · Fail: 10 · Skip: 5 · Blocked: 22 (auth crash)
 | # | Priority | Issue | File(s) |
 |---|---|---|---|
 | ~~M-1~~ | ~~High~~ | ~~Archive previous-month nav broken — `<` chevron always disabled~~ | Fixed `2bff3dc` |
-| M-2 | Medium | No date or puzzle number shown on play board header | Board screen / `PlayScreen` |
+| ~~M-2~~ | ~~Medium~~ | ~~No date or puzzle number shown on play board header~~ | Fixed — `PlayLoad.puzzleNumber` + `formatShortDate` |
 | ~~M-3~~ | ~~Medium~~ | ~~Archive missing pull-to-refresh~~ | Fixed `2bff3dc` |
 | M-4 | Low | No help/feedback link in Settings ABOUT section | Settings screen |
 | M-5 | Low | Android back gesture exits app immediately from Home | App root / `main.dart` |

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/haptics_service.dart';
+import '../../data/local_date.dart';
 import '../../data/models/models.dart';
 import '../../engine/validator.dart' as validator;
 import '../../providers/providers.dart';
@@ -129,24 +130,40 @@ class _UnavailableView extends StatelessWidget {
 
 /// The shared, flat top bar for the Play surface: back chevron + a centered
 /// (iOS) / leading (Android) uppercase difficulty label, no trailing action.
+/// [puzzleInfo] is an optional subtitle rendered below (e.g. "#153 · June 2").
 class _PlayTopBar extends StatelessWidget {
-  const _PlayTopBar({required this.label});
+  const _PlayTopBar({required this.label, this.puzzleInfo});
 
   final String label;
+  final String? puzzleInfo;
 
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    return HalveTopBar(
-      onBack: () => context.canPop() ? context.pop() : context.go(Routes.home),
-      title: null,
-      trailing: Padding(
-        padding: const EdgeInsets.only(right: AppSpacing.s5),
-        child: Text(
-          label.toUpperCase(),
-          style: AppTypography.label.copyWith(color: c.fg3),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        HalveTopBar(
+          onBack: () => context.canPop() ? context.pop() : context.go(Routes.home),
+          title: null,
+          trailing: Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.s5),
+            child: Text(
+              label.toUpperCase(),
+              style: AppTypography.label.copyWith(color: c.fg3),
+            ),
+          ),
         ),
-      ),
+        if (puzzleInfo != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.s1),
+            child: Text(
+              puzzleInfo!,
+              style: AppTypography.small.copyWith(color: c.fg3),
+              textAlign: TextAlign.center,
+            ),
+          ),
+      ],
     );
   }
 }
@@ -165,6 +182,15 @@ class _PlayViewState extends ConsumerState<_PlayView> {
   bool _handledSolve = false;
 
   Puzzle get _puzzle => widget.load.puzzle;
+
+  /// "#153 · June 2" for daily/archive; null for practice.
+  String? _puzzleInfo(PlayLoad load) {
+    if (load.kind == PlayKind.practice) return null;
+    final date = load.date ?? load.localDate;
+    final dateStr = formatShortDate(date);
+    final num = load.puzzleNumber;
+    return num != null ? '#$num · $dateStr' : dateStr;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +216,10 @@ class _PlayViewState extends ConsumerState<_PlayView> {
 
     return Column(
       children: [
-        _PlayTopBar(label: _puzzle.difficulty.wire),
+        _PlayTopBar(
+          label: _puzzle.difficulty.wire,
+          puzzleInfo: _puzzleInfo(widget.load),
+        ),
         if (widget.load.isOffline)
           Padding(
             padding: const EdgeInsets.fromLTRB(
