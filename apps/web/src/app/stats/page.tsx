@@ -54,7 +54,7 @@ export default async function StatsPage() {
       const firstSolveDate = rows[0]?.solved_at
         ? new Date(rows[0].solved_at)
         : new Date(user.created_at);
-      const since = firstSolveDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      const since = firstSolveDate.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
 
       stats = {
         displayName: profile?.display_name ?? user.email?.split("@")[0] ?? "You",

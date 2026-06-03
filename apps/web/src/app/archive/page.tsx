@@ -74,9 +74,10 @@ export default async function ArchivePage() {
       const [y, m] = entry.date.split("-").map(Number);
       const key = `${y}-${m}`;
       if (!monthMap.has(key)) {
-        const label = new Date(y!, m! - 1, 1).toLocaleDateString("en-US", {
+        const label = new Date(Date.UTC(y!, m! - 1, 1)).toLocaleDateString("en-US", {
           month: "long",
           year: "numeric",
+          timeZone: "UTC",
         });
         monthMap.set(key, { label, year: y!, monthIdx: m! - 1, days: [] });
       }
