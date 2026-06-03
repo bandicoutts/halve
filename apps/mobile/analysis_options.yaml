@@ -7,6 +7,9 @@ include: package:flutter_lints/flutter.yaml
 # Riverpod lints run through the custom_lint plugin. After `flutter pub get`,
 # they surface in `flutter analyze` and `dart run custom_lint`.
 analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
   plugins:
     - custom_lint
   exclude:
@@ -27,3 +30,4 @@ linter:
     prefer_const_literals_to_create_immutables: true
     # Brand/code hygiene.
     avoid_print: true
+    avoid_dynamic_calls: true

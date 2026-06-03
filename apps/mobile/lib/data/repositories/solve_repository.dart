@@ -24,7 +24,7 @@ class SolveRepository {
     required String localDate,
   }) async {
     try {
-      final data = await _client.rpc(
+      final data = await _client.rpc<dynamic>(
         'record_solve',
         params: recordSolveParams(
           puzzleId: puzzleId,

@@ -88,7 +88,7 @@ class PuzzleRepository {
   /// parity; null rotates deterministically by UTC day. Returns null if the
   /// pool is empty (the caller shows the "practice unavailable" fallback).
   Future<Puzzle?> fetchPracticePuzzle(Difficulty difficulty, {int? seq}) async {
-    final result = await _client.rpc(
+    final result = await _client.rpc<dynamic>(
       'get_practice_puzzle',
       params: practicePuzzleParams(difficulty, seq: seq),
     );
