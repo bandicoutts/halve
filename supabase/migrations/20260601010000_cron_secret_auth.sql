@@ -1,5 +1,13 @@
 -- Harden the daily-puzzle cron call with a shared secret (SEC-2).
 --
+-- SUPERSEDED BY 20260602000000_cron_secret_vault.sql (SEC-8):
+-- The cron_secret value generated here was migrated to Supabase Vault and the
+-- plaintext row in internal_config was deleted. The token produced by this
+-- migration is RETIRED — it no longer exists in internal_config and is not
+-- used anywhere. This migration is preserved as-is for history; it is safe to
+-- leave in place (the insert is idempotent and the vault migration already
+-- cleaned up the plaintext row).
+--
 -- vault.secrets requires pgsodium internal roles that migrations cannot use.
 -- Instead a plain internal_config table stores the token: RLS enabled with
 -- no policies blocks PostgREST access (anon/authenticated cannot read it),

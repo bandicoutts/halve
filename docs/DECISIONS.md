@@ -4,6 +4,8 @@ Append-only. Newest first. One entry per decision: `date · decision · why`. Lo
 
 ---
 
+- **2026-06-03 · SEC-12: Annotated SEC-2 migration as retired / superseded.** `20260601010000_cron_secret_auth.sql` contains a `gen_random_uuid()` insert that produced the original cron token — now migrated to Vault and deleted from `internal_config` by SEC-8. The token no longer applies, but the migration comment did not say so. Added a "SUPERSEDED BY…RETIRED" header comment so the history is self-documenting if the repo ever goes public.
+
 - **2026-06-03 · SEC-11: Move hardcoded test email out of source in dev-login route.** `route.ts` had `TEST_EMAIL = "stayrightdemo@gmail.com"` as a source-code constant — a personal Gmail address visible in any future open-source release, exposing it to spam/phishing. Moved to `DEV_TEST_EMAIL` env variable (read alongside `DEV_LOGIN_SECRET`). Route returns 500 if unset (same behaviour as missing `DEV_LOGIN_SECRET`). Added to `.env.local.example` with the recommended `dev@halve.today` placeholder; `.env.local` retains the current address for continuity.
 
 - **2026-06-03 · DX-1: Extracted `computeNextIn` to `src/lib/puzzle-clock.ts`.** The function was defined identically (byte-for-byte) in both `BoardScreen.tsx` and `useRecordSolve.ts`. A future change to the 00:05 UTC daily publish time would silently diverge if only one copy was updated. Extracted to `src/lib/puzzle-clock.ts`; `BoardScreen`, `useRecordSolve`, and `HomeScreen` (which imported from `BoardScreen`) all import from the shared module.
