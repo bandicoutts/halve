@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // Engine is vendored (Deno can't resolve the pnpm `workspace:*` protocol).
 // Regenerate with ./scripts/sync-engine.sh after changing packages/engine.
-import { generateDaily } from "../_shared/engine/index.js";
+import { generateDaily, dailyPolicy } from "../_shared/engine/index.js";
 
 // Scheduled via Supabase cron (see migrations) — runs daily at 00:05 UTC.
 Deno.serve(async (req) => {
@@ -34,6 +34,7 @@ Deno.serve(async (req) => {
   // (shared with the CLI seeder and the /play fallback). generateDaily retries
   // on a fresh deterministic seed before giving up, so a transient generator
   // edge case doesn't leave the day without a puzzle.
+  const targetDifficulty = dailyPolicy(today).difficulty;
   let result;
   try {
     result = generateDaily(today);
@@ -61,6 +62,12 @@ Deno.serve(async (req) => {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
+  }
+
+  if (difficulty !== targetDifficulty) {
+    console.warn(
+      `[daily-puzzle] difficulty mismatch: target=${targetDifficulty} actual=${difficulty} date=${today}`
+    );
   }
 
   return new Response(JSON.stringify({ ok: true, date: today, difficulty }), {
