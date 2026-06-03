@@ -14,10 +14,7 @@ export default async function PlayPage() {
   const today = await getLocalToday();
 
   let puzzleId: string | undefined;
-  // Deterministic offline fallback: the SAME seed+difficulty policy every other
-  // producer uses (CLI seeder, edge function), so an offline player gets the
-  // canonical puzzle for the date — not a random one — even with no DB row (CQ-3).
-  let puzzle = generateDaily(today).puzzle;
+  let puzzle: ReturnType<typeof generateDaily>["puzzle"] | undefined;
 
   try {
     const supabase = await createClient();
@@ -42,8 +39,15 @@ export default async function PlayPage() {
       );
     }
   } catch (err) {
-    // DB unavailable — serve the deterministic fallback above.
+    // DB unavailable — serve the deterministic fallback below.
     console.error(`[daily-puzzle] DB unavailable serving ${today}:`, err);
+  }
+
+  if (!puzzle) {
+    // Deterministic offline fallback: the SAME seed+difficulty policy every other
+    // producer uses (CLI seeder, edge function), so an offline player gets the
+    // canonical puzzle for the date — not a random one — even with no DB row (CQ-3).
+    puzzle = generateDaily(today).puzzle;
   }
 
   return (
