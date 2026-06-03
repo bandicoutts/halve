@@ -17,6 +17,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return document.documentElement.classList.contains("dark") ? "dark" : "light";
   });
 
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e: MediaQueryListEvent) => {
+      if (localStorage.getItem(LS_KEY) !== null) return;
+      const next: Theme = e.matches ? "dark" : "light";
+      setTheme(next);
+      document.documentElement.classList.toggle("dark", next === "dark");
+    };
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   const toggle = useCallback(() => {
     setTheme((t) => {
       const next = t === "light" ? "dark" : "light";
