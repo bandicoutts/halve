@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:halve/data/models/models.dart';
 import 'package:halve/data/repositories/solve_repository.dart';
 import 'package:halve/providers/providers.dart';
+import 'package:halve/screens/play/play_board.dart';
 import 'package:halve/screens/play/play_provider.dart';
 import 'package:halve/screens/play/play_screen.dart';
 import 'package:halve/screens/win/win_screen.dart';
@@ -106,6 +110,33 @@ Future<GoRouter> pumpPlay(
   );
   await tester.pumpAndSettle();
   return router;
+}
+
+/// Like [pumpPlay] but does NOT inject a [playLoadProvider] override — callers
+/// supply their own via [overrides] to test loading/error/retry states.
+Future<void> pumpPlayRaw(
+  WidgetTester tester, {
+  required List<Override> overrides,
+}) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: overrides,
+      child: MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: MaterialApp.router(
+          theme: AppTheme.light(),
+          routerConfig: GoRouter(
+            initialLocation: '/play',
+            routes: [
+              GoRoute(path: '/play', builder: (_, _) => const PlayScreen()),
+              GoRoute(path: '/', builder: (_, _) => const SizedBox.shrink()),
+              GoRoute(path: '/tutorial', builder: (_, _) => const SizedBox.shrink()),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 void main() {
@@ -299,6 +330,73 @@ void main() {
           localDate: any(named: 'localDate'),
         ));
     expect(find.byType(WinScreen), findsOneWidget);
+  });
+
+  testWidgets('loading — spinner visible while the future is pending',
+      (tester) async {
+    final completer = Completer<PlayLoad>();
+
+    await pumpPlayRaw(tester, overrides: [
+      playLoadProvider.overrideWith((ref, args) => completer.future),
+      currentUserProvider.overrideWithValue(null),
+    ]);
+    await tester.pump(); // one frame — future still pending
+
+    // CircularProgressIndicator.adaptive() renders as CircularProgressIndicator
+    // on Android/Linux and CupertinoActivityIndicator on iOS/macOS.
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is CircularProgressIndicator || w is CupertinoActivityIndicator,
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Reload'), findsNothing);
+
+    completer.completeError(Exception('teardown'));
+  });
+
+  testWidgets('error — _UnavailableView shown when the load throws',
+      (tester) async {
+    await pumpPlayRaw(tester, overrides: [
+      playLoadProvider.overrideWith(
+        (ref, args) => Future<PlayLoad>.error(Exception('unavailable')),
+      ),
+      currentUserProvider.overrideWithValue(null),
+    ]);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Reload'), findsOneWidget);
+    expect(find.textContaining('unavailable'), findsOneWidget);
+    expect(find.byType(PlayBoard), findsNothing);
+  });
+
+  testWidgets(
+      'retry — tapping Reload invalidates the provider and re-loads the board',
+      (tester) async {
+    var attempt = 0;
+    // Pre-complete the completer so the retry future resolves immediately,
+    // landing straight in the data state without a loading-spinner frame that
+    // would cause pumpAndSettle to spin indefinitely.
+    final completer = Completer<PlayLoad>()..complete(dailyLoad(puzzle()));
+
+    await pumpPlayRaw(tester, overrides: [
+      playLoadProvider.overrideWith((ref, args) {
+        if (attempt++ == 0) return Future<PlayLoad>.error(Exception('unavailable'));
+        return completer.future;
+      }),
+      currentUserProvider.overrideWithValue(null),
+    ]);
+    await tester.pumpAndSettle(); // settle into error state
+
+    expect(find.text('Reload'), findsOneWidget);
+    expect(find.byType(PlayBoard), findsNothing);
+
+    await tester.tap(find.text('Reload'));
+    await tester.pumpAndSettle();
+
+    // Provider was re-invoked and resolved: board is visible, error view is gone.
+    expect(find.text('Reload'), findsNothing);
+    expect(find.byType(PlayBoard), findsOneWidget);
   });
 
   testWidgets('timer starts on first interaction and counts up', (tester) async {
