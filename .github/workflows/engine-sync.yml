@@ -3,6 +3,12 @@ name: engine-sync
 # Detects drift between packages/engine/dist/ and the vendored copy in
 # supabase/functions/_shared/engine/. Fails if they differ, reminding the
 # author to run ./scripts/sync-engine.sh and commit the result.
+#
+# REQUIRED STATUS CHECK: this workflow must be listed as a required status
+# check in Settings → Branches → main branch protection for any PR touching
+# packages/engine/**. Without enforcement, engine/vendor drift can merge
+# undetected, causing the daily-puzzle edge function to run different logic
+# than the web app.
 
 on:
   push:
