@@ -25,6 +25,8 @@ function SignOutIcon() {
   );
 }
 
+const MENU_ITEM_CLASS = "account-menu-item";
+
 const itemStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
@@ -45,15 +47,6 @@ const itemStyle: React.CSSProperties = {
   transition: "background .12s, color .12s",
 };
 
-function hoverOn(e: React.MouseEvent<HTMLElement> | React.FocusEvent<HTMLElement>) {
-  e.currentTarget.style.background = "var(--bg-sunken)";
-  e.currentTarget.style.color = "var(--fg-1)";
-}
-function hoverOff(e: React.MouseEvent<HTMLElement> | React.FocusEvent<HTMLElement>) {
-  e.currentTarget.style.background = "none";
-  e.currentTarget.style.color = "var(--fg-2)";
-}
-
 /**
  * Account affordance for the TopBar: a monogram avatar that opens a small
  * popover menu (name header → Statistics · Sign out). One pattern that works
@@ -63,6 +56,7 @@ function hoverOff(e: React.MouseEvent<HTMLElement> | React.FocusEvent<HTMLElemen
 export function AccountMenu({ displayName }: { displayName: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [triggerHovered, setTriggerHovered] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -127,6 +121,7 @@ export function AccountMenu({ displayName }: { displayName: string }) {
 
   return (
     <div ref={rootRef} style={{ position: "relative", display: "inline-flex" }}>
+      <style>{`.${MENU_ITEM_CLASS}:hover,.${MENU_ITEM_CLASS}:focus{background:var(--bg-sunken)!important;color:var(--fg-1)!important}`}</style>
       <button
         ref={triggerRef}
         type="button"
@@ -134,6 +129,8 @@ export function AccountMenu({ displayName }: { displayName: string }) {
         aria-expanded={open}
         aria-label="Your account"
         onClick={() => setOpen((v) => !v)}
+        onMouseEnter={() => setTriggerHovered(true)}
+        onMouseLeave={() => setTriggerHovered(false)}
         style={{
           display: "inline-flex",
           alignItems: "center",
@@ -144,10 +141,8 @@ export function AccountMenu({ displayName }: { displayName: string }) {
           borderRadius: "var(--radius-full)",
           cursor: "pointer",
           transition: "box-shadow .15s",
-          boxShadow: open ? "0 0 0 2px var(--accent-tint)" : "none",
+          boxShadow: open || triggerHovered ? "0 0 0 2px var(--accent-tint)" : "none",
         }}
-        onMouseEnter={(e) => { if (!open) e.currentTarget.style.boxShadow = "0 0 0 2px var(--accent-tint)"; }}
-        onMouseLeave={(e) => { if (!open) e.currentTarget.style.boxShadow = "none"; }}
       >
         <Monogram name={name} size={32} />
       </button>
@@ -188,12 +183,9 @@ export function AccountMenu({ displayName }: { displayName: string }) {
           <Link
             href="/stats"
             role="menuitem"
+            className={MENU_ITEM_CLASS}
             onClick={() => setOpen(false)}
             style={itemStyle}
-            onMouseEnter={hoverOn}
-            onMouseLeave={hoverOff}
-            onFocus={hoverOn}
-            onBlur={hoverOff}
           >
             <StatsIcon />
             Statistics
@@ -202,12 +194,9 @@ export function AccountMenu({ displayName }: { displayName: string }) {
           <button
             type="button"
             role="menuitem"
+            className={MENU_ITEM_CLASS}
             onClick={handleSignOut}
             style={itemStyle}
-            onMouseEnter={hoverOn}
-            onMouseLeave={hoverOff}
-            onFocus={hoverOn}
-            onBlur={hoverOff}
           >
             <SignOutIcon />
             Sign out
