@@ -1,0 +1,67 @@
+name: validator-parity
+
+# Asserts that the Dart validator (apps/mobile/lib/engine/validator.dart)
+# produces identical findViolations output as the TypeScript engine for a
+# suite of known test cases. Catches divergence when engine rules change.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/engine/src/validators.ts"
+      - "packages/engine/test-fixtures/**"
+      - "apps/mobile/lib/engine/validator.dart"
+      - "scripts/gen-validator-fixtures.ts"
+      - ".github/workflows/validator-parity.yml"
+  pull_request:
+    paths:
+      - "packages/engine/src/validators.ts"
+      - "packages/engine/test-fixtures/**"
+      - "apps/mobile/lib/engine/validator.dart"
+      - "scripts/gen-validator-fixtures.ts"
+      - ".github/workflows/validator-parity.yml"
+
+jobs:
+  validator-parity:
+    name: TS engine ↔ Dart validator parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install JS dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Regenerate fixtures from TS engine
+        run: pnpm tsx --tsconfig scripts/tsconfig.json scripts/gen-validator-fixtures.ts
+
+      - name: Assert fixtures are up-to-date
+        run: |
+          if ! git diff --exit-code packages/engine/test-fixtures/; then
+            echo ""
+            echo "ERROR: packages/engine/test-fixtures/validator.json is out of sync."
+            echo "Run: pnpm tsx --tsconfig scripts/tsconfig.json scripts/gen-validator-fixtures.ts"
+            echo "Then commit the updated fixtures."
+            exit 1
+          fi
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+          channel: stable
+
+      - name: Flutter dependencies
+        run: flutter pub get
+        working-directory: apps/mobile
+
+      - name: Run Dart parity test
+        run: flutter test test/engine/validator_parity_test.dart
+        working-directory: apps/mobile

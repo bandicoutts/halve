@@ -1,0 +1,941 @@
+[
+  {
+    "description": "empty grid",
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [],
+    "violations": []
+  },
+  {
+    "description": "horizontal triple (row 0)",
+    "grid": [
+      [
+        0,
+        0,
+        0,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [],
+    "violations": [
+      "0-0",
+      "0-1",
+      "0-2"
+    ]
+  },
+  {
+    "description": "vertical triple (col 1)",
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        1,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        1,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        1,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [],
+    "violations": [
+      "3-1",
+      "4-1",
+      "5-1"
+    ]
+  },
+  {
+    "description": "row balance violation (row 2, four A)",
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [],
+    "violations": [
+      "2-0",
+      "2-1",
+      "2-2",
+      "2-3"
+    ]
+  },
+  {
+    "description": "column balance violation (col 4, four B)",
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        null,
+        1,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        1,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        1,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        1,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [],
+    "violations": [
+      "0-4",
+      "1-4",
+      "2-4",
+      "3-4"
+    ]
+  },
+  {
+    "description": "eq edge violated",
+    "grid": [
+      [
+        0,
+        1,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [
+      {
+        "orientation": "h",
+        "r": 0,
+        "c": 0,
+        "kind": "eq"
+      }
+    ],
+    "violations": [
+      "0-0",
+      "0-1"
+    ]
+  },
+  {
+    "description": "ne edge violated",
+    "grid": [
+      [
+        null,
+        null,
+        0,
+        0,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [
+      {
+        "orientation": "h",
+        "r": 0,
+        "c": 2,
+        "kind": "ne"
+      }
+    ],
+    "violations": [
+      "0-2",
+      "0-3"
+    ]
+  },
+  {
+    "description": "eq edge satisfied",
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        1,
+        1,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [
+      {
+        "orientation": "h",
+        "r": 1,
+        "c": 0,
+        "kind": "eq"
+      }
+    ],
+    "violations": []
+  },
+  {
+    "description": "vertical eq edge violated",
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        0,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        1,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [
+      {
+        "orientation": "v",
+        "r": 2,
+        "c": 3,
+        "kind": "eq"
+      }
+    ],
+    "violations": [
+      "2-3",
+      "3-3"
+    ]
+  },
+  {
+    "description": "eq edge with one cell empty (no violation)",
+    "grid": [
+      [
+        0,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [
+      {
+        "orientation": "h",
+        "r": 0,
+        "c": 0,
+        "kind": "eq"
+      }
+    ],
+    "violations": []
+  },
+  {
+    "description": "horizontal triple + eq edge violation",
+    "grid": [
+      [
+        0,
+        0,
+        0,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        0,
+        1,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [
+      {
+        "orientation": "h",
+        "r": 4,
+        "c": 2,
+        "kind": "eq"
+      }
+    ],
+    "violations": [
+      "0-0",
+      "0-1",
+      "0-2",
+      "4-2",
+      "4-3"
+    ]
+  },
+  {
+    "description": "valid partial grid (no violations)",
+    "grid": [
+      [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [],
+    "violations": []
+  },
+  {
+    "description": "row + column balance violation",
+    "grid": [
+      [
+        0,
+        0,
+        0,
+        0,
+        null,
+        null
+      ],
+      [
+        1,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        1,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        1,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        1,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [],
+    "violations": [
+      "0-0",
+      "0-1",
+      "0-2",
+      "0-3",
+      "1-0",
+      "2-0",
+      "3-0",
+      "4-0"
+    ]
+  },
+  {
+    "description": "ne edge satisfied (no violation)",
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        0,
+        1
+      ]
+    ],
+    "edges": [
+      {
+        "orientation": "h",
+        "r": 5,
+        "c": 4,
+        "kind": "ne"
+      }
+    ],
+    "violations": []
+  },
+  {
+    "description": "multiple edges mixed validity",
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        0,
+        1,
+        1,
+        0,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "edges": [
+      {
+        "orientation": "h",
+        "r": 1,
+        "c": 0,
+        "kind": "eq"
+      },
+      {
+        "orientation": "h",
+        "r": 1,
+        "c": 1,
+        "kind": "ne"
+      },
+      {
+        "orientation": "h",
+        "r": 1,
+        "c": 2,
+        "kind": "ne"
+      }
+    ],
+    "violations": [
+      "1-0",
+      "1-1",
+      "1-2"
+    ]
+  }
+]
