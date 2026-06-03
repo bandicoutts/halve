@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { AccountMenu } from "@/components/ui/AccountMenu";
 import { formatDuration } from "@/lib/format";
-import { computeNextIn } from "@/components/board/BoardScreen";
+import { computeNextIn } from "@/lib/puzzle-clock";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 

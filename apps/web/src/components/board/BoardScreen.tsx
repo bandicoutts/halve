@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { WinScreen } from "@/components/screens/WinScreen";
 import Link from "next/link";
+import { computeNextIn } from "@/lib/puzzle-clock";
 
 // Visually hidden but available to screen readers (for aria-live regions).
 const srOnly: React.CSSProperties = {
@@ -28,19 +29,6 @@ const srOnly: React.CSSProperties = {
   whiteSpace: "nowrap",
   border: 0,
 };
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-export function computeNextIn(): string {
-  const now = new Date();
-  const tomorrowUtc = new Date(Date.UTC(
-    now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 5, 0
-  ));
-  const diffMs = tomorrowUtc.getTime() - now.getTime();
-  const h = Math.floor(diffMs / 3600000);
-  const m = Math.floor((diffMs % 3600000) / 60000);
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
-}
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 

@@ -4,6 +4,8 @@ Append-only. Newest first. One entry per decision: `date · decision · why`. Lo
 
 ---
 
+- **2026-06-03 · DX-1: Extracted `computeNextIn` to `src/lib/puzzle-clock.ts`.** The function was defined identically (byte-for-byte) in both `BoardScreen.tsx` and `useRecordSolve.ts`. A future change to the 00:05 UTC daily publish time would silently diverge if only one copy was updated. Extracted to `src/lib/puzzle-clock.ts`; `BoardScreen`, `useRecordSolve`, and `HomeScreen` (which imported from `BoardScreen`) all import from the shared module.
+
 - **2026-06-03 · SEC-10: Mobile auth flow changed from conditional implicit→PKCE to unconditional PKCE.** `supabase_client.dart` previously used `AuthFlowType.implicit` in debug builds to work around emulator deep-link handling. Implicit flow transmits the access token in the URL fragment — it leaks via Referer headers, WebView history, and server logs, and is deprecated per the OAuth 2.0 Security BCP. `supabase_flutter` supports PKCE on emulators via the `halve://auth-callback` custom URL scheme already configured; the debug carve-out was unnecessary. Fix: removed the `kDebugMode` conditional and use `AuthFlowType.pkce` unconditionally.
 
 - **2026-06-03 · SEC-9: Added `env.json.example` for mobile credentials template.** `apps/mobile/env.json` was never committed (`.gitignore` already blocked it, confirmed by empty `git log --all -- apps/mobile/env.json`), but no placeholder example existed to guide local setup. Added `env.json.example` with non-secret placeholder values. The real `env.json` should never be committed — it contains Supabase credentials and a dev account password that would be exposed if the repo goes public.
