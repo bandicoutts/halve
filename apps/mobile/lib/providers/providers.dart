@@ -6,7 +6,7 @@ import '../data/notification_service.dart';
 import '../data/puzzle_cache.dart';
 import '../data/repositories/repositories.dart';
 import '../data/supabase_client.dart';
-export '../data/theme_store.dart' show themeModeProvider, ThemeModeNotifier, themeModeKey, sharedPreferencesProvider;
+export '../data/theme_store.dart' show themeModeProvider, ThemeModeNotifier, sharedPreferencesProvider;
 
 /// The active Supabase client. Reading this in guest mode (no build-time creds)
 /// throws — callers gate UI on [isSignedInProvider] / [authStateProvider],

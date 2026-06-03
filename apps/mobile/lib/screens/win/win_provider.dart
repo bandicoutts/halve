@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/local_date.dart';
+import '../../data/prefs_keys.dart';
 import '../../data/streak.dart';
 import '../../providers/providers.dart';
 import '../play/play_provider.dart';
@@ -94,10 +95,6 @@ abstract interface class StreakNudgePrefs {
   Future<void> setDismissed();
 }
 
-/// The `shared_preferences` key for the dismissed flag (parity with the web
-/// `localStorage` key in `app/HANDOFF.md`).
-const streakNudgeDismissedKey = 'halve:streak-nudge-dismissed';
-
 class SharedPrefsStreakNudge implements StreakNudgePrefs {
   const SharedPrefsStreakNudge(this._prefs);
 
@@ -105,13 +102,13 @@ class SharedPrefsStreakNudge implements StreakNudgePrefs {
 
   @override
   Future<bool> isDismissed() async {
-    return _prefs?.getBool(streakNudgeDismissedKey) ?? false;
+    return _prefs?.getBool(prefKeyStreakNudgeDismissed) ?? false;
   }
 
   @override
   Future<void> setDismissed() async {
     // No persistence available — the nudge simply reappears next session.
-    await _prefs?.setBool(streakNudgeDismissedKey, true);
+    await _prefs?.setBool(prefKeyStreakNudgeDismissed, true);
   }
 }
 

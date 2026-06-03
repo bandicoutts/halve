@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const themeModeKey = 'halve:theme';
+import 'prefs_keys.dart';
 
 /// Provides the [SharedPreferences] instance used by [ThemeModeNotifier].
 /// Defaults to null (in-memory / no persistence). `main.dart` overrides this
@@ -16,7 +16,7 @@ final sharedPreferencesProvider = Provider<SharedPreferences?>((ref) => null);
 class ThemeModeNotifier extends Notifier<ThemeMode> {
   static ThemeMode _load(SharedPreferences? prefs) {
     if (prefs == null) return ThemeMode.system;
-    return switch (prefs.getString(themeModeKey) ?? 'system') {
+    return switch (prefs.getString(prefKeyThemeMode) ?? 'system') {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
       _ => ThemeMode.system,
@@ -33,7 +33,7 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
       ThemeMode.dark => 'dark',
       _ => 'system',
     };
-    await ref.read(sharedPreferencesProvider)?.setString(themeModeKey, raw);
+    await ref.read(sharedPreferencesProvider)?.setString(prefKeyThemeMode, raw);
   }
 }
 

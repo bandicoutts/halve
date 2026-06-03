@@ -1,14 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'prefs_keys.dart';
+
 /// First-run gate state — whether this device has completed (or skipped) the
 /// onboarding tutorial. Persisted to `shared_preferences`; read once at cold
 /// start to decide whether to land on `/firstrun` or Home. Behind a provider
 /// so tests inject a fake.
-
-/// The `shared_preferences` flag key (the `halve:` namespace mirrors the web
-/// `localStorage` keys in `app/HANDOFF.md`).
-const onboardedKey = 'halve:onboarded';
 
 abstract interface class OnboardingStore {
   Future<bool> isOnboarded();
@@ -24,7 +22,7 @@ class SharedPrefsOnboarding implements OnboardingStore {
   Future<bool> isOnboarded() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      return prefs.getBool(onboardedKey) ?? false;
+      return prefs.getBool(prefKeyOnboarded) ?? false;
     } catch (_) {
       return false;
     }
@@ -34,7 +32,7 @@ class SharedPrefsOnboarding implements OnboardingStore {
   Future<void> setOnboarded() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(onboardedKey, true);
+      await prefs.setBool(prefKeyOnboarded, true);
     } catch (_) {
       // No persistence available — first-run simply shows again next launch.
     }

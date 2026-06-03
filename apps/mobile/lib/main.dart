@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/haptics_service.dart';
 import 'data/onboarding.dart';
+import 'data/prefs_keys.dart';
 import 'data/puzzle_cache.dart';
 import 'data/supabase_client.dart';
 import 'providers/providers.dart';
@@ -41,7 +42,7 @@ Future<void> main() async {
     overrides.add(
       sharedPreferencesProvider.overrideWithValue(prefs),
     );
-    onboarded = prefs.getBool(onboardedKey) ?? false;
+    onboarded = prefs.getBool(prefKeyOnboarded) ?? false;
     HapticsService.instance.configure(prefs.getBool(prefKeyHaptics) ?? true);
   } catch (e) {
     debugPrint('SharedPreferences unavailable — using in-memory cache: $e');
