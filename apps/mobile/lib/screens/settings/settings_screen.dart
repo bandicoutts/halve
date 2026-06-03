@@ -458,7 +458,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _reminderAmpm = prefs.getString(prefKeyReminderAmpm) ?? 'am';
         _haptics = prefs.getBool(prefKeyHaptics) ?? true;
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('_loadLocalPrefs failed: $e');
+    }
   }
 
   Future<void> _setReminder(bool on) async {
