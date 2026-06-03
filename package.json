@@ -2,7 +2,7 @@
   "name": "parity",
   "version": "0.0.0",
   "private": true,
-  "description": "Premium daily binary-logic puzzle app (fire & water).",
+  "description": "Halve — premium daily 6×6 binary Latin-square puzzle (solid circle & ring).",
   "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=20"
