@@ -17,41 +17,6 @@ import '../../theme/breakpoints.dart';
 import '../../widgets/widgets.dart';
 import 'stats_provider.dart';
 
-// ─── Monogram avatar ─────────────────────────────────────────────────────────
-
-class _Monogram extends StatelessWidget {
-  // ignore: unused_element_parameter
-  const _Monogram({required this.name, this.size = 48});
-
-  final String name;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.halveColors;
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: c.accentTint,
-        shape: BoxShape.circle,
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        initial,
-        style: AppTypography.tabular(
-          AppTypography.h2.copyWith(
-            color: c.accent,
-            fontSize: size * 0.44,
-            fontWeight: FontWeight.w600,
-            height: 1,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ─── Eyebrow label ───────────────────────────────────────────────────────────
 
@@ -590,7 +555,7 @@ class _StatsRecord extends ConsumerWidget {
         // Identity row
         Row(
           children: [
-            _Monogram(name: name),
+            HalveMonogram(name: name),
             const SizedBox(width: AppSpacing.s4),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -730,7 +695,7 @@ class _StatsGuest extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const _Monogram(name: 'D'),
+                            const HalveMonogram(name: 'D'),
                             const SizedBox(width: AppSpacing.s4),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

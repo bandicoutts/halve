@@ -161,35 +161,6 @@ class _ChevronPainter extends CustomPainter {
       old.color != color || old.direction != direction;
 }
 
-/// Account avatar — accent-tint circle with the first letter of [name].
-class _AvatarInitial extends StatelessWidget {
-  const _AvatarInitial(this.name);
-
-  final String name;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.halveColors;
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: c.accentTint,
-        shape: BoxShape.circle,
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        initial,
-        style: AppTypography.small.copyWith(
-          color: c.accent,
-          fontWeight: FontWeight.w600,
-          height: 1,
-        ),
-      ),
-    );
-  }
-}
 
 // ─── Section / row components ─────────────────────────────────────────────────
 
@@ -750,7 +721,7 @@ class _SettingsContent extends StatelessWidget {
             children: data.isSignedIn
                 ? [
                     _SettingsRow(
-                      leading: _AvatarInitial(data.accountLabel),
+                      leading: HalveMonogram(name: data.accountLabel, size: 36),
                       label: data.displayName ?? data.email ?? 'Account',
                       sublabel: data.email ?? 'Streak synced',
                       trailing: const _ChevronIcon(),
