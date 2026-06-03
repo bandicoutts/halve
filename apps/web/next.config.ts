@@ -24,6 +24,7 @@ const cspReportOnly = [
   "font-src 'self' data:",
   `connect-src 'self' ${SUPABASE} wss://*.supabase.co`,
   "form-action 'self'",
+  "report-uri /api/csp-report",
 ].join("; ");
 
 const securityHeaders = [
