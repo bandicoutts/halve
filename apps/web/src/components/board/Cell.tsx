@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import type { Cell as CellValue } from "@parity/engine";
 import { Fire } from "@/components/symbols/Fire";
 import { Water } from "@/components/symbols/Water";
@@ -29,6 +30,7 @@ export function Cell({
   size,
   onClick,
 }: CellProps) {
+  const [pressed, setPressed] = useState(false);
   const filled = value !== null;
 
   // e.g. "Row 2, column 3, solid, given" — position + symbol + given/error context.
@@ -78,6 +80,7 @@ export function Cell({
         justifyContent: "center",
         padding: 0,
         cursor,
+        transform: pressed ? "scale(0.94)" : "scale(1)",
         transition: "transform 0.12s, background 0.16s, box-shadow 0.16s",
       }}
       onMouseEnter={(e) => {
@@ -85,18 +88,19 @@ export function Cell({
       }}
       onMouseLeave={(e) => {
         if (!isGiven && !filled) e.currentTarget.style.background = "var(--surface-raised)";
+        setPressed(false);
       }}
-      onMouseDown={(e) => {
-        if (!isGiven) e.currentTarget.style.transform = "scale(0.94)";
+      onMouseDown={() => {
+        if (!isGiven) setPressed(true);
       }}
-      onMouseUp={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
+      onMouseUp={() => {
+        setPressed(false);
       }}
-      onTouchStart={(e) => {
-        if (!isGiven) e.currentTarget.style.transform = "scale(0.94)";
+      onTouchStart={() => {
+        if (!isGiven) setPressed(true);
       }}
-      onTouchEnd={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
+      onTouchEnd={() => {
+        setPressed(false);
       }}
     >
       {value !== null && (
