@@ -140,7 +140,7 @@ export function generatePuzzle(opts: GenerateOptions = {}): Puzzle {
       best = cand;
     }
   }
-  return best!;
+  return best!; // safe: the loop runs at least once (attempts >= 1), so best is always set.
 }
 
 export { classify, measure };
