@@ -311,6 +311,9 @@ class _StepBody extends StatelessWidget {
   }
 }
 
+const _kSolveStep = 4;
+const _kLastLessonStep = 3;
+
 /// The footer changes per step: a primary button for the lesson steps, a status
 /// line for the guided solve.
 class _StepFooter extends StatelessWidget {
@@ -328,9 +331,9 @@ class _StepFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (step < 4) {
+    if (step < _kSolveStep) {
       return HalveButton(
-        label: step == 3 ? 'Got it' : 'Next',
+        label: step == _kLastLessonStep ? 'Got it' : 'Next',
         full: true,
         onPressed: onNext,
       );

@@ -54,8 +54,7 @@ class HalveBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final platform = Theme.of(context).platform;
-    final isAndroid = platform == TargetPlatform.android ||
-        platform == TargetPlatform.fuchsia;
+    final isAndroid = platform == TargetPlatform.android;
     return isAndroid ? _AndroidNavBar(this) : _IOSNavBar(this);
   }
 }

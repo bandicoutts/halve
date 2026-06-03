@@ -152,7 +152,7 @@ class _DifficultyCardState extends State<_DifficultyCard> {
                     duration: const Duration(milliseconds: 120),
                     style: AppTypography.body.copyWith(
                       fontWeight: FontWeight.w600,
-                      letterSpacing: -0.01 * 17,
+                      letterSpacing: -0.17,
                       color: selected ? c.accent : c.fg1,
                     ),
                     child: Text(widget.difficulty.label),

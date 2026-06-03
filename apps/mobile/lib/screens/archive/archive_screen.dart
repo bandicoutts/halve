@@ -532,7 +532,7 @@ class _MonthPicker extends StatelessWidget {
         final (solved, total) = data.monthStats(ym);
         final isSel = ym == selected;
         return GestureDetector(
-          onTap: () => Navigator.of(context).pop(ym),
+          onTap: () => context.pop(ym),
           behavior: HitTestBehavior.opaque,
           child: Container(
             constraints: const BoxConstraints(minHeight: 52),

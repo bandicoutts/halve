@@ -17,6 +17,7 @@ class HalveTopBar extends StatelessWidget {
     this.onBack,
     this.trailing,
     this.leading,
+    this.platform,
   });
 
   final String? title;
@@ -28,10 +29,14 @@ class HalveTopBar extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
 
+  /// Overrides the host platform; useful in widget tests.
+  final TargetPlatform? platform;
+
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    final isAndroid =
+        (platform ?? Theme.of(context).platform) == TargetPlatform.android;
 
     final lead = leading ??
         (onBack != null

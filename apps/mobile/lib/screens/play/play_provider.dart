@@ -120,7 +120,6 @@ final playLoadProvider =
   if (repo == null) return cachedOrUnavailable();
 
   try {
-    // Fire puzzle + count concurrently — independent queries.
     final puzzleFuture = repo.fetchByDate(date);
     final countFuture = repo.fetchPuzzleCount(date);
 

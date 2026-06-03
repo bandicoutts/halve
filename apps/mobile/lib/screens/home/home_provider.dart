@@ -86,7 +86,6 @@ final homeDataProvider = FutureProvider.autoDispose<HomeData>((ref) async {
   }
 
   try {
-    // Fire all four calls concurrently — they are independent.
     final puzzleFuture = puzzleRepo.fetchDaily(today);
     final countFuture = puzzleRepo.fetchPuzzleCount(today);
     final yesterdayFuture =

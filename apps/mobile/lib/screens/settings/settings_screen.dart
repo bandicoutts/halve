@@ -256,7 +256,7 @@ class _SettingsRowState extends State<_SettingsRow> {
     return GestureDetector(
       onTapDown:
           widget.onTap != null ? (_) => setState(() => _pressed = true) : null,
-      onTapUp: (_) => setState(() => _pressed = false),
+      onTapUp: widget.onTap != null ? (_) => setState(() => _pressed = false) : null,
       onTapCancel: () => setState(() => _pressed = false),
       onTap: widget.onTap,
       child: AnimatedContainer(
