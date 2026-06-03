@@ -10,6 +10,7 @@ vi.mock("next/headers", () => ({ cookies: vi.fn() }));
 let mockUser: { id: string } | null = { id: "user-1" };
 let mockPuzzleData: unknown = null;
 let mockInsertError: { code?: string; message: string } | null = null;
+let insertCallCount = 0;
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
@@ -26,8 +27,15 @@ vi.mock("@/lib/supabase/server", () => ({
           }),
         };
       }
-      // "solves"
-      return { insert: async () => ({ error: mockInsertError }) };
+      // "solves" — tracks call count so duplicate-submission tests can simulate
+      // the 23505 unique-constraint on the second identical insert.
+      return {
+        insert: async () => {
+          insertCallCount++;
+          if (insertCallCount > 1) return { error: { code: "23505", message: "duplicate key" } };
+          return { error: mockInsertError };
+        },
+      };
     },
   }),
 }));
@@ -65,6 +73,7 @@ beforeEach(() => {
   mockUser = { id: "user-1" };
   mockPuzzleData = VALID_PUZZLE;
   mockInsertError = null;
+  insertCallCount = 0;
 });
 
 describe("recordSolve", () => {
@@ -112,6 +121,11 @@ describe("recordSolve", () => {
 
   it("returns ok:true with alreadySolved:true on unique_violation", async () => {
     mockInsertError = { code: "23505", message: "duplicate key" };
+    expect(await recordSolve(BASE_INPUT)).toEqual({ ok: true, alreadySolved: true });
+  });
+
+  it("returns ok:true with alreadySolved:true when called twice with identical arguments", async () => {
+    expect(await recordSolve(BASE_INPUT)).toEqual({ ok: true });
     expect(await recordSolve(BASE_INPUT)).toEqual({ ok: true, alreadySolved: true });
   });
 });

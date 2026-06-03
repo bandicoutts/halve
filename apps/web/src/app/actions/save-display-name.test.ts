@@ -6,6 +6,7 @@ import { DISPLAY_NAME_MAX } from "@/lib/display-name";
 
 let mockUser: { id: string } | null = { id: "user-1" };
 let mockUpdateError: { message: string } | null = null;
+let capturedEqArgs: unknown[] = [];
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
@@ -14,7 +15,10 @@ vi.mock("@/lib/supabase/server", () => ({
     },
     from: () => ({
       update: () => ({
-        eq: async () => ({ error: mockUpdateError }),
+        eq: (...args: unknown[]) => {
+          capturedEqArgs = args;
+          return Promise.resolve({ error: mockUpdateError });
+        },
       }),
     }),
   }),
@@ -25,6 +29,7 @@ vi.mock("@/lib/supabase/server", () => ({
 beforeEach(() => {
   mockUser = { id: "user-1" };
   mockUpdateError = null;
+  capturedEqArgs = [];
 });
 
 describe("saveDisplayName", () => {
@@ -57,5 +62,11 @@ describe("saveDisplayName", () => {
   it("returns ok:false on a DB error", async () => {
     mockUpdateError = { message: "connection reset" };
     expect(await saveDisplayName("Alice")).toEqual({ ok: false });
+  });
+
+  it("scopes the update to the authenticated user's own id — not a hardcoded value", async () => {
+    mockUser = { id: "user-abc-123" };
+    await saveDisplayName("Alice");
+    expect(capturedEqArgs).toEqual(["id", "user-abc-123"]);
   });
 });
