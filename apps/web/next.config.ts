@@ -6,9 +6,15 @@ import type { NextConfig } from "next";
  * - frame-ancestors 'none' + X-Frame-Options DENY: block clickjacking of the
  *   authenticated app.
  * - nosniff / Referrer-Policy: standard hardening.
- * - CSP is shipped Report-Only for now (observe violations before enforcing) —
- *   it allows the inline styles this app uses and the Supabase API origin.
- *   Tighten and switch to enforcing once the report stream is clean.
+ * - CSP is Report-Only (no active enforcement). Before public launch:
+ *   1. Monitor /api/csp-report violations until the stream is clean.
+ *   2. Switch to nonce-based script-src using Next.js middleware nonce support
+ *      (see next.js docs: Content Security Policy with nonces).
+ *   3. Replace Content-Security-Policy-Report-Only with Content-Security-Policy.
+ *   Until then, unsafe-inline in script-src/style-src means CSP provides no
+ *   active XSS protection.
+ *
+ * TODO(pre-launch): enforce CSP with nonce-based script-src.
  */
 const SUPABASE = "https://*.supabase.co";
 
