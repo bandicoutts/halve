@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../screens/archive/archive_screen.dart';
 import '../screens/auth/auth_screen.dart';
@@ -36,6 +37,11 @@ abstract final class Routes {
       '/practice/play?difficulty=$difficulty';
 }
 
+/// Routes that require a signed-in user. Any path listed here will redirect to
+/// [Routes.auth] if [Supabase.instance.client.auth.currentUser] is null.
+/// Extend this set when adding auth-gated screens (e.g. a leaderboard).
+const _authRequired = <String>{};
+
 /// Builds the app's [GoRouter]. The Home/Archive/Stats tabs are a
 /// [StatefulShellRoute] (each branch keeps its own navigation state); the
 /// full-screen routes (Play, Practice, Settings, Auth, Tutorial, First-run)
@@ -45,6 +51,12 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
   return GoRouter(
     initialLocation: initialLocation,
     extraCodec: const _PlayResultCodec(),
+    redirect: (_, state) {
+      final requiresAuth = _authRequired.contains(state.matchedLocation);
+      if (!requiresAuth) return null;
+      final signedIn = Supabase.instance.client.auth.currentUser != null;
+      return signedIn ? null : Routes.auth;
+    },
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
