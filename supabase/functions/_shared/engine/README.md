@@ -10,3 +10,7 @@ Regenerate after any change to `packages/engine`:
 ```sh
 ./scripts/sync-engine.sh
 ```
+
+The `engine-sync` CI workflow (`.github/workflows/engine-sync.yml`) detects drift
+automatically: it re-runs the script on every PR that touches `packages/engine` or
+this directory and fails with a clear error if the two copies differ.

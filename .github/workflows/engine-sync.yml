@@ -1,0 +1,51 @@
+name: engine-sync
+
+# Detects drift between packages/engine/dist/ and the vendored copy in
+# supabase/functions/_shared/engine/. Fails if they differ, reminding the
+# author to run ./scripts/sync-engine.sh and commit the result.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/engine/**"
+      - "supabase/functions/_shared/engine/**"
+      - "scripts/sync-engine.sh"
+      - ".github/workflows/engine-sync.yml"
+  pull_request:
+    paths:
+      - "packages/engine/**"
+      - "supabase/functions/_shared/engine/**"
+      - "scripts/sync-engine.sh"
+      - ".github/workflows/engine-sync.yml"
+
+jobs:
+  engine-sync:
+    name: vendor drift check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Rebuild vendored engine
+        run: ./scripts/sync-engine.sh
+
+      - name: Assert no drift
+        run: |
+          if ! git diff --exit-code supabase/functions/_shared/engine/; then
+            echo ""
+            echo "ERROR: supabase/functions/_shared/engine/ is out of sync with packages/engine/dist/."
+            echo "Run ./scripts/sync-engine.sh locally and commit the result."
+            exit 1
+          fi
