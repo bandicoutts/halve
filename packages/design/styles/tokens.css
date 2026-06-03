@@ -5,8 +5,6 @@
    Single characterful grotesque (Space Grotesk) + tabular nums.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-
 /* ---------- RAW PALETTE (reference values, do not theme on these) ---------- */
 :root {
   /* Warm paper neutrals (light) */

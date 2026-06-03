@@ -1,15 +1,13 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { OnboardingScreen } from "@/components/screens/OnboardingScreen";
-import { SAFE_PATHS } from "@/lib/safe-paths";
+import { isSafePath } from "@/lib/safe-paths";
 
 function safeNext(raw: string | undefined): string {
   if (!raw) return "/";
   try {
     const url = new URL(raw, "http://localhost");
-    if (SAFE_PATHS.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"))) {
-      return url.pathname + url.search;
-    }
+    if (isSafePath(url.pathname)) return url.pathname + url.search;
   } catch { /* ignore */ }
   return "/";
 }

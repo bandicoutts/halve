@@ -4,7 +4,6 @@ import type { MutableRefObject } from "react";
 import type { Grid } from "@parity/engine";
 import { createClient } from "@/lib/supabase/client";
 import { recordSolve } from "@/app/actions/record-solve";
-import { computeStreak, offsetDay } from "@/lib/streak";
 import { computeNextIn } from "@/lib/puzzle-clock";
 
 export function useRecordSolve({
@@ -48,22 +47,8 @@ export function useRecordSolve({
     }
 
     if (kind === "daily") {
-      const today = new Date().toLocaleDateString("en-CA");
-      const { data: solveDays } = await supabase
-        .from("solves")
-        .select("solved_at, local_date")
-        .eq("user_id", user.id)
-        .gte("local_date", offsetDay(today, -60));
-      const days = [
-        ...new Set(
-          (solveDays ?? []).map(
-            (r: { solved_at: string; local_date: string | null }) =>
-              r.local_date ?? r.solved_at.slice(0, 10)
-          )
-        ),
-      ] as string[];
       setStreakData({
-        streak: computeStreak(days, today),
+        streak: result.currentStreak ?? 0,
         nextIn: computeNextIn(),
       });
     }

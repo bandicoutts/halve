@@ -2,6 +2,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { resolveLocalToday } from "@/lib/local-date";
+import { computeStreak, computeLongestStreak, offsetDay } from "@/lib/streak";
 
 interface RecordSolveInput {
   puzzleId: string;
@@ -16,6 +17,8 @@ interface RecordSolveResult {
   ok: boolean;
   /** True when the unique-violation constraint fired (already solved). */
   alreadySolved?: boolean;
+  currentStreak?: number;
+  longestStreak?: number;
 }
 
 /**
@@ -77,11 +80,30 @@ export async function recordSolve(input: RecordSolveInput): Promise<RecordSolveR
     local_date: validatedLocalDate,
   });
 
-  if (error?.code === "23505") return { ok: true, alreadySolved: true };
-  if (error) {
+  const alreadySolved = error?.code === "23505";
+  if (error && !alreadySolved) {
     console.error("recordSolve: insert failed:", error.message);
     return { ok: false };
   }
 
-  return { ok: true };
+  const { data: solveDays } = await supabase
+    .from("solves")
+    .select("local_date, solved_at")
+    .eq("user_id", user.id)
+    .gte("local_date", offsetDay(validatedLocalDate, -60));
+  const days = [
+    ...new Set(
+      (solveDays ?? []).map(
+        (r: { local_date: string | null; solved_at: string }) =>
+          r.local_date ?? r.solved_at.slice(0, 10)
+      )
+    ),
+  ] as string[];
+
+  return {
+    ok: true,
+    alreadySolved,
+    currentStreak: computeStreak(days, validatedLocalDate),
+    longestStreak: computeLongestStreak(days),
+  };
 }

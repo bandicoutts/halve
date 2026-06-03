@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { SAFE_PATHS } from "@/lib/safe-paths";
+import { isSafePath } from "@/lib/safe-paths";
 
 export const config = {
   matcher: [
@@ -12,9 +12,7 @@ function safeRedirect(next: string | null): string {
   if (!next) return "/";
   try {
     const url = new URL(next, "http://localhost");
-    if (SAFE_PATHS.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"))) {
-      return url.pathname + url.search;
-    }
+    if (isSafePath(url.pathname)) return url.pathname + url.search;
   } catch {
     /* ignore malformed */
   }
