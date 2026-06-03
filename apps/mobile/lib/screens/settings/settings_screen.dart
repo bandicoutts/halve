@@ -596,7 +596,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       await ref.read(profileRepositoryProvider)?.updateDisplayName(userId, newName);
       ref.invalidate(settingsDataProvider);
-    } catch (_) {}
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update display name. Please try again.')),
+        );
+      }
+    }
   }
 
   @override
