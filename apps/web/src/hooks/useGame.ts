@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useReducer } from "react";
-import type { Cell, Edge, Grid, Solution, Sym } from "@parity/engine";
+import { findViolations, type Cell, type Edge, type Grid, type Solution, type Sym } from "@parity/engine";
 
 export interface GameState {
   cells: Grid;
@@ -46,49 +46,13 @@ export function reducer(state: GameState, action: Action): GameState {
 }
 
 export function computeErrors(cells: Grid, edges: Edge[]): Set<string> {
-  const N = cells.length;
-  const errs = new Set<string>();
-  const mark = (r: number, c: number) => errs.add(`${r}-${c}`);
-
-  for (let r = 0; r < N; r++) {
-    for (let c = 0; c < N; c++) {
-      const v = cells[r]![c];
-      if (v === null) continue;
-      if (c <= N - 3 && cells[r]![c + 1] === v && cells[r]![c + 2] === v) {
-        mark(r, c); mark(r, c + 1); mark(r, c + 2);
-      }
-      if (r <= N - 3 && cells[r + 1]?.[c] === v && cells[r + 2]?.[c] === v) {
-        mark(r, c); mark(r + 1, c); mark(r + 2, c);
-      }
-    }
-  }
-  for (let r = 0; r < N; r++) {
-    for (const sym of [0, 1] as const) {
-      const idx: number[] = [];
-      for (let c = 0; c < N; c++) if (cells[r]![c] === sym) idx.push(c);
-      if (idx.length > N / 2) idx.forEach((c) => mark(r, c));
-    }
-  }
-  for (let c = 0; c < N; c++) {
-    for (const sym of [0, 1] as const) {
-      const idx: number[] = [];
-      for (let r = 0; r < N; r++) if (cells[r]![c] === sym) idx.push(r);
-      if (idx.length > N / 2) idx.forEach((r) => mark(r, c));
-    }
-  }
-
-  for (const edge of edges) {
-    const { orientation: o, r, c, kind } = edge;
-    const a = cells[r]![c];
-    const b = o === "h" ? cells[r]![c + 1] : cells[r + 1]?.[c];
-    if (a === null || b === null) continue;
-    if (kind === "eq" && a !== b) { mark(r, c); o === "h" ? mark(r, c + 1) : mark(r + 1, c); }
-    if (kind === "ne" && a === b) { mark(r, c); o === "h" ? mark(r, c + 1) : mark(r + 1, c); }
-  }
-
-  return errs;
+  return findViolations(cells, edges);
 }
 
+// Intentionally different from the engine's isSolved: this checks that the
+// board matches the stored solution cell-for-cell, so it works on a partial
+// grid without needing edge constraints at call-time. The engine's isSolved
+// requires isComplete + isValid — semantically richer but not needed here.
 function isSolved(cells: Grid, solution: Solution): boolean {
   return cells.every((row, r) => row.every((v, c) => v === solution[r]![c]));
 }
