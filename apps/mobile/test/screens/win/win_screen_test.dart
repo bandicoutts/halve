@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:halve/data/models/models.dart';
+import 'package:halve/data/prefs_keys.dart';
 import 'package:halve/data/repositories/solve_repository.dart';
 import 'package:halve/providers/providers.dart';
 import 'package:halve/screens/play/play_provider.dart';
@@ -153,11 +154,11 @@ void main() {
     expect(find.textContaining('lives on this device'), findsNothing);
     // …and persisted.
     final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getBool(streakNudgeDismissedKey), isTrue);
+    expect(prefs.getBool(prefKeyStreakNudgeDismissed), isTrue);
   });
 
   testWidgets('nudge stays hidden when already dismissed', (tester) async {
-    SharedPreferences.setMockInitialValues({streakNudgeDismissedKey: true});
+    SharedPreferences.setMockInitialValues({prefKeyStreakNudgeDismissed: true});
     await pumpWin(
       tester,
       res: result(),

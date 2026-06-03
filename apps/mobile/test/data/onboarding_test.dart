@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:halve/data/onboarding.dart';
+import 'package:halve/data/prefs_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -24,7 +25,7 @@ void main() {
 
       // Persisted under the web-parity key.
       final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getBool(onboardedKey), isTrue);
+      expect(prefs.getBool(prefKeyOnboarded), isTrue);
     });
   });
 }

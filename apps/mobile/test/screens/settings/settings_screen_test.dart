@@ -136,7 +136,7 @@ void main() {
       await tester.tap(find.text('Light'));
       await tester.pumpAndSettle();
 
-      expect(prefs.getString(themeModeKey), 'light');
+      expect(prefs.getString(prefKeyThemeMode), 'light');
     });
 
     testWidgets('tapping Dark persists halve:theme=dark to prefs',
@@ -155,12 +155,12 @@ void main() {
       await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
 
-      expect(prefs.getString(themeModeKey), 'dark');
+      expect(prefs.getString(prefKeyThemeMode), 'dark');
     });
 
     testWidgets('tapping System persists halve:theme=system to prefs',
         (tester) async {
-      SharedPreferences.setMockInitialValues({themeModeKey: 'dark'});
+      SharedPreferences.setMockInitialValues({prefKeyThemeMode: 'dark'});
       final prefs = await SharedPreferences.getInstance();
 
       await pumpSettings(
@@ -174,7 +174,7 @@ void main() {
       await tester.tap(find.text('System'));
       await tester.pumpAndSettle();
 
-      expect(prefs.getString(themeModeKey), 'system');
+      expect(prefs.getString(prefKeyThemeMode), 'system');
     });
   });
 
