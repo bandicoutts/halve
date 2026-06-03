@@ -8,6 +8,7 @@ import { useRecordSolve } from "@/hooks/useRecordSolve";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { Board } from "./Board";
+import { BoardSkeleton } from "./BoardSkeleton";
 import { BackIcon, UndoIcon, HintIcon, ControlButton } from "./BoardIcons";
 import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -160,6 +161,8 @@ export function BoardScreen({
     else if (kind === "archive") router.push(backHref);
     else router.push("/practice");
   }, [kind, router, backHref]);
+
+  if (cellSize === null) return <BoardSkeleton />;
 
   return (
     <div
