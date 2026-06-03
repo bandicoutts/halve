@@ -56,9 +56,13 @@ export default async function PlayDatePage({ params }: Props) {
   const spec = parseGridSpec(puzzleRow.grid_spec);
   if (!spec) notFound();
 
+  const VALID_DIFFICULTIES = ["easy", "medium", "hard"] as const;
+  const rawDifficulty = puzzleRow.difficulty;
+  if (!VALID_DIFFICULTIES.includes(rawDifficulty as Difficulty)) notFound();
+
   return (
     <BoardScreen
-      puzzle={{ size: 6, ...spec, difficulty: puzzleRow.difficulty as Difficulty }}
+      puzzle={{ size: 6, ...spec, difficulty: rawDifficulty as Difficulty }}
       puzzleId={puzzleRow.id}
       dayNo={dayNo}
       date={date}
