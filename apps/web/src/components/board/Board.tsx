@@ -91,13 +91,13 @@ export function Board({
       </div>
 
       {/* Edge signs — positioned over the gap between cells */}
-      {edges.map((edge, i) => {
+      {edges.map((edge) => {
         const { orientation: o, r, c } = edge;
         const cx = o === "h" ? span(c) + cellSize + gap / 2 : span(c) + cellSize / 2;
         const cy = o === "h" ? span(r) + cellSize / 2 : span(r) + cellSize + gap / 2;
         return (
           <div
-            key={i}
+            key={`${o}-${r}-${c}`}
             style={{ position: "absolute", left: cx, top: cy, transform: "translate(-50%, -50%)", zIndex: 3 }}
           >
             <EdgeSign sign={edge.kind} size={edgeSignSize} />
