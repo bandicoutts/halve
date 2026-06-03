@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Supabase project credentials, injected at build time via
@@ -24,19 +23,13 @@ bool get isSupabaseConfigured =>
 
 /// Initialise Supabase if configured. No-op (returns false) otherwise, so
 /// `flutter run` works without env. Safe to call once at startup.
-///
-/// Debug builds use implicit auth flow so magic-link deep links work on
-/// emulators without PKCE code-exchange. Release builds use PKCE (the secure
-/// default). The flow type only affects how the session is delivered after the
-/// link is tapped — it has no impact on what the user sees.
 Future<bool> initSupabase() async {
   if (!isSupabaseConfigured) return false;
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
     authOptions: const FlutterAuthClientOptions(
-      authFlowType:
-          kDebugMode ? AuthFlowType.implicit : AuthFlowType.pkce,
+      authFlowType: AuthFlowType.pkce,
     ),
   );
   return true;
