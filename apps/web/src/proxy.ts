@@ -60,8 +60,11 @@ export async function proxy(request: NextRequest) {
             .eq("id", user.id)
             .maybeSingle();
           if (!profile?.display_name) {
+            // Strip query string: only carry the pathname into ?next= to
+            // prevent a nested ?next= value from bypassing safe-path checks.
+            const nextPathname = new URL(next, "http://localhost").pathname;
             return NextResponse.redirect(
-              new URL(`/onboarding?next=${encodeURIComponent(next)}`, request.url)
+              new URL(`/onboarding?next=${encodeURIComponent(nextPathname)}`, request.url)
             );
           }
         }
