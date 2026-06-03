@@ -86,6 +86,14 @@ Replace the legacy PNGs (`mipmap-mdpi/hdpi/xhdpi/xxhdpi/xxxhdpi`) with the Halve
 
 ---
 
+## Exact-alarm permission
+
+`USE_EXACT_ALARM` (Android 13+, granted automatically, no runtime prompt) is declared in the manifest. `SCHEDULE_EXACT_ALARM` was deliberately omitted: Google Play scrutinises it for apps that are not calendar or alarm apps, and the notification service (`NotificationService.scheduleDaily`) already falls back to inexact scheduling on devices where exact alarms are unavailable.
+
+If Play Console flags `USE_EXACT_ALARM` during review, justify it as a clock-style daily-reminder feature (the puzzle resets at midnight) using the store-listing text in `STORE-LISTING.md`.
+
+---
+
 ## Version bumping
 
 Version is set in `pubspec.yaml`:
