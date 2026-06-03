@@ -2,12 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:halve/data/haptics_service.dart';
+import 'package:halve/data/notification_service.dart';
+import 'package:halve/data/prefs_keys.dart';
 import 'package:halve/data/repositories/auth_repository.dart';
 import 'package:halve/providers/providers.dart';
 import 'package:halve/screens/settings/settings_provider.dart';
 import 'package:halve/screens/settings/settings_screen.dart';
 import 'package:halve/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+// ─── Mock services ────────────────────────────────────────────────────────────
+
+class _MockHapticsService extends Fake implements HapticsService {
+  final List<bool> configureCalls = [];
+
+  @override
+  void configure(bool enabled) => configureCalls.add(enabled);
+}
+
+class _MockNotificationService extends Fake implements NotificationService {
+  final List<(int, String)> scheduleCalls = [];
+  int cancelCount = 0;
+
+  @override
+  Future<void> scheduleDaily(int hour, String ampm) async =>
+      scheduleCalls.add((hour, ampm));
+
+  @override
+  Future<void> cancelReminder() async => cancelCount++;
+}
 
 // ─── Fake auth ────────────────────────────────────────────────────────────────
 
@@ -306,6 +330,94 @@ void main() {
       );
 
       expect(find.text('Haptics'), findsOneWidget);
+    });
+  });
+
+  group('SettingsScreen — haptics toggle behavior', () {
+    // _HvSwitch uses AnimatedContainer(duration: 200ms). In tree order:
+    //   .at(0) = notifications (Daily reminder), .at(1) = game (Haptics).
+    Finder _hvSwitchAt(int index) => find.byWidgetPredicate(
+          (w) =>
+              w is AnimatedContainer &&
+              w.duration == const Duration(milliseconds: 200),
+        ).at(index);
+
+    testWidgets('toggling haptics off calls HapticsService.configure(false)',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final mockHaptics = _MockHapticsService();
+
+      await pumpSettings(
+        tester,
+        data: const SettingsData(isSignedIn: false),
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          hapticsServiceProvider.overrideWithValue(mockHaptics),
+        ],
+      );
+
+      // Default _haptics == true (no saved pref), so toggle → configure(false).
+      await tester.tap(_hvSwitchAt(1));
+      await tester.pumpAndSettle();
+
+      expect(mockHaptics.configureCalls, [false]);
+    });
+  });
+
+  group('SettingsScreen — reminder toggle behavior', () {
+    Finder _hvSwitchAt(int index) => find.byWidgetPredicate(
+          (w) =>
+              w is AnimatedContainer &&
+              w.duration == const Duration(milliseconds: 200),
+        ).at(index);
+
+    testWidgets(
+        'toggling reminder on calls NotificationService.scheduleDaily',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final mockNotif = _MockNotificationService();
+
+      await pumpSettings(
+        tester,
+        data: const SettingsData(isSignedIn: false),
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          notificationServiceProvider.overrideWithValue(mockNotif),
+        ],
+      );
+
+      // Default _reminderOn == false; toggle → scheduleDaily(8, 'am').
+      await tester.tap(_hvSwitchAt(0));
+      await tester.pumpAndSettle();
+
+      expect(mockNotif.scheduleCalls, [(8, 'am')]);
+      expect(mockNotif.cancelCount, 0);
+    });
+
+    testWidgets(
+        'toggling reminder off calls NotificationService.cancelReminder',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({prefKeyReminder: true});
+      final prefs = await SharedPreferences.getInstance();
+      final mockNotif = _MockNotificationService();
+
+      await pumpSettings(
+        tester,
+        data: const SettingsData(isSignedIn: false),
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          notificationServiceProvider.overrideWithValue(mockNotif),
+        ],
+      );
+
+      // _reminderOn == true from prefs; toggle → cancelReminder().
+      await tester.tap(_hvSwitchAt(0));
+      await tester.pumpAndSettle();
+
+      expect(mockNotif.cancelCount, 1);
+      expect(mockNotif.scheduleCalls, isEmpty);
     });
   });
 }
