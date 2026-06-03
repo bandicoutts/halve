@@ -736,7 +736,7 @@ class _StatsGuest extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'david',
+                                  'Player',
                                   style: AppTypography.h3.copyWith(
                                     color: c.fg1,
                                     fontSize: 23,
