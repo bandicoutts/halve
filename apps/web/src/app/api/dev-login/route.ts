@@ -19,14 +19,13 @@ import { NextResponse, type NextRequest } from "next/server";
  *   - request host is localhost   → not reachable if the dev server is exposed.
  *   - ?secret matches DEV_LOGIN_SECRET (per-machine, set in .env.local) → if the
  *     secret is unset the route is disabled entirely.
- * It only ever authenticates as TEST_EMAIL; it cannot impersonate other users.
+ * It only ever authenticates as DEV_TEST_EMAIL; it cannot impersonate other users.
  * The test account must already exist; `generate_link` errors otherwise.
  *
  * NOTE: SUPABASE_SERVICE_ROLE_KEY must NEVER be set in the deployed web
  * environment — this route is its only web-tier consumer and 404s in prod.
  */
 
-const TEST_EMAIL = "stayrightdemo@gmail.com";
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 
 export async function POST(request: NextRequest) {
@@ -50,7 +49,8 @@ export async function POST(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !anonKey || !serviceKey) {
+  const testEmail = process.env.DEV_TEST_EMAIL;
+  if (!url || !anonKey || !serviceKey || !testEmail) {
     return new NextResponse("Missing Supabase env vars", { status: 500 });
   }
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       Authorization: `Bearer ${serviceKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ type: "magiclink", email: TEST_EMAIL }),
+    body: JSON.stringify({ type: "magiclink", email: testEmail }),
   });
   const gen = await genRes.json();
   if (!genRes.ok || !gen?.hashed_token) {
