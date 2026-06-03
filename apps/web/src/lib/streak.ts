@@ -9,11 +9,11 @@
  * the day the user experienced, matching the served puzzle's date (EPIC-B).
  */
 
-/** Offset a YYYY-MM-DD string by `delta` days without timezone conversion. */
+/** Offset a YYYY-MM-DD string by `delta` days, pinned to UTC. */
 export function offsetDay(date: string, delta: number): string {
-  const d = new Date(date + "T00:00:00");
-  d.setDate(d.getDate() + delta);
-  return d.toLocaleDateString("en-CA");
+  const d = new Date(date + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + delta);
+  return d.toLocaleDateString("en-CA", { timeZone: "UTC" });
 }
 
 /**
