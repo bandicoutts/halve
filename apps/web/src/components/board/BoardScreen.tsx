@@ -4,10 +4,8 @@ import { useRouter } from "next/navigation";
 import type { Grid, Puzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { useTimer } from "@/hooks/useTimer";
-import { computeStreak, offsetDay } from "@/lib/streak";
+import { useRecordSolve } from "@/hooks/useRecordSolve";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
-import { createClient } from "@/lib/supabase/client";
-import { recordSolve } from "@/app/actions/record-solve";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { Board } from "./Board";
 import { TopBar } from "@/components/ui/TopBar";
@@ -158,11 +156,6 @@ export function BoardScreen({
   const { theme, toggle: toggleTheme } = useTheme();
   const [showWin, setShowWin] = useState(false);
   const [winTime, setWinTime] = useState("");
-  const [streakData, setStreakData] = useState<{
-    streak: number;
-    nextIn: string;
-  } | null>(null);
-  const [saveError, setSaveError] = useState(false);
   const solveRecorded = useRef(false);
   // Kept current on every render so the solve-recording effect always reads the
   // latest cells/duration without needing them in its dep array.
@@ -180,6 +173,14 @@ export function BoardScreen({
   const { secs, formatted } = useTimer(!solved);
   secsRef.current = secs;
 
+  const { recordAndFetch, saveError, streakData } = useRecordSolve({
+    puzzleId,
+    usedHint,
+    kind,
+    cellsRef,
+    secsRef,
+  });
+
   useEffect(() => {
     if (solved && !showWin) {
       const t = setTimeout(() => {
@@ -189,52 +190,6 @@ export function BoardScreen({
       return () => clearTimeout(t);
     }
   }, [solved, showWin, formatted]);
-
-  // Record the solve, then (daily only) fetch the streak for the win screen.
-  // Reads duration/grid from refs so it never needs them in a dep array, and is
-  // safe to call again from the win-screen Retry button after a save failure.
-  const recordAndFetch = useCallback(async () => {
-    if (!puzzleId) return;
-    setSaveError(false);
-    // Guests get a silent no-op — no solve to record, no streak to show.
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const result = await recordSolve({
-      puzzleId,
-      grid: cellsRef.current,
-      durationMs: Math.max(1, secsRef.current * 1000),
-      usedHint,
-      localDate: new Date().toLocaleDateString("en-CA"),
-    });
-
-    if (!result.ok && !result.alreadySolved) {
-      setSaveError(true);
-      return;
-    }
-
-    if (kind === "daily") {
-      const today = new Date().toLocaleDateString("en-CA");
-      const { data: solveDays } = await supabase
-        .from("solves")
-        .select("solved_at, local_date")
-        .eq("user_id", user.id)
-        .gte("local_date", offsetDay(today, -60));
-      const days = [
-        ...new Set(
-          (solveDays ?? []).map(
-            (r: { solved_at: string; local_date: string | null }) =>
-              r.local_date ?? r.solved_at.slice(0, 10)
-          )
-        ),
-      ] as string[];
-      setStreakData({
-        streak: computeStreak(days, today),
-        nextIn: computeNextIn(),
-      });
-    }
-  }, [puzzleId, usedHint, kind]);
 
   // Record solve once when solved. solveRecorded guards against re-entry.
   useEffect(() => {

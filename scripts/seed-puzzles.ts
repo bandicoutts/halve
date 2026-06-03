@@ -26,7 +26,7 @@ const envPath = resolve(__dir, "../apps/web/.env.local");
 try {
   for (const line of readFileSync(envPath, "utf8").split("\n")) {
     const m = line.match(/^([^#=\s][^=]*)=(.*)$/);
-    if (m) process.env[m[1]!.trim()] ??= m[2]!.trim();
+    if (m) process.env[m[1]!.trim()] ??= m[2]!.trim().replace(/\s+#.*$/, "");
   }
 } catch {
   // rely on actual env vars if .env.local not present

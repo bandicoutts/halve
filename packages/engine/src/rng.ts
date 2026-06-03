@@ -13,7 +13,11 @@ export function mulberry32(seed: number): Rng {
   };
 }
 
-/** Hash an arbitrary string/number seed into a 32-bit integer (FNV-1a). */
+/**
+ * Hash an arbitrary string/number seed into a 32-bit integer (FNV-1a).
+ * XORs UTF-16 code units (not bytes), so this is standard FNV-1a only for
+ * ASCII input; non-ASCII produces a deterministic but non-standard result.
+ */
 export function hashSeed(seed: string | number): number {
   const str = String(seed);
   let h = 0x811c9dc5;

@@ -9,6 +9,10 @@
 -- trigger); a set name must be 1–40 chars after the app trims it. Kept in sync
 -- with DISPLAY_NAME_MAX in apps/web/src/app/actions/save-display-name.ts.
 --
+-- char_length counts Unicode code points; JS .length counts UTF-16 code units.
+-- 40 emoji = 40 code points (DB allows) but up to 80 UTF-16 code units —
+-- unreachable via the UI's maxLength={40}, which counts UTF-16 units.
+--
 -- NOT VALID skips the scan of existing rows on add; we validate separately so
 -- the constraint is enforced for both new writes and (once validated) old rows.
 

@@ -37,8 +37,8 @@ export function Board({
     if (!delta) return;
     const wrapper = (e.target as HTMLElement).closest("[data-row]");
     if (!wrapper) return;
-    const r = parseInt(wrapper.getAttribute("data-row") ?? "0");
-    const c = parseInt(wrapper.getAttribute("data-col") ?? "0");
+    const r = parseInt(wrapper.getAttribute("data-row") ?? "0", 10);
+    const c = parseInt(wrapper.getAttribute("data-col") ?? "0", 10);
     const nr = Math.min(N - 1, Math.max(0, r + delta[0]));
     const nc = Math.min(N - 1, Math.max(0, c + delta[1]));
     if (nr === r && nc === c) return;
