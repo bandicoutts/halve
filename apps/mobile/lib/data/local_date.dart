@@ -27,7 +27,8 @@ String formatDay(DateTime d) {
 }
 
 /// "Today" as the device-local `yyyy-MM-dd`.
-String localToday() => formatDay(DateTime.now());
+/// Accepts an optional [now] for testing streak logic without mocking the clock.
+String localToday([DateTime? now]) => formatDay(now ?? DateTime.now());
 
 /// Human label for a `yyyy-MM-dd` string, e.g. "Monday, June 1". Mirrors the
 /// web `formatDateLabel`. Built without `intl` (no extra dep) — month/weekday
