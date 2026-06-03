@@ -27,7 +27,7 @@ function StreakBand({
 }: {
   streak: number;
   last7: boolean[];
-  solvedToday?: boolean;
+  solvedToday?: boolean | undefined;
 }) {
   return (
     <div
@@ -89,7 +89,7 @@ interface Props {
   userId: string;
   /** The user's local calendar day, already resolved by the parent (NXT-2). */
   today: string;
-  solvedToday?: boolean;
+  solvedToday?: boolean | undefined;
 }
 
 export async function HomeUserContent({ userId, today, solvedToday }: Props) {

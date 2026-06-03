@@ -77,7 +77,7 @@ export function Board({
               >
                 <Cell
                   value={v}
-                  isGiven={!!givens[r][c]}
+                  isGiven={!!givens[r]![c]}
                   isError={errors.has(`${r}-${c}`)}
                   rowIndex={r}
                   colIndex={c}

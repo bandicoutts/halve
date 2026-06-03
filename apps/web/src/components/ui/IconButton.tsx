@@ -2,9 +2,9 @@
 
 interface IconButtonProps {
   label: string;
-  onClick?: () => void;
-  disabled?: boolean;
-  size?: number;
+  onClick?: (() => void) | undefined;
+  disabled?: boolean | undefined;
+  size?: number | undefined;
   children: React.ReactNode;
 }
 

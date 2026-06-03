@@ -32,7 +32,7 @@ export interface ArchiveMonth {
 
 export interface ArchiveScreenProps {
   months: ArchiveMonth[];
-  initialId?: string;
+  initialId?: string | undefined;
 }
 
 // ─── Layout constants ──────────────────────────────────────────────────────────
@@ -54,8 +54,8 @@ function solvedCount(month: ArchiveMonth): number {
 interface MonthStats {
   solved: number;
   total: number;
-  avgMs?: number;
-  bestMs?: number;
+  avgMs?: number | undefined;
+  bestMs?: number | undefined;
 }
 
 function monthStats(month: ArchiveMonth): MonthStats {

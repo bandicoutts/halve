@@ -57,7 +57,7 @@ interface TeachCellProps {
   dimmed?: boolean;
   animate?: boolean;
   delay?: number;
-  onTap?: () => void;
+  onTap?: (() => void) | undefined;
 }
 
 function TeachCell({

@@ -134,7 +134,7 @@ function CheckIcon() {
 }
 
 /** Completed-state hero shown once today's puzzle is solved. */
-function SolvedHero({ durationMs }: { durationMs?: number }) {
+function SolvedHero({ durationMs }: { durationMs?: number | undefined }) {
   const [nextIn, setNextIn] = useState(() => computeNextIn());
   useEffect(() => {
     const id = setInterval(() => setNextIn(computeNextIn()), 60_000);
@@ -202,23 +202,23 @@ function SolvedHero({ durationMs }: { durationMs?: number }) {
 const HOME_MAX = 480;
 
 interface HomeScreenProps {
-  difficulty?: string;
-  puzzleNumber?: number;
+  difficulty?: string | undefined;
+  puzzleNumber?: number | undefined;
   /** Pre-formatted "today" label, computed server-side from getLocalToday() so
    *  the client never renders `new Date()` (avoids hydration mismatch — NXT-1). */
-  todayLabel?: string;
-  fetchError?: boolean;
-  isAuthenticated?: boolean;
+  todayLabel?: string | undefined;
+  fetchError?: boolean | undefined;
+  isAuthenticated?: boolean | undefined;
   /** Display name (or email) of the signed-in user — drives the account avatar. */
-  displayName?: string;
-  archiveCount?: number;
-  lastDifficulty?: string;
+  displayName?: string | undefined;
+  archiveCount?: number | undefined;
+  lastDifficulty?: string | undefined;
   /** True once the signed-in user has solved today's puzzle. */
-  solvedToday?: boolean;
+  solvedToday?: boolean | undefined;
   /** Duration (ms) of today's solve, when known. */
-  solveDurationMs?: number;
+  solveDurationMs?: number | undefined;
   /** Streamed server slot: renders StreakBand when user data resolves */
-  streakBand?: ReactNode;
+  streakBand?: ReactNode | undefined;
 }
 
 export function HomeScreen({

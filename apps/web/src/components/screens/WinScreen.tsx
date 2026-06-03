@@ -99,16 +99,16 @@ export interface WinScreenProps {
   kind: "daily" | "archive" | "practice";
   time: string;
   solution: number[][];
-  gridSize?: number;
-  dayNo?: number;
-  date?: string;
+  gridSize?: number | undefined;
+  dayNo?: number | undefined;
+  date?: string | undefined;
   difficulty: string;
-  streak?: number;
-  nextIn?: string;
+  streak?: number | undefined;
+  nextIn?: string | undefined;
   /** True when recording the solve failed — shows a retry prompt. */
-  saveError?: boolean;
+  saveError?: boolean | undefined;
   /** Re-attempts the solve insert. */
-  onRetrySave?: () => void;
+  onRetrySave?: (() => void) | undefined;
   onClose: () => void;
   onSecondary: () => void;
 }

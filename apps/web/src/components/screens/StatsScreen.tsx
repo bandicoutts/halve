@@ -100,11 +100,11 @@ function Cal14Weeks({ days }: { days: boolean[] }) {
 
 function smoothPath(pts: { x: number; y: number }[]): string {
   if (pts.length < 2) return "";
-  let d = `M ${pts[0].x} ${pts[0].y}`;
+  let d = `M ${pts[0]!.x} ${pts[0]!.y}`;
   for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] ?? pts[i];
-    const p1 = pts[i];
-    const p2 = pts[i + 1];
+    const p0 = pts[i - 1] ?? pts[i]!;
+    const p1 = pts[i]!;
+    const p2 = pts[i + 1]!;
     const p3 = pts[i + 2] ?? p2;
     const c1x = p1.x + (p2.x - p0.x) / 6, c1y = p1.y + (p2.y - p0.y) / 6;
     const c2x = p2.x - (p3.x - p1.x) / 6, c2y = p2.y - (p3.y - p1.y) / 6;
@@ -121,13 +121,13 @@ function AreaSignature({ dist }: { dist: number[] }) {
   const yFor = (c: number) => padTop + (1 - c / max) * (H - padTop - padBot);
   const pts = dist.map((c, i) => ({ x: padX + i * stepX, y: yFor(c) }));
   const line = smoothPath(pts);
-  const area = `${line} L ${pts[pts.length - 1].x} ${H - padBot} L ${pts[0].x} ${H - padBot} Z`;
+  const area = `${line} L ${pts[pts.length - 1]!.x} ${H - padBot} L ${pts[0]!.x} ${H - padBot} Z`;
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" style={{ display: "block", overflow: "visible" }}>
       <line x1={padX} y1={H - padBot} x2={W - padX} y2={H - padBot} stroke="var(--hairline)" strokeWidth="1" />
       <path d={area} fill="var(--accent-tint)" />
       <path d={line} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
-      <circle cx={pts[peak].x} cy={pts[peak].y} r="4.5" fill="var(--accent)" stroke="var(--surface)" strokeWidth="2" />
+      <circle cx={pts[peak]!.x} cy={pts[peak]!.y} r="4.5" fill="var(--accent)" stroke="var(--surface)" strokeWidth="2" />
       {pts.map((p, i) => (
         <text key={i} x={p.x} y={H - 10} textAnchor="middle" fontSize="10.5" fontWeight={i === peak ? 700 : 500}
           fill={i === peak ? "var(--accent)" : "var(--fg-3)"} fontFamily="var(--font-sans)" style={{ letterSpacing: "0.02em" }}>

@@ -95,8 +95,8 @@ function ControlButton({
   children,
 }: {
   label: string;
-  onClick?: () => void;
-  disabled?: boolean;
+  onClick?: (() => void) | undefined;
+  disabled?: boolean | undefined;
   children: React.ReactNode;
 }) {
   return (
@@ -118,17 +118,17 @@ const GRID_WIDTH_FACTOR = GRID_SIZE + (GRID_SIZE - 1) * GAP_RATIO; // 6 + 5*0.16
 export interface BoardScreenProps {
   puzzle: Puzzle;
   /** DB row id — used to record solves */
-  puzzleId?: string;
+  puzzleId?: string | undefined;
   /** Day number shown on win screen */
-  dayNo?: number;
+  dayNo?: number | undefined;
   /** ISO date string (YYYY-MM-DD) for the keepsake card */
-  date?: string;
+  date?: string | undefined;
   /** Drives win screen variant and streak fetch */
-  kind?: "daily" | "archive" | "practice";
+  kind?: "daily" | "archive" | "practice" | undefined;
   /** Back navigation — defaults to "/" */
-  backHref?: string;
+  backHref?: string | undefined;
   /** True when DB was unavailable and a generated fallback is being played */
-  isOffline?: boolean;
+  isOffline?: boolean | undefined;
 }
 
 export function BoardScreen({
@@ -205,7 +205,7 @@ export function BoardScreen({
     const el = boardWrapRef.current;
     if (!el) return;
     const obs = new ResizeObserver(([entry]) => {
-      setCellSize(Math.floor(entry.contentRect.width / GRID_WIDTH_FACTOR));
+      setCellSize(Math.floor(entry!.contentRect.width / GRID_WIDTH_FACTOR));
     });
     obs.observe(el);
     return () => obs.disconnect();

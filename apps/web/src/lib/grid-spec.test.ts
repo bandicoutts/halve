@@ -51,22 +51,22 @@ describe("parseGridSpec — structural validation", () => {
 describe("parseGridSpec — givens ⊆ solution (ENG-4)", () => {
   it("accepts a given that matches the solution", () => {
     const g = GIVENS.map((r) => [...r]);
-    g[0][0] = SOL[0][0]; // 0
-    g[0][1] = SOL[0][1]; // 1
+    g[0]![0] = SOL[0]![0]!; // 0
+    g[0]![1] = SOL[0]![1]!; // 1
     expect(parseGridSpec(valid({ givens: g }))).not.toBeNull();
   });
 
   it("rejects a given that contradicts the solution", () => {
     const g = GIVENS.map((r) => [...r]);
     // SOL[0][0] is 0 — set given to 1 (conflict)
-    g[0][0] = 1;
+    g[0]![0] = 1;
     expect(parseGridSpec(valid({ givens: g }))).toBeNull();
   });
 
   it("rejects a given conflict in an interior cell", () => {
     const g = GIVENS.map((r) => [...r]);
     // SOL[3][3] is 0 — set given to 1
-    g[3][3] = 1;
+    g[3]![3] = 1;
     expect(parseGridSpec(valid({ givens: g }))).toBeNull();
   });
 });

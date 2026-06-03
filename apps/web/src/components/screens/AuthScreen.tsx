@@ -171,7 +171,7 @@ function friendlyError(msg: string): string {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function AuthScreen({ initialError }: { initialError?: string }) {
+export function AuthScreen({ initialError }: { initialError?: string | undefined }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);

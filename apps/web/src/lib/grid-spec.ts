@@ -33,8 +33,8 @@ export function parseGridSpec(raw: unknown, size = 6): StoredGridSpec | null {
   // Every non-null given must agree with the solution at that cell.
   for (let gr = 0; gr < size; gr++) {
     for (let gc = 0; gc < size; gc++) {
-      const g = (givens as (0 | 1 | null)[][])[gr][gc];
-      if (g !== null && g !== (solution as (0 | 1)[][])[gr][gc]) return null;
+      const g = (givens as (0 | 1 | null)[][])[gr]![gc];
+      if (g !== null && g !== (solution as (0 | 1)[][])[gr]![gc]) return null;
     }
   }
 
@@ -56,8 +56,8 @@ export function parseGridSpec(raw: unknown, size = 6): StoredGridSpec | null {
     // Edge constraint must hold in the solution — a corrupt/forged spec is rejected.
     const nr = orientation === "v" ? r + 1 : r;
     const nc = orientation === "h" ? c + 1 : c;
-    if (kind === "eq" && sol[r][c] !== sol[nr][nc]) return null;
-    if (kind === "ne" && sol[r][c] === sol[nr][nc]) return null;
+    if (kind === "eq" && sol[r]![c] !== sol[nr]![nc]) return null;
+    if (kind === "ne" && sol[r]![c] === sol[nr]![nc]) return null;
   }
 
   return {

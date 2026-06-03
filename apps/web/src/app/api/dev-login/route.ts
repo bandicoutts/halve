@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
   // Gate 2 — only from a local host (Host is client-settable, so this stacks
   // on the other gates rather than standing alone).
-  const host = (request.headers.get("host") ?? "").split(":")[0];
+  const host = (request.headers.get("host") ?? "").split(":")[0]!;
   if (!LOCAL_HOSTS.has(host)) {
     return new NextResponse("Not found", { status: 404 });
   }

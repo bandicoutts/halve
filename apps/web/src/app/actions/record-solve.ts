@@ -63,9 +63,9 @@ export async function recordSolve(input: RecordSolveInput): Promise<RecordSolveR
   const N = spec.solution.length;
   if (!Array.isArray(grid) || grid.length !== N) return { ok: false };
   for (let r = 0; r < N; r++) {
-    if (!Array.isArray(grid[r]) || grid[r].length !== N) return { ok: false };
+    if (!Array.isArray(grid[r]!) || grid[r]!.length !== N) return { ok: false };
     for (let c = 0; c < N; c++) {
-      if (grid[r][c] !== spec.solution[r][c]) return { ok: false };
+      if (grid[r]![c] !== spec.solution[r]![c]) return { ok: false };
     }
   }
 

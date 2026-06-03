@@ -54,16 +54,19 @@ export default async function ArchivePage() {
     }
 
     // Build flat list with day numbers (1-indexed ascending)
-    const allDays: ArchiveDayEntry[] = rows.map((r, i) => ({
-      id: r.id,
-      date: r.date as string,
-      day: parseInt((r.date as string).split("-")[2]!, 10),
-      dayNo: i + 1,
-      difficulty: r.difficulty as ArchiveDayEntry["difficulty"],
-      isToday: r.date === today,
-      solved: solvedIds.has(r.id),
-      timeMs: solveTimeMap.get(r.id),
-    }));
+    const allDays: ArchiveDayEntry[] = rows.map((r, i) => {
+      const timeMs = solveTimeMap.get(r.id);
+      return {
+        id: r.id,
+        date: r.date as string,
+        day: parseInt((r.date as string).split("-")[2]!, 10),
+        dayNo: i + 1,
+        difficulty: r.difficulty as ArchiveDayEntry["difficulty"],
+        isToday: r.date === today,
+        solved: solvedIds.has(r.id),
+        ...(timeMs !== undefined ? { timeMs } : {}),
+      };
+    });
 
     // Group by month, build ArchiveMonth[]
     const monthMap = new Map<string, ArchiveMonth>();

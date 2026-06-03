@@ -12,7 +12,7 @@ interface CellProps {
   rowIndex: number;
   colIndex: number;
   size: number;
-  onClick?: () => void;
+  onClick?: (() => void) | undefined;
 }
 
 function CellSymbol({ value, size }: { value: CellValue; size: number }) {

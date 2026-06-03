@@ -25,7 +25,7 @@ function computeTimeDist(durations: number[]): number[] {
   for (const ms of durations) {
     const m = ms / MS_PER_MIN;
     const i = BUCKET_MINS.findIndex((boundary) => m < boundary);
-    b[i === -1 ? BUCKET_MINS.length : i]++;
+    b[i === -1 ? BUCKET_MINS.length : i]!++;
   }
   return b;
 }

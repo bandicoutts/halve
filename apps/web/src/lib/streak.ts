@@ -49,7 +49,7 @@ export function computeLongestStreak(days: string[]): number {
   let cur = 1;
   for (let i = 1; i < sorted.length; i++) {
     const diff = Math.round(
-      (new Date(sorted[i]).getTime() - new Date(sorted[i - 1]).getTime()) / 86_400_000
+      (new Date(sorted[i]!).getTime() - new Date(sorted[i - 1]!).getTime()) / 86_400_000
     );
     if (diff === 1) {
       cur++;
