@@ -23,7 +23,7 @@ function cloneGrid(g: Grid): Grid {
   return g.map((row) => row.slice());
 }
 
-function reducer(state: GameState, action: Action): GameState {
+export function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
     case "tap": {
       const next = cloneGrid(state.cells);
@@ -45,7 +45,7 @@ function reducer(state: GameState, action: Action): GameState {
   }
 }
 
-function computeErrors(cells: Grid, edges: Edge[]): Set<string> {
+export function computeErrors(cells: Grid, edges: Edge[]): Set<string> {
   const N = cells.length;
   const errs = new Set<string>();
   const mark = (r: number, c: number) => errs.add(`${r}-${c}`);
