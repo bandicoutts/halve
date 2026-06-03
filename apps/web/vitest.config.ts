@@ -10,6 +10,6 @@ export default defineConfig({
   test: {
     globals: true,
     // Only pure-logic units — no jsdom/Next runtime needed.
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}"],
   },
 });
