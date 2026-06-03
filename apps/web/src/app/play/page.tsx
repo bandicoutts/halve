@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getLocalToday } from "@/lib/local-date";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { BoardScreen } from "@/components/board/BoardScreen";
+import { DailyUnavailable } from "@/components/screens/DailyUnavailable";
 
 // revalidate is omitted: cookies()/getUser() force dynamic rendering anyway,
 // so the value had no effect.
@@ -47,7 +48,12 @@ export default async function PlayPage() {
     // Deterministic offline fallback: the SAME seed+difficulty policy every other
     // producer uses (CLI seeder, edge function), so an offline player gets the
     // canonical puzzle for the date — not a random one — even with no DB row (CQ-3).
-    puzzle = generateDaily(today).puzzle;
+    try {
+      puzzle = generateDaily(today).puzzle;
+    } catch (err) {
+      console.error(`[daily-puzzle] offline fallback generator threw for ${today}:`, err);
+      return <DailyUnavailable />;
+    }
   }
 
   return (
