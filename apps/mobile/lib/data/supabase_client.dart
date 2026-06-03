@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Supabase project credentials, injected at build time via
@@ -7,8 +8,11 @@ const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
 /// Dev-only test account credentials (dart-define via env.json). Both are
 /// empty strings in release builds / when not set — the dev button is hidden.
+/// devPassword is guarded by kReleaseMode so it is always empty in release
+/// builds even if --dart-define-from-file env.json is accidentally passed.
 const devEmail = String.fromEnvironment('DEV_EMAIL');
-const devPassword = String.fromEnvironment('DEV_PASSWORD');
+// ignore: do_not_use_environment
+const devPassword = kReleaseMode ? '' : String.fromEnvironment('DEV_PASSWORD');
 
 /// The magic-link redirect target. Custom scheme for now (works without server
 /// association files); a universal/App Link is added before public launch.
