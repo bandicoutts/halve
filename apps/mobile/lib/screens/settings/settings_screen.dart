@@ -584,39 +584,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final c = context.halveColors;
 
     return SafeScaffold(
-      safeBottom: true,
-      body: Column(
-        children: [
-          HalveTopBar(title: 'Settings', onBack: () => context.pop()),
-          Expanded(
-            child: settingsAsync.when(
-              loading: () => const SizedBox.shrink(),
-              error: (_, _) => Center(
-                child: Text(
-                  'Could not load settings.',
-                  style: AppTypography.small.copyWith(color: c.fg3),
-                ),
-              ),
-              data: (data) => _SettingsContent(
-                data: data,
-                reminderOn: _reminderOn,
-                reminderHour: _reminderHour,
-                reminderAmpm: _reminderAmpm,
-                haptics: _haptics,
-                onReminderToggle: () => _setReminder(!_reminderOn),
-                onReminderHourDecrease: () =>
-                    _setReminderHour((_reminderHour - 2) % 12 + 1),
-                onReminderHourIncrease: () =>
-                    _setReminderHour(_reminderHour % 12 + 1),
-                onReminderAmpmToggle: () =>
-                    _setReminderAmpm(_reminderAmpm == 'am' ? 'pm' : 'am'),
-                onHapticsToggle: () => _setHaptics(!_haptics),
-                onSignOut: _confirmSignOut,
-                onEditDisplayName: _editDisplayName,
-              ),
-            ),
+      body: settingsAsync.when(
+        loading: () => const SizedBox.shrink(),
+        error: (_, _) => Center(
+          child: Text(
+            'Could not load settings.',
+            style: AppTypography.small.copyWith(color: c.fg3),
           ),
-        ],
+        ),
+        data: (data) => _SettingsContent(
+          data: data,
+          reminderOn: _reminderOn,
+          reminderHour: _reminderHour,
+          reminderAmpm: _reminderAmpm,
+          haptics: _haptics,
+          onReminderToggle: () => _setReminder(!_reminderOn),
+          onReminderHourDecrease: () =>
+              _setReminderHour((_reminderHour - 2) % 12 + 1),
+          onReminderHourIncrease: () =>
+              _setReminderHour(_reminderHour % 12 + 1),
+          onReminderAmpmToggle: () =>
+              _setReminderAmpm(_reminderAmpm == 'am' ? 'pm' : 'am'),
+          onHapticsToggle: () => _setHaptics(!_haptics),
+          onSignOut: _confirmSignOut,
+          onEditDisplayName: _editDisplayName,
+        ),
       ),
     );
   }
@@ -656,7 +648,6 @@ class _SettingsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     final hPad = context.hPagePad;
 
     return SingleChildScrollView(
@@ -664,7 +655,7 @@ class _SettingsContent extends StatelessWidget {
         hPad,
         AppSpacing.s4,
         hPad,
-        AppSpacing.s4 + bottomInset,
+        AppSpacing.s6,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

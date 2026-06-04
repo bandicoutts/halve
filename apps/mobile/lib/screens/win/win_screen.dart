@@ -241,7 +241,7 @@ class _WinScreenState extends ConsumerState<WinScreen> {
   }
 
   String _secondaryLabel(PlayKind kind) => switch (kind) {
-        PlayKind.daily => 'See your stats',
+        PlayKind.daily => 'Your stats',
         PlayKind.archive => 'Back to archive',
         PlayKind.practice => 'New puzzle',
       };
@@ -271,7 +271,7 @@ class _WinTopBar extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             Text(
-              'COMPLETE',
+              'SOLVED',
               style: AppTypography.label.copyWith(
                 letterSpacing: 1.2, // 0.1em
                 color: c.fg3,

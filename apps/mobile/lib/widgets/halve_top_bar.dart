@@ -4,6 +4,7 @@ import '../theme/app_layout.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
+import '../theme/breakpoints.dart';
 import 'halve_icon_button.dart';
 
 /// A lightweight screen header: optional leading back button, a title, and an
@@ -55,8 +56,8 @@ class HalveTopBar extends StatelessWidget {
           );
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.s2,
+      padding: EdgeInsets.symmetric(
+        horizontal: context.isTablet ? context.hPagePad : AppSpacing.s2,
         vertical: AppSpacing.s1,
       ),
       child: SizedBox(

@@ -53,6 +53,27 @@ class ArchiveGlyph extends StatelessWidget {
   }
 }
 
+/// Settings tab — three horizontal sliders with knobs.
+class SettingsGlyph extends StatelessWidget {
+  const SettingsGlyph({super.key, this.size = 24, this.active = false, this.color});
+
+  final double size;
+  final bool active;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    return CustomPaint(
+      size: Size.square(size),
+      painter: _SettingsPainter(
+        color: color ?? (active ? c.accent : c.fg3),
+        strokeWidth: active ? 2.0 : 1.6,
+      ),
+    );
+  }
+}
+
 /// Stats tab — three ascending bars.
 class StatsGlyph extends StatelessWidget {
   const StatsGlyph({super.key, this.size = 24, this.active = false, this.color});
@@ -194,5 +215,46 @@ class _StatsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_StatsPainter old) =>
+      old.color != color || old.strokeWidth != strokeWidth;
+}
+
+class _SettingsPainter extends CustomPainter {
+  _SettingsPainter({required this.color, required this.strokeWidth});
+  final Color color;
+  final double strokeWidth;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 24, size.height / 24);
+    final stroke = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round
+      ..isAntiAlias = true;
+    final fill = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+
+    // Three horizontal slider lines with knobs at staggered positions.
+    // Line 1 (y=6): knob at x=9
+    canvas.drawLine(const Offset(3, 6), const Offset(21, 6), stroke);
+    canvas.drawCircle(const Offset(9, 6), 2.4, fill);
+
+    // Line 2 (y=12): knob at x=15
+    canvas.drawLine(const Offset(3, 12), const Offset(21, 12), stroke);
+    canvas.drawCircle(const Offset(15, 12), 2.4, fill);
+
+    // Line 3 (y=18): knob at x=9
+    canvas.drawLine(const Offset(3, 18), const Offset(21, 18), stroke);
+    canvas.drawCircle(const Offset(9, 18), 2.4, fill);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_SettingsPainter old) =>
       old.color != color || old.strokeWidth != strokeWidth;
 }

@@ -17,7 +17,7 @@ class HvContentBox extends StatelessWidget {
     if (!context.isTablet) return child;
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: Breakpoints.contentWidth),
+        constraints: const BoxConstraints(maxWidth: Breakpoints.contentWidthPortrait),
         child: child,
       ),
     );

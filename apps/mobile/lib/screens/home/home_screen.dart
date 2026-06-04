@@ -35,61 +35,62 @@ class HomeScreen extends ConsumerWidget {
     }
 
     return SafeScaffold(
-      body: RefreshIndicator.adaptive(
-        onRefresh: () => ref.refresh(homeDataProvider.future),
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(
-            context.hPagePad, AppSpacing.s2, context.hPagePad, AppSpacing.s5,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const _HomeHeader(),
-              const SizedBox(height: AppSpacing.s5 + 2),
-              body,
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+      body: LayoutBuilder(
+        builder: (ctx, constraints) {
+          const topPad = AppSpacing.s2;
+          const bottomPad = AppSpacing.s5;
+          final isTablet = ctx.isTablet;
+          final isLandscape =
+              MediaQuery.orientationOf(ctx) == Orientation.landscape;
+          final hPad = ctx.hPagePad;
 
-/// Logo wordmark + settings gear.
-class _HomeHeader extends StatelessWidget {
-  const _HomeHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.halveColors;
-    return SizedBox(
-      height: 40,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const HalveMark(size: 22),
-              const SizedBox(width: AppSpacing.s2),
-              Text(
-                'Halve',
-                style: AppTypography.h3.copyWith(
-                  color: c.fg1,
-                  fontWeight: FontWeight.w600,
-                  fontVariations: const [FontVariation('wght', 600)],
+          // Portrait tablet: ConstrainedBox(minHeight) + Column(center) vertically
+          // centres the content block. constraints.maxHeight (confirmed 1095dp on
+          // Pixel Tablet portrait) correctly excludes captionBar + HalveBottomNav
+          // + shellBar; all MediaQuery padding is zero at this point (consumed by
+          // outer shells). _LoadedBody uses mainAxisSize.min so the inner Column
+          // sizes to content, leaving the outer Column free space to centre against.
+          if (isTablet && !isLandscape) {
+            return RefreshIndicator.adaptive(
+              onRefresh: () => ref.refresh(homeDataProvider.future),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(hPad, topPad, hPad, bottomPad),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - topPad - bottomPad,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [body],
+                  ),
                 ),
               ),
-            ],
-          ),
-          HalveIconButton(
-            semanticLabel: 'Settings',
-            size: 40,
-            onPressed: () => context.push(Routes.settings),
-            child: const Icon(Icons.settings_outlined),
-          ),
-        ],
+            );
+          }
+
+          final inner = isTablet
+              ? ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - topPad - bottomPad,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [body],
+                  ),
+                )
+              : body;
+          return RefreshIndicator.adaptive(
+            onRefresh: () => ref.refresh(homeDataProvider.future),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(hPad, topPad, hPad, bottomPad),
+              child: inner,
+            ),
+          );
+        },
       ),
     );
   }
@@ -160,28 +161,46 @@ class _LoadedBody extends StatelessWidget {
     final hasCache = data.puzzle != null;
     final offlineNoCache = data.offline && !hasCache;
     final emptyNoPuzzle = !data.offline && data.puzzle == null;
+    final c = context.halveColors;
+    final isTablet = context.isTablet;
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
 
-    return Column(
+    // On tablet, constrain the CTA to a pill width that suits a large screen.
+    Widget ctaButton(Widget btn) => isTablet
+        ? Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 300),
+              child: btn,
+            ),
+          )
+        : btn;
+
+    // Responsive gap helpers.
+    double gap(double phone, {double portrait = -1, double landscape = -1}) {
+      if (!isTablet) return phone;
+      return isLandscape ? landscape : portrait;
+    }
+
+    // ── Primary block: heading + CTA + streak ─────────────────────────
+    final primary = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // ── Streak band region ──────────────────────────────────────────
-        _StreakRegion(data: data),
-        const SizedBox(height: AppSpacing.s5 - 2),
-
-        // ── Puzzle region ──────────────────────────────────────────────
-        if (data.dateLabel.isNotEmpty) _MetaRow(data: data),
-        const SizedBox(height: AppSpacing.s3 - 2),
+        if (data.dateLabel.isNotEmpty) ...[
+          isTablet ? Center(child: _MetaRow(data: data)) : _MetaRow(data: data),
+          SizedBox(height: gap(AppSpacing.s3 - 2, portrait: 14, landscape: 10)),
+        ],
         Text(
           "Today's puzzle",
+          textAlign: isTablet ? TextAlign.center : TextAlign.start,
           style: AppTypography.h1.copyWith(
-            fontSize: 44,
+            fontSize: isTablet ? (isLandscape ? 52 : 62) : 44,
             height: 1.04,
-            letterSpacing: -1.1, // -0.025em
-            color: context.halveColors.fg1,
+            letterSpacing: isTablet ? -1.55 : -1.1,
+            color: c.fg1,
           ),
         ),
-        const SizedBox(height: AppSpacing.s5 - 2),
-
+        SizedBox(height: gap(AppSpacing.s5 - 2, portrait: 30, landscape: 22)),
         if (offlineNoCache)
           _OfflineNotice(onReload: onReload)
         else if (emptyNoPuzzle)
@@ -193,18 +212,43 @@ class _LoadedBody extends StatelessWidget {
             const _OfflineBanner(),
             const SizedBox(height: AppSpacing.s3),
           ],
-          HalveButton(
-            label: 'Play today',
-            full: true,
-            onPressed: () => context.push(Routes.play),
+          ctaButton(
+            HalveButton(
+              label: 'Play today',
+              full: true,
+              onPressed: () => context.push(Routes.play),
+            ),
           ),
         ],
+        // Streak band sits below the CTA — signed-in only, no gap when absent.
+        if (data.signedIn) ...[
+          SizedBox(height: gap(AppSpacing.s5 - 2, portrait: 28, landscape: 20)),
+          _StreakRegion(data: data),
+        ],
+      ],
+    );
 
-        // ── Keep playing ───────────────────────────────────────────────
-        const SizedBox(height: AppSpacing.s6),
+    // ── Footer block: Keep playing + How to play ───────────────────────
+    final footer = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         _KeepPlaying(data: data),
-        const SizedBox(height: AppSpacing.s6),
+        SizedBox(height: gap(AppSpacing.s6, portrait: 30, landscape: 22)),
         const _HowToPlayFooter(),
+      ],
+    );
+
+    // mainAxisSize.min: size to content only, so the outer centering Column
+    // (portrait tablet ConstrainedBox) retains free space to centre against.
+    // Safe for phone too — in an unbounded scroll context max and min behave
+    // identically (Column can't expand to infinity, falls back to content).
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        primary,
+        SizedBox(height: gap(AppSpacing.s6, portrait: 30, landscape: 22)),
+        footer,
       ],
     );
   }
@@ -225,6 +269,7 @@ class _StreakRegion extends StatelessWidget {
         streak: data.streak,
         last7: data.last7,
         solvedToday: data.solvedToday,
+        today: data.today,
       );
     }
     return const _EmptyStreakBand();
@@ -236,72 +281,73 @@ class _StreakBand extends StatelessWidget {
     required this.streak,
     required this.last7,
     required this.solvedToday,
+    required this.today,
   });
 
   final int streak;
   final List<bool> last7;
   final bool solvedToday;
+  final String today;
 
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: 14),
-      decoration: BoxDecoration(
-        color: c.surface,
-        border: Border.all(color: c.hairline),
-        borderRadius: AppRadii.lgR,
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(color: c.accentTint, shape: BoxShape.circle),
-            alignment: Alignment.center,
-            child: const FlameIcon(size: 20),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text.rich(
-                  TextSpan(children: [
-                    TextSpan(
-                      text: '$streak',
-                      style: AppTypography.tabular(AppTypography.small).copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        fontVariations: const [FontVariation('wght', 600)],
-                        color: c.accent,
-                      ),
+    final isTablet = context.isTablet;
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+    final hPad = isTablet ? (isLandscape ? 18.0 : 24.0) : AppSpacing.s4;
+
+    final streakTextRow = Row(
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(color: c.accentTint, shape: BoxShape.circle),
+          alignment: Alignment.center,
+          child: const FlameIcon(size: 20),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text.rich(
+                TextSpan(children: [
+                  TextSpan(
+                    text: '$streak',
+                    style: AppTypography.tabular(AppTypography.small).copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      fontVariations: const [FontVariation('wght', 600)],
+                      color: c.accent,
                     ),
-                    TextSpan(
-                      text: ' day streak',
-                      style: AppTypography.small.copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        fontVariations: const [FontVariation('wght', 600)],
-                        color: c.fg1,
-                      ),
-                    ),
-                  ]),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  solvedToday ? 'Solved today — streak safe' : 'Solve today to keep it going',
-                  style: AppTypography.label.copyWith(
-                    letterSpacing: 0,
-                    fontWeight: FontWeight.w400,
-                    fontVariations: const [FontVariation('wght', 400)],
-                    color: c.fg3,
                   ),
+                  TextSpan(
+                    text: ' day streak',
+                    style: AppTypography.small.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      fontVariations: const [FontVariation('wght', 600)],
+                      color: c.fg1,
+                    ),
+                  ),
+                ]),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                solvedToday ? 'Solved today — streak safe' : 'Solve today to keep it going',
+                style: AppTypography.label.copyWith(
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.w400,
+                  fontVariations: const [FontVariation('wght', 400)],
+                  color: c.fg3,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
+        if (!isTablet) ...[
           const SizedBox(width: AppSpacing.s3),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -320,7 +366,151 @@ class _StreakBand extends StatelessWidget {
             ],
           ),
         ],
+      ],
+    );
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 14),
+      decoration: BoxDecoration(
+        color: c.surface,
+        border: Border.all(color: c.hairline),
+        borderRadius: AppRadii.lgR,
       ),
+      child: isTablet
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                streakTextRow,
+                const SizedBox(height: 14),
+                _WeekCalendar(
+                  last7: last7,
+                  today: today,
+                  solvedToday: solvedToday,
+                  circleSize: isLandscape ? 32.0 : 38.0,
+                ),
+              ],
+            )
+          : streakTextRow,
+    );
+  }
+}
+
+/// Mon–Sun week calendar row shown inside the streak band on tablet.
+class _WeekCalendar extends StatelessWidget {
+  const _WeekCalendar({
+    required this.last7,
+    required this.today,
+    required this.solvedToday,
+    required this.circleSize,
+  });
+
+  final List<bool> last7;
+  final String today;
+  final bool solvedToday;
+  final double circleSize;
+
+  // last7 is oldest-first: index 0 = 6 days ago, index 6 = today.
+  static const _dayLetters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        for (var i = 0; i < last7.length; i++)
+          _DayCell(
+            letter: _dayLetters[
+                DateTime.parse(
+                  // offsetDay(today, -(6-i)): i=0→6 days ago, i=6→today
+                  _offsetDay(today, -(6 - i)),
+                ).weekday -
+                    1],
+            solved: last7[i],
+            isToday: i == last7.length - 1,
+            circleSize: circleSize,
+          ),
+      ],
+    );
+  }
+
+  static String _offsetDay(String date, int delta) {
+    final parts = date.split('-');
+    final d = DateTime(
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+      int.parse(parts[2]) + delta,
+    );
+    return '${d.year.toString().padLeft(4, '0')}-'
+        '${d.month.toString().padLeft(2, '0')}-'
+        '${d.day.toString().padLeft(2, '0')}';
+  }
+}
+
+class _DayCell extends StatelessWidget {
+  const _DayCell({
+    required this.letter,
+    required this.solved,
+    required this.isToday,
+    required this.circleSize,
+  });
+
+  final String letter;
+  final bool solved;
+  final bool isToday;
+  final double circleSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+
+    BoxDecoration circleDecoration;
+    Widget? circleChild;
+
+    if (solved) {
+      // Solved (past or today): filled amber + checkmark.
+      circleDecoration = BoxDecoration(
+        color: c.accent,
+        shape: BoxShape.circle,
+      );
+      circleChild = Icon(Icons.check_rounded, size: circleSize * 0.45, color: Colors.white);
+    } else if (isToday) {
+      // Today unsolved: amber outline ring with tint fill.
+      circleDecoration = BoxDecoration(
+        color: c.accentTint,
+        shape: BoxShape.circle,
+        border: Border.all(color: c.accent, width: 2),
+      );
+    } else {
+      // Past missed: hairline ring, no fill.
+      circleDecoration = BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: c.hairline2, width: 1),
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          letter,
+          style: AppTypography.label.copyWith(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            fontVariations: const [FontVariation('wght', 600)],
+            letterSpacing: 0.6,
+            color: c.fg2,
+          ),
+        ),
+        const SizedBox(height: 9),
+        Container(
+          width: circleSize,
+          height: circleSize,
+          decoration: circleDecoration,
+          alignment: Alignment.center,
+          child: circleChild,
+        ),
+      ],
     );
   }
 }
@@ -553,10 +743,10 @@ class _SolvedBlock extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.s4),
         HalveButton(
-          label: 'See your stats',
+          label: 'Practice',
           variant: HalveButtonVariant.secondary,
           full: true,
-          onPressed: () => context.go(Routes.stats),
+          onPressed: () => context.push(Routes.practice),
         ),
       ],
     );
@@ -604,7 +794,7 @@ class _KeepPlaying extends StatelessWidget {
                 onTap: () => context.push(Routes.practice),
               ),
             ),
-            const SizedBox(width: AppSpacing.s3),
+            SizedBox(width: context.isTablet ? 14 : AppSpacing.s3),
             Expanded(
               child: _DestCard(
                 motif: const HalveMark(size: 26),
@@ -636,11 +826,16 @@ class _DestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    return GestureDetector(
+    final isTablet = context.isTablet;
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+    final minH = isTablet ? (isLandscape ? 128.0 : 148.0) : 124.0;
+    final pad = isTablet ? (isLandscape ? 18.0 : 22.0) : 18.0;
+    return TapFade(
       onTap: onTap,
       child: Container(
-        constraints: const BoxConstraints(minHeight: 124),
-        padding: const EdgeInsets.all(18),
+        constraints: BoxConstraints(minHeight: minH),
+        padding: EdgeInsets.all(pad),
         decoration: BoxDecoration(
           color: c.surface,
           border: Border.all(color: c.hairline),
@@ -698,7 +893,7 @@ class _HowToPlayFooter extends StatelessWidget {
         onTap: () => context.push(Routes.tutorial),
         behavior: HitTestBehavior.opaque,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.s2),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.s3),
           child: Text(
             'How to play',
             style: AppTypography.small.copyWith(

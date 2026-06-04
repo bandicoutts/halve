@@ -71,6 +71,9 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
           StatefulShellBranch(
             routes: [GoRoute(path: Routes.stats, builder: (_, _) => const StatsScreen())],
           ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: Routes.settings, builder: (_, _) => const SettingsScreen())],
+          ),
         ],
       ),
       GoRoute(
@@ -104,10 +107,6 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
             difficulty: state.uri.queryParameters['difficulty'],
           ),
         ),
-      ),
-      GoRoute(
-        path: Routes.settings,
-        pageBuilder: (_, state) => _fade(state, const SettingsScreen()),
       ),
       GoRoute(
         path: Routes.auth,
@@ -175,7 +174,8 @@ class _PlayResultDecoder extends Converter<Object?, Object?> {
   }
 }
 
-/// The tab shell: hosts the active branch and the anchored bottom nav.
+/// The tab shell: hosts the persistent brand bar, the active branch, and the
+/// anchored bottom nav.
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.navigationShell});
 
@@ -185,13 +185,49 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.halveColors.bg,
-      body: navigationShell,
+      body: SafeArea(
+        top: true,
+        bottom: false,
+        child: Column(
+          children: [
+            const _HalveShellBar(),
+            Expanded(child: navigationShell),
+          ],
+        ),
+      ),
       bottomNavigationBar: HalveBottomNav(
         currentIndex: navigationShell.currentIndex,
         onTap: (index) => navigationShell.goBranch(
           index,
-          // Re-tapping the active tab pops it back to its root.
           initialLocation: index == navigationShell.currentIndex,
+        ),
+      ),
+    );
+  }
+}
+
+/// Persistent brand bar shown across all shell tabs. Logo + name, centered.
+class _HalveShellBar extends StatelessWidget {
+  const _HalveShellBar();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    final labelStyle = AppTypography.h3.copyWith(
+      color: c.fg1,
+      fontWeight: FontWeight.w600,
+      fontVariations: const [FontVariation('wght', 600)],
+    );
+    return SizedBox(
+      height: AppLayout.topBarHeight,
+      child: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const HalveMark(size: 22),
+            const SizedBox(width: AppSpacing.s2),
+            Text('Halve', style: labelStyle),
+          ],
         ),
       ),
     );

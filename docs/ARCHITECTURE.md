@@ -5,13 +5,17 @@ Halve — a premium daily logic-puzzle web app (Flutter mobile later). The puzzl
 
 ## Monorepo map (pnpm workspaces)
 ```
-apps/web            Next.js 16 (App Router) web app — the only frontend for now
+apps/web            Next.js 16 (App Router) web app
+apps/mobile         Flutter app (Android/iOS) — same Supabase backend as web
 packages/engine     pure TS: puzzle generator + solver + validators (no deps, no DOM)
 packages/design     design tokens (color/space/type) — single source of truth
 supabase/           migrations, edge functions, seed
 docs/               these context docs
 ```
-Phase 5 adds a Flutter app that re-implements `packages/engine` in Dart against the same Supabase backend.
+The Flutter app re-implements the engine rules in Dart (`packages/engine` logic is not shared at the package level — the Dart port lives in `apps/mobile/lib/`) and shares the same Supabase backend (same `puzzles`/`solves`/`profiles` schema, same `record_solve` RPC).
+
+### Mobile shell structure
+The Flutter app uses go_router with a `StatefulShellRoute` for the three main tabs (Today / Archive / Stats). A persistent `_HalveShellBar` (logo + settings) sits above the tab content in `AppShell`; the shell's `SafeArea(top: true)` consumes the status-bar inset so tab screens' own `SafeArea` adds nothing. Full-screen routes (Play, Win, Settings, Tutorial, Auth) live outside the shell and own their own chrome.
 
 ## Request flows
 - **Daily puzzle:** a scheduled Supabase Edge Function mints one puzzle/day at a fixed difficulty into `puzzles` keyed by date. All users fetch the same row → shared daily.

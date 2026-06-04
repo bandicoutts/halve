@@ -15,7 +15,7 @@ class HalveNavItem {
   final Widget Function(bool active) glyphBuilder;
 }
 
-/// The Halve bottom tab bar — Today · Archive · Stats. Anchored (never
+/// The Halve bottom tab bar — Today · Archive · Stats · Settings. Anchored (never
 /// floating), platform-adaptive per the mobile wireframe (`app/screens/nav.jsx`):
 ///   • iOS    — bare labelled icons, active in accent.
 ///   • Android — Material 3 NavigationBar, active glyph seated in an
@@ -45,11 +45,16 @@ class HalveBottomNav extends StatelessWidget {
       label: 'Stats',
       glyphBuilder: _statsGlyph,
     ),
+    HalveNavItem(
+      label: 'Settings',
+      glyphBuilder: _settingsGlyph,
+    ),
   ];
 
   static Widget _todayGlyph(bool a) => TodayGlyph(active: a);
   static Widget _archiveGlyph(bool a) => ArchiveGlyph(active: a);
   static Widget _statsGlyph(bool a) => StatsGlyph(active: a);
+  static Widget _settingsGlyph(bool a) => SettingsGlyph(active: a);
 
   @override
   Widget build(BuildContext context) {

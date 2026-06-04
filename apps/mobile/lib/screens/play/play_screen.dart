@@ -206,9 +206,14 @@ class _PlayViewState extends ConsumerState<_PlayView> {
       }
       if (prev != null && !next.solved) {
         if (prev.violations.isEmpty && next.violations.isNotEmpty) hapticsOnError();
+        if (_filledLineCount(next.grid) > _filledLineCount(prev.grid)) {
+          hapticsOnLineComplete();
+        }
       }
     });
 
+    final isTablet = context.isTablet;
+    final reduceMotion = context.reduceMotion;
     return Column(
       children: [
         _PlayTopBar(
@@ -225,88 +230,168 @@ class _PlayViewState extends ConsumerState<_PlayView> {
               style: AppTypography.small.copyWith(color: c.fg3),
             ),
           ),
-        // Timer.
-        Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.s1),
-          child: Text(
-            formatDuration(state.elapsedSeconds),
-            style: AppTypography.timer.copyWith(
-              color: state.solved ? c.correct : c.fg1,
-            ),
-          ),
-        ),
         // Board — sized to a centered square within the available space.
-        // On tablet: generous horizontal padding + 480 px max-side cap so the
-        // board doesn't grow uncomfortably large on a 10-inch display.
+        // On tablet: board + controls are grouped and centred together so no
+        // dead space accumulates below the grid.
         Expanded(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-                context.hPagePad, AppSpacing.s4, context.hPagePad, AppSpacing.s4),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                const maxSide = 480.0;
-                final side = math.min(
-                    math.min(constraints.maxWidth, constraints.maxHeight),
-                    maxSide);
-                // 6 cells + 5 gaps (gap ≈ 0.16·cell) → total ≈ 6.8·cell.
-                final cellSize = (side / 6.8).floorToDouble();
-                final gap = math.max(6.0, (cellSize * 0.16).floorToDouble());
-                return Center(
-                  child: PlayBoard(
-                    cells: state.grid,
-                    givens: _puzzle.givens,
-                    edges: _puzzle.edges,
-                    violations: state.violations,
-                    cellSize: cellSize,
-                    gap: gap,
-                    readOnly: state.solved,
-                    onCellTap: (r, c) {
-                      hapticsOnTap();
-                      controller.tap(r, c);
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: reduceMotion ? 0.0 : 8.0, end: 0.0),
+            duration:
+                reduceMotion ? Duration.zero : const Duration(milliseconds: 420),
+            curve: const Cubic(0.34, 1.4, 0.5, 1),
+            builder: (_, dy, child) =>
+                Transform.translate(offset: Offset(0, dy), child: child),
+            child: isTablet
+              ? Padding(
+                  padding: EdgeInsets.symmetric(horizontal: context.hPagePad),
+                  child: LayoutBuilder(
+                    builder: (ctx, constraints) {
+                      // Reserve space for spacer + controls + HowToPlay below
+                      // the board so the column never overflows on any tablet.
+                      const maxSide = Breakpoints.contentWidthPortrait;
+                      const controlsReserve = 132.0;
+                      final side = math.min(
+                          math.min(constraints.maxWidth,
+                              constraints.maxHeight - controlsReserve),
+                          maxSide);
+                      final cellSize = (side / 6.8).floorToDouble();
+                      final gap =
+                          math.max(6.0, (cellSize * 0.16).floorToDouble());
+                      final isLandscape =
+                          MediaQuery.orientationOf(ctx) == Orientation.landscape;
+                      return Column(
+                        mainAxisAlignment: isLandscape
+                            ? MainAxisAlignment.center
+                            : MainAxisAlignment.start,
+                        children: [
+                          if (!isLandscape) const SizedBox(height: AppSpacing.s6),
+                          PlayBoard(
+                            cells: state.grid,
+                            givens: _puzzle.givens,
+                            edges: _puzzle.edges,
+                            violations: state.violations,
+                            cellSize: cellSize,
+                            gap: gap,
+                            readOnly: state.solved,
+                            onCellTap: (r, c) {
+                              hapticsOnTap();
+                              controller.tap(r, c);
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.s4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _ControlButton(
+                                label: 'Undo',
+                                onPressed: state.canUndo && !state.solved
+                                    ? controller.undo
+                                    : null,
+                                child: const UndoGlyph(),
+                              ),
+                              const SizedBox(width: AppSpacing.s7),
+                              _ControlButton(
+                                label: 'Hint',
+                                onPressed:
+                                    state.solved ? null : controller.hint,
+                                child: const HintGlyph(),
+                              ),
+                            ],
+                          ),
+                          TapFade(
+                            onTap: () => context.push(Routes.tutorial),
+                            child: Container(
+                              constraints:
+                                  const BoxConstraints(minHeight: 44),
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.s2),
+                              child: Text(
+                                'How to play',
+                                style:
+                                    AppTypography.small.copyWith(color: c.fg2),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
                     },
                   ),
-                );
-              },
+                )
+              : Padding(
+                  padding: EdgeInsets.fromLTRB(context.hPagePad, AppSpacing.s4,
+                      context.hPagePad, AppSpacing.s4),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      const maxSide = 480.0;
+                      final side = math.min(
+                          math.min(constraints.maxWidth, constraints.maxHeight),
+                          maxSide);
+                      // 6 cells + 5 gaps (gap ≈ 0.16·cell) → total ≈ 6.8·cell.
+                      final cellSize = (side / 6.8).floorToDouble();
+                      final gap =
+                          math.max(6.0, (cellSize * 0.16).floorToDouble());
+                      return Center(
+                        child: PlayBoard(
+                          cells: state.grid,
+                          givens: _puzzle.givens,
+                          edges: _puzzle.edges,
+                          violations: state.violations,
+                          cellSize: cellSize,
+                          gap: gap,
+                          readOnly: state.solved,
+                          onCellTap: (r, c) {
+                            hapticsOnTap();
+                            controller.tap(r, c);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+          ),
+        ),
+        // Controls and How to play — phone only; tablet renders these inside
+        // the Expanded group above so they stay close to the board.
+        if (!isTablet) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.s5, AppSpacing.s1, AppSpacing.s5, AppSpacing.s2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _ControlButton(
+                  label: 'Undo',
+                  onPressed:
+                      state.canUndo && !state.solved ? controller.undo : null,
+                  child: const UndoGlyph(),
+                ),
+                const SizedBox(width: AppSpacing.s7),
+                _ControlButton(
+                  label: 'Hint',
+                  onPressed: state.solved ? null : controller.hint,
+                  child: const HintGlyph(),
+                ),
+              ],
             ),
           ),
-        ),
-        // Controls.
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              AppSpacing.s5, AppSpacing.s1, AppSpacing.s5, AppSpacing.s2),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _ControlButton(
-                label: 'Undo',
-                onPressed: state.canUndo && !state.solved ? controller.undo : null,
-                child: const UndoGlyph(),
-              ),
-              const SizedBox(width: AppSpacing.s7),
-              _ControlButton(
-                label: 'Hint',
-                onPressed: state.solved ? null : controller.hint,
-                child: const HintGlyph(),
-              ),
-            ],
-          ),
-        ),
-        // How to play.
-        Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.s2),
-          child: TapFade(
-            onTap: () => context.push(Routes.tutorial),
-            child: Container(
-              constraints: const BoxConstraints(minHeight: 44),
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s2),
-              child: Text(
-                'How to play',
-                style: AppTypography.small.copyWith(color: c.fg2),
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.s2),
+            child: TapFade(
+              onTap: () => context.push(Routes.tutorial),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 44),
+                alignment: Alignment.center,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: AppSpacing.s2),
+                child: Text(
+                  'How to play',
+                  style: AppTypography.small.copyWith(color: c.fg2),
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -345,6 +430,21 @@ class _PlayViewState extends ConsumerState<_PlayView> {
         saveResult: saveResult,
       ),
     );
+  }
+
+  /// Counts fully-filled rows + columns (all cells non-null). Used to detect
+  /// the moment a line completes so we can fire a satisfying haptic beat.
+  int _filledLineCount(Grid grid) {
+    var count = 0;
+    for (final row in grid) {
+      if (row.every((c) => c != null)) count++;
+    }
+    if (grid.isNotEmpty) {
+      for (var col = 0; col < grid[0].length; col++) {
+        if (grid.every((row) => row[col] != null)) count++;
+      }
+    }
+    return count;
   }
 
   Future<RecordSolveResult?> _record({

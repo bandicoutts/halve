@@ -23,9 +23,13 @@ class HapticsService {
 
   /// Light impact: new violation appeared.
   Future<void> onError() => _fire(HapticFeedback.lightImpact);
+
+  /// Light impact: a row or column just became fully filled.
+  Future<void> onLineComplete() => _fire(HapticFeedback.lightImpact);
 }
 
 /// Convenience top-level wrappers (call-site API unchanged).
 Future<void> hapticsOnTap() => HapticsService.instance.onTap();
 Future<void> hapticsOnWin() => HapticsService.instance.onWin();
 Future<void> hapticsOnError() => HapticsService.instance.onError();
+Future<void> hapticsOnLineComplete() => HapticsService.instance.onLineComplete();

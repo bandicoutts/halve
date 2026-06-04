@@ -44,37 +44,25 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_activated) {
-      // Show the header + skeleton so there's no flash of blank content.
-      return const SafeScaffold(
-        body: Column(
-          children: [_ArchiveHeader(), Expanded(child: SizedBox())],
-        ),
-      );
+      return const SafeScaffold(body: SizedBox.expand());
     }
     final async = ref.watch(archiveDataProvider);
     return SafeScaffold(
-      body: Column(
-        children: [
-          const _ArchiveHeader(),
-          Expanded(
-            child: async.when(
-              data: (data) => data.isEmpty
-                  ? _EmptyArchive(
-                      offline: data.offline,
-                      onRefresh: _refresh,
-                    )
-                  : _ArchiveBody(
-                      data: data,
-                      view: _effectiveView(data),
-                      onView: (ym) => setState(() => _view = ym),
-                      onRefresh: _refresh,
-                    ),
-              loading: () =>
-                  const Center(child: CircularProgressIndicator.adaptive()),
-              error: (_, _) => _EmptyArchive(offline: true, onRefresh: _refresh),
-            ),
-          ),
-        ],
+      body: async.when(
+        data: (data) => data.isEmpty
+            ? _EmptyArchive(
+                offline: data.offline,
+                onRefresh: _refresh,
+              )
+            : _ArchiveBody(
+                data: data,
+                view: _effectiveView(data),
+                onView: (ym) => setState(() => _view = ym),
+                onRefresh: _refresh,
+              ),
+        loading: () =>
+            const Center(child: CircularProgressIndicator.adaptive()),
+        error: (_, _) => _EmptyArchive(offline: true, onRefresh: _refresh),
       ),
     );
   }
@@ -86,30 +74,6 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
     final v = _view;
     if (v != null && data.months.contains(v)) return v;
     return data.currentMonth;
-  }
-}
-
-class _ArchiveHeader extends StatelessWidget {
-  const _ArchiveHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.halveColors;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-          context.hPagePad, AppSpacing.s3, context.hPagePad, AppSpacing.s1),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          'Archive',
-          style: AppTypography.h2.copyWith(
-            fontWeight: FontWeight.w600,
-            fontVariations: const [FontVariation('wght', 600)],
-            color: c.fg1,
-          ),
-        ),
-      ),
-    );
   }
 }
 
@@ -134,6 +98,9 @@ class _ArchiveBody extends StatelessWidget {
     final next = nextMonth(view, current);
 
     final hPad = context.hPagePad;
+    final navBarH = Theme.of(context).platform == TargetPlatform.android
+        ? 64.0
+        : AppLayout.topBarHeight;
     return GestureDetector(
       onHorizontalDragEnd: (d) {
         final v = d.primaryVelocity ?? 0;
@@ -147,7 +114,9 @@ class _ArchiveBody extends StatelessWidget {
         onRefresh: onRefresh,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(hPad, AppSpacing.s1, hPad, AppSpacing.s6),
+          // navBarH mirrors the bottom nav height (64dp Android, 52dp iOS) so
+          // the last row scrolls clear of the bar without a SafeArea wrapper.
+          padding: EdgeInsets.fromLTRB(hPad, AppSpacing.s1, hPad, navBarH + AppSpacing.s4),
           children: [
             _MonthNav(
               view: view,

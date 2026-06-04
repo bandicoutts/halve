@@ -303,7 +303,7 @@ class _AreaPainter extends CustomPainter {
       tp.text = TextSpan(
         text: _distLabels[i],
         style: TextStyle(
-          fontFamily: 'SpaceGrotesk',
+          fontFamily: AppTypography.fontFamily,
           fontSize: 10.5,
           fontWeight: i == peakIdx ? FontWeight.w700 : FontWeight.w500,
           color: i == peakIdx ? accentColor : fg3,
@@ -617,7 +617,10 @@ class _StatsRecord extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 14),
-          _AreaChart(dist: stats.timeDist),
+          Semantics(
+            label: 'Solve time distribution chart',
+            child: _AreaChart(dist: stats.timeDist),
+          ),
 
           // Avg + best time
           const SizedBox(height: AppSpacing.s4),
@@ -737,7 +740,7 @@ class _StatsGuest extends StatelessWidget {
         Align(
           alignment: const Alignment(0, -0.1),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s5),
+            padding: EdgeInsets.symmetric(horizontal: context.hPagePad),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -762,11 +765,21 @@ class _StatsGuest extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 22),
-                HalveButton(
-                  label: 'Sign in',
-                  full: true,
-                  onPressed: () => context.push('/auth'),
-                ),
+                Builder(builder: (context) {
+                  final btn = HalveButton(
+                    label: 'Sign in',
+                    full: true,
+                    onPressed: () => context.push('/auth'),
+                  );
+                  return context.isTablet
+                      ? Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 300),
+                            child: btn,
+                          ),
+                        )
+                      : btn;
+                }),
               ],
             ),
           ),
@@ -810,36 +823,25 @@ class StatsScreen extends ConsumerWidget {
     final async = ref.watch(statsDataProvider);
 
     return SafeScaffold(
-      body: Column(
-        children: [
-          const HalveTopBar(title: 'Statistics'),
-          Expanded(
-            child: async.when(
-              loading: () => Builder(builder: (context) {
-                final hPad = context.hPagePad;
-                return SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                      hPad, AppSpacing.s4, hPad, AppSpacing.s7),
-                  child: const _LoadingSkeleton(),
-                );
-              }),
-              error: (_, _) => const _ErrorState(),
-              data: (data) {
-                if (!data.signedIn) {
-                  return const _StatsGuest();
-                }
-                return Builder(builder: (context) {
-                  final hPad = context.hPagePad;
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                        hPad, AppSpacing.s4, hPad, AppSpacing.s7),
-                    child: _StatsRecord(data: data),
-                  );
-                });
-              },
-            ),
-          ),
-        ],
+      body: async.when(
+        loading: () => Builder(builder: (context) {
+          final hPad = context.hPagePad;
+          return SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(hPad, AppSpacing.s3, hPad, AppSpacing.s7),
+            child: const _LoadingSkeleton(),
+          );
+        }),
+        error: (_, _) => const _ErrorState(),
+        data: (data) {
+          if (!data.signedIn) return const _StatsGuest();
+          return Builder(builder: (context) {
+            final hPad = context.hPagePad;
+            return SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(hPad, AppSpacing.s3, hPad, AppSpacing.s7),
+              child: _StatsRecord(data: data),
+            );
+          });
+        },
       ),
     );
   }
