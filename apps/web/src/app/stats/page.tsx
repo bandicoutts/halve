@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { getLocalToday, solveDay } from "@/lib/local-date";
+import { getLocalToday } from "@/lib/local-date.server";
+import { solveDay } from "@/lib/local-date";
 import { computeStreak, computeLongestStreak, computeLastDays } from "@/lib/streak";
 import { StatsScreen } from "@/components/screens/StatsScreen";
 

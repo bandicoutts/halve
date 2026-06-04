@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import type { Difficulty } from "@parity/engine";
 import { createClient } from "@/lib/supabase/server";
-import { getLocalToday } from "@/lib/local-date";
+import { getLocalToday } from "@/lib/local-date.server";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { BoardScreen } from "@/components/board/BoardScreen";
 

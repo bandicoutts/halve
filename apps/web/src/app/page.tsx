@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { getLocalToday, formatDateLabel } from "@/lib/local-date";
+import { getLocalToday } from "@/lib/local-date.server";
+import { formatDateLabel } from "@/lib/local-date";
 import { HomeScreen } from "@/components/screens/HomeScreen";
 import { HomeUserContent } from "./_components/HomeUserContent";
 

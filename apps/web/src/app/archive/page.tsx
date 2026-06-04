@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { ArchiveScreen } from "@/components/screens/ArchiveScreen";
 import type { ArchiveDayEntry, ArchiveMonth } from "@/components/screens/ArchiveScreen";
-import { getLocalToday } from "@/lib/local-date";
+import { getLocalToday } from "@/lib/local-date.server";
 
 // revalidate is omitted: cookies()/getUser() force dynamic rendering anyway.
 
