@@ -162,8 +162,6 @@ export function BoardScreen({
     else router.push("/practice");
   }, [kind, router, backHref]);
 
-  if (cellSize === null) return <BoardSkeleton />;
-
   return (
     <div
       style={{
