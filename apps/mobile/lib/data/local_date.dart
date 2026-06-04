@@ -46,6 +46,13 @@ String formatShortDate(String date) {
   return '${kMonthNames[dt.month - 1]} ${dt.day}';
 }
 
+/// Day-of-week name for a `yyyy-MM-dd` string, e.g. "Wednesday".
+String formatDayName(String date) {
+  final dt = _parse(date);
+  if (dt == null) return '';
+  return _weekdays[dt.weekday - 1];
+}
+
 /// The best day string for a solve row: prefer the stored local date, falling
 /// back to the UTC date of `solved_at` for legacy null-`local_date` rows
 /// (BE-3). Mirrors the web `solveDay`.

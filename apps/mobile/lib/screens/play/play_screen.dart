@@ -109,7 +109,7 @@ class _UnavailableView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Puzzle unavailable — try again shortly.',
+                "Couldn't load the puzzle.",
                 textAlign: TextAlign.center,
                 style: AppTypography.small.copyWith(color: c.fg3),
               ),
@@ -260,11 +260,8 @@ class _PlayViewState extends ConsumerState<_PlayView> {
                       final isLandscape =
                           MediaQuery.orientationOf(ctx) == Orientation.landscape;
                       return Column(
-                        mainAxisAlignment: isLandscape
-                            ? MainAxisAlignment.center
-                            : MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (!isLandscape) const SizedBox(height: AppSpacing.s6),
                           PlayBoard(
                             cells: state.grid,
                             givens: _puzzle.givens,
@@ -299,7 +296,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
                             ],
                           ),
                           TapFade(
-                            onTap: () => context.push(Routes.tutorial),
+                            onTap: () => _showRules(context),
                             child: Container(
                               constraints:
                                   const BoxConstraints(minHeight: 44),
@@ -307,7 +304,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: AppSpacing.s2),
                               child: Text(
-                                'How to play',
+                                'Rules',
                                 style:
                                     AppTypography.small.copyWith(color: c.fg2),
                               ),
@@ -378,14 +375,14 @@ class _PlayViewState extends ConsumerState<_PlayView> {
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.s2),
             child: TapFade(
-              onTap: () => context.push(Routes.tutorial),
+              onTap: () => _showRules(context),
               child: Container(
                 constraints: const BoxConstraints(minHeight: 44),
                 alignment: Alignment.center,
                 padding:
                     const EdgeInsets.symmetric(horizontal: AppSpacing.s2),
                 child: Text(
-                  'How to play',
+                  'Rules',
                   style: AppTypography.small.copyWith(color: c.fg2),
                 ),
               ),
@@ -447,6 +444,13 @@ class _PlayViewState extends ConsumerState<_PlayView> {
     return count;
   }
 
+  void _showRules(BuildContext context) {
+    showHalveBottomSheet<void>(
+      context: context,
+      builder: (_) => const _RulesSheet(),
+    );
+  }
+
   Future<RecordSolveResult?> _record({
     required int durationMs,
     required bool usedHint,
@@ -503,6 +507,133 @@ class _ControlButton extends StatelessWidget {
           label.toUpperCase(),
           style: AppTypography.micro.copyWith(
             color: disabled ? c.hairline2 : c.fg3,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Compact rules reference shown in a bottom sheet during play.
+/// Three rules, each one sentence. Not a tutorial — a reminder.
+class _RulesSheet extends StatelessWidget {
+  const _RulesSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.s5,
+        AppSpacing.s4,
+        AppSpacing.s5,
+        AppSpacing.s6,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Rules', style: AppTypography.h3.copyWith(color: c.fg1)),
+          const SizedBox(height: AppSpacing.s5),
+          _RuleRow(
+            motif: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SymbolDisc(size: 18),
+                SizedBox(width: 5),
+                SymbolRing(size: 18),
+              ],
+            ),
+            heading: 'Two symbols',
+            body: 'Fill every cell with a disc or a ring.',
+            c: c,
+          ),
+          const SizedBox(height: AppSpacing.s4),
+          _RuleRow(
+            motif: Text(
+              '3+3',
+              style: AppTypography.label.copyWith(color: c.accent, letterSpacing: 0),
+            ),
+            heading: 'Balance',
+            body: 'Each row and column must contain exactly 3 of each symbol.',
+            c: c,
+          ),
+          const SizedBox(height: AppSpacing.s4),
+          _RuleRow(
+            motif: Text(
+              '≤2',
+              style: AppTypography.label.copyWith(color: c.accent, letterSpacing: 0),
+            ),
+            heading: 'No three in a row',
+            body: 'No three identical symbols may appear side-by-side in any row or column.',
+            c: c,
+          ),
+          const SizedBox(height: AppSpacing.s4),
+          _RuleRow(
+            motif: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('=', style: AppTypography.label.copyWith(color: c.accent, letterSpacing: 0)),
+                const SizedBox(height: 2),
+                Text('≠', style: AppTypography.label.copyWith(color: c.fg3, letterSpacing: 0)),
+              ],
+            ),
+            heading: 'Edge clues',
+            body: '= means the two neighbouring cells share a symbol. ≠ means they differ.',
+            c: c,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RuleRow extends StatelessWidget {
+  const _RuleRow({
+    required this.motif,
+    required this.heading,
+    required this.body,
+    required this.c,
+  });
+
+  final Widget motif;
+  final String heading;
+  final String body;
+  final HalveColors c;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 36,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: motif,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.s3),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                heading,
+                style: AppTypography.small.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontVariations: const [FontVariation('wght', 600)],
+                  color: c.fg1,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                body,
+                style: AppTypography.small.copyWith(color: c.fg2, height: 1.5),
+              ),
+            ],
           ),
         ),
       ],

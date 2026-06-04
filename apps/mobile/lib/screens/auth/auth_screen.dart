@@ -63,7 +63,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           HalveTopBar(onBack: () => context.pop()),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(28, 0, 28, AppSpacing.s6),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.s5, 0, AppSpacing.s5, AppSpacing.s6),
               child: _step == _AuthStep.email
                   ? _EmailStep(
                       controller: _emailController,
@@ -174,15 +174,15 @@ class _EmailStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 44),
+        const SizedBox(height: AppSpacing.s8),
         // Visual anchor — 30px brand mark
         const HalveMark(size: 30),
-        const SizedBox(height: 18),
+        const SizedBox(height: AppSpacing.s4),
         Text(
           'Sign in to keep your streak safe',
           style: AppTypography.h2.copyWith(color: c.fg1),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: AppSpacing.s3),
         Text(
           "We'll send a link to your email — no password needed.",
           style: AppTypography.small.copyWith(
@@ -191,7 +191,7 @@ class _EmailStep extends StatelessWidget {
             height: 1.55,
           ),
         ),
-        const SizedBox(height: 36),
+        const SizedBox(height: AppSpacing.s6),
         // Eyebrow label
         Text(
           'EMAIL',
@@ -346,7 +346,7 @@ class _SentStepState extends State<_SentStep> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 44),
+        const SizedBox(height: AppSpacing.s8),
         Container(
           width: 52,
           height: 52,
@@ -354,7 +354,7 @@ class _SentStepState extends State<_SentStep> {
           alignment: Alignment.center,
           child: CheckGlyph(color: c.accent, size: 22),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: AppSpacing.s5),
         Text('Check your email', style: AppTypography.h2.copyWith(color: c.fg1)),
         const SizedBox(height: 10),
         RichText(
@@ -370,16 +370,20 @@ class _SentStepState extends State<_SentStep> {
             ],
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: AppSpacing.s5),
         GestureDetector(
           onTap: _resent ? null : _handleResend,
-          child: AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 150),
-            style: AppTypography.small.copyWith(
-              color: _resent ? c.fg3 : c.accent,
-              letterSpacing: -0.14,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 44),
+            alignment: Alignment.centerLeft,
+            child: AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 150),
+              style: AppTypography.small.copyWith(
+                color: _resent ? c.fg3 : c.accent,
+                letterSpacing: -0.14,
+              ),
+              child: Text(_resent ? 'Link sent again' : "Didn't get it? Resend"),
             ),
-            child: Text(_resent ? 'Link sent again' : "Didn't get it? Resend"),
           ),
         ),
       ],

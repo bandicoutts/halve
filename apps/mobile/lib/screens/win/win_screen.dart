@@ -211,7 +211,7 @@ class _WinScreenState extends ConsumerState<WinScreen> {
                           onRetry: _retrySave,
                         ),
                       ],
-                      const SizedBox(height: AppSpacing.s6),
+                      const SizedBox(height: AppSpacing.s5),
                       HalveButton(
                         label: 'Share result',
                         full: true,

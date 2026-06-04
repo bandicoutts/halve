@@ -20,7 +20,7 @@ class UndoGlyph extends StatelessWidget {
     return CustomPaint(
       size: Size.square(theme.size ?? 24),
       painter: _UndoPainter(
-        color: theme.color ?? const Color(0xFF000000),
+        color: theme.color ?? Theme.of(context).colorScheme.onSurface,
         strokeWidth: strokeWidth,
       ),
     );
@@ -39,7 +39,7 @@ class HintGlyph extends StatelessWidget {
     return CustomPaint(
       size: Size.square(theme.size ?? 24),
       painter: _HintPainter(
-        color: theme.color ?? const Color(0xFF000000),
+        color: theme.color ?? Theme.of(context).colorScheme.onSurface,
         strokeWidth: strokeWidth,
       ),
     );
@@ -59,7 +59,7 @@ class ShareGlyph extends StatelessWidget {
     return CustomPaint(
       size: Size.square(theme.size ?? 24),
       painter: _SharePainter(
-        color: theme.color ?? const Color(0xFF000000),
+        color: theme.color ?? Theme.of(context).colorScheme.onSurface,
         strokeWidth: strokeWidth,
       ),
     );

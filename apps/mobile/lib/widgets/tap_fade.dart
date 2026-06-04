@@ -36,11 +36,16 @@ class _TapFadeState extends State<TapFade> {
       onTapCancel: () => _setPressed(false),
       onTap: widget.onTap,
       behavior: widget.behavior,
-      child: AnimatedOpacity(
-        opacity: _pressed ? 0.65 : 1.0,
-        duration: const Duration(milliseconds: 100),
+      child: AnimatedScale(
+        scale: _pressed ? 0.985 : 1.0,
+        duration: const Duration(milliseconds: 120),
         curve: Curves.easeOut,
-        child: widget.child,
+        child: AnimatedOpacity(
+          opacity: _pressed ? 0.65 : 1.0,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeOut,
+          child: widget.child,
+        ),
       ),
     );
   }

@@ -37,7 +37,7 @@ class HomeScreen extends ConsumerWidget {
     return SafeScaffold(
       body: LayoutBuilder(
         builder: (ctx, constraints) {
-          const topPad = AppSpacing.s2;
+          const topPad = AppSpacing.s4;
           const bottomPad = AppSpacing.s5;
           final isTablet = ctx.isTablet;
           final isLandscape =
@@ -70,18 +70,18 @@ class HomeScreen extends ConsumerWidget {
             );
           }
 
-          final inner = isTablet
-              ? ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight - topPad - bottomPad,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [body],
-                  ),
-                )
-              : body;
+          final inner = ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight - topPad - bottomPad,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: isTablet
+                  ? MainAxisAlignment.spaceEvenly
+                  : MainAxisAlignment.center,
+              children: [body],
+            ),
+          );
           return RefreshIndicator.adaptive(
             onRefresh: () => ref.refresh(homeDataProvider.future),
             child: SingleChildScrollView(
@@ -106,7 +106,7 @@ class _LoadingBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Skeleton(height: 66, borderRadius: AppRadii.lgR),
-        SizedBox(height: AppSpacing.s5 - 2),
+        SizedBox(height: AppSpacing.s5),
         Align(
           alignment: Alignment.centerLeft,
           child: FractionallySizedBox(
@@ -122,7 +122,7 @@ class _LoadingBody extends StatelessWidget {
             child: Skeleton(height: 42, borderRadius: AppRadii.mdR),
           ),
         ),
-        SizedBox(height: AppSpacing.s5 - 2),
+        SizedBox(height: AppSpacing.s5),
         Skeleton(height: 52, borderRadius: AppRadii.fullR),
       ],
     );
@@ -186,12 +186,12 @@ class _LoadedBody extends StatelessWidget {
     final primary = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (data.dateLabel.isNotEmpty) ...[
+        if (data.today.isNotEmpty) ...[
           isTablet ? Center(child: _MetaRow(data: data)) : _MetaRow(data: data),
-          SizedBox(height: gap(AppSpacing.s3 - 2, portrait: 14, landscape: 10)),
+          SizedBox(height: gap(AppSpacing.s3, portrait: 14, landscape: 10)),
         ],
         Text(
-          "Today's puzzle",
+          formatShortDate(data.today),
           textAlign: isTablet ? TextAlign.center : TextAlign.start,
           style: AppTypography.h1.copyWith(
             fontSize: isTablet ? (isLandscape ? 52 : 62) : 44,
@@ -584,7 +584,7 @@ class _MetaRow extends StatelessWidget {
     final style = AppTypography.label.copyWith(color: c.fg3);
 
     final items = <String>[
-      data.dateLabel.toUpperCase(),
+      formatDayName(data.today).toUpperCase(),
       if (data.puzzle != null) data.puzzle!.difficulty.label.toUpperCase(),
       if (data.archiveCount != null) '#${data.archiveCount}',
     ];
@@ -633,7 +633,7 @@ class _OfflineNotice extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Puzzle unavailable — try again shortly.',
+                  'Offline — no saved puzzle available.',
                   style: AppTypography.small.copyWith(color: c.fg3, height: 1.5),
                 ),
               ),
@@ -688,7 +688,7 @@ class _EmptyPuzzleNotice extends StatelessWidget {
         borderRadius: AppRadii.lgR,
       ),
       child: Text(
-        "Today's puzzle isn't ready yet — check back soon.",
+        "Today's puzzle isn't ready yet — it usually arrives in the morning.",
         style: AppTypography.small.copyWith(color: c.fg3, height: 1.5),
       ),
     );
@@ -829,7 +829,7 @@ class _DestCard extends StatelessWidget {
     final isTablet = context.isTablet;
     final isLandscape =
         MediaQuery.orientationOf(context) == Orientation.landscape;
-    final minH = isTablet ? (isLandscape ? 128.0 : 148.0) : 124.0;
+    final minH = isTablet ? (isLandscape ? 128.0 : 172.0) : 124.0;
     final pad = isTablet ? (isLandscape ? 18.0 : 22.0) : 18.0;
     return TapFade(
       onTap: onTap,
@@ -868,10 +868,12 @@ class _DestCard extends StatelessWidget {
                     letterSpacing: -0.17,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: AppSpacing.s1),
                 Text(
                   sub,
                   style: AppTypography.small.copyWith(fontSize: 12.5, color: c.fg3),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ],
             ),
@@ -889,11 +891,12 @@ class _HowToPlayFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     return Center(
-      child: GestureDetector(
+      child: TapFade(
         onTap: () => context.push(Routes.tutorial),
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.s3),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 44),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s2),
           child: Text(
             'How to play',
             style: AppTypography.small.copyWith(
