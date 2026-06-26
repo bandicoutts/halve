@@ -132,6 +132,14 @@ input::placeholder { color: var(--fg-3); opacity: 1; }
   to   { opacity: 1;    transform: none; }
 }
 
+/* Solve settle — a quiet diagonal wave when the board is completed. The board
+   is the reward, so this is one tactile lift per cell, never a celebration. */
+@keyframes cell-settle {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
 /* Screen fade-in — pure opacity, no translate, so skeleton→content is seamless */
 @keyframes fade-up {
   from { opacity: 0; }

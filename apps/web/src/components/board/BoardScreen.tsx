@@ -97,7 +97,7 @@ export function BoardScreen({
       const t = setTimeout(() => {
         setWinTime(formatted);
         setShowWin(true);
-      }, 520);
+      }, 660); // let the diagonal solve-settle (≈620ms) complete first
       return () => clearTimeout(t);
     }
   }, [solved, showWin, formatted]);
@@ -254,6 +254,7 @@ export function BoardScreen({
               cellSize={cellSize}
               gap={gap}
               readOnly={solved}
+              solved={solved}
             />
           )}
         </div>
