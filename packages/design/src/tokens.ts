@@ -170,6 +170,15 @@ export const radius = {
 } as const;
 
 /**
+ * Motion — tactile and confirming, never decorative. Brand easing is the
+ * standard curve (no bounce/elastic); durations in ms.
+ */
+export const motion = {
+  easing: { standard: 'cubic-bezier(0.4, 0, 0.2, 1)' },
+  duration: { instant: 120, fast: 160, base: 220, slow: 320 },
+} as const;
+
+/**
  * Brand symbol geometry — 100×100 viewBox.
  * Symbol A is a filled circle; symbol B is an outlined ring (same outer radius).
  * The mark is a single circle split vertically: left half A, right half B.

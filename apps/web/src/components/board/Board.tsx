@@ -11,6 +11,8 @@ interface BoardProps {
   cellSize?: number;
   gap?: number;
   readOnly?: boolean;
+  /** When true, cells play a one-shot diagonal settle wave on completion. */
+  solved?: boolean;
 }
 
 const ARROW_DELTA: Record<string, [number, number]> = {
@@ -26,8 +28,12 @@ export function Board({
   cellSize = 50,
   gap = 9,
   readOnly = false,
+  solved = false,
 }: BoardProps) {
   const N = cells.length;
+  // Diagonal settle wave: each cell lifts staggered by its distance from the
+  // top-left corner, so a completed board resolves corner-to-corner.
+  const SETTLE_STEP = 30; // ms between successive diagonals
   const total = N * cellSize + (N - 1) * gap;
   const span = (i: number) => i * (cellSize + gap);
   const edgeSignSize = Math.max(20, cellSize * 0.42);
@@ -83,6 +89,7 @@ export function Board({
                   colIndex={c}
                   size={cellSize}
                   onClick={readOnly ? undefined : () => onCellTap?.(r, c)}
+                  settleDelay={solved ? (r + c) * SETTLE_STEP : undefined}
                 />
               </div>
             ))}

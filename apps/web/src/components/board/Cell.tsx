@@ -13,6 +13,8 @@ interface CellProps {
   colIndex: number;
   size: number;
   onClick?: (() => void) | undefined;
+  /** When set, the cell plays the solve-settle once after this delay (ms). */
+  settleDelay?: number | undefined;
 }
 
 function CellSymbol({ value, size }: { value: CellValue; size: number }) {
@@ -29,6 +31,7 @@ export function Cell({
   colIndex,
   size,
   onClick,
+  settleDelay,
 }: CellProps) {
   const [pressed, setPressed] = useState(false);
   const filled = value !== null;
@@ -82,6 +85,10 @@ export function Cell({
         cursor,
         transform: pressed ? "scale(0.94)" : "scale(1)",
         transition: "transform 0.12s, background 0.16s, box-shadow 0.16s",
+        animation:
+          settleDelay !== undefined
+            ? `cell-settle var(--dur-slow) var(--ease-standard) ${settleDelay}ms`
+            : undefined,
       }}
       onMouseEnter={(e) => {
         if (!isGiven && !filled) e.currentTarget.style.background = "var(--bg-sunken)";

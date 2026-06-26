@@ -235,6 +235,18 @@
 }
 
 /* ============================================================
+   MOTION — tactile and confirming, never decorative.
+   Brand easing is the standard curve; no bounce/elastic.
+   ============================================================ */
+:root {
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-instant: 120ms;  /* press / tap feedback */
+  --dur-fast:    160ms;  /* symbol placement, hovers */
+  --dur-base:    220ms;  /* state changes */
+  --dur-slow:    320ms;  /* solve settle, deliberate reveals */
+}
+
+/* ============================================================
    BASE
    ============================================================ */
 html { -webkit-text-size-adjust: 100%; }
