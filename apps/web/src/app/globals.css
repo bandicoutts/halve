@@ -197,6 +197,24 @@ a:focus-visible {
   border-radius: var(--radius-sm);
 }
 
+/* Theme toggle — the thumb position and visible icon are driven by the `.dark`
+   class (set pre-paint by the inline script in layout.tsx), NOT by React state,
+   so the control is correct from the first paint with no hydration mismatch or
+   desynced first click. The thumb slides via transform (54px track − 26px thumb
+   = 28px travel) and respects reduced-motion via the rule below. */
+.theme-toggle .tt-thumb {
+  transform: translateX(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dark .theme-toggle .tt-thumb {
+  transform: translateX(28px);
+}
+.tt-icon { line-height: 0; }
+.tt-icon--dark { display: none; }
+.tt-icon--light { display: inline-flex; }
+.dark .tt-icon--light { display: none; }
+.dark .tt-icon--dark { display: inline-flex; }
+
 /* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

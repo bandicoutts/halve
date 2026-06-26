@@ -17,16 +17,11 @@ export function BoardSkeleton() {
         </div>
       </header>
 
-      {/* Timer — static 0:00 reads as a real starting state */}
-      <div style={{ textAlign: "center", paddingTop: 8 }}>
-        <div style={{ fontSize: "var(--text-timer)", fontWeight: 500, letterSpacing: "var(--tracking-snug)", lineHeight: 1, color: "var(--fg-3)", fontVariantNumeric: "tabular-nums" }}>
-          0:00
-        </div>
-      </div>
-
-      {/* Board — 6×6 skeleton grid */}
+      {/* Board hero — mirrors BoardScreen composition (no timer; removed per
+          MOB-UX-1) so there is no layout jump when the real board replaces it. */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8, width: "min(calc(100vw - 48px), calc(55dvh - 80px))" }}>
+        {/* Board — 6×6 skeleton grid (same width formula as the real board) */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8, width: "min(calc(100vw - 48px), 55vh)" }}>
           {Array.from({ length: 36 }, (_, i) => (
             <div key={i} style={{ ...SKEL, aspectRatio: "1", borderRadius: "var(--radius-cell)", animationDelay: `${(i % 6) * 40}ms` }} />
           ))}
