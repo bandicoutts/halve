@@ -9,6 +9,7 @@ import { Mark } from "@/components/symbols/Mark";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { formatDuration } from "@/lib/format";
 import { formatDateLabel } from "@/lib/local-date";
+import { BackIcon } from "@/components/ui/icons";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -73,14 +74,6 @@ function monthStats(month: ArchiveMonth): MonthStats {
 }
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
-
-function BackIcon() {
-  return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  );
-}
 
 function CheckIcon({ size = 20, color = "var(--correct)" }: { size?: number; color?: string }) {
   return (

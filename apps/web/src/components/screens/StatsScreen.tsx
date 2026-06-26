@@ -9,31 +9,14 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
 import { Mark } from "@/components/symbols/Mark";
 import { Monogram } from "@/components/ui/Monogram";
+import { BackIcon, SignOutIcon } from "@/components/ui/icons";
 import Link from "next/link";
 import type { UserStats } from "@/app/stats/page";
-
-function BackIcon() {
-  return (
-    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  );
-}
 
 function FlameIcon({ size = 18, color = "var(--accent)" }: { size?: number; color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
       <path d="M12 2C12 2 7 8 7 13a5 5 0 0 0 10 0c0-5-5-11-5-11zm0 16a3 3 0 0 1-3-3c0-2.5 3-7 3-7s3 4.5 3 7a3 3 0 0 1-3 3z" />
-    </svg>
-  );
-}
-
-function SignOutIcon() {
-  return (
-    <svg width={17} height={17} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   );
 }
@@ -228,7 +211,7 @@ function StatsRecord({ stats, onBack }: { stats: UserStats; onBack: () => void }
       {/* Sign out — bordered, unmistakable account action (this is the account page) */}
       <div style={{ paddingTop: 32, display: "flex", justifyContent: "center" }}>
         <Button variant="secondary" size="sm" onClick={handleSignOut}>
-          <SignOutIcon />
+          <SignOutIcon size={17} />
           Sign out
         </Button>
       </div>
