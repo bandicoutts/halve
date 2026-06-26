@@ -15,6 +15,7 @@ import { Logo } from "@/components/symbols/Logo";
 import { Fire } from "@/components/symbols/Fire";
 import { Water } from "@/components/symbols/Water";
 import { TeachBoard, GoodBad } from "@/components/tutorial/TeachBoard";
+import { BackIcon, CloseIcon } from "@/components/ui/icons";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -81,43 +82,6 @@ function getDedCells(phase: number): Grid2D {
     c[0]![3] = 0;
   }
   return c;
-}
-
-// ─── Icons ───────────────────────────────────────────────────────────────────
-
-function BackIcon() {
-  return (
-    <svg
-      width={20}
-      height={20}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg
-      width={20}
-      height={20}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
 }
 
 // ─── ProgressDots ─────────────────────────────────────────────────────────────

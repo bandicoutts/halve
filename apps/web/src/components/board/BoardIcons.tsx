@@ -1,23 +1,6 @@
 import { IconButton } from "@/components/ui/IconButton";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 
-export function BackIcon() {
-  return (
-    <svg
-      width={20}
-      height={20}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  );
-}
-
 export function UndoIcon() {
   return (
     <svg
