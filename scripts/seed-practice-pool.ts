@@ -42,22 +42,16 @@
  */
 
 import { generatePuzzle, type Difficulty } from "@parity/engine";
-import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { loadEnvLocal } from "./lib/env.js";
+import { createRestHeaders } from "./lib/supabase-rest.js";
 
 // ─── Load .env.local ──────────────────────────────────────────────────────────
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const envPath = resolve(__dir, "../apps/web/.env.local");
-try {
-  for (const line of readFileSync(envPath, "utf8").split("\n")) {
-    const m = line.match(/^([^#=\s][^=]*)=(.*)$/);
-    if (m) process.env[m[1]!.trim()] ??= m[2]!.trim();
-  }
-} catch {
-  // rely on actual env vars if .env.local not present
-}
+loadEnvLocal(envPath);
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -91,11 +85,7 @@ const RESET = process.argv.slice(2).includes("--reset");
 
 // ─── REST helpers (no realtime / WebSocket needed; mirrors seed-puzzles.ts) ───
 
-const REST_HEADERS = {
-  apikey: SERVICE_KEY,
-  Authorization: `Bearer ${SERVICE_KEY}`,
-  "Content-Type": "application/json",
-};
+const REST_HEADERS = createRestHeaders(SERVICE_KEY);
 
 interface PuzzleRow {
   date: null;
