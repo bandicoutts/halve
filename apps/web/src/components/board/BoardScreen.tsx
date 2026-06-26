@@ -71,7 +71,6 @@ export function BoardScreen({
   // Kept current on every render so the solve-recording effect always reads the
   // latest cells/duration without needing them in its dep array.
   const cellsRef = useRef<Grid>([]);
-  const secsRef = useRef(0);
 
   const { cells, errors, solved, canUndo, usedHint, tap, undo, hint } = useGame({
     givens: puzzle.givens,
@@ -81,8 +80,7 @@ export function BoardScreen({
 
   cellsRef.current = cells;
 
-  const { secs, formatted } = useTimer(!solved);
-  secsRef.current = secs;
+  const { secsRef, getFormatted } = useTimer(!solved);
 
   const { recordAndFetch, saveError, streakData } = useRecordSolve({
     puzzleId,
@@ -95,12 +93,12 @@ export function BoardScreen({
   useEffect(() => {
     if (solved && !showWin) {
       const t = setTimeout(() => {
-        setWinTime(formatted);
+        setWinTime(getFormatted());
         setShowWin(true);
       }, 660); // let the diagonal solve-settle (≈620ms) complete first
       return () => clearTimeout(t);
     }
-  }, [solved, showWin, formatted]);
+  }, [solved, showWin]);
 
   // Record solve once when solved. solveRecorded guards against re-entry.
   useEffect(() => {
@@ -117,7 +115,7 @@ export function BoardScreen({
   // Announced politely to screen readers: validation conflicts while playing,
   // then the solve result once the puzzle is complete.
   const liveMessage = solved
-    ? `Puzzle solved in ${formatted}.`
+    ? `Puzzle solved in ${getFormatted()}.`
     : errors.size > 0
     ? `${errors.size} cell${errors.size === 1 ? "" : "s"} in conflict.`
     : "";
