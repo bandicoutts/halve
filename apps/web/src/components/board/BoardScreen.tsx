@@ -223,24 +223,13 @@ export function BoardScreen({
         </p>
       )}
 
-      <div style={{ textAlign: "center", paddingTop: 8 }}>
-        <div
-          className="tnum"
-          role="timer"
-          aria-label={`Elapsed time ${formatted}`}
-          style={{
-            fontSize: "var(--text-timer)",
-            fontWeight: 500,
-            letterSpacing: "var(--tracking-snug)",
-            lineHeight: 1,
-            color: solved ? "var(--correct)" : "var(--fg-1)",
-            transition: "color 0.2s",
-          }}
-        >
-          {formatted}
-        </div>
-      </div>
-
+      {/* The board is the sole hero of the play screen (DESIGN.md: "the 6×6 grid
+          is the hero of every game screen"). The visible play timer was removed
+          per MOB-UX-1 (2026-06-04): ambient time pressure conflicts with the calm
+          brand voice, so solve time is revealed on the Win screen instead. The
+          timer still ticks (useTimer above) purely to feed that reveal. Centering
+          a lone hero object avoids a dead-zone — the top-align pattern used on
+          home/archive is for content lists, not a single centered object. */}
       <div
         style={{
           flex: 1,
