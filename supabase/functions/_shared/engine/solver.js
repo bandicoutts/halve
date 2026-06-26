@@ -1,6 +1,6 @@
 import { cloneGrid, isComplete } from './board.js';
 import { edgeCells, isValid } from './validators.js';
-import { otherSym } from './types.js';
+import {} from './types.js';
 // A value is forbidden at (r,c) if placing it completes a triple.
 function adjacencyForbids(grid, r, c, val, size) {
     if (c >= 2 && grid[r][c - 1] === val && grid[r][c - 2] === val)
@@ -102,5 +102,4 @@ export function solve(givens, edges = []) {
 export function isDeductionSolvable(givens, edges = []) {
     return solve(givens, edges).solved;
 }
-export { otherSym };
 //# sourceMappingURL=solver.js.map
