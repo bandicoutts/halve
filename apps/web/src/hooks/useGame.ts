@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useReducer } from "react";
+import { useCallback, useMemo, useReducer } from "react";
 import { findViolations, type Cell, type Edge, type Grid, type Solution, type Sym } from "@parity/engine";
 
 export interface GameState {
@@ -73,9 +73,11 @@ export function useGame({ givens, solution, edges }: UseGameOptions) {
   const errors = useMemo(() => computeErrors(state.cells, edges), [state.cells, edges]);
   const solved = useMemo(() => isSolved(state.cells, solution), [state.cells, solution]);
 
-  function tap(r: number, c: number) {
+  // Stable reference (dispatch never changes) so a memoized Cell only
+  // re-renders when its own value/error actually changes, not on every tap.
+  const tap = useCallback((r: number, c: number) => {
     dispatch({ type: "tap", r, c });
-  }
+  }, []);
 
   function undo() {
     dispatch({ type: "undo" });

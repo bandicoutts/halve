@@ -88,7 +88,8 @@ export function Board({
                   rowIndex={r}
                   colIndex={c}
                   size={cellSize}
-                  onClick={readOnly ? undefined : () => onCellTap?.(r, c)}
+                  onCellTap={onCellTap}
+                  readOnly={readOnly}
                   settleDelay={solved ? (r + c) * SETTLE_STEP : undefined}
                 />
               </div>

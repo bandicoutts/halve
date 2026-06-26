@@ -437,15 +437,15 @@ function PracticeBoard({
     solution: puzzle.solution,
     edges: puzzle.edges,
   });
-  const { formatted } = useTimer(!solved);
+  const { getFormatted } = useTimer(!solved, true); // tutorial shows a live timer
   const fired = useRef(false);
 
   useEffect(() => {
     if (solved && !fired.current) {
       fired.current = true;
-      setTimeout(() => onWin(formatted, puzzle.solution), 520);
+      setTimeout(() => onWin(getFormatted(), puzzle.solution), 520);
     }
-  }, [solved, formatted, onWin, puzzle.solution]);
+  }, [solved, onWin, puzzle.solution]);
 
   const [cellSize, setCellSize] = useState(60);
   useEffect(() => {
@@ -531,7 +531,7 @@ function PracticeBoard({
             transition: "color 0.2s",
           }}
         >
-          {formatted}
+          {getFormatted()}
         </div>
 
         <Board

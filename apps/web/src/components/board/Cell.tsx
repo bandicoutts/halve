@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { Cell as CellValue } from "@parity/engine";
 import { Fire } from "@/components/symbols/Fire";
 import { Water } from "@/components/symbols/Water";
@@ -12,7 +12,10 @@ interface CellProps {
   rowIndex: number;
   colIndex: number;
   size: number;
-  onClick?: (() => void) | undefined;
+  /** Stable tap handler — Cell calls it with its own coords, keeping the prop
+   *  reference stable across renders so React.memo can skip untouched cells. */
+  onCellTap?: ((r: number, c: number) => void) | undefined;
+  readOnly?: boolean;
   /** When set, the cell plays the solve-settle once after this delay (ms). */
   settleDelay?: number | undefined;
 }
@@ -23,14 +26,15 @@ function CellSymbol({ value, size }: { value: CellValue; size: number }) {
   return null;
 }
 
-export function Cell({
+export const Cell = memo(function Cell({
   value,
   isGiven,
   isError,
   rowIndex,
   colIndex,
   size,
-  onClick,
+  onCellTap,
+  readOnly,
   settleDelay,
 }: CellProps) {
   const [pressed, setPressed] = useState(false);
@@ -68,7 +72,7 @@ export function Cell({
 
   return (
     <button
-      onClick={onClick}
+      onClick={readOnly ? undefined : () => onCellTap?.(rowIndex, colIndex)}
       disabled={isGiven}
       aria-label={ariaLabel}
       style={{
@@ -117,4 +121,4 @@ export function Cell({
       )}
     </button>
   );
-}
+});
