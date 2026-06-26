@@ -44,25 +44,3 @@ export function countSolutions(givens: Grid, edges: readonly Edge[] = [], cap = 
 export function hasUniqueSolution(givens: Grid, edges: readonly Edge[] = []): boolean {
   return countSolutions(givens, edges, 2) === 1;
 }
-
-/** Return one solution (any), or null if unsolvable. Does not assert uniqueness. */
-export function findAnySolution(givens: Grid, edges: readonly Edge[] = []): Grid | null {
-  const size = givens.length;
-  if (!isValid(givens, edges)) return null;
-  const grid = cloneGrid(givens);
-
-  const search = (): boolean => {
-    const next = firstEmpty(grid, size);
-    if (next === null) return true;
-    const [r, c] = next;
-    for (const val of [0, 1] as Sym[]) {
-      if (wouldViolate(grid, r, c, val, edges, size)) continue;
-      grid[r]![c] = val;
-      if (search()) return true;
-      grid[r]![c] = null;
-    }
-    return false;
-  };
-
-  return search() ? grid : null;
-}
