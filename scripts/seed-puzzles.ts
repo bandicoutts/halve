@@ -15,22 +15,16 @@
  */
 
 import { generateDaily } from "@parity/engine";
-import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { loadEnvLocal } from "./lib/env.js";
+import { createRestHeaders } from "./lib/supabase-rest.js";
 
 // ─── Load .env.local ──────────────────────────────────────────────────────────
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const envPath = resolve(__dir, "../apps/web/.env.local");
-try {
-  for (const line of readFileSync(envPath, "utf8").split("\n")) {
-    const m = line.match(/^([^#=\s][^=]*)=(.*)$/);
-    if (m) process.env[m[1]!.trim()] ??= m[2]!.trim().replace(/\s+#.*$/, "");
-  }
-} catch {
-  // rely on actual env vars if .env.local not present
-}
+loadEnvLocal(envPath);
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -42,12 +36,7 @@ if (!SUPABASE_URL || !SERVICE_KEY) {
 
 // ─── REST helpers (no realtime / WebSocket needed) ───────────────────────────
 
-const REST_HEADERS = {
-  apikey: SERVICE_KEY,
-  Authorization: `Bearer ${SERVICE_KEY}`,
-  "Content-Type": "application/json",
-  Prefer: "resolution=merge-duplicates",
-};
+const REST_HEADERS = createRestHeaders(SERVICE_KEY, "resolution=merge-duplicates");
 
 async function upsertPuzzle(row: Record<string, unknown>): Promise<void> {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/puzzles?on_conflict=date`, {
