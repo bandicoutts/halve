@@ -50,7 +50,7 @@ export const Cell = memo(function Cell({
   const filled = value !== null;
 
   // e.g. "Row 2, column 3, solid, given" — position + symbol + given/error context.
-  const symbolLabel = value === 0 ? "solid" : value === 1 ? "open" : "empty";
+  const symbolLabel = value === 0 ? "solid" : value === 1 ? "ring" : "empty";
   const ariaLabel = [
     `Row ${rowIndex + 1}, column ${colIndex + 1}`,
     symbolLabel,

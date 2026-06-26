@@ -38,7 +38,7 @@ export function Board({
   const SETTLE_STEP = 30; // ms between successive diagonals
   const total = N * cellSize + (N - 1) * gap;
   const span = (i: number) => i * (cellSize + gap);
-  const edgeSignSize = Math.max(20, cellSize * 0.42);
+  const edgeSignSize = Math.max(22, cellSize * 0.5);
 
   // Roving tabindex: only the active cell is in the tab order (one stop into
   // the grid). Arrow keys move focus; the focused cell becomes active so Tab

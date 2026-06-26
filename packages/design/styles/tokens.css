@@ -13,7 +13,6 @@
   --paper-200: #EFE8DA;
   --paper-300: #E4DDCD;   /* hairline */
   --paper-400: #D6CCB8;
-  --clay-500:  #9A9080;   /* decorative muted (fails AA as text) */
   --clay-550:  #746B5A;   /* muted fg — AA text (4.67:1 on bg) */
   --clay-600:  #6B6253;   /* secondary fg */
   --clay-700:  #463F33;
@@ -26,7 +25,6 @@
   --night-800: #2A2418;
   --night-700: #352E20;   /* hairline */
   --night-600: #4A4030;
-  --dust-500:  #6E6553;   /* decorative muted (fails AA as text) */
   --dust-400:  #928873;   /* muted fg — AA text (5.37:1 on bg) */
   --dust-300:  #A79D89;   /* secondary fg */
   --dust-100:  #EFE8D9;   /* primary fg on ink */

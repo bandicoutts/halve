@@ -12,7 +12,6 @@ export const palette = {
   paper200: '#EFE8DA',
   paper300: '#E4DDCD', // hairline
   paper400: '#D6CCB8',
-  clay500: '#9A9080', // decorative muted (fails AA as text)
   clay550: '#746B5A', // muted fg — AA text (4.67:1 on bg)
   clay600: '#6B6253', // secondary fg
   clay700: '#463F33',
@@ -25,7 +24,6 @@ export const palette = {
   night800: '#2A2418',
   night700: '#352E20', // hairline
   night600: '#4A4030',
-  dust500: '#6E6553', // decorative muted (fails AA as text)
   dust400: '#928873', // muted fg — AA text (5.37:1 on bg)
   dust300: '#A79D89', // secondary fg
   dust100: '#EFE8D9', // primary fg on ink

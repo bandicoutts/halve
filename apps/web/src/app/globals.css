@@ -210,6 +210,9 @@ a:focus-visible {
    so the control is correct from the first paint with no hydration mismatch or
    desynced first click. The thumb slides via transform (54px track − 26px thumb
    = 28px travel) and respects reduced-motion via the rule below. */
+/* Expand the tap target to >=44px (AAA) without enlarging the 32px pill. */
+.theme-toggle { position: relative; }
+.theme-toggle::before { content: ""; position: absolute; inset: -6px; }
 .theme-toggle .tt-thumb {
   transform: translateX(0);
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
