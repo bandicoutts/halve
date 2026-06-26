@@ -1,3 +1,5 @@
+"use client";
+import { useCallback, useState } from "react";
 import type { Edge, Grid } from "@parity/engine";
 import { Cell } from "./Cell";
 import { EdgeSign } from "@/components/symbols/EdgeSign";
@@ -38,6 +40,24 @@ export function Board({
   const span = (i: number) => i * (cellSize + gap);
   const edgeSignSize = Math.max(20, cellSize * 0.42);
 
+  // Roving tabindex: only the active cell is in the tab order (one stop into
+  // the grid). Arrow keys move focus; the focused cell becomes active so Tab
+  // re-enters where you left off. Tracked via onFocus so clicks keep it in sync.
+  const [active, setActive] = useState<[number, number]>([0, 0]);
+  const onCellFocus = useCallback((r: number, c: number) => setActive([r, c]), []);
+
+  // Per-cell edge-constraint description for screen readers. Each edge is owned
+  // by its top-left cell ('h' links to the cell on the right, 'v' to the one
+  // below), so folding the rule into that cell's label lets a non-sighted
+  // solver hear every constraint while navigating cell by cell.
+  const edgeHintByCell = new Map<string, string>();
+  for (const e of edges) {
+    const phrase = `${e.kind === "eq" ? "Same symbol as" : "Opposite symbol to"} the cell ${e.orientation === "h" ? "to the right" : "below"}`;
+    const key = `${e.r}-${e.c}`;
+    const prev = edgeHintByCell.get(key);
+    edgeHintByCell.set(key, prev ? `${prev}; ${phrase}` : phrase);
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     const delta = ARROW_DELTA[e.key];
     if (!delta) return;
@@ -49,6 +69,7 @@ export function Board({
     const nc = Math.min(N - 1, Math.max(0, c + delta[1]));
     if (nr === r && nc === c) return;
     e.preventDefault();
+    setActive([nr, nc]); // move the roving tab stop with the arrow keys
     const target = e.currentTarget.querySelector(
       `[data-row="${nr}"][data-col="${nc}"] button`
     ) as HTMLElement | null;
@@ -91,6 +112,9 @@ export function Board({
                   onCellTap={onCellTap}
                   readOnly={readOnly}
                   settleDelay={solved ? (r + c) * SETTLE_STEP : undefined}
+                  tabIndex={r === active[0] && c === active[1] ? 0 : -1}
+                  onFocus={onCellFocus}
+                  edgeHint={edgeHintByCell.get(`${r}-${c}`)}
                 />
               </div>
             ))}
@@ -98,7 +122,8 @@ export function Board({
         ))}
       </div>
 
-      {/* Edge signs — positioned over the gap between cells */}
+      {/* Edge signs — purely visual; the constraint is announced via the owning
+          cell's aria-label (edgeHint above), so these are hidden from SR. */}
       {edges.map((edge) => {
         const { orientation: o, r, c } = edge;
         const cx = o === "h" ? span(c) + cellSize + gap / 2 : span(c) + cellSize / 2;
@@ -106,6 +131,7 @@ export function Board({
         return (
           <div
             key={`${o}-${r}-${c}`}
+            aria-hidden
             style={{ position: "absolute", left: cx, top: cy, transform: "translate(-50%, -50%)", zIndex: 3 }}
           >
             <EdgeSign sign={edge.kind} size={edgeSignSize} />

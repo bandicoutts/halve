@@ -18,6 +18,12 @@ interface CellProps {
   readOnly?: boolean;
   /** When set, the cell plays the solve-settle once after this delay (ms). */
   settleDelay?: number | undefined;
+  /** Roving-tabindex value: 0 for the active cell, -1 for the rest. */
+  tabIndex?: number;
+  /** Notifies the grid which cell is focused (keeps roving tabindex in sync). */
+  onFocus?: ((r: number, c: number) => void) | undefined;
+  /** Edge-constraint phrase appended to the SR label. */
+  edgeHint?: string | undefined;
 }
 
 function CellSymbol({ value, size }: { value: CellValue; size: number }) {
@@ -36,6 +42,9 @@ export const Cell = memo(function Cell({
   onCellTap,
   readOnly,
   settleDelay,
+  tabIndex,
+  onFocus,
+  edgeHint,
 }: CellProps) {
   const [pressed, setPressed] = useState(false);
   const filled = value !== null;
@@ -47,6 +56,7 @@ export const Cell = memo(function Cell({
     symbolLabel,
     isGiven ? "given" : null,
     isError ? "error" : null,
+    edgeHint ?? null,
   ]
     .filter(Boolean)
     .join(", ");
@@ -72,8 +82,10 @@ export const Cell = memo(function Cell({
 
   return (
     <button
-      onClick={readOnly ? undefined : () => onCellTap?.(rowIndex, colIndex)}
-      disabled={isGiven}
+      onClick={readOnly || isGiven ? undefined : () => onCellTap?.(rowIndex, colIndex)}
+      aria-disabled={isGiven || undefined}
+      tabIndex={tabIndex}
+      onFocus={() => onFocus?.(rowIndex, colIndex)}
       aria-label={ariaLabel}
       style={{
         width: size,
