@@ -16,5 +16,3 @@ export function isSafePath(pathname: string): boolean {
   if (EXACT_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) return true;
   return PLAY_DATE_RE.test(pathname);
 }
-
-export const SAFE_PATHS = EXACT_PATHS;

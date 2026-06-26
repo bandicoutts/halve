@@ -1,6 +1,6 @@
 import { cloneGrid, isComplete } from './board.js';
 import { edgeCells, isValid } from './validators.js';
-import { otherSym, type Edge, type Grid, type Sym } from './types.js';
+import { type Edge, type Grid, type Sym } from './types.js';
 
 /** Which deduction technique forced a placement. */
 export type Technique = 'adjacency' | 'balance' | 'edge';
@@ -119,5 +119,3 @@ export function solve(givens: Grid, edges: readonly Edge[] = []): SolveResult {
 export function isDeductionSolvable(givens: Grid, edges: readonly Edge[] = []): boolean {
   return solve(givens, edges).solved;
 }
-
-export { otherSym };

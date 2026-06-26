@@ -27,29 +27,6 @@ export function gridFromMask(solution: Solution, mask: boolean[][]): Grid {
   return solution.map((row, r) => row.map((v, c) => (mask[r]![c] ? v : null)));
 }
 
-/** Coordinates of every empty cell, row-major. */
-export function emptyCells(grid: Grid): Array<[number, number]> {
-  const out: Array<[number, number]> = [];
-  for (let r = 0; r < grid.length; r++) {
-    for (let c = 0; c < grid[r]!.length; c++) {
-      if (grid[r]![c] === null) out.push([r, c]);
-    }
-  }
-  return out;
-}
-
-/** True when two complete grids are identical. */
-export function gridsEqual(a: Grid, b: Grid): boolean {
-  if (a.length !== b.length) return false;
-  for (let r = 0; r < a.length; r++) {
-    const ra = a[r]!;
-    const rb = b[r]!;
-    if (ra.length !== rb.length) return false;
-    for (let c = 0; c < ra.length; c++) if (ra[c] !== rb[c]) return false;
-  }
-  return true;
-}
-
 /** True when the grid matches the solution on every filled cell (empties ignored). */
 export function matchesSolution(grid: Grid, solution: Solution): boolean {
   for (let r = 0; r < solution.length; r++) {
