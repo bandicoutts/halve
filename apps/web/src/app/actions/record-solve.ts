@@ -1,7 +1,7 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
 import { parseGridSpec } from "@/lib/grid-spec";
-import { resolveLocalToday } from "@/lib/local-date";
+import { resolveLocalToday, isValidDate } from "@/lib/local-date";
 import { computeStreak, computeLongestStreak, offsetDay } from "@/lib/streak";
 
 interface RecordSolveInput {
@@ -37,7 +37,7 @@ export async function recordSolve(input: RecordSolveInput): Promise<RecordSolveR
   if (typeof puzzleId !== "string" || !puzzleId) return { ok: false };
   if (!Number.isInteger(durationMs) || durationMs < 1) return { ok: false };
   if (typeof usedHint !== "boolean") return { ok: false };
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(localDate)) return { ok: false };
+  if (!isValidDate(localDate)) return { ok: false };
 
   // Load puzzle server-side — the solution never needs to leave the server
   const { data: puzzle } = await supabase

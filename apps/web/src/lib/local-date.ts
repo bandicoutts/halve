@@ -1,3 +1,11 @@
+/** Matches a strict YYYY-MM-DD calendar-date string. */
+const DATE_FORMAT_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+/** True when `s` is a well-formed YYYY-MM-DD string. */
+export function isValidDate(s: string): boolean {
+  return DATE_FORMAT_REGEX.test(s);
+}
+
 /**
  * Pure resolution of "today" from a candidate tz_date cookie and the server's
  * UTC date. Extracted from getLocalToday() so it can be unit-tested without the
@@ -13,7 +21,7 @@ export function resolveLocalToday(
   tzDate: string | undefined,
   utcToday: string
 ): string {
-  if (tzDate && /^\d{4}-\d{2}-\d{2}$/.test(tzDate)) {
+  if (tzDate && isValidDate(tzDate)) {
     const diffDays = Math.abs(
       (new Date(`${tzDate}T00:00:00Z`).getTime() -
         new Date(`${utcToday}T00:00:00Z`).getTime()) /
