@@ -40,6 +40,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # @parity/engine and @parity/design resolve to their dist/ — build them
+      # before typecheck/test/build (a fresh install does not produce dist).
+      - name: Build engine + design
+        run: pnpm --filter @parity/engine --filter @parity/design build
+
       - name: Typecheck (all packages)
         run: pnpm typecheck
 
