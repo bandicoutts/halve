@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
 import { Mark } from "@/components/symbols/Mark";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { FitToViewport } from "@/components/ui/FitToViewport";
 import { formatDuration } from "@/lib/format";
 import { formatDateLabel } from "@/lib/local-date";
 import { BackIcon } from "@/components/ui/icons";
@@ -782,7 +783,7 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
   return (
     <div
       style={{
-        minHeight: "100dvh",
+        height: "100dvh",
         display: "flex",
         flexDirection: "column",
         background: "var(--bg)",
@@ -805,15 +806,8 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
 
       <h1 className="sr-only">Archive</h1>
 
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          WebkitOverflowScrolling: "touch" as const,
-          padding: "14px 24px 40px",
-        }}
-      >
-        <div style={{ maxWidth: CONTENT_MAX, margin: "0 auto" }}>
+      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
+        <div style={{ maxWidth: CONTENT_MAX, width: "100%", paddingTop: 14, paddingBottom: 40 }}>
           <MonthNav months={months} index={monthIdx} onChange={setMonthIdx} />
           <div style={{ marginTop: 6, marginBottom: 18 }}>
             <MonthSummary stats={monthStats(currentMonth)} />
@@ -838,7 +832,7 @@ export function ArchiveScreen({ months, initialId }: ArchiveScreenProps) {
             <Legend />
           </div>
         </div>
-      </div>
+      </FitToViewport>
 
       {canHover && hover && <HoverPreview hover={hover} />}
     </div>

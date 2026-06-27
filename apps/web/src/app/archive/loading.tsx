@@ -1,4 +1,5 @@
 import { Skel } from "@/components/ui/Skel";
+import { FitToViewport } from "@/components/ui/FitToViewport";
 
 // Mirror ArchiveScreen's layout constants so the skeleton matches the real grid.
 const CELL_H = 42;
@@ -7,7 +8,7 @@ const CONTENT_MAX = 460;
 export default function ArchiveLoading() {
   return (
     <div
-      style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}
+      style={{ height: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}
     >
       {/* TopBar — back button left, centered title, theme toggle right */}
       <header
@@ -30,9 +31,9 @@ export default function ArchiveLoading() {
         </div>
       </header>
 
-      {/* Scroll area — content capped + centered to match the real screen */}
-      <div style={{ flex: 1, padding: "14px 24px 40px" }}>
-        <div style={{ maxWidth: CONTENT_MAX, margin: "0 auto" }}>
+      {/* Fit-to-viewport area — content capped + centered to match the real screen */}
+      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
+        <div style={{ maxWidth: CONTENT_MAX, width: "100%", paddingTop: 14, paddingBottom: 40 }}>
           {/* Month navigation — arrow · month picker · arrow */}
           <div
             style={{
@@ -93,7 +94,7 @@ export default function ArchiveLoading() {
             <Skel w={260} h={14} delay={180} />
           </div>
         </div>
-      </div>
+      </FitToViewport>
     </div>
   );
 }

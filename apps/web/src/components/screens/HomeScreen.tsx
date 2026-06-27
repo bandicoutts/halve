@@ -11,6 +11,7 @@ import { Fire } from "@/components/symbols/Fire";
 import { Water } from "@/components/symbols/Water";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { FitToViewport } from "@/components/ui/FitToViewport";
 import { AccountMenu } from "@/components/ui/AccountMenu";
 import { formatDuration } from "@/lib/format";
 import { computeNextIn } from "@/lib/puzzle-clock";
@@ -242,7 +243,7 @@ export function HomeScreen({
   return (
     <div
       style={{
-        minHeight: "100dvh",
+        height: "100dvh",
         display: "flex",
         flexDirection: "column",
         background: "var(--bg)",
@@ -282,13 +283,8 @@ export function HomeScreen({
         }
       />
 
-      <div
-        style={{
-          flex: 1,
-          padding: "0 24px 28px",
-        }}
-      >
-       <div style={{ maxWidth: HOME_MAX, margin: "0 auto", width: "100%" }}>
+      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
+       <div style={{ maxWidth: HOME_MAX, width: "100%", paddingBottom: 28 }}>
         {/* Hero section */}
         <div style={{ marginTop: 26 }}>
           {/* StreakBand — renders via Suspense when authenticated */}
@@ -440,7 +436,7 @@ export function HomeScreen({
           </Link>
         </div>
        </div>
-      </div>
+      </FitToViewport>
     </div>
   );
 }

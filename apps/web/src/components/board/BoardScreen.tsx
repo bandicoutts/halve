@@ -235,7 +235,9 @@ export function BoardScreen({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "24px 16px",
+          // Vertical padding shrinks on short viewports so the board, controls,
+          // and "How to play" link all fit without scrolling down to ~600px.
+          padding: "clamp(10px, 2.4vh, 24px) 16px",
         }}
       >
         {/* CSS-sized container eliminates layout shift; cellSize is derived via ResizeObserver */}

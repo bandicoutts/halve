@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { FitToViewport } from "@/components/ui/FitToViewport";
 import { Mark } from "@/components/symbols/Mark";
 import { Logo } from "@/components/symbols/Logo";
 import { Fire } from "@/components/symbols/Fire";
@@ -41,8 +42,8 @@ function SolvedBoard({
   gridSize: number;
 }) {
   const flat = solution.flat();
-  const cell = 46;
-  const gap = 7;
+  const cell = 42;
+  const gap = 6;
   return (
     <div
       style={{
@@ -172,30 +173,21 @@ export function WinScreen({
         title={<Eyebrow>Complete</Eyebrow>}
         right={<ThemeToggle theme={theme} onToggle={toggle} />}
       />
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "8px 24px 36px",
-        }}
-      >
+      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
         <div
           style={{
             width: "100%",
             maxWidth: 384,
-            flex: 1,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            paddingTop: "clamp(4px, 1.4vh, 8px)",
+            paddingBottom: "clamp(16px, 3vh, 36px)",
           }}
         >
           {/* Mark entrance */}
           <div
             style={{
-              marginTop: 8,
               animation: "win-mark .6s cubic-bezier(0.34,1.56,0.64,1)",
             }}
           >
@@ -205,7 +197,7 @@ export function WinScreen({
           {/* Puzzle identity */}
           <div
             style={{
-              marginTop: 18,
+              marginTop: "clamp(10px, 2.2vh, 18px)",
               fontSize: "var(--text-label)",
               fontWeight: 600,
               letterSpacing: "0.14em",
@@ -220,7 +212,7 @@ export function WinScreen({
           {/* Solve time hero */}
           <div
             style={{
-              marginTop: 14,
+              marginTop: "clamp(8px, 1.8vh, 14px)",
               fontSize: "var(--text-small)",
               color: "var(--fg-3)",
               letterSpacing: "0.01em",
@@ -231,7 +223,7 @@ export function WinScreen({
           <div
             className="tnum"
             style={{
-              fontSize: 64,
+              fontSize: "clamp(44px, 8vh, 64px)",
               fontWeight: 500,
               letterSpacing: "-0.035em",
               color: "var(--fg-1)",
@@ -245,12 +237,12 @@ export function WinScreen({
           {/* Keepsake card */}
           <div
             style={{
-              marginTop: 28,
+              marginTop: "clamp(16px, 3.4vh, 28px)",
               width: "100%",
               background: "var(--surface)",
               border: "1px solid var(--hairline)",
               borderRadius: "var(--radius-xl)",
-              padding: "18px 18px 20px",
+              padding: "clamp(14px, 2vh, 18px) 18px clamp(15px, 2.2vh, 20px)",
               boxShadow: "var(--shadow-md)",
               animation: "win-settle .5s cubic-bezier(0.34,1.4,0.5,1)",
             }}
@@ -286,7 +278,7 @@ export function WinScreen({
           {/* Meta: difficulty + streak */}
           <div
             style={{
-              marginTop: 16,
+              marginTop: "clamp(10px, 2vh, 16px)",
               fontSize: "var(--text-small)",
               color: "var(--fg-3)",
               display: "inline-flex",
@@ -312,8 +304,6 @@ export function WinScreen({
               </>
             )}
           </div>
-
-          <div style={{ flex: 1, minHeight: 24 }} />
 
           {/* Save failure — solve wasn't recorded; offer a retry */}
           {saveError && (
@@ -361,7 +351,7 @@ export function WinScreen({
               display: "flex",
               flexDirection: "column",
               gap: 12,
-              marginTop: 24,
+              marginTop: "clamp(16px, 3.4vh, 24px)",
             }}
           >
             <Button variant="primary" full onClick={handleShare}>
@@ -381,7 +371,7 @@ export function WinScreen({
                 justifyContent: "center",
                 gap: 8,
                 color: "var(--fg-3)",
-                marginTop: 18,
+                marginTop: "clamp(12px, 2.4vh, 18px)",
               }}
             >
               <span style={{ fontSize: "var(--text-small)" }}>Next puzzle in</span>
@@ -394,7 +384,7 @@ export function WinScreen({
             </div>
           )}
         </div>
-      </div>
+      </FitToViewport>
     </div>
   );
 }
