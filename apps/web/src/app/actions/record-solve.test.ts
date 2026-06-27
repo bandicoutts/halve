@@ -27,14 +27,20 @@ vi.mock("@/lib/supabase/server", () => ({
           }),
         };
       }
-      // "solves" — tracks call count so duplicate-submission tests can simulate
-      // the 23505 unique-constraint on the second identical insert.
+      // "solves" — insert tracks call count so duplicate-submission tests can
+      // simulate the 23505 unique-constraint on the second identical insert;
+      // select serves the post-insert streak-window query.
       return {
         insert: async () => {
           insertCallCount++;
           if (insertCallCount > 1) return { error: { code: "23505", message: "duplicate key" } };
           return { error: mockInsertError };
         },
+        select: () => ({
+          eq: () => ({
+            gte: async () => ({ data: [] }),
+          }),
+        }),
       };
     },
   }),
@@ -116,16 +122,16 @@ describe("recordSolve", () => {
   });
 
   it("returns ok:true for a correct grid and valid inputs", async () => {
-    expect(await recordSolve(BASE_INPUT)).toEqual({ ok: true });
+    expect(await recordSolve(BASE_INPUT)).toMatchObject({ ok: true, alreadySolved: false });
   });
 
   it("returns ok:true with alreadySolved:true on unique_violation", async () => {
     mockInsertError = { code: "23505", message: "duplicate key" };
-    expect(await recordSolve(BASE_INPUT)).toEqual({ ok: true, alreadySolved: true });
+    expect(await recordSolve(BASE_INPUT)).toMatchObject({ ok: true, alreadySolved: true });
   });
 
   it("returns ok:true with alreadySolved:true when called twice with identical arguments", async () => {
-    expect(await recordSolve(BASE_INPUT)).toEqual({ ok: true });
-    expect(await recordSolve(BASE_INPUT)).toEqual({ ok: true, alreadySolved: true });
+    expect(await recordSolve(BASE_INPUT)).toMatchObject({ ok: true, alreadySolved: false });
+    expect(await recordSolve(BASE_INPUT)).toMatchObject({ ok: true, alreadySolved: true });
   });
 });
