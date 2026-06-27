@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { FitToViewport } from "@/components/ui/FitToViewport";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { BackIcon } from "@/components/ui/icons";
 import type { Difficulty } from "@parity/engine";
@@ -28,13 +29,14 @@ export function PracticeScreen() {
   }
 
   return (
-    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
+    <div style={{ height: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
       <TopBar
         left={<IconButton label="Back" size={40} onClick={() => router.push("/")}><BackIcon /></IconButton>}
         title={<span style={{ fontWeight: 600, fontSize: 16, color: "var(--fg-1)" }}>Practice</span>}
         right={<ThemeToggle theme={theme} onToggle={toggle} />}
       />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "0 24px" }}>
+      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
+       <div style={{ width: "100%", maxWidth: 460, paddingBottom: "clamp(16px, 3vh, 40px)" }}>
         <div style={{ marginTop: 14 }}>
           <h1 style={{ fontSize: 32, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", lineHeight: 1.2 }}>
             A fresh puzzle,<br />any time.
@@ -67,13 +69,13 @@ export function PracticeScreen() {
           <p style={{ marginTop: 18, fontSize: 15, color: "var(--fg-2)", lineHeight: 1.5 }}>{d.blurb}</p>
         </div>
 
-        <div style={{ flex: 1 }} />
-        <div style={{ paddingBottom: 40 }}>
+        <div style={{ marginTop: 28 }}>
           <Button variant="primary" full onClick={handleStart}>
             Start {diff.toLowerCase()} puzzle
           </Button>
         </div>
-      </div>
+       </div>
+      </FitToViewport>
     </div>
   );
 }

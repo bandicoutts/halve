@@ -1,8 +1,9 @@
 import { Skel } from "@/components/ui/Skel";
+import { FitToViewport } from "@/components/ui/FitToViewport";
 
 export default function StatsLoading() {
   return (
-    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+    <div style={{ height: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
       {/* TopBar */}
       <header style={{ height: 56, flexShrink: 0, display: "flex", alignItems: "center", padding: "0 16px", gap: 8 }}>
         <div style={{ flex: 1 }}>
@@ -12,8 +13,8 @@ export default function StatsLoading() {
         <div style={{ flex: 1 }} />
       </header>
 
-      <div style={{ flex: 1, padding: "0 24px 36px" }}>
-        <div style={{ maxWidth: 560, margin: "0 auto", width: "100%" }}>
+      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
+        <div style={{ maxWidth: 560, width: "100%", paddingBottom: 36 }}>
 
           {/* Identity row — monogram + name + subtitle */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 16, marginBottom: 24 }}>
@@ -68,7 +69,7 @@ export default function StatsLoading() {
           </div>
 
         </div>
-      </div>
+      </FitToViewport>
     </div>
   );
 }

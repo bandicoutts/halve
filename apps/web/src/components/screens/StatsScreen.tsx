@@ -6,6 +6,7 @@ import { TopBar } from "@/components/ui/TopBar";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IconButton } from "@/components/ui/IconButton";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { FitToViewport } from "@/components/ui/FitToViewport";
 import { Button } from "@/components/ui/Button";
 import { Mark } from "@/components/symbols/Mark";
 import { Monogram } from "@/components/ui/Monogram";
@@ -141,18 +142,18 @@ function StatDivided({ items }: { items: { value: string; label: string; accent?
 function StatsShell({ onBack, children }: { onBack: () => void; children: React.ReactNode }) {
   const { theme, toggle } = useTheme();
   return (
-    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+    <div style={{ height: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
       <TopBar
         left={<IconButton label="Back" size={44} onClick={onBack}><BackIcon /></IconButton>}
         title={<span style={{ fontWeight: 600, fontSize: "var(--text-body)", color: "var(--fg-1)" }}>Statistics</span>}
         right={<ThemeToggle theme={theme} onToggle={toggle} />}
       />
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 24px 36px" }}>
-        <div style={{ maxWidth: 560, margin: "0 auto", width: "100%" }}>
+      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
+        <div style={{ maxWidth: 560, width: "100%", paddingBottom: 36 }}>
           <h1 className="sr-only">Statistics</h1>
           {children}
         </div>
-      </div>
+      </FitToViewport>
     </div>
   );
 }
