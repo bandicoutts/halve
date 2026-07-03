@@ -150,7 +150,7 @@ export function SiteHeader({
         </span>
       </Link>
 
-      <nav style={{ display: "flex", alignItems: "center", gap: "clamp(14px, 2.6vw, 22px)" }}>
+      <nav className="hv-nav" style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "clamp(14px, 2.6vw, 22px)" }}>
         {navLink("practice", "Practice", "/practice")}
         {navLink("archive", "Archive", "/archive")}
         {navLink("stats", "Stats", "/stats")}

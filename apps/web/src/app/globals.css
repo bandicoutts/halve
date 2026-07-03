@@ -273,6 +273,61 @@ a:focus-visible {
 }
 .dark .theme-glyph { transform: rotate(180deg); }
 
+/* ============================================================
+   RESPONSIVE — editorial split layout + header nav
+   ============================================================ */
+
+/* Two-column "editorial split" (home hero, auth). Below the breakpoint it is a
+   single stacked column with the decorative aside on top (column-reverse); at
+   and above it, a side-by-side layout with a hairline divider between. The
+   divider only EXISTS in the two-column layout, so it can never strand as a
+   floating hairline mid-wrap (the old flex-wrap approach did). */
+.hv-split {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+}
+.hv-split > * { min-width: 0; }
+.hv-split-rule { display: none; }
+
+@media (min-width: 940px) {
+  .hv-split { flex-direction: row; }
+  .hv-split-main { flex: 1 1 var(--split-main, 480px); }
+  .hv-split-aside { flex: 1 1 var(--split-aside, 380px); }
+  .hv-split-rule {
+    display: block;
+    flex: 0 0 1px;
+    align-self: stretch;
+    background: var(--hairline);
+    margin: clamp(24px, 4vw, 48px) 0;
+  }
+}
+
+/* Stats streak band — same idea at a smaller breakpoint: stacked below 720px
+   (divider hidden), streak beside the stat-cards above it. */
+.hv-band {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.hv-band-rule { display: none; }
+@media (min-width: 720px) {
+  .hv-band { flex-direction: row; }
+  .hv-band-main { flex: 1 1 300px; }
+  .hv-band-aside { flex: 1 1 320px; }
+  .hv-band-rule { display: block; flex: 0 0 1px; background: var(--hairline); }
+}
+
+/* Header nav wraps within the padded container instead of overflowing off the
+   right edge on narrow screens (its items used to exceed the padding). */
+.hv-nav {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+@media (max-width: 430px) {
+  .hv-nav { column-gap: 14px; }
+}
+
 /* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

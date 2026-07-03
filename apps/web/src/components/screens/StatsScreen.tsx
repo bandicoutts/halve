@@ -107,15 +107,13 @@ function StatsRecord({ stats }: { stats: UserStats }) {
 
         {/* Streak band + stat cards */}
         <div
+          className="hv-band"
           style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "stretch",
             borderTop: "1px solid var(--hairline)",
             borderBottom: "1px solid var(--hairline)",
           }}
         >
-          <div style={{ flex: "1 1 300px", padding: "clamp(26px, 4vw, 40px) 32px clamp(26px, 4vw, 40px) 0", display: "flex", alignItems: "center", gap: "clamp(18px, 3vw, 28px)", minWidth: 0 }}>
+          <div className="hv-band-main" style={{ padding: "clamp(26px, 4vw, 40px) 32px clamp(26px, 4vw, 40px) 0", display: "flex", alignItems: "center", gap: "clamp(18px, 3vw, 28px)", minWidth: 0 }}>
             <div
               style={{
                 fontFamily: "var(--font-serif)",
@@ -139,10 +137,10 @@ function StatsRecord({ stats }: { stats: UserStats }) {
               <WeekDots days={stats.last14Days} />
             </div>
           </div>
-          <div style={{ flex: "0 0 1px", background: "var(--hairline)" }} />
+          <div className="hv-band-rule" />
           <div
+            className="hv-band-aside"
             style={{
-              flex: "1 1 320px",
               padding: "clamp(26px, 4vw, 40px) 0 clamp(26px, 4vw, 40px) clamp(24px, 4vw, 40px)",
               display: "grid",
               gridTemplateColumns: "1fr 1fr",

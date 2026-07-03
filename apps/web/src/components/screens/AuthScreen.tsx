@@ -10,7 +10,7 @@ import { Wordmark } from "@/components/ui/Wordmark";
 /** Right-column brand mark. `waiting` = static, dimmed-left (link-sent state). */
 function BrandColumn({ caption, waiting }: { caption: string; waiting?: boolean }) {
   return (
-    <div style={{ flex: "1 1 340px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 28, minWidth: 0, padding: "24px 0" }}>
+    <div className="hv-split-aside" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 28, padding: "24px 0" }}>
       <svg viewBox="0 0 200 200" style={{ width: "clamp(120px, 22vw, 250px)", overflow: "visible" }} aria-hidden="true">
         {waiting ? (
           <>
@@ -40,11 +40,9 @@ function AuthLayout({ form, brand }: { form: React.ReactNode; brand: React.React
         <Wordmark />
       </header>
       <div
+        className="hv-split"
         style={{
           flex: 1,
-          display: "flex",
-          flexWrap: "wrap-reverse",
-          alignItems: "stretch",
           justifyContent: "center",
           maxWidth: 1180,
           width: "100%",
@@ -53,10 +51,10 @@ function AuthLayout({ form, brand }: { form: React.ReactNode; brand: React.React
           animation: "fadeup 0.5s var(--ease-editorial) both",
         }}
       >
-        <div style={{ flex: "1 1 420px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 22, maxWidth: 560, padding: "24px clamp(0px, 4vw, 64px) 24px 0", minWidth: 0 }}>
+        <div className="hv-split-main" style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 22, padding: "24px clamp(0px, 4vw, 64px) 24px 0" }}>
           {form}
         </div>
-        <div style={{ flex: "0 0 1px", alignSelf: "stretch", background: "var(--hairline)", margin: "24px 0" }} />
+        <div className="hv-split-rule" />
         {brand}
       </div>
     </div>

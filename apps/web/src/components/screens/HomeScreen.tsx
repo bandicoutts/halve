@@ -101,11 +101,9 @@ export function HomeScreen({
       <SiteHeader isAuthenticated={isAuthenticated} displayName={displayName} maxWidth={1280} />
 
       <section
+        className="hv-split"
         style={{
           flex: 1,
-          display: "flex",
-          flexWrap: "wrap-reverse",
-          alignItems: "stretch",
           justifyContent: "center",
           maxWidth: 1280,
           width: "100%",
@@ -116,14 +114,13 @@ export function HomeScreen({
       >
         {/* Left — the hero */}
         <div
+          className="hv-split-main"
           style={{
-            flex: "1 1 480px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             gap: 30,
             padding: "40px 0",
-            minWidth: 0,
           }}
         >
           <div
@@ -196,25 +193,17 @@ export function HomeScreen({
           )}
         </div>
 
-        {/* Divider */}
-        <div
-          style={{
-            flex: "0 0 1px",
-            alignSelf: "stretch",
-            background: "var(--hairline)",
-            margin: "48px 0",
-          }}
-        />
+        {/* Divider — only present in the two-column layout (see .hv-split) */}
+        <div className="hv-split-rule" />
 
         {/* Right — the drifting mark */}
         <div
+          className="hv-split-aside"
           style={{
-            flex: "1 1 380px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             padding: "clamp(24px, 4vw, 56px)",
-            minWidth: 0,
           }}
         >
           <DriftMark />
