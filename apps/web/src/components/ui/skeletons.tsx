@@ -20,7 +20,19 @@ function Sk({ w, h, r = 6, delay = 0, style }: { w?: number | string; h: number 
   );
 }
 
-/** Static header silhouette matching SiteHeader (no auth control while loading). */
+// A 30px circle chip; `display` is omitted so .hv-nav-burger can control it.
+const skCircle: React.CSSProperties = {
+  width: 30,
+  height: 30,
+  borderRadius: "50%",
+  border: "1px solid var(--hairline)",
+  alignItems: "center",
+  justifyContent: "center",
+  flex: "none",
+};
+
+/** Static header silhouette matching SiteHeader — inline nav on desktop, a
+ *  hamburger chip on mobile — so the real header never jumps in on load. */
 function SkHeader() {
   const navItem = (t: string) => (
     <span style={{ color: "var(--fg-3)", fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.16em" }}>{t}</span>
@@ -28,14 +40,25 @@ function SkHeader() {
   return (
     <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18, padding: "20px clamp(20px,4vw,40px)", flex: "none", maxWidth: 1280, width: "100%", margin: "0 auto" }}>
       <Wordmark href={null} />
-      <nav style={{ display: "flex", alignItems: "center", gap: "clamp(14px,2.6vw,22px)" }}>
-        {navItem("PRACTICE")}
-        {navItem("ARCHIVE")}
-        {navItem("STATS")}
-        <span style={{ width: 30, height: 30, borderRadius: "50%", border: "1px solid var(--hairline)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <nav style={{ display: "flex", alignItems: "center", gap: 18 }}>
+        <div className="hv-nav-desktop">
+          {navItem("PRACTICE")}
+          {navItem("ARCHIVE")}
+          {navItem("STATS")}
+        </div>
+        {/* Theme toggle (always) */}
+        <span style={{ ...skCircle, display: "flex" }}>
           <svg viewBox="0 0 200 200" style={{ width: 15, height: 15 }} aria-hidden="true">
             <path d="M95 10 A90 90 0 0 0 95 190 Z" style={{ fill: "var(--fg-1)", opacity: 0.85 }} />
             <circle cx="100" cy="100" r="90" style={{ fill: "none", stroke: "var(--fg-1)", strokeWidth: "10px", opacity: 0.85 }} />
+          </svg>
+        </span>
+        {/* Hamburger (mobile only) */}
+        <span className="hv-nav-burger" style={skCircle}>
+          <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="var(--fg-1)" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </span>
       </nav>
