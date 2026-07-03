@@ -11,7 +11,8 @@ export interface GameState {
 type Action =
   | { type: "tap"; r: number; c: number }
   | { type: "undo" }
-  | { type: "hint"; r: number; c: number; sym: Sym };
+  | { type: "hint"; r: number; c: number; sym: Sym }
+  | { type: "restart"; givens: Grid };
 
 function cycle(v: Cell): Cell {
   if (v === null) return 0;
@@ -39,6 +40,10 @@ export function reducer(state: GameState, action: Action): GameState {
       const next = cloneGrid(state.cells);
       next[action.r]![action.c] = action.sym;
       return { cells: next, history: [...state.history, state.cells], usedHint: true };
+    }
+    case "restart": {
+      // Back to the starting position: givens only, empty history, no hint used.
+      return { cells: cloneGrid(action.givens), history: [], usedHint: false };
     }
     default:
       return state;
@@ -83,6 +88,10 @@ export function useGame({ givens, solution, edges }: UseGameOptions) {
     dispatch({ type: "undo" });
   }
 
+  const restart = useCallback(() => {
+    dispatch({ type: "restart", givens });
+  }, [givens]);
+
   function hint() {
     const empties: [number, number][] = [];
     state.cells.forEach((row, r) =>
@@ -104,5 +113,6 @@ export function useGame({ givens, solution, edges }: UseGameOptions) {
     tap,
     undo,
     hint,
+    restart,
   };
 }

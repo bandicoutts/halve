@@ -1,8 +1,6 @@
 "use client";
-import { memo, useState } from "react";
-import type { Cell as CellValue } from "@parity/engine";
-import { Fire } from "@/components/symbols/Fire";
-import { Water } from "@/components/symbols/Water";
+import { memo } from "react";
+import type { Cell as CellValue, EdgeKind, EdgeOrientation } from "@parity/engine";
 
 interface CellProps {
   value: CellValue;
@@ -11,12 +9,13 @@ interface CellProps {
   /** Zero-based grid coordinates, used to build the screen-reader label. */
   rowIndex: number;
   colIndex: number;
-  size: number;
+  /** Grid size — drives the internal hairlines (no border on the last row/col). */
+  n: number;
   /** Stable tap handler — Cell calls it with its own coords, keeping the prop
    *  reference stable across renders so React.memo can skip untouched cells. */
   onCellTap?: ((r: number, c: number) => void) | undefined;
   readOnly?: boolean;
-  /** When set, the cell plays the solve-settle once after this delay (ms). */
+  /** When set, the placed symbol plays the solve wave once after this delay (ms). */
   settleDelay?: number | undefined;
   /** Roving-tabindex value: 0 for the active cell, -1 for the rest. */
   tabIndex?: number;
@@ -24,13 +23,47 @@ interface CellProps {
   onFocus?: ((r: number, c: number) => void) | undefined;
   /** Edge-constraint phrase appended to the SR label. */
   edgeHint?: string | undefined;
+  /** Edge cap owned by this cell (drawn straddling its right/bottom edge). */
+  edge?: { kind: EdgeKind; orientation: EdgeOrientation } | undefined;
 }
 
-function CellSymbol({ value, size }: { value: CellValue; size: number }) {
-  if (value === 0) return <Fire size={size * 0.6} />;
-  if (value === 1) return <Water size={size * 0.6} />;
-  return null;
+/** Shared style for the two symbol layers — both are always mounted and the
+ *  active one fades/scales in, matching the prototype's tactile placement. */
+function symLayer(show: boolean, settleDelay: number | undefined): React.CSSProperties {
+  return {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2,
+    pointerEvents: "none",
+    opacity: show ? 1 : 0,
+    transform: show ? "scale(1)" : "scale(0.45)",
+    transition: "transform 0.26s var(--ease-out-back), opacity 0.13s ease",
+    animation: settleDelay !== undefined && show ? `solvepop 0.7s var(--ease-out-back) ${settleDelay}ms both` : undefined,
+  };
 }
+
+const CAP_GLYPH: Record<EdgeKind, string> = { eq: "=", ne: "≠" };
+
+const capBase: React.CSSProperties = {
+  position: "absolute",
+  zIndex: 4,
+  minWidth: 25,
+  height: 25,
+  padding: "0 5px",
+  borderRadius: 999,
+  background: "var(--bg)",
+  border: "1px solid var(--hairline)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: 13,
+  fontWeight: 600,
+  lineHeight: 1,
+  pointerEvents: "none",
+};
 
 export const Cell = memo(function Cell({
   value,
@@ -38,19 +71,17 @@ export const Cell = memo(function Cell({
   isError,
   rowIndex,
   colIndex,
-  size,
+  n,
   onCellTap,
   readOnly,
   settleDelay,
   tabIndex,
   onFocus,
   edgeHint,
+  edge,
 }: CellProps) {
-  const [pressed, setPressed] = useState(false);
-  const filled = value !== null;
-
-  // e.g. "Row 2, column 3, solid, given" — position + symbol + given/error context.
-  const symbolLabel = value === 0 ? "solid" : value === 1 ? "ring" : "empty";
+  // e.g. "Row 2, column 3, disc, given" — position + symbol + given/error context.
+  const symbolLabel = value === 0 ? "disc" : value === 1 ? "ring" : "empty";
   const ariaLabel = [
     `Row ${rowIndex + 1}, column ${colIndex + 1}`,
     symbolLabel,
@@ -61,75 +92,92 @@ export const Cell = memo(function Cell({
     .filter(Boolean)
     .join(", ");
 
-  let bg = "var(--surface-raised)";
-  let border = "1px solid var(--hairline)";
-  let boxShadow = "none";
-  let cursor = "pointer";
-
-  if (isGiven) {
-    bg = "var(--bg-sunken)";
-    border = "none";
-    cursor = "default";
-  } else if (isError) {
-    bg = "var(--wrong-tint)";
-    border = "2px solid var(--wrong)";
-    boxShadow = "none";
-  } else if (filled) {
-    bg = "var(--surface-raised)";
-    border = "none";
-    boxShadow = "var(--shadow-cell)";
-  }
+  const interactive = !isGiven && !readOnly;
 
   return (
     <button
-      onClick={readOnly || isGiven ? undefined : () => onCellTap?.(rowIndex, colIndex)}
+      onClick={interactive ? () => onCellTap?.(rowIndex, colIndex) : undefined}
       aria-disabled={isGiven || undefined}
       tabIndex={tabIndex}
       onFocus={() => onFocus?.(rowIndex, colIndex)}
       aria-label={ariaLabel}
       style={{
-        width: size,
-        height: size,
-        borderRadius: "var(--radius-cell)",
-        border,
-        background: bg,
-        boxShadow,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        position: "relative",
+        border: "none",
+        outline: "none",
+        font: "inherit",
+        color: "inherit",
+        background: "transparent",
         padding: 0,
-        cursor,
-        transform: pressed ? "scale(0.94)" : "scale(1)",
-        transition: "transform 0.12s, background 0.16s, box-shadow 0.16s",
-        animation:
-          settleDelay !== undefined
-            ? `cell-settle var(--dur-slow) var(--ease-standard) ${settleDelay}ms`
-            : undefined,
+        margin: 0,
+        width: "100%",
+        height: "100%",
+        cursor: interactive ? "pointer" : "default",
+        borderRight: colIndex < n - 1 ? "1px solid var(--hairline)" : "none",
+        borderBottom: rowIndex < n - 1 ? "1px solid var(--hairline)" : "none",
+        WebkitTapHighlightColor: "transparent",
       }}
       onMouseEnter={(e) => {
-        if (!isGiven && !filled) e.currentTarget.style.background = "var(--bg-sunken)";
+        if (interactive) e.currentTarget.style.background = "var(--hover)";
       }}
       onMouseLeave={(e) => {
-        if (!isGiven && !filled) e.currentTarget.style.background = "var(--surface-raised)";
-        setPressed(false);
-      }}
-      onMouseDown={() => {
-        if (!isGiven) setPressed(true);
-      }}
-      onMouseUp={() => {
-        setPressed(false);
-      }}
-      onTouchStart={() => {
-        if (!isGiven) setPressed(true);
-      }}
-      onTouchEnd={() => {
-        setPressed(false);
+        e.currentTarget.style.background = "transparent";
       }}
     >
-      {value !== null && (
-        <span style={{ animation: "cell-pop 0.16s cubic-bezier(0.4,0,0.2,1)", display: "flex" }}>
-          <CellSymbol value={value} size={size} />
-        </span>
+      {/* Given plate — a soft rounded fill marking the fixed clues */}
+      <div
+        style={{
+          position: "absolute",
+          inset: "9%",
+          borderRadius: 12,
+          zIndex: 1,
+          pointerEvents: "none",
+          background: isGiven ? "var(--plate)" : "transparent",
+        }}
+      />
+
+      {/* Symbol layers */}
+      <div style={symLayer(value === 0, settleDelay)}>
+        <svg viewBox="0 0 40 40" style={{ width: "56%", height: "56%" }} aria-hidden="true">
+          <circle cx="20" cy="20" r="15" fill="var(--symbol-a)" />
+        </svg>
+      </div>
+      <div style={symLayer(value === 1, settleDelay)}>
+        <svg viewBox="0 0 40 40" style={{ width: "56%", height: "56%" }} aria-hidden="true">
+          <circle cx="20" cy="20" r="13" fill="none" stroke="var(--symbol-b)" strokeWidth="5" />
+        </svg>
+      </div>
+
+      {/* Violation marker — a small dot under the symbol */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          bottom: "8%",
+          transform: "translateX(-50%)",
+          width: 5,
+          height: 5,
+          borderRadius: "50%",
+          background: "var(--err)",
+          zIndex: 3,
+          opacity: isError ? 1 : 0,
+          transition: "opacity 0.25s ease",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Edge cap — the = / ≠ constraint straddling the shared edge */}
+      {edge && (
+        <div
+          aria-hidden="true"
+          style={
+            edge.orientation === "h"
+              ? { ...capBase, right: 0, top: "50%", transform: "translate(50%, -50%)" }
+              : { ...capBase, bottom: 0, left: "50%", transform: "translate(-50%, 50%)" }
+          }
+        >
+          {CAP_GLYPH[edge.kind]}
+        </div>
       )}
     </button>
   );

@@ -1,54 +1,49 @@
 /**
  * Halve design tokens — single source of truth (TS mirror of styles/tokens.css).
  * Light/dark duality is the brand device: warm "paper" light, deep "ink" dark.
- * Amber is the hero accent (symbol A); teal is the secondary symbol color (symbol B).
+ * Editorial voice: Newsreader (italic serif display) + Instrument Sans (body) +
+ * Spline Sans Mono (labels/kickers/timer). Amber is both the hero accent and the
+ * solid game symbol (A); teal is the ring game symbol (B).
  */
 
 /** Raw palette — reference values; theme via the semantic tokens, not these. */
 export const palette = {
   // Warm paper neutrals (light)
-  paper50: '#FBF8F1',
-  paper100: '#F6F1E8', // page background
-  paper200: '#EFE8DA',
-  paper300: '#E4DDCD', // hairline
-  paper400: '#D6CCB8',
-  clay550: '#746B5A', // muted fg — AA text (4.67:1 on bg)
-  clay600: '#6B6253', // secondary fg
+  paper100: '#F5F0E6', // page background
+  paper200: '#EDE6D8', // sunken
+  paperSurface: '#FDFAF3',
   clay700: '#463F33',
-  ink900: '#211C15', // primary fg on paper
+  clay600: '#6E6455', // secondary fg
+  clay500: '#8A7F6E', // muted fg
+  ink900: '#211B14', // primary fg on paper
 
   // Warm ink neutrals (dark)
-  night950: '#14110B', // page background
-  night900: '#1A160F',
-  night850: '#221D15', // surface
-  night800: '#2A2418',
-  night700: '#352E20', // hairline
-  night600: '#4A4030',
-  dust400: '#928873', // muted fg — AA text (5.37:1 on bg)
-  dust300: '#A79D89', // secondary fg
-  dust100: '#EFE8D9', // primary fg on ink
+  night950: '#161210', // page background
+  night925: '#120E0C', // sunken
+  night850: '#1F1A15', // surface
+  night800: '#2A2418', // raised
+  dust300: '#B4A990', // secondary fg on ink
+  dust400: '#9A8F7E', // muted fg on ink
+  dust100: '#EDE5D7', // primary fg on ink
 
-  // Amber — the hero accent
-  amberDisc: '#D45220', // the solid game symbol (A)
-  amber: '#B03E12', // accent on paper
-  amberStrong: '#943210', // pressed / strong
-  amberBright: '#E86B38', // accent on ink
-  amberTint: '#F8E4DC', // soft fill on paper
-  amberTintDk: '#38180E', // soft fill on ink
+  // Amber — the hero accent AND the solid game symbol (A). Unified.
+  amberPaper: '#DE5F27', // accent + disc on paper
+  amberPaperStrong: '#C24E1C',
+  amberInk: '#E8703A', // accent + disc on ink
+  amberInkStrong: '#F2895A',
 
   // Teal — the ring game symbol (B)
-  teal: '#2A7A6E', // game symbol B on paper
-  tealBright: '#6EC8BC', // game symbol B on ink
-  tealStrong: '#1E5C52',
+  tealPaper: '#1E9C8F',
+  tealInk: '#45BFB2',
 
   // Semantic feedback (warm-leaning)
   correctL: '#4E8A66',
   correctTintL: '#E2EFE5',
-  wrongL: '#C2564B',
+  wrongL: '#C0442C',
   wrongTintL: '#F6E2DD',
   correctD: '#6FB389',
   correctTintD: '#1E2C22',
-  wrongD: '#DC7A6E',
+  wrongD: '#D9553B',
   wrongTintD: '#2E1C18',
 } as const;
 
@@ -57,19 +52,22 @@ export const colors = {
   light: {
     bg: palette.paper100,
     bgSunken: palette.paper200,
-    surface: palette.paper50,
+    surface: palette.paperSurface,
     surfaceRaised: '#FFFFFF',
     fg1: palette.ink900,
     fg2: palette.clay600,
-    fg3: palette.clay550,
-    hairline: palette.paper300,
-    hairline2: palette.paper400,
-    accent: palette.amber,
-    accentStrong: palette.amberStrong,
-    accentTint: palette.amberTint,
-    onAccent: '#FFFFFF',
-    symbolA: palette.amberDisc,
-    symbolB: palette.teal,
+    fg3: palette.clay500,
+    hairline: 'rgba(31, 26, 20, 0.16)',
+    hairline2: 'rgba(31, 26, 20, 0.28)',
+    accent: palette.amberPaper,
+    accentStrong: palette.amberPaperStrong,
+    accentTint: 'rgba(222, 95, 39, 0.12)',
+    onAccent: '#1B1410',
+    symbolA: palette.amberPaper,
+    symbolB: palette.tealPaper,
+    plate: 'rgba(31, 26, 20, 0.055)',
+    hover: 'rgba(31, 26, 20, 0.045)',
+    err: '#C0442C',
     correct: palette.correctL,
     correctTint: palette.correctTintL,
     wrong: palette.wrongL,
@@ -77,20 +75,23 @@ export const colors = {
   },
   dark: {
     bg: palette.night950,
-    bgSunken: palette.night900,
+    bgSunken: palette.night925,
     surface: palette.night850,
     surfaceRaised: palette.night800,
     fg1: palette.dust100,
     fg2: palette.dust300,
     fg3: palette.dust400,
-    hairline: palette.night700,
-    hairline2: palette.night600,
-    accent: palette.amberBright,
-    accentStrong: palette.amberDisc,
-    accentTint: palette.amberTintDk,
-    onAccent: '#1A160F',
-    symbolA: palette.amberDisc,
-    symbolB: palette.tealBright,
+    hairline: 'rgba(233, 223, 205, 0.15)',
+    hairline2: 'rgba(233, 223, 205, 0.28)',
+    accent: palette.amberInk,
+    accentStrong: palette.amberInkStrong,
+    accentTint: 'rgba(232, 112, 58, 0.16)',
+    onAccent: '#1B1410',
+    symbolA: palette.amberInk,
+    symbolB: palette.tealInk,
+    plate: 'rgba(233, 223, 205, 0.06)',
+    hover: 'rgba(233, 223, 205, 0.05)',
+    err: '#D9553B',
     correct: palette.correctD,
     correctTint: palette.correctTintD,
     wrong: palette.wrongD,
@@ -114,24 +115,32 @@ export const shadows = {
 } as const;
 
 export const font = {
-  sans: "'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif",
-  num: "'Space Grotesk', ui-monospace, monospace",
+  serif: "'Newsreader', Georgia, 'Times New Roman', serif",
+  sans: "'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif",
+  mono: "'Spline Sans Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
+  /** @deprecated use `mono` */
+  num: "'Spline Sans Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
 } as const;
 
-/** Type scale in px. */
+/**
+ * Type scale. Editorial display sizes are fluid (CSS clamp) and expressed as
+ * strings; the fixed steps stay in px for programmatic use.
+ */
 export const fontSize = {
-  display: 56,
+  jumbo: 'clamp(5rem, 13vw, 9.375rem)',
+  hero: 'clamp(3.625rem, 8.5vw, 7.25rem)',
+  display: 'clamp(2.5rem, 6vw, 4rem)',
   h1: 36,
   h2: 26,
   h3: 20,
   body: 16,
   small: 14,
   label: 12,
-  timer: 44,
+  timer: 'clamp(3.25rem, 6vw, 4.75rem)',
 } as const;
 
 export const leading = {
-  tight: 1.05,
+  tight: 0.92,
   snug: 1.2,
   normal: 1.5,
 } as const;
@@ -139,7 +148,7 @@ export const leading = {
 export const tracking = {
   tight: '-0.02em',
   snug: '-0.01em',
-  label: '0.08em',
+  label: '0.18em',
 } as const;
 
 /** 8-point spacing system, in px. */
@@ -168,11 +177,15 @@ export const radius = {
 } as const;
 
 /**
- * Motion — tactile and confirming, never decorative. Brand easing is the
- * standard curve (no bounce/elastic); durations in ms.
+ * Motion — tactile and confirming. The standard curve is the brand easing;
+ * the back curve is used only for symbol placement and the solve wave.
  */
 export const motion = {
-  easing: { standard: 'cubic-bezier(0.4, 0, 0.2, 1)' },
+  easing: {
+    standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    outBack: 'cubic-bezier(0.34, 1.56, 0.5, 1)',
+    editorial: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+  },
   duration: { instant: 120, fast: 160, base: 220, slow: 320 },
 } as const;
 
@@ -185,11 +198,11 @@ export const symbols = {
   viewBox: '0 0 100 100',
   a: {
     circle: { cx: 50, cy: 50, r: 42 },
-    fill: palette.amberDisc,
+    fill: palette.amberInk,
   },
   b: {
     circle: { cx: 50, cy: 50, r: 36, strokeWidth: 12 },
-    stroke: palette.teal,
+    stroke: palette.tealInk,
   },
 } as const;
 

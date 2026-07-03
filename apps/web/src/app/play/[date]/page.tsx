@@ -62,7 +62,9 @@ export default async function PlayDatePage({ params }: Props) {
   if (!VALID_DIFFICULTIES.includes(rawDifficulty as Difficulty)) notFound();
 
   return (
+    // key by date so navigating between archive days remounts the board.
     <BoardScreen
+      key={date}
       puzzle={{ size: 6, ...spec, difficulty: rawDifficulty as Difficulty }}
       puzzleId={puzzleRow.id}
       dayNo={dayNo}

@@ -3,51 +3,31 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Monogram } from "@/components/ui/Monogram";
-import { SignOutIcon } from "@/components/ui/icons";
 
-function StatsIcon() {
-  return (
-    <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="18" y1="20" x2="18" y2="10" />
-      <line x1="12" y1="20" x2="12" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="14" />
-    </svg>
-  );
-}
-
-const MENU_ITEM_CLASS = "account-menu-item";
-
-const itemStyle: React.CSSProperties = {
+const menuItemBase: React.CSSProperties = {
   display: "flex",
-  alignItems: "center",
-  gap: 10,
   width: "100%",
-  height: 40,
-  padding: "0 12px",
+  textAlign: "left",
+  padding: "12px 14px",
   background: "none",
   border: "none",
-  borderRadius: "var(--radius-sm)",
-  color: "var(--fg-2)",
-  fontSize: "var(--text-small)",
-  fontWeight: 500,
-  fontFamily: "var(--font-sans)",
-  textAlign: "left",
-  textDecoration: "none",
+  borderRadius: 10,
   cursor: "pointer",
-  transition: "background .12s, color .12s",
+  fontFamily: "var(--font-mono)",
+  fontSize: 12,
+  letterSpacing: "0.16em",
+  textDecoration: "none",
+  transition: "background .15s, color .15s",
 };
 
 /**
- * Account affordance for the TopBar: a monogram avatar that opens a small
- * popover menu (name header → Statistics · Sign out). One pattern that works
- * on both surfaces — click-to-open on desktop, tap-to-open on mobile — so
- * sign-out is always one interaction from wherever the menu appears.
+ * Account affordance for the header: a monogram avatar that opens a small
+ * popover (signed-in name → Statistics · Sign out). Click/tap-to-open on both
+ * surfaces, with full keyboard support (Escape, arrow nav, outside-click).
  */
 export function AccountMenu({ displayName }: { displayName: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [triggerHovered, setTriggerHovered] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -76,24 +56,18 @@ export function AccountMenu({ displayName }: { displayName: string }) {
 
   // Move focus into the menu when it opens.
   useEffect(() => {
-    if (open) {
-      const first = menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]');
-      first?.focus();
-    }
+    if (open) menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
   }, [open]);
 
   // Arrow-key navigation between items.
   function onMenuKeyDown(e: React.KeyboardEvent) {
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
-    const items = Array.from(
-      menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
-    );
+    const items = Array.from(menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
     if (!items.length) return;
     const idx = items.indexOf(document.activeElement as HTMLElement);
-    const next = e.key === "ArrowDown"
-      ? items[(idx + 1) % items.length]
-      : items[(idx - 1 + items.length) % items.length];
+    const next =
+      e.key === "ArrowDown" ? items[(idx + 1) % items.length] : items[(idx - 1 + items.length) % items.length];
     next?.focus();
   }
 
@@ -106,13 +80,11 @@ export function AccountMenu({ displayName }: { displayName: string }) {
   }
 
   const name = displayName.trim() || "Account";
-  // Capitalise real names, but leave emails (the fallback when no display name
-  // is set) untouched — "stayrightdemo@gmail.com", not "Stayrightdemo@Gmail.Com".
   const nameCasing = name.includes("@") ? "none" : "capitalize";
+  const initial = (name[0] ?? "?").toUpperCase();
 
   return (
     <div ref={rootRef} style={{ position: "relative", display: "inline-flex" }}>
-      <style>{`.${MENU_ITEM_CLASS}:hover,.${MENU_ITEM_CLASS}:focus{background:var(--bg-sunken)!important;color:var(--fg-1)!important}`}</style>
       <button
         ref={triggerRef}
         type="button"
@@ -120,22 +92,26 @@ export function AccountMenu({ displayName }: { displayName: string }) {
         aria-expanded={open}
         aria-label="Your account"
         onClick={() => setOpen((v) => !v)}
-        onMouseEnter={() => setTriggerHovered(true)}
-        onMouseLeave={() => setTriggerHovered(false)}
         style={{
-          display: "inline-flex",
+          width: 30,
+          height: 30,
+          borderRadius: "50%",
+          border: `1px solid ${open ? "var(--accent)" : "var(--hairline)"}`,
+          background: "var(--surface)",
+          cursor: "pointer",
+          display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "none",
-          border: "none",
           padding: 0,
-          borderRadius: "var(--radius-full)",
-          cursor: "pointer",
-          transition: "box-shadow .15s",
-          boxShadow: open || triggerHovered ? "0 0 0 2px var(--accent-tint)" : "none",
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          color: "var(--fg-1)",
+          transition: "border-color .15s",
         }}
+        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
+        onMouseLeave={(e) => (e.currentTarget.style.borderColor = open ? "var(--accent)" : "var(--hairline)")}
       >
-        <Monogram name={name} size={32} />
+        {initial}
       </button>
 
       {open && (
@@ -146,51 +122,70 @@ export function AccountMenu({ displayName }: { displayName: string }) {
           onKeyDown={onMenuKeyDown}
           style={{
             position: "absolute",
-            top: "calc(100% + 8px)",
+            top: "calc(100% + 10px)",
             right: 0,
-            minWidth: 208,
+            width: 244,
             background: "var(--surface)",
             border: "1px solid var(--hairline)",
-            borderRadius: "var(--radius-lg)",
+            borderRadius: 16,
             boxShadow: "var(--shadow-lg)",
-            padding: 6,
+            padding: 8,
             zIndex: 50,
-            animation: "fade-up .12s cubic-bezier(0.4,0,0.2,1)",
+            animation: "fadeup .16s var(--ease-editorial) both",
           }}
         >
-          {/* Identity header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px 10px" }}>
-            <Monogram name={name} size={32} />
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: "var(--text-small)", fontWeight: 600, color: "var(--fg-1)", textTransform: nameCasing, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {name}
-              </div>
-              <div style={{ fontSize: "var(--text-label)", color: "var(--fg-3)", marginTop: 1 }}>Signed in</div>
-            </div>
+          <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 4 }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.22em", color: "var(--fg-3)" }}>SIGNED IN</span>
+            <span
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontWeight: 500,
+                fontSize: 20,
+                textTransform: nameCasing,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {name}
+            </span>
           </div>
 
-          <div style={{ height: 1, background: "var(--hairline)", margin: "2px 0 4px" }} />
+          <div style={{ height: 1, background: "var(--hairline)", margin: "2px 6px 6px" }} />
 
           <Link
             href="/stats"
             role="menuitem"
-            className={MENU_ITEM_CLASS}
             onClick={() => setOpen(false)}
-            style={itemStyle}
+            style={{ ...menuItemBase, color: "var(--fg-1)" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--hover)";
+              e.currentTarget.style.color = "var(--accent)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "none";
+              e.currentTarget.style.color = "var(--fg-1)";
+            }}
           >
-            <StatsIcon />
-            Statistics
+            STATISTICS
           </Link>
 
           <button
             type="button"
             role="menuitem"
-            className={MENU_ITEM_CLASS}
             onClick={handleSignOut}
-            style={itemStyle}
+            style={{ ...menuItemBase, color: "var(--fg-3)" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--hover)";
+              e.currentTarget.style.color = "var(--err)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "none";
+              e.currentTarget.style.color = "var(--fg-3)";
+            }}
           >
-            <SignOutIcon />
-            Sign out
+            SIGN OUT
           </button>
         </div>
       )}

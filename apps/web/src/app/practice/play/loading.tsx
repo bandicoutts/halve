@@ -1,2 +1,1 @@
-import { BoardSkeleton } from "@/components/board/BoardSkeleton";
-export default BoardSkeleton;
+export { SkeletonPlay as default } from "@/components/ui/skeletons";

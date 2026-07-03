@@ -4,7 +4,9 @@
 /* Map design tokens to Tailwind v4 theme utilities */
 @theme inline {
   /* Font */
+  --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
   --font-num: var(--font-num);
 
   /* Colors — semantic tokens */
@@ -146,6 +148,41 @@ input::placeholder { color: var(--fg-3); opacity: 1; }
   to   { opacity: 1; }
 }
 
+/* Editorial screen entrance — opacity + gentle rise (used on redesigned screens) */
+@keyframes fadeup {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero mark — the split circle breathes apart and back (home) */
+@keyframes driftL { from { transform: translateX(0); } to { transform: translateX(-8px); } }
+@keyframes driftR { from { transform: translateX(0); } to { transform: translateX(8px); } }
+
+/* Solve wave — one tactile lift per cell, diagonally staggered on completion */
+@keyframes solvepop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.24); }
+  100% { transform: scale(1); }
+}
+
+/* Hint reveal — a placed symbol springs into being */
+@keyframes hintpulse {
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Spinner — used by in-progress buttons (e.g. onboarding "Saving…") */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Skeleton breathe — the redesigned loading placeholders pulse on --plate */
+@keyframes breathe {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
 /* Soft fade for card transitions */
 @keyframes lm-fade {
   from { opacity: 0; }
@@ -225,6 +262,78 @@ a:focus-visible {
 .tt-icon--light { display: inline-flex; }
 .dark .tt-icon--light { display: none; }
 .dark .tt-icon--dark { display: inline-flex; }
+
+/* Editorial header theme toggle — a split-circle glyph that rotates 180° between
+   themes. Like .tt-thumb, the rotation is driven by the `.dark` class (set
+   pre-paint in layout.tsx), never by React state, so it is correct on first
+   paint with no hydration mismatch. */
+.theme-glyph {
+  transform: rotate(0deg);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.5, 1);
+}
+.dark .theme-glyph { transform: rotate(180deg); }
+
+/* ============================================================
+   RESPONSIVE — editorial split layout + header nav
+   ============================================================ */
+
+/* Two-column "editorial split" (home hero, auth). Below the breakpoint it is a
+   single stacked column with the decorative aside on top (column-reverse); at
+   and above it, a side-by-side layout with a hairline divider between. The
+   divider only EXISTS in the two-column layout, so it can never strand as a
+   floating hairline mid-wrap (the old flex-wrap approach did). */
+.hv-split {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  /* Stacked: a centered, phone-width column so medium screens aren't a
+     left-pinned block with a big empty right half. */
+  max-width: 620px;
+  margin-inline: auto;
+}
+.hv-split > * { min-width: 0; }
+.hv-split-rule { display: none; }
+
+@media (min-width: 940px) {
+  .hv-split { flex-direction: row; max-width: var(--split-max, 1280px); }
+  .hv-split-main { flex: 1 1 var(--split-main, 480px); }
+  .hv-split-aside { flex: 1 1 var(--split-aside, 380px); }
+  .hv-split-rule {
+    display: block;
+    flex: 0 0 1px;
+    align-self: stretch;
+    background: var(--hairline);
+    margin: clamp(24px, 4vw, 48px) 0;
+  }
+}
+
+/* Stats streak band — same idea at a smaller breakpoint: stacked below 720px
+   (divider hidden), streak beside the stat-cards above it. */
+.hv-band {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.hv-band-rule { display: none; }
+@media (min-width: 720px) {
+  .hv-band { flex-direction: row; }
+  .hv-band-main { flex: 1 1 300px; }
+  .hv-band-aside { flex: 1 1 320px; }
+  .hv-band-rule { display: block; flex: 0 0 1px; background: var(--hairline); }
+}
+
+/* Header nav: the full inline nav on ≥560px, a hamburger + dropdown below it
+   (the inline links + auth used to overflow / wrap awkwardly on phones). */
+.hv-nav-desktop {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.6vw, 22px);
+}
+.hv-nav-burger { display: none; }
+@media (max-width: 560px) {
+  .hv-nav-desktop { display: none; }
+  .hv-nav-burger { display: flex; }
+}
 
 /* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {

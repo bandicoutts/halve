@@ -10,6 +10,8 @@ export default async function ArchivePage() {
 
   const months: ArchiveMonth[] = [];
   let initialId: string | undefined;
+  let isAuthenticated = false;
+  let displayName: string | undefined;
 
   try {
     const supabase = await createClient();
@@ -27,6 +29,16 @@ export default async function ArchivePage() {
         .lte("date", today)
         .order("date", { ascending: true }),
     ]);
+
+    isAuthenticated = !!user;
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      displayName = profile?.display_name ?? user.email ?? undefined;
+    }
 
     const rows = puzzles ?? [];
 
@@ -94,5 +106,12 @@ export default async function ArchivePage() {
     // DB unavailable — render empty state
   }
 
-  return <ArchiveScreen months={months} initialId={initialId} />;
+  return (
+    <ArchiveScreen
+      months={months}
+      initialId={initialId}
+      isAuthenticated={isAuthenticated}
+      displayName={displayName}
+    />
+  );
 }
