@@ -1,206 +1,63 @@
 "use client";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useTheme } from "@/components/providers/ThemeProvider";
-import { TopBar } from "@/components/ui/TopBar";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { Logo } from "@/components/symbols/Logo";
-import { Mark } from "@/components/symbols/Mark";
-import { Fire } from "@/components/symbols/Fire";
-import { Water } from "@/components/symbols/Water";
-import { Button } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
-import { FitToViewport } from "@/components/ui/FitToViewport";
-import { AccountMenu } from "@/components/ui/AccountMenu";
-import { formatDuration } from "@/lib/format";
-import { computeNextIn } from "@/lib/puzzle-clock";
+import { useState } from "react";
+import { SiteHeader } from "@/components/ui/SiteHeader";
+import { RulesModal } from "@/components/screens/RulesModal";
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
+// ─── Ghost (mono) link ────────────────────────────────────────────────────────
 
-function ChevronRight({ shifted }: { shifted: boolean }) {
-  return (
-    <svg
-      width={16}
-      height={16}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="var(--fg-3)"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      style={{
-        flexShrink: 0,
-        transform: shifted ? "translateX(2px)" : "none",
-        transition: "transform .15s",
-      }}
-    >
-      <polyline points="9 18 15 12 9 6" />
-    </svg>
-  );
-}
-
-// ─── Destination card ─────────────────────────────────────────────────────────
-
-function DestCard({
-  motif,
-  title,
-  sub,
+function GhostLink({
+  children,
   href,
+  onClick,
 }: {
-  motif: ReactNode;
-  title: string;
-  sub: string;
-  href: string;
+  children: ReactNode;
+  href?: string;
+  onClick?: () => void;
 }) {
-  const [h, setH] = useState(false);
+  const [hot, setHot] = useState(false);
+  const style: React.CSSProperties = {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: hot ? "var(--accent)" : "var(--fg-3)",
+    fontFamily: "var(--font-mono)",
+    fontSize: 12,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    textDecoration: "none",
+    padding: "8px 0",
+    transition: "color 0.18s ease",
+  };
+  if (href) {
+    return (
+      <Link href={href} style={style} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
+        {children}
+      </Link>
+    );
+  }
   return (
-    <Link href={href} style={{ flex: "1 1 140px", textDecoration: "none" }}>
-      <div
-        onMouseEnter={() => setH(true)}
-        onMouseLeave={() => setH(false)}
-        onTouchStart={(e) => {
-          e.currentTarget.style.opacity = "0.7";
-        }}
-        onTouchEnd={(e) => {
-          e.currentTarget.style.opacity = "1";
-        }}
-        onTouchCancel={(e) => {
-          e.currentTarget.style.opacity = "1";
-        }}
-        style={{
-          background: "var(--surface)",
-          borderRadius: "var(--radius-xl)",
-          padding: 18,
-          border: `1px solid ${h ? "var(--accent)" : "var(--hairline)"}`,
-          boxShadow: h ? "var(--shadow-md)" : "var(--shadow-sm)",
-          cursor: "pointer",
-          transition: "border-color .16s, box-shadow .16s",
-          display: "flex",
-          flexDirection: "column",
-          minHeight: 132,
-          justifyContent: "space-between",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
-        >
-          <div style={{ height: 32, display: "flex", alignItems: "center" }}>
-            {motif}
-          </div>
-          <ChevronRight shifted={h} />
-        </div>
-        <div>
-          <div
-            style={{
-              fontSize: 18,
-              fontWeight: 600,
-              color: "var(--fg-1)",
-              letterSpacing: "var(--tracking-snug)",
-            }}
-          >
-            {title}
-          </div>
-          <div style={{ fontSize: "var(--text-small)", color: "var(--fg-3)", marginTop: 3 }}>
-            {sub}
-          </div>
-        </div>
-      </div>
-    </Link>
+    <button style={style} onClick={onClick} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
+      {children}
+    </button>
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Hero mark — the split circle that drifts apart and back ───────────────────
 
-function CheckIcon() {
+function DriftMark() {
   return (
-    <svg
-      width={20}
-      height={20}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="var(--correct)"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <polyline points="20 6 9 17 4 12" />
+    <svg viewBox="0 0 200 200" style={{ width: "clamp(190px, 28vw, 380px)", overflow: "visible" }} aria-hidden="true">
+      <g style={{ animation: "driftL 5.5s ease-in-out infinite alternate" }}>
+        <path d="M96 5 A95 95 0 0 0 96 195 Z" style={{ fill: "var(--symbol-a)" }} />
+      </g>
+      <g style={{ animation: "driftR 5.5s ease-in-out infinite alternate" }}>
+        <path d="M104 5 A95 95 0 0 1 104 195 Z" style={{ fill: "var(--symbol-b)" }} />
+      </g>
     </svg>
   );
 }
-
-/** Completed-state hero shown once today's puzzle is solved. */
-function SolvedHero({ durationMs }: { durationMs?: number | undefined }) {
-  const [nextIn, setNextIn] = useState(() => computeNextIn());
-  useEffect(() => {
-    const id = setInterval(() => setNextIn(computeNextIn()), 60_000);
-    return () => clearInterval(id);
-  }, []);
-  return (
-    <div style={{ marginTop: 22 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "16px 18px",
-          background: "var(--surface)",
-          border: "1px solid var(--hairline)",
-          borderRadius: "var(--radius-xl)",
-          boxShadow: "var(--shadow-sm)",
-        }}
-      >
-        <div
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: "var(--radius-full)",
-            background: "var(--correct-tint, var(--accent-tint))",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <CheckIcon />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--fg-1)" }}>
-            {durationMs !== undefined ? (
-              <>
-                Solved in{" "}
-                <span className="tnum" style={{ color: "var(--correct)" }}>
-                  {formatDuration(durationMs)}
-                </span>
-              </>
-            ) : (
-              "Solved today"
-            )}
-          </div>
-          <div style={{ fontSize: 12, color: "var(--fg-3)", marginTop: 1 }}>
-            Next puzzle in {nextIn}
-          </div>
-        </div>
-      </div>
-      <div style={{ marginTop: 12 }}>
-        <Link href="/stats" style={{ textDecoration: "none" }}>
-          <Button variant="secondary" full>
-            See your stats
-          </Button>
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-/** Max content-column width — keeps the hero/CTA/cards readable on desktop,
- *  matching the constrained-column convention used across the app. */
-const HOME_MAX = 480;
 
 interface HomeScreenProps {
   difficulty?: string | undefined;
@@ -229,214 +86,159 @@ export function HomeScreen({
   fetchError,
   isAuthenticated,
   displayName,
-  archiveCount,
-  lastDifficulty,
   solvedToday,
-  solveDurationMs,
   streakBand,
 }: HomeScreenProps) {
-  const { theme, toggle } = useTheme();
+  const [showRules, setShowRules] = useState(false);
 
-  const [signInHovered, setSignInHovered] = useState(false);
-
+  const kicker = [todayLabel, difficulty ?? "Medium", puzzleNumber !== undefined ? `NO. ${puzzleNumber}` : null]
+    .filter(Boolean)
+    .join(" · ")
+    .toUpperCase();
 
   return (
-    <div
-      style={{
-        height: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--bg)",
-        animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)",
-      }}
-    >
-      <TopBar
-        left={<Logo size={20} />}
-        right={
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {isAuthenticated ? (
-              <AccountMenu displayName={displayName || "?"} />
-            ) : (
-              <Link
-                href="/auth"
-                onMouseEnter={() => setSignInHovered(true)}
-                onMouseLeave={() => setSignInHovered(false)}
-                style={{
-                  fontSize: "var(--text-small)",
-                  fontWeight: 600,
-                  color: signInHovered ? "var(--fg-1)" : "var(--fg-2)",
-                  height: 34,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  padding: "0 14px",
-                  border: `1.5px solid ${signInHovered ? "var(--fg-3)" : "var(--hairline-2)"}`,
-                  borderRadius: "var(--radius-full)",
-                  textDecoration: "none",
-                  transition: "all .15s",
-                }}
-              >
-                Sign in
-              </Link>
-            )}
-            <ThemeToggle theme={theme} onToggle={toggle} />
-          </div>
-        }
-      />
+    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+      <SiteHeader isAuthenticated={isAuthenticated} displayName={displayName} maxWidth={1280} />
 
-      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
-       <div style={{ maxWidth: HOME_MAX, width: "100%", paddingBottom: 28 }}>
-        {/* Hero section */}
-        <div style={{ marginTop: 26 }}>
-          {/* StreakBand — renders via Suspense when authenticated */}
-          {streakBand && (
-            <div style={{ marginBottom: 20 }}>{streakBand}</div>
-          )}
-
-          {/* Meta row */}
+      <section
+        style={{
+          flex: 1,
+          display: "flex",
+          flexWrap: "wrap-reverse",
+          alignItems: "stretch",
+          justifyContent: "center",
+          maxWidth: 1280,
+          width: "100%",
+          margin: "0 auto",
+          padding: "0 clamp(20px, 4vw, 40px) 56px",
+          animation: "fadeup 0.5s var(--ease-editorial) both",
+        }}
+      >
+        {/* Left — the hero */}
+        <div
+          style={{
+            flex: "1 1 480px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: 30,
+            padding: "40px 0",
+            minWidth: 0,
+          }}
+        >
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              flexWrap: "nowrap",
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              letterSpacing: "0.22em",
+              color: "var(--fg-3)",
             }}
           >
-            <Eyebrow style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-              {todayLabel}
-            </Eyebrow>
-            <span
-              aria-hidden="true"
-              style={{ color: "var(--hairline-2)", fontSize: 12 }}
-            >
-              ·
-            </span>
-            <Eyebrow style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-              {difficulty ?? "Medium"}
-            </Eyebrow>
-            {puzzleNumber !== undefined && (
-              <>
-                <span
-                  aria-hidden="true"
-                  style={{ color: "var(--hairline-2)", fontSize: 12 }}
-                >
-                  ·
-                </span>
-                <Eyebrow style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-                  #{puzzleNumber}
-                </Eyebrow>
-              </>
-            )}
+            {kicker}
           </div>
 
           <h1
             style={{
-              fontSize: 44,
+              fontFamily: "var(--font-serif)",
+              fontStyle: "italic",
               fontWeight: 500,
-              letterSpacing: "-0.025em",
-              color: "var(--fg-1)",
-              marginTop: 10,
-              lineHeight: 1.05,
+              fontSize: "var(--text-hero)",
+              lineHeight: 0.92,
+              margin: 0,
+              letterSpacing: "-0.02em",
+              textWrap: "balance",
             }}
           >
-            Today&rsquo;s puzzle
+            Today&rsquo;s
+            <br />
+            puzzle.
           </h1>
 
-          {fetchError && (
-            <p
-              style={{
-                fontSize: 14,
-                lineHeight: 1.5,
-                color: "var(--fg-3)",
-                margin: "12px 0 0",
-              }}
-            >
-              Today&rsquo;s puzzle is unavailable — try again shortly.
-            </p>
-          )}
-
           {fetchError ? (
-            <div style={{ marginTop: 22 }}>
-              <Button
-                variant="primary"
-                full
-                onClick={() => window.location.reload()}
-              >
-                Try again
-              </Button>
-            </div>
-          ) : solvedToday ? (
-            <SolvedHero durationMs={solveDurationMs} />
+            <>
+              <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "36ch" }}>
+                Today&rsquo;s puzzle is unavailable — try again shortly.
+              </p>
+              <div>
+                <button
+                  onClick={() => window.location.reload()}
+                  style={heroButtonStyle}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
+                >
+                  Try again
+                </button>
+              </div>
+            </>
           ) : (
-            <div style={{ marginTop: 22 }}>
-              <Link href="/play" style={{ textDecoration: "none" }}>
-                <Button variant="primary" full>
-                  Play today
-                </Button>
-              </Link>
-            </div>
+            <>
+              <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "36ch" }}>
+                Six by six. Every row and column, half and half. One solution, no guessing.
+              </p>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+                <Link href="/play" style={{ textDecoration: "none" }}>
+                  <span
+                    style={heroButtonStyle}
+                    onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
+                  >
+                    {solvedToday ? "Review your solve" : "Play today"}
+                  </span>
+                </Link>
+                <GhostLink href="/practice">Practice</GhostLink>
+                <GhostLink onClick={() => setShowRules(true)}>How to play</GhostLink>
+              </div>
+
+              {/* Streak band — streamed in for authenticated users */}
+              {streakBand}
+            </>
           )}
         </div>
 
-        {/* Destination cards */}
-        <div style={{ marginTop: 36 }}>
-          <Eyebrow style={{ marginBottom: 12 }}>Keep playing</Eyebrow>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 12,
-            }}
-          >
-            <DestCard
-              motif={
-                <span style={{ display: "flex", gap: 6 }}>
-                  <Fire size={26} />
-                  <Water size={26} />
-                </span>
-              }
-              title="Practice"
-              sub="Any difficulty, unlimited plays"
-              href="/practice"
-            />
-            <DestCard
-              motif={<Mark size={28} />}
-              title="Archive"
-              sub={
-                archiveCount !== undefined && lastDifficulty
-                  ? `${archiveCount} puzzles · last ${lastDifficulty.toLowerCase()}`
-                  : "Every past puzzle, at your pace"
-              }
-              href="/archive"
-            />
-          </div>
-        </div>
+        {/* Divider */}
+        <div
+          style={{
+            flex: "0 0 1px",
+            alignSelf: "stretch",
+            background: "var(--hairline)",
+            margin: "48px 0",
+          }}
+        />
 
-        {/* Footer — trailing element with a comfortable gap; not pinned to the
-            viewport bottom, which previously left a large void on tall screens. */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 44 }}>
-          <Link
-            href="/tutorial"
-            style={{
-              fontSize: "var(--text-small)",
-              color: "var(--fg-3)",
-              textDecoration: "none",
-              minHeight: 44,
-              display: "inline-flex",
-              alignItems: "center",
-              transition: "color .15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "var(--fg-2)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "var(--fg-3)";
-            }}
-          >
-            How to play
-          </Link>
+        {/* Right — the drifting mark */}
+        <div
+          style={{
+            flex: "1 1 380px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "clamp(24px, 4vw, 56px)",
+            minWidth: 0,
+          }}
+        >
+          <DriftMark />
         </div>
-       </div>
-      </FitToViewport>
+      </section>
+
+      <RulesModal open={showRules} onClose={() => setShowRules(false)} />
     </div>
   );
 }
+
+const heroButtonStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "var(--accent)",
+  color: "var(--on-accent)",
+  border: "none",
+  borderRadius: 999,
+  padding: "18px 42px",
+  fontFamily: "var(--font-sans)",
+  fontSize: 17,
+  fontWeight: 600,
+  cursor: "pointer",
+  transition: "transform 0.2s ease",
+  letterSpacing: "0.01em",
+};

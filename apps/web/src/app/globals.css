@@ -4,7 +4,9 @@
 /* Map design tokens to Tailwind v4 theme utilities */
 @theme inline {
   /* Font */
+  --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
   --font-num: var(--font-num);
 
   /* Colors — semantic tokens */
@@ -146,6 +148,30 @@ input::placeholder { color: var(--fg-3); opacity: 1; }
   to   { opacity: 1; }
 }
 
+/* Editorial screen entrance — opacity + gentle rise (used on redesigned screens) */
+@keyframes fadeup {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero mark — the split circle breathes apart and back (home) */
+@keyframes driftL { from { transform: translateX(0); } to { transform: translateX(-8px); } }
+@keyframes driftR { from { transform: translateX(0); } to { transform: translateX(8px); } }
+
+/* Solve wave — one tactile lift per cell, diagonally staggered on completion */
+@keyframes solvepop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.24); }
+  100% { transform: scale(1); }
+}
+
+/* Hint reveal — a placed symbol springs into being */
+@keyframes hintpulse {
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 /* Soft fade for card transitions */
 @keyframes lm-fade {
   from { opacity: 0; }
@@ -225,6 +251,16 @@ a:focus-visible {
 .tt-icon--light { display: inline-flex; }
 .dark .tt-icon--light { display: none; }
 .dark .tt-icon--dark { display: inline-flex; }
+
+/* Editorial header theme toggle — a split-circle glyph that rotates 180° between
+   themes. Like .tt-thumb, the rotation is driven by the `.dark` class (set
+   pre-paint in layout.tsx), never by React state, so it is correct on first
+   paint with no hydration mismatch. */
+.theme-glyph {
+  transform: rotate(0deg);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.5, 1);
+}
+.dark .theme-glyph { transform: rotate(180deg); }
 
 /* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {

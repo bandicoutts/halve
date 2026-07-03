@@ -498,16 +498,19 @@ function PracticeBoard({
           {getFormatted()}
         </div>
 
-        <Board
-          cells={cells}
-          givens={puzzle.givens}
-          edges={puzzle.edges}
-          errors={errors}
-          onCellTap={tap}
-          cellSize={cellSize}
-          gap={gap}
-          readOnly={solved}
-        />
+        {/* Board auto-sizes to its container; reuse the computed cell size to
+            keep the tutorial grid at a comparable footprint (full Phase 3
+            restyle pending). */}
+        <div style={{ width: cellSize * 4 + gap * 3, maxWidth: "calc(100vw - 48px)" }}>
+          <Board
+            cells={cells}
+            givens={puzzle.givens}
+            edges={puzzle.edges}
+            errors={errors}
+            onCellTap={tap}
+            readOnly={solved}
+          />
+        </div>
 
         <button
           onClick={undo}
