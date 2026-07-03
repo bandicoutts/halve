@@ -1,911 +1,339 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { generatePuzzle } from "@parity/engine";
-import type { Puzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
-import { useTimer } from "@/hooks/useTimer";
 import { Board } from "@/components/board/Board";
-import { TopBar } from "@/components/ui/TopBar";
-import { IconButton } from "@/components/ui/IconButton";
-import { Button } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
-import { Mark } from "@/components/symbols/Mark";
-import { Logo } from "@/components/symbols/Logo";
-import { Fire } from "@/components/symbols/Fire";
-import { Water } from "@/components/symbols/Water";
-import { TeachBoard, GoodBad } from "@/components/tutorial/TeachBoard";
-import { BackIcon, CloseIcon } from "@/components/ui/icons";
+import { Wordmark } from "@/components/ui/Wordmark";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Illustration helpers ─────────────────────────────────────────────────────
 
-type CellValue = 0 | 1 | null;
-type Grid2D = CellValue[][];
-
-// ─── Tutorial grid constants ──────────────────────────────────────────────────
-
-const TN = 4;
-
-const TSOL: Grid2D = [
-  [0, 1, 1, 0],
-  [1, 0, 0, 1],
-  [0, 1, 0, 1],
-  [1, 0, 1, 0],
-];
-
-// Edge signs on the demo board (signs step + intro board)
-const TH_EDGES: Record<string, "eq" | "ne"> = { "0,1": "eq", "2,0": "ne" };
-const TV_EDGES: Record<string, "eq" | "ne"> = { "1,2": "eq" };
-
-// Edge sign for the deduction walkthrough
-const DED_H_EDGES: Record<string, "eq" | "ne"> = { "0,1": "eq" };
-
-const keyOf = (r: number, c: number) => `${r},${c}`;
-
-function fullGrid(): Grid2D {
-  return TSOL.map((row) => row.slice()) as Grid2D;
-}
-function emptyGrid(): Grid2D {
-  return Array.from({ length: TN }, () => Array<CellValue>(TN).fill(null));
-}
-function allGivens(): Record<string, boolean> {
-  const g: Record<string, boolean> = {};
-  for (let r = 0; r < TN; r++)
-    for (let c = 0; c < TN; c++) g[keyOf(r, c)] = true;
-  return g;
-}
-
-// ─── Deduction walkthrough ────────────────────────────────────────────────────
-
-const DED_LAST = 3;
-
-const DED_CAPTIONS: string[] = [
-  "Start from a cell you're given — this one's a ring.",
-  "The = sign links it to its neighbour, so that cell is a ring too.",
-  "The row now has its two rings, so the rest can only be solids.",
-  "Every step was forced. You never had to guess.",
-];
-
-const DED_HIGHLIGHTS: string[][] = [
-  ["0,1"],
-  ["0,1", "0,2"],
-  ["0,0", "0,3"],
-  [],
-];
-
-function getDedCells(phase: number): Grid2D {
-  const c = emptyGrid();
-  c[0]![1] = 1;
-  if (phase >= 1) c[0]![2] = 1;
-  if (phase >= 2) {
-    c[0]![0] = 0;
-    c[0]![3] = 0;
-  }
-  return c;
-}
-
-// ─── ProgressDots ─────────────────────────────────────────────────────────────
-
-function ProgressDots({ count, active }: { count: number; active: number }) {
+function Disc({ size = 34 }: { size?: number }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      {Array.from({ length: count }, (_, i) => (
-        <span
-          key={i}
-          style={{
-            height: 7,
-            borderRadius: "var(--radius-full)",
-            width: i === active ? 22 : 7,
-            background: i === active ? "var(--accent)" : "var(--hairline-2)",
-            transition: "width .22s cubic-bezier(0.4,0,0.2,1), background .22s",
-            display: "block",
-          }}
-        />
-      ))}
-    </div>
+    <svg viewBox="0 0 40 40" style={{ width: size, height: size }} aria-hidden="true">
+      <circle cx="20" cy="20" r="15" style={{ fill: "var(--symbol-a)" }} />
+    </svg>
+  );
+}
+function Ring({ size = 34 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 40 40" style={{ width: size, height: size }} aria-hidden="true">
+      <circle cx="20" cy="20" r="13" style={{ fill: "none", stroke: "var(--symbol-b)", strokeWidth: 5 }} />
+    </svg>
   );
 }
 
-// ─── ThreeStrip — good/bad row contrast for the line-law step ────────────────
+const monoLabel: React.CSSProperties = { fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.18em", color: "var(--fg-3)" };
 
-function ThreeStrip({
-  values,
-  state,
-  size,
-}: {
-  values: (0 | 1)[];
-  state: "bad" | "good";
-  size: number;
-}) {
+function Beat1Art() {
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-      <span style={{ display: "inline-flex", gap: 5 }}>
-        {values.map((v, i) => (
-          <div
-            key={i}
-            style={{
-              width: size,
-              height: size,
-              borderRadius: "var(--radius-cell)",
-              background: "var(--surface)",
-              border: "1px solid var(--hairline)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            {v === 0 ? (
-              <Fire size={size * 0.6} fill="var(--symbol-a)" />
-            ) : (
-              <Water size={size * 0.6} fill="var(--symbol-b)" />
-            )}
-          </div>
-        ))}
-      </span>
-      <GoodBad good={state === "good"} size={size * 0.65} />
-    </span>
-  );
-}
-
-// ─── TutorialWin ──────────────────────────────────────────────────────────────
-
-function TutorialWin({
-  time,
-  solution,
-  onPlayToday,
-  onHome,
-}: {
-  time: string;
-  solution: number[][];
-  onPlayToday: () => void;
-  onHome: () => void;
-}) {
-  const flat = solution.flat();
-  const cell = 54;
-  const gap = 8;
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--bg)",
-        zIndex: 50,
-      }}
-    >
-      <TopBar
-        left={
-          <IconButton label="Close" size={40} onClick={onHome}>
-            <CloseIcon />
-          </IconButton>
-        }
-        title={<Eyebrow>How to play</Eyebrow>}
-        right={<span style={{ width: 40 }} />}
-      />
-      <h1 className="sr-only">How to play</h1>
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "8px 24px 36px",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 384,
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          {/* Mark entrance — same animation as real Win */}
-          <div
-            style={{
-              marginTop: 8,
-              animation: "win-mark .6s cubic-bezier(0.34,1.56,0.64,1)",
-            }}
-          >
-            <Mark size={48} />
-          </div>
-
-          {/* Eyebrow — accent instead of fg-3, no number to earn yet */}
-          <div
-            style={{
-              marginTop: 18,
-              fontSize: "var(--text-label)",
-              fontWeight: 600,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              color: "var(--accent)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            You&rsquo;ve got it
-          </div>
-
-          {/* Solve time hero */}
-          <div
-            style={{
-              marginTop: 14,
-              fontSize: "var(--text-small)",
-              color: "var(--fg-3)",
-              letterSpacing: "0.01em",
-            }}
-          >
-            Solved in
-          </div>
-          <div
-            className="tnum"
-            style={{
-              fontSize: 64,
-              fontWeight: 500,
-              letterSpacing: "-0.035em",
-              color: "var(--fg-1)",
-              lineHeight: 1,
-              marginTop: 4,
-            }}
-          >
-            {time}
-          </div>
-
-          {/* Keepsake card — 4×4 in real symbols */}
-          <div
-            style={{
-              marginTop: 28,
-              width: "100%",
-              background: "var(--surface)",
-              border: "1px solid var(--hairline)",
-              borderRadius: "var(--radius-xl)",
-              padding: "18px 18px 22px",
-              boxShadow: "var(--shadow-md)",
-              animation: "win-settle .5s cubic-bezier(0.34,1.4,0.5,1)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 18,
-              }}
-            >
-              <Logo size={16} />
-              <span
-                style={{
-                  fontSize: "var(--text-label)",
-                  fontWeight: 600,
-                  color: "var(--fg-3)",
-                  letterSpacing: "0.02em",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Your first solve
-              </span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: `repeat(4, ${cell}px)`,
-                  gap,
-                  justifyContent: "center",
-                }}
-              >
-                {flat.map((s, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      width: cell,
-                      height: cell,
-                      borderRadius: "var(--radius-sm)",
-                      background: "var(--bg-sunken)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      animation: "cell-pop .4s cubic-bezier(0.34,1.4,0.5,1)",
-                      animationDelay: `${(i % 4) * 22 + Math.floor(i / 4) * 26}ms`,
-                    }}
-                  >
-                    {s === 0 ? (
-                      <Fire size={cell * 0.62} fill="var(--symbol-a)" />
-                    ) : (
-                      <Water size={cell * 0.62} fill="var(--symbol-b)" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div
-            style={{
-              marginTop: 16,
-              fontSize: "var(--text-small)",
-              color: "var(--fg-3)",
-              textAlign: "center",
-              lineHeight: 1.5,
-              maxWidth: 280,
-            }}
-          >
-            That&rsquo;s the whole game. Today&rsquo;s board is bigger, but the rules
-            don&rsquo;t change.
-          </div>
-
-          <div style={{ flex: 1, minHeight: 24 }} />
-
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-              marginTop: 24,
-            }}
-          >
-            <Button variant="primary" full onClick={onPlayToday}>
-              Play today&rsquo;s puzzle
-            </Button>
-            <Button variant="secondary" full onClick={onHome}>
-              Go home
-            </Button>
-          </div>
-        </div>
+    <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center", gap: "clamp(32px,6vw,64px)", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
+        <Disc size={120} />
+        <span style={monoLabel}>DISC</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
+        <Ring size={120} />
+        <span style={monoLabel}>RING</span>
       </div>
     </div>
   );
 }
 
-// ─── TutorialPractice — hands-on 4×4 solve ───────────────────────────────────
-
-function TutorialPractice({
-  onWin,
-  onBack,
-}: {
-  onWin: (time: string, solution: number[][]) => void;
-  onBack: () => void;
-}) {
-  const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
-
-  useEffect(() => {
-    setPuzzle(generatePuzzle({ size: 4, difficulty: "easy" }));
-  }, []);
-
-  if (!puzzle) {
-    return (
-      <div style={{ minHeight: "100dvh", background: "var(--bg)" }} />
-    );
-  }
-
-  return <PracticeBoard puzzle={puzzle} onWin={onWin} onBack={onBack} />;
+function EdgePair({ right, glyph, label }: { right: "disc" | "ring"; glyph: string; label: string }) {
+  const cellStyle: React.CSSProperties = { width: 96, height: 96, display: "flex", alignItems: "center", justifyContent: "center" };
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+      <div style={{ display: "flex", position: "relative", border: "1px solid var(--hairline)" }}>
+        <div style={{ ...cellStyle, borderRight: "1px solid var(--hairline)" }}>
+          <Disc size={54} />
+        </div>
+        <div style={cellStyle}>{right === "disc" ? <Disc size={54} /> : <Ring size={54} />}</div>
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%,-50%)",
+            minWidth: 27,
+            height: 27,
+            padding: "0 5px",
+            borderRadius: 999,
+            background: "var(--bg)",
+            border: "1px solid var(--accent)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 14,
+            fontWeight: 600,
+            lineHeight: 1,
+          }}
+        >
+          {glyph}
+        </div>
+      </div>
+      <span style={monoLabel}>{label}</span>
+    </div>
+  );
 }
 
-function PracticeBoard({
-  puzzle,
-  onWin,
-  onBack,
-}: {
-  puzzle: Puzzle;
-  onWin: (time: string, solution: number[][]) => void;
-  onBack: () => void;
-}) {
-  const { cells, errors, solved, canUndo, tap, undo } = useGame({
+function Beat2Art() {
+  return (
+    <div style={{ flex: "1 1 0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 44 }}>
+      <EdgePair right="disc" glyph="=" label="= — THE PAIR MATCHES" />
+      <EdgePair right="ring" glyph="≠" label="≠ — THE PAIR DIFFERS" />
+    </div>
+  );
+}
+
+function StripCell({ v, bad }: { v: 0 | 1 | null; bad?: boolean }) {
+  return (
+    <div style={{ width: 60, height: 60, display: "flex", alignItems: "center", justifyContent: "center", borderRight: "1px solid var(--hairline)", position: "relative" }}>
+      {bad && <div style={{ position: "absolute", inset: "8%", border: "1.5px solid var(--err)", borderRadius: 10, opacity: 0.75 }} />}
+      {v === 0 ? <Disc /> : v === 1 ? <Ring /> : null}
+    </div>
+  );
+}
+
+function Beat3Art() {
+  const balanced: (0 | 1)[] = [0, 1, 0, 1, 1, 0];
+  return (
+    <div style={{ flex: "1 1 0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 40 }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", border: "1px solid var(--hairline)" }}>
+          {balanced.map((v, i) => (
+            <StripCell key={i} v={v} />
+          ))}
+        </div>
+        <span style={{ ...monoLabel, color: "var(--symbol-b)" }}>THREE OF EACH — BALANCED</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", border: "1px solid var(--hairline)" }}>
+          <StripCell v={0} bad />
+          <StripCell v={0} bad />
+          <StripCell v={0} bad />
+          <StripCell v={1} />
+          <StripCell v={null} />
+          <StripCell v={null} />
+        </div>
+        <span style={{ ...monoLabel, color: "var(--err)" }}>THREE ALIKE — NEVER</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Beat 4 — hands-on 4×4 ────────────────────────────────────────────────────
+
+function pill(): React.CSSProperties {
+  return {
+    background: "none",
+    border: "1px solid var(--hairline)",
+    borderRadius: 999,
+    padding: "12px 22px",
+    cursor: "pointer",
+    color: "inherit",
+    fontFamily: "var(--font-mono)",
+    fontSize: 12,
+    letterSpacing: "0.16em",
+    transition: "border-color .2s, color .2s",
+  };
+}
+
+function InteractiveBeat({ onFinish }: { onFinish: () => void }) {
+  // Seeded so it's deterministic (no SSR/CSR hydration mismatch) and stable across renders.
+  const puzzle = useMemo(() => generatePuzzle({ size: 4, difficulty: "easy", seed: "tutorial-v1" }), []);
+  const { cells, errors, solved, canUndo, tap, hint, restart } = useGame({
     givens: puzzle.givens,
     solution: puzzle.solution,
     edges: puzzle.edges,
   });
-  const { getFormatted } = useTimer(!solved, true); // tutorial shows a live timer
-  const fired = useRef(false);
 
-  useEffect(() => {
-    if (solved && !fired.current) {
-      fired.current = true;
-      setTimeout(() => onWin(getFormatted(), puzzle.solution), 520);
-    }
-  }, [solved, onWin, puzzle.solution]);
+  const placed = cells.reduce((n, row) => n + row.filter((v) => v !== null).length, 0);
+  const total = puzzle.size * puzzle.size;
+  const status = solved
+    ? "Solved — nicely deduced."
+    : errors.size > 0
+    ? "That breaks a rule — check the marks."
+    : "";
 
-  const [cellSize, setCellSize] = useState(60);
-  useEffect(() => {
-    const compute = () =>
-      Math.floor(
-        Math.min(
-          (window.innerWidth - 48) / 4,
-          (window.innerHeight * 0.48) / 4
-        )
-      );
-    setCellSize(compute());
-    const h = () => setCellSize(compute());
-    window.addEventListener("resize", h);
-    return () => window.removeEventListener("resize", h);
-  }, []);
-  const gap = Math.max(7, Math.floor(cellSize * 0.14));
+  const onPill = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
+    e.currentTarget.style.borderColor = on ? "var(--accent)" : "var(--hairline)";
+    e.currentTarget.style.color = on ? "var(--accent)" : "inherit";
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--bg)",
-        animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)",
-      }}
-    >
-      <TopBar
-        left={
-          <IconButton label="Back" size={40} onClick={onBack}>
-            <BackIcon />
-          </IconButton>
-        }
-        title={<Eyebrow>Practice puzzle</Eyebrow>}
-        right={<span style={{ width: 40 }} />}
-      />
-
-      <h1 className="sr-only">How to play</h1>
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0 24px 12px",
-          gap: 22,
-        }}
-      >
-        <div style={{ textAlign: "center", maxWidth: 300 }}>
-          <div
-            style={{
-              fontSize: "var(--text-h3)",
-              fontWeight: 600,
-              letterSpacing: "var(--tracking-snug)",
-              color: "var(--fg-1)",
-            }}
-          >
-            Your turn
-          </div>
-          <p
-            style={{
-              fontSize: "var(--text-small)",
-              lineHeight: 1.5,
-              color: "var(--fg-3)",
-              margin: "6px 0 0",
-            }}
-          >
-            {solved
-              ? "Solved — nicely deduced."
-              : "Fill the empty cells. Tap to place, tap again to switch."}
-          </p>
-        </div>
-
-        <div
-          className="tnum"
-          style={{
-            fontSize: "var(--text-h1)",
-            fontWeight: 500,
-            letterSpacing: "var(--tracking-snug)",
-            lineHeight: 1,
-            color: solved ? "var(--correct)" : "var(--fg-1)",
-            transition: "color 0.2s",
-          }}
-        >
-          {getFormatted()}
-        </div>
-
-        {/* Board auto-sizes to its container; reuse the computed cell size to
-            keep the tutorial grid at a comparable footprint (full Phase 3
-            restyle pending). */}
-        <div style={{ width: cellSize * 4 + gap * 3, maxWidth: "calc(100vw - 48px)" }}>
-          <Board
-            cells={cells}
-            givens={puzzle.givens}
-            edges={puzzle.edges}
-            errors={errors}
-            onCellTap={tap}
-            readOnly={solved}
-          />
-        </div>
-
-        <button
-          onClick={undo}
-          disabled={!canUndo || solved}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            height: 44,
-            padding: "0 16px",
-            borderRadius: "var(--radius-full)",
-            border: "1.5px solid var(--hairline-2)",
-            background: "transparent",
-            color: canUndo && !solved ? "var(--fg-2)" : "var(--hairline-2)",
-            fontFamily: "var(--font-sans)",
-            fontSize: "var(--text-small)",
-            fontWeight: 500,
-            cursor: canUndo && !solved ? "pointer" : "default",
-            transition: "all .15s",
-          }}
-        >
-          <svg
-            width={16}
-            height={16}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.75}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="9 14 4 9 9 4" />
-            <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
-          </svg>
-          Undo
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── TutorialFlow ─────────────────────────────────────────────────────────────
-
-type FlowMode = "teach" | "practice" | "win";
-
-const STEPS = [
-  {
-    title: "Two symbols",
-    body: "Every cell holds one of two symbols — a solid or a ring. This is a 4×4 board; the daily puzzle is 6×6. Tap the empty cell to try it.",
-  },
-  {
-    title: "Read the signs",
-    body: "Some cells are linked by a sign. = means the two cells hold the same symbol; ≠ means they're opposite. These are your surest first moves.",
-  },
-  {
-    title: "The line law",
-    body: "Every row and column holds an equal count of each — two and two here. And no symbol may sit three in a row. Together these two rules force most of the board.",
-  },
-] as const;
-
-const TOTAL_DOTS = STEPS.length + 1; // 3 rule steps + 1 deduction step
-
-function TutorialFlow({
-  onPlay,
-  onBack,
-}: {
-  onPlay: () => void;
-  onBack: () => void;
-}) {
-  // idx 0..2 = rule steps, idx 3 = deduction
-  const [idx, setIdx] = useState(0);
-  const [phase, setPhase] = useState(0);
-  const [mode, setMode] = useState<FlowMode>("teach");
-  const [winData, setWinData] = useState<{
-    time: string;
-    solution: number[][];
-  } | null>(null);
-  // Intro board: full grid with one tappable cell
-  const [introCells, setIntroCells] = useState<Grid2D>(() => {
-    const g = fullGrid();
-    g[1]![1] = null;
-    return g;
-  });
-
-  const onDeduction = idx === STEPS.length;
-
-  const advance = useCallback(() => {
-    if (!onDeduction) {
-      setIdx((i) => i + 1);
-    } else if (phase < DED_LAST) {
-      setPhase((p) => p + 1);
-    } else {
-      setMode("practice");
-    }
-  }, [onDeduction, phase]);
-
-  const back = useCallback(() => {
-    if (onDeduction) {
-      if (phase > 0) {
-        setPhase((p) => p - 1);
-      } else {
-        setIdx(STEPS.length - 1);
-      }
-    } else if (idx > 0) {
-      setIdx((i) => i - 1);
-    } else {
-      onBack();
-    }
-  }, [onDeduction, phase, idx, onBack]);
-
-  if (mode === "win" && winData) {
-    return (
-      <TutorialWin
-        time={winData.time}
-        solution={winData.solution}
-        onPlayToday={onPlay}
-        onHome={onBack}
-      />
-    );
-  }
-
-  if (mode === "practice") {
-    return (
-      <TutorialPractice
-        onWin={(time, solution) => {
-          setWinData({ time, solution });
-          setMode("win");
-        }}
-        onBack={() => setMode("teach")}
-      />
-    );
-  }
-
-  // ── Build demo ──
-  const SIZE = 44;
-  const GAP = 20;
-
-  let demo: React.ReactNode;
-  let counter: string;
-  let title: string;
-  let body: string;
-
-  if (onDeduction) {
-    const dedCells = getDedCells(phase);
-    counter = `${String(TOTAL_DOTS).padStart(2, "0")} / ${String(TOTAL_DOTS).padStart(2, "0")}`;
-    title = "It's always provable";
-    body = DED_CAPTIONS[phase] ?? "";
-    demo = (
-      <TeachBoard
-        cells={dedCells}
-        n={TN}
-        size={SIZE}
-        gap={GAP}
-        givens={{}}
-        hEdges={DED_H_EDGES}
-        vEdges={{}}
-        highlight={DED_HIGHLIGHTS[phase] ?? []}
-        focusEdges={phase === 1}
-      />
-    );
-  } else {
-    const step = STEPS[idx]!;
-    counter = `${String(idx + 1).padStart(2, "0")} / ${String(TOTAL_DOTS).padStart(2, "0")}`;
-    title = step.title;
-    body = step.body;
-
-    if (idx === 0) {
-      // Symbols step: board with one interactive cell
-      demo = (
-        <TeachBoard
-          cells={introCells}
-          n={TN}
-          size={SIZE}
-          gap={GAP}
-          givens={allGivens()}
-          hEdges={{}}
-          vEdges={{}}
-          onTap={(r, c) => {
-            if (r !== 1 || c !== 1) return;
-            setIntroCells((g) => {
-              const next = g.map((row) => row.slice()) as Grid2D;
-              const cur = g[1]![1];
-              next[1]![1] = cur === null ? 0 : cur === 0 ? 1 : null;
-              return next;
-            });
-          }}
-        />
-      );
-    } else if (idx === 1) {
-      // Signs step: full board with edge signs highlighted
-      demo = (
-        <TeachBoard
-          cells={fullGrid()}
-          n={TN}
-          size={SIZE}
-          gap={GAP}
-          givens={allGivens()}
-          hEdges={TH_EDGES}
-          vEdges={TV_EDGES}
-          focusEdges
-        />
-      );
-    } else {
-      // Lines step: full board (row 3 highlighted) + ThreeStrip contrast
-      const rowHi = [keyOf(3, 0), keyOf(3, 1), keyOf(3, 2), keyOf(3, 3)];
-      const STRIP_CELL = 38;
-      demo = (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
-          <TeachBoard
-            cells={fullGrid()}
-            n={TN}
-            size={SIZE}
-            gap={GAP}
-            givens={allGivens()}
-            hEdges={{}}
-            vEdges={{}}
-            highlight={rowHi}
-          />
-          <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
-            <ThreeStrip values={[0, 0, 0]} state="bad" size={STRIP_CELL} />
-            <ThreeStrip values={[0, 0, 1]} state="good" size={STRIP_CELL} />
-          </div>
-        </div>
-      );
-    }
-  }
-
-  const primaryLabel = onDeduction
-    ? phase < DED_LAST
-      ? "Continue"
-      : "Try one yourself"
-    : "Continue";
-
-  return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--bg)",
-      }}
-    >
-      <TopBar
-        left={
-          <IconButton label="Back" size={40} onClick={back}>
-            <BackIcon />
-          </IconButton>
-        }
-        title={<Eyebrow>How to play</Eyebrow>}
-        right={
-          <button
-            onClick={onPlay}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "var(--text-small)",
-              fontWeight: 600,
-              color: "var(--fg-2)",
-              fontFamily: "var(--font-sans)",
-              padding: "0 6px",
-              minHeight: 44,
-              display: "inline-flex",
-              alignItems: "center",
-              transition: "color .15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "var(--fg-1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "var(--fg-2)";
-            }}
-          >
-            Skip
+    <div style={{ display: "flex", alignItems: "center", gap: "clamp(32px,6vw,80px)", flexWrap: "wrap", width: "100%" }}>
+      <div style={{ flex: "1 1 300px", maxWidth: 460, display: "flex", flexDirection: "column", gap: 20, minWidth: 0 }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.22em", color: "var(--fg-3)" }}>HOW IT WORKS</div>
+        <h1 style={beatTitle}>Try one yourself.</h1>
+        <p style={beatBody}>
+          A little four-by-four: two of each per line, same laws. The plated cells are given — fill the
+          rest. Stuck? Take a hint.
+        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
+          <button style={pill()} onClick={hint} disabled={solved} onMouseEnter={(e) => onPill(e, true)} onMouseLeave={(e) => onPill(e, false)}>
+            HINT
           </button>
-        }
-      />
-
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0 24px",
-          textAlign: "center",
-        }}
-      >
-        <div
-          key={onDeduction ? `d${phase}` : `s${idx}`}
-          style={{
-            width: "100%",
-            maxWidth: 360,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            animation: "tut-fade .24s cubic-bezier(0.4,0,0.2,1) both",
-          }}
-        >
-          <div
-            style={{
-              minHeight: 220,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 28,
-            }}
-          >
-            {demo}
-          </div>
-
-          <div
-            className="tnum"
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              letterSpacing: "0.14em",
-              color: "var(--accent)",
-              marginBottom: 14,
-            }}
-          >
-            {counter}
-          </div>
-
-          <h1
-            style={{
-              fontSize: 30,
-              fontWeight: 500,
-              letterSpacing: "-0.025em",
-              color: "var(--fg-1)",
-              margin: 0,
-              lineHeight: 1.05,
-            }}
-          >
-            {title}
-          </h1>
-
-          <p
-            style={{
-              fontSize: 16,
-              lineHeight: 1.55,
-              color: "var(--fg-2)",
-              margin: "12px 0 0",
-              maxWidth: 330,
-            }}
-          >
-            {body}
-          </p>
+          <button style={pill()} onClick={restart} disabled={!canUndo} onMouseEnter={(e) => onPill(e, true)} onMouseLeave={(e) => onPill(e, false)}>
+            RESET
+          </button>
+          {solved && (
+            <button
+              onClick={onFinish}
+              style={{ background: "var(--accent)", color: "var(--on-accent)", border: "none", borderRadius: 999, padding: "14px 34px", fontFamily: "var(--font-sans)", fontSize: 16, fontWeight: 600, cursor: "pointer", transition: "transform .2s ease" }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
+            >
+              Finish
+            </button>
+          )}
         </div>
       </div>
-
-      <div
-        style={{
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "16px 24px 28px",
-          gap: 16,
-        }}
-      >
-        <ProgressDots count={TOTAL_DOTS} active={onDeduction ? TOTAL_DOTS - 1 : idx} />
-        <Button
-          variant="primary"
-          onClick={advance}
-          style={{ height: 50, padding: "0 26px" }}
-        >
-          {primaryLabel}
-        </Button>
+      <div style={{ flex: "0 1 380px", width: "100%", minWidth: "min(100%,260px)" }}>
+        <Board cells={cells} givens={puzzle.givens} edges={puzzle.edges} errors={errors} onCellTap={tap} readOnly={solved} solved={solved} />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginTop: 14, minHeight: 22 }}>
+          <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 16, color: solved ? "var(--accent)" : errors.size > 0 ? "var(--err)" : "var(--fg-3)" }}>{status}</span>
+          <span className="tnum" style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.14em", color: "var(--fg-3)", flex: "none" }}>
+            {placed} / {total}
+          </span>
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── Main export — no props, sets halve-tutorial-seen on mount ────────────────
+// ─── Shared beat text styles ──────────────────────────────────────────────────
+
+const beatTitle: React.CSSProperties = {
+  fontFamily: "var(--font-serif)",
+  fontStyle: "italic",
+  fontWeight: 500,
+  fontSize: "clamp(40px, 6vw, 56px)",
+  lineHeight: 1,
+  margin: 0,
+  letterSpacing: "-0.02em",
+};
+const beatBody: React.CSSProperties = { margin: 0, fontSize: 16.5, lineHeight: 1.65, color: "var(--fg-3)" };
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function TutorialScreen() {
   const router = useRouter();
+  const [beat, setBeat] = useState(0);
 
-  useEffect(() => {
-    localStorage.setItem("halve-tutorial-seen", "1");
-  }, []);
+  const exit = () => router.push("/");
+
+  const BEATS = [
+    {
+      title: "Two symbols.",
+      body: (
+        <>
+          Every cell takes one of two marks: the amber <b style={{ color: "var(--accent)" }}>disc</b> or the
+          teal <b style={{ color: "var(--symbol-b)" }}>ring</b>. Tap a cell to cycle — disc, ring, empty.
+        </>
+      ),
+      art: <Beat1Art />,
+    },
+    {
+      title: "Read the signs.",
+      body: (
+        <>
+          Some edges carry a sign. <b style={{ color: "var(--fg-1)" }}>=</b> means the two cells match.{" "}
+          <b style={{ color: "var(--fg-1)" }}>≠</b> means they differ. Signs are never wrong — lean on them.
+        </>
+      ),
+      art: <Beat2Art />,
+    },
+    {
+      title: "The line law.",
+      body: (
+        <>
+          Every row and every column ends with <b style={{ color: "var(--fg-1)" }}>three discs and three
+          rings</b> — and never three of a kind touching.
+        </>
+      ),
+      art: <Beat3Art />,
+    },
+  ];
+
+  const isInteractive = beat === 3;
 
   return (
-    <TutorialFlow
-      onPlay={() => router.push("/play")}
-      onBack={() => router.push("/")}
-    />
+    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18, padding: "20px clamp(24px, 5vw, 40px)", flex: "none" }}>
+        <Wordmark />
+        <button
+          onClick={exit}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--fg-3)", fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.16em", padding: "4px 0" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-3)")}
+        >
+          SKIP TUTORIAL
+        </button>
+      </header>
+
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 24, maxWidth: 1180, width: "100%", margin: "0 auto", padding: "16px clamp(24px, 5vw, 64px) 52px", animation: "fadeup 0.45s var(--ease-editorial) both" }}>
+        {/* Progress */}
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ display: "flex", gap: 6 }}>
+            {[0, 1, 2, 3].map((i) => (
+              <span
+                key={i}
+                style={{ width: 36, height: 2, background: i < beat ? "var(--accent)" : i === beat ? "var(--accent)" : "var(--hairline)", opacity: i < beat ? 0.4 : 1 }}
+              />
+            ))}
+          </div>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em", color: "var(--fg-3)" }}>
+            BEAT 0{beat + 1} / 04
+          </span>
+        </div>
+
+        <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
+          {isInteractive ? (
+            <InteractiveBeat onFinish={() => router.push("/play")} />
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: "clamp(40px,7vw,80px)", flexWrap: "wrap", width: "100%" }}>
+              <div style={{ flex: "1 1 300px", maxWidth: 460, display: "flex", flexDirection: "column", gap: 20, minWidth: 0 }}>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.22em", color: "var(--fg-3)" }}>HOW IT WORKS</div>
+                <h1 style={beatTitle}>{BEATS[beat]!.title}</h1>
+                <p style={beatBody}>{BEATS[beat]!.body}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 8 }}>
+                  <button
+                    onClick={() => setBeat((b) => b + 1)}
+                    style={{ background: "var(--accent)", color: "var(--on-accent)", border: "none", borderRadius: 999, padding: "14px 34px", fontFamily: "var(--font-sans)", fontSize: 16, fontWeight: 600, cursor: "pointer", transition: "transform .2s ease" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
+                  >
+                    Next
+                  </button>
+                  {beat > 0 && (
+                    <button
+                      onClick={() => setBeat((b) => b - 1)}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--fg-3)", fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.18em", padding: "4px 0" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-3)")}
+                    >
+                      BACK
+                    </button>
+                  )}
+                </div>
+              </div>
+              {BEATS[beat]!.art}
+            </div>
+          )}
+        </div>
+
+        {isInteractive && (
+          <button
+            onClick={() => setBeat(2)}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--fg-3)", fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.18em", padding: 0, textAlign: "left", width: "fit-content" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-3)")}
+          >
+            BACK
+          </button>
+        )}
+      </div>
+    </div>
   );
 }

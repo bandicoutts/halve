@@ -3,154 +3,175 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Logo } from "@/components/symbols/Logo";
-import { Mark } from "@/components/symbols/Mark";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { GhostLink } from "@/components/ui/GhostLink";
+import { Wordmark } from "@/components/ui/Wordmark";
 
-// ─── Shell (Logo top-left, form vertically centered, footer anchored) ─────────
+// ─── Shared bits ──────────────────────────────────────────────────────────────
 
-function AuthShell({
-  children,
-  footer,
-}: {
-  children: React.ReactNode;
-  footer?: React.ReactNode;
-}) {
+/** Right-column brand mark. `waiting` = static, dimmed-left (link-sent state). */
+function BrandColumn({ caption, waiting }: { caption: string; waiting?: boolean }) {
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--bg)",
-      }}
-    >
-      <div style={{ flexShrink: 0, padding: "22px 24px 0" }}>
-        <Link href="/" style={{ display: "inline-block", textDecoration: "none" }}>
-          <Logo size={20} />
-        </Link>
-      </div>
+    <div style={{ flex: "1 1 340px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 28, minWidth: 0, padding: "24px 0" }}>
+      <svg viewBox="0 0 200 200" style={{ width: "clamp(120px, 22vw, 250px)", overflow: "visible" }} aria-hidden="true">
+        {waiting ? (
+          <>
+            <path d="M96 5 A95 95 0 0 0 96 195 Z" style={{ fill: "var(--accent)", opacity: 0.25 }} />
+            <path d="M104 5 A95 95 0 0 1 104 195 Z" style={{ fill: "var(--symbol-b)" }} />
+          </>
+        ) : (
+          <>
+            <g style={{ animation: "driftL 3.4s ease-in-out infinite alternate" }}>
+              <path d="M96 5 A95 95 0 0 0 96 195 Z" style={{ fill: "var(--accent)" }} />
+            </g>
+            <g style={{ animation: "driftR 3.4s ease-in-out infinite alternate" }}>
+              <path d="M104 5 A95 95 0 0 1 104 195 Z" style={{ fill: "var(--symbol-b)" }} />
+            </g>
+          </>
+        )}
+      </svg>
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.3em", color: "var(--fg-3)" }}>{caption}</div>
+    </div>
+  );
+}
+
+function AuthLayout({ form, brand }: { form: React.ReactNode; brand: React.ReactNode }) {
+  return (
+    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+      <header style={{ padding: "20px clamp(24px, 5vw, 40px)", flex: "none" }}>
+        <Wordmark />
+      </header>
       <div
         style={{
           flex: 1,
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          flexWrap: "wrap-reverse",
+          alignItems: "stretch",
           justifyContent: "center",
-          padding: "0 24px",
+          maxWidth: 1180,
+          width: "100%",
+          margin: "0 auto",
+          padding: "0 clamp(24px, 5vw, 64px) 48px",
+          animation: "fadeup 0.5s var(--ease-editorial) both",
         }}
       >
-        <div style={{ width: "100%", maxWidth: 340 }}>{children}</div>
-      </div>
-      {footer && (
-        <div
-          style={{
-            flexShrink: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 2,
-            padding: "0 24px 26px",
-          }}
-        >
-          {footer}
+        <div style={{ flex: "1 1 420px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 22, maxWidth: 560, padding: "24px clamp(0px, 4vw, 64px) 24px 0", minWidth: 0 }}>
+          {form}
         </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Callout — wrong-tint pill for the expired-link error ────────────────────
-
-function CalloutError({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        gap: 10,
-        alignItems: "flex-start",
-        background: "var(--wrong-tint)",
-        borderRadius: "var(--radius-md)",
-        padding: "12px 14px",
-        marginBottom: 22,
-      }}
-    >
-      <span
-        style={{
-          width: 16,
-          height: 16,
-          borderRadius: "var(--radius-full)",
-          background: "var(--wrong)",
-          color: "var(--surface)",
-          flexShrink: 0,
-          marginTop: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "var(--text-label)",
-          fontWeight: 700,
-        }}
-      >
-        !
-      </span>
-      <span style={{ fontSize: "var(--text-small)", lineHeight: 1.45, color: "var(--wrong)" }}>
-        {children}
-      </span>
-    </div>
-  );
-}
-
-// ─── Sent screen ─────────────────────────────────────────────────────────────
-
-function SentScreen({ email, onBack }: { email: string; onBack: () => void }) {
-  const router = useRouter();
-  return (
-    <AuthShell
-      footer={
-        <>
-          <GhostLink onClick={onBack}>Use a different email</GhostLink>
-          <GhostLink onClick={() => router.push("/play")}>
-            Play now, sign in later
-          </GhostLink>
-        </>
-      }
-    >
-      <div
-        style={{
-          display: "flex",
-          marginBottom: 22,
-          animation: "win-mark .6s cubic-bezier(0.34,1.56,0.64,1)",
-        }}
-      >
-        <Mark size={40} />
+        <div style={{ flex: "0 0 1px", alignSelf: "stretch", background: "var(--hairline)", margin: "24px 0" }} />
+        {brand}
       </div>
-      <h1
+    </div>
+  );
+}
+
+const KICKER: React.CSSProperties = { fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.22em", color: "var(--fg-3)" };
+const HEADLINE: React.CSSProperties = {
+  fontFamily: "var(--font-serif)",
+  fontStyle: "italic",
+  fontWeight: 500,
+  fontSize: "clamp(40px, 6vw, 58px)",
+  lineHeight: 1,
+  margin: 0,
+  letterSpacing: "-0.02em",
+  textWrap: "balance",
+};
+const GHOST: React.CSSProperties = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  color: "var(--fg-3)",
+  fontFamily: "var(--font-mono)",
+  fontSize: 12,
+  letterSpacing: "0.18em",
+  padding: 0,
+  transition: "color 0.18s ease",
+  textAlign: "left",
+  textDecoration: "none",
+};
+
+function GhostAction({ children, onClick, href }: { children: React.ReactNode; onClick?: () => void; href?: string }) {
+  const hover = {
+    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "var(--accent)"),
+    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "var(--fg-3)"),
+  };
+  return href ? (
+    <Link href={href} style={GHOST} {...hover}>
+      {children}
+    </Link>
+  ) : (
+    <button style={GHOST} onClick={onClick} {...hover}>
+      {children}
+    </button>
+  );
+}
+
+function EmailField({
+  value,
+  onChange,
+  error,
+  autoFocus,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  error?: string | null;
+  autoFocus?: boolean;
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+      <label htmlFor="auth-email" style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.18em", color: "var(--fg-3)" }}>
+        EMAIL
+      </label>
+      <input
+        id="auth-email"
+        type="email"
+        placeholder="you@example.com"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        autoFocus={autoFocus}
+        autoComplete="email"
+        required
+        aria-invalid={error ? true : undefined}
         style={{
-          fontSize: 32,
-          fontWeight: 500,
-          letterSpacing: "-0.025em",
+          width: "100%",
+          background: "var(--surface)",
+          border: `1px solid ${error ? "var(--err)" : "var(--hairline)"}`,
+          borderRadius: 12,
+          padding: "16px 18px",
+          fontSize: 16,
           color: "var(--fg-1)",
-          margin: 0,
-          lineHeight: 1.05,
+          fontFamily: "var(--font-sans)",
+          outline: "none",
         }}
-      >
-        Check your email.
-      </h1>
-      <p
-        style={{
-          fontSize: "var(--text-small)",
-          lineHeight: 1.55,
-          color: "var(--fg-2)",
-          margin: "12px 0 0",
-        }}
-      >
-        We sent a link to{" "}
-        <strong style={{ color: "var(--fg-1)", fontWeight: 600 }}>{email}</strong>.
-        Click it to sign in — no password needed.
-      </p>
-    </AuthShell>
+      />
+      {error && <span style={{ fontSize: 13.5, color: "var(--err)", lineHeight: 1.4 }}>{error}</span>}
+    </div>
+  );
+}
+
+function SubmitButton({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) {
+  return (
+    <button
+      type="submit"
+      disabled={disabled}
+      style={{
+        background: "var(--accent)",
+        color: "var(--on-accent)",
+        border: "none",
+        borderRadius: 999,
+        padding: "16px 40px",
+        fontFamily: "var(--font-sans)",
+        fontSize: 16,
+        fontWeight: 600,
+        cursor: disabled ? "default" : "pointer",
+        opacity: disabled ? 0.7 : 1,
+        transition: "transform 0.2s ease",
+        width: "fit-content",
+        alignSelf: "flex-start",
+      }}
+      onMouseEnter={(e) => !disabled && (e.currentTarget.style.transform = "translateY(-2px)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -161,15 +182,13 @@ function friendlyError(msg: string): string {
   if (lower.includes("rate limit") || lower.includes("429"))
     return "Too many attempts — wait a minute and try again.";
   if (lower.includes("user already registered"))
-    return "An account with this email already exists. Try signing in with a magic link.";
-  if (lower.includes("invalid login credentials") || lower.includes("invalid credentials"))
-    return "Wrong email or password.";
+    return "An account with this email already exists. Try a magic link.";
   if (lower.includes("email not confirmed"))
     return "Please confirm your email first — check your inbox.";
   return msg;
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function AuthScreen({ initialError }: { initialError?: string | undefined }) {
   const router = useRouter();
@@ -199,64 +218,59 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
     setSent(true);
   }
 
+  // State B — link sent
   if (sent) {
-    return <SentScreen email={email} onBack={() => setSent(false)} />;
+    return (
+      <AuthLayout
+        brand={<BrandColumn caption="WAITING ON YOUR TAP" waiting />}
+        form={
+          <>
+            <div style={{ ...KICKER, color: "var(--accent)" }}>LINK SENT</div>
+            <h1 style={HEADLINE}>Check your email.</h1>
+            <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "42ch" }}>
+              We sent a sign-in link to{" "}
+              <span style={{ color: "var(--fg-1)", fontWeight: 600 }}>{email}</span>. It&rsquo;s good for
+              fifteen minutes — one tap and you&rsquo;re in.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 14, borderTop: "1px solid var(--hairline)", paddingTop: 18, marginTop: 8 }}>
+              <GhostAction onClick={() => setSent(false)}>USE A DIFFERENT EMAIL</GhostAction>
+              <GhostAction onClick={() => router.push("/play")}>PLAY NOW, SIGN IN LATER →</GhostAction>
+            </div>
+          </>
+        }
+      />
+    );
   }
 
+  // State C — expired/invalid link (initialError). State A otherwise.
   return (
-    <AuthShell
-      footer={
-        <GhostLink onClick={() => router.push("/play")}>
-          Continue without account
-        </GhostLink>
+    <AuthLayout
+      brand={<BrandColumn caption="ONE PUZZLE · EVERY DAY" />}
+      form={
+        <form onSubmit={handleMagicLink} style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          {initialError && (
+            <div style={{ background: "var(--wrong-tint)", border: "1px solid var(--err)", borderRadius: 14, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 6 }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em", color: "var(--err)" }}>LINK EXPIRED</span>
+              <span style={{ fontSize: 14.5, lineHeight: 1.55, color: "var(--fg-1)" }}>{initialError}</span>
+            </div>
+          )}
+          <div style={KICKER}>SIGN IN · MAGIC LINK</div>
+          <h1 style={HEADLINE}>{initialError ? "Let’s try that again." : "No password. Just a link."}</h1>
+          {!initialError && (
+            <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "40ch" }}>
+              Enter your email and we&rsquo;ll send a one-tap sign-in link. Your streak and record follow
+              you anywhere.
+            </p>
+          )}
+          <EmailField value={email} onChange={setEmail} error={error} autoFocus={!initialError} />
+          <SubmitButton disabled={loading}>
+            {loading ? "Sending…" : initialError ? "Send a new link" : "Send link"}
+          </SubmitButton>
+          <div style={{ borderTop: "1px solid var(--hairline)", paddingTop: 18, marginTop: 4 }}>
+            <GhostAction onClick={() => router.push("/play")}>PLAY NOW, SIGN IN LATER →</GhostAction>
+          </div>
+        </form>
       }
-    >
-      {/* Wrong-tint callout for the expired-link error case */}
-      {initialError && <CalloutError>{initialError}</CalloutError>}
-
-      <h1
-        style={{
-          fontSize: 32,
-          fontWeight: 500,
-          letterSpacing: "-0.025em",
-          color: "var(--fg-1)",
-          margin: 0,
-          lineHeight: 1.05,
-        }}
-      >
-        Sign in
-      </h1>
-      <p
-        style={{
-          fontSize: "var(--text-small)",
-          lineHeight: 1.5,
-          color: "var(--fg-2)",
-          margin: "10px 0 24px",
-        }}
-      >
-        Enter your email and we&rsquo;ll send a one-time link — no password to
-        remember.
-      </p>
-
-      <form
-        onSubmit={handleMagicLink}
-        style={{ display: "flex", flexDirection: "column", gap: 16 }}
-      >
-        <Input
-          label="Email"
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          error={error}
-          autoFocus={!initialError}
-          required
-          autoComplete="email"
-        />
-        <Button variant="primary" full type="submit" disabled={loading}>
-          {loading ? "Sending…" : "Send me a link"}
-        </Button>
-      </form>
-    </AuthShell>
+    />
   );
 }

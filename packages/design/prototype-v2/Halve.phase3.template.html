@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="69e76908-f90f-4de4-8419-2c2177769cd8"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <style>/* latin-ext */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("ae7d43b2-9458-4700-b2a0-469bf3203019") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Instrument Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("57afc649-ac80-4571-ba42-861c7e885687") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("deccf8f2-1598-4e0d-8583-edf4e5264456") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("87c3b166-9972-45ca-a370-44f01441540f") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("a1339606-b272-4309-98e6-ccae8179b03b") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url("deccf8f2-1598-4e0d-8583-edf4e5264456") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url("87c3b166-9972-45ca-a370-44f01441540f") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url("a1339606-b272-4309-98e6-ccae8179b03b") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url("deccf8f2-1598-4e0d-8583-edf4e5264456") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url("87c3b166-9972-45ca-a370-44f01441540f") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url("a1339606-b272-4309-98e6-ccae8179b03b") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("e294bd44-6852-4e5e-afe2-8657ac60e3f9") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("3aaaa7a7-574d-4db9-abb0-c5609d477681") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("d757d719-1d57-41fa-aa0c-cc43625630b8") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("e294bd44-6852-4e5e-afe2-8657ac60e3f9") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("3aaaa7a7-574d-4db9-abb0-c5609d477681") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("d757d719-1d57-41fa-aa0c-cc43625630b8") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("635f7549-fee6-4b6c-bc15-9b4be3e4d890") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("e85ddcdc-a660-4e2b-b6e3-8cde9a9d55bd") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+  <style>
+    html, body { margin: 0; padding: 0; }
+    body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+    * { box-sizing: border-box; }
+    ::selection { background: rgba(232,112,58,.35); }
+    @keyframes driftL { from { transform: translateX(0); } to { transform: translateX(-8px); } }
+    @keyframes driftR { from { transform: translateX(0); } to { transform: translateX(8px); } }
+    @keyframes fadeup { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes solvepop { 0% { transform: scale(1); } 40% { transform: scale(1.24); } 100% { transform: scale(1); } }
+    @keyframes hintpulse { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes breathe { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#0F0D0B; color:#EDE5D7; padding:72px 72px 140px; font-family:'Instrument Sans',system-ui,sans-serif; display:flex; flex-direction:column; gap:90px;">
+
+  <!-- ================= DOC HEADER ================= -->
+  <div style="display:flex; flex-direction:column; gap:16px; max-width:860px;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <svg viewBox="0 0 200 200" style="width:22px; height:22px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:#E8703A;"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:#45BFB2;"></path></svg>
+      <span style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.24em; color:#7A7161;">HALVE · PHASE 3 · CONNECTIVE TISSUE</span>
+    </div>
+    <h1 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:56px; line-height:1; margin:0; letter-spacing:-0.02em;">The screens between the screens.</h1>
+    <p style="margin:0; font-size:16px; line-height:1.6; color:#B4A995; max-width:62ch;">Auth, onboarding, the interactive tutorial, per-route loading skeletons, error states, and the account menu — drawn from the same system as the daily loop: Newsreader italics, Instrument Sans body, Spline Sans Mono kickers, amber disc, teal ring, =/≠ edge caps. Ink and paper renditions are shown where it matters. Sections: <a href="#a1" style="color:#E8703A; text-decoration:none;">1a auth</a> · <a href="#a2" style="color:#E8703A; text-decoration:none;">1b onboarding</a> · <a href="#a3" style="color:#E8703A; text-decoration:none;">1c tutorial</a> · <a href="#a4" style="color:#E8703A; text-decoration:none;">1d skeletons</a> · <a href="#a5" style="color:#E8703A; text-decoration:none;">1e errors</a> · <a href="#a6" style="color:#E8703A; text-decoration:none;">1f account menu</a> · <a href="#b1" style="color:#E8703A; text-decoration:none;">2a–2b mirrors</a>.</p>
+  </div>
+
+  <!-- ================= 2a/2b MIRRORS (already in code) ================= -->
+  <section id="b1" style="display:flex; flex-direction:column; gap:26px;">
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <a href="#b1" style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.08em; border:1px solid rgba(237,229,215,.3); border-radius:999px; padding:4px 10px; color:#EDE5D7; text-decoration:none; white-space:nowrap;">2a–2b</a>
+      <span style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7A7161;">MIRRORS · ALREADY DESIGNED IN CODE</span>
+      <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:16px; color:#B4A995;">The empty Archive and guest Stats, mirrored here so the set is cohesive.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:48px; align-items:flex-start;">
+
+      <!-- 2a Empty archive / ink -->
+      <div id="2a" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <a href="#2a" style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.08em; border:1px solid rgba(237,229,215,.3); border-radius:999px; padding:3px 9px; color:#EDE5D7; text-decoration:none;">2a</a>
+          <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">ARCHIVE — EMPTY · INK</div>
+        </div>
+        <div data-screen-label="Archive empty" style="width:1180px; min-height:620px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <nav style="display:flex; align-items:center; gap:22px;">
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">PRACTICE</span>
+              <span style="color:var(--ink); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">ARCHIVE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">STATS</span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 200 200" style="width:15px; height:15px;"><path d="M95 10 A90 90 0 0 0 95 190 Z" style="fill:var(--ink); opacity:.85;"></path><circle cx="100" cy="100" r="90" style="fill:none; stroke:var(--ink); stroke-width:10px; opacity:.85;"></circle></svg></span>
+            </nav>
+          </header>
+          <div style="flex:1; display:flex; align-items:stretch; padding:0 64px 48px;">
+            <div style="flex:1 1 0; display:flex; flex-direction:column; justify-content:center; gap:22px; max-width:520px; padding-right:64px;">
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">ARCHIVE · SINCE JULY 2026</div>
+              <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:64px; line-height:.95; margin:0; letter-spacing:-0.02em; text-wrap:balance;">The back<br>catalogue.</h2>
+              <p style="margin:0; font-size:16px; line-height:1.6; color:var(--muted); max-width:38ch;">Every daily, kept. Nothing here yet — day one is today. Solve it, and the catalogue begins.</p>
+              <div style="display:flex; align-items:center; gap:20px; margin-top:4px;">
+                <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:16px 36px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Play today’s puzzle</button>
+              </div>
+            </div>
+            <div style="flex:0 0 1px; align-self:stretch; background:var(--line); margin:24px 0;"></div>
+            <div style="flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px;">
+              <svg viewBox="0 0 200 200" style="width:220px; overflow:visible;">
+                <path d="M96 5 A95 95 0 0 0 96 195 Z" style="fill:var(--amber); opacity:.3;"></path>
+                <path d="M104 5 A95 95 0 0 1 104 195 Z" style="fill:none; stroke:var(--teal); stroke-width:7px; opacity:.4;"></path>
+              </svg>
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.3em; color:var(--muted);">NO. 001 ARRIVES TOMORROW</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2b Stats guest / paper -->
+      <div id="2b" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <a href="#2b" style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.08em; border:1px solid rgba(237,229,215,.3); border-radius:999px; padding:3px 9px; color:#EDE5D7; text-decoration:none;">2b</a>
+          <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">STATS — GUEST · PAPER</div>
+        </div>
+        <div data-screen-label="Stats guest" style="width:1180px; min-height:620px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#F5F0E6; --surface:#FDFAF3; --line:rgba(31,26,20,.16); --ink:#211B14; --muted:#8A7F6E; --plate:rgba(31,26,20,.055); --hover:rgba(31,26,20,.045); --err:#C0442C; --amber:#DE5F27; --teal:#1E9C8F; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <nav style="display:flex; align-items:center; gap:22px;">
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">PRACTICE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">ARCHIVE</span>
+              <span style="color:var(--ink); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">STATS</span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 200 200" style="width:15px; height:15px;"><path d="M95 10 A90 90 0 0 0 95 190 Z" style="fill:var(--ink); opacity:.85;"></path><circle cx="100" cy="100" r="90" style="fill:none; stroke:var(--ink); stroke-width:10px; opacity:.85;"></circle></svg></span>
+            </nav>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:40px; padding:24px 140px 56px;">
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:18px; flex-wrap:wrap;">
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">STATS · GUEST</div>
+                <div style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:56px; line-height:1; letter-spacing:-0.01em;">Start your record.</div>
+              </div>
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.14em; color:var(--muted); padding-bottom:6px;">NOTHING ON FILE — YET</div>
+            </div>
+            <div style="display:flex; align-items:stretch; border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+              <div style="flex:1 1 0; padding:36px 32px 36px 0; display:flex; align-items:center; gap:28px;">
+                <div style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:130px; line-height:.85; color:var(--amber); letter-spacing:-0.03em; opacity:.3;">0</div>
+                <div style="display:flex; flex-direction:column; gap:12px; padding-top:8px;">
+                  <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.2em; color:var(--muted);">DAY<br>STREAK</div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <svg viewBox="0 0 20 20" style="width:10px; height:10px;"><circle cx="10" cy="10" r="6.5" style="fill:none; stroke:var(--line); stroke-width:2px;"></circle></svg>
+                    <svg viewBox="0 0 20 20" style="width:10px; height:10px;"><circle cx="10" cy="10" r="6.5" style="fill:none; stroke:var(--line); stroke-width:2px;"></circle></svg>
+                    <svg viewBox="0 0 20 20" style="width:10px; height:10px;"><circle cx="10" cy="10" r="6.5" style="fill:none; stroke:var(--line); stroke-width:2px;"></circle></svg>
+                    <svg viewBox="0 0 20 20" style="width:10px; height:10px;"><circle cx="10" cy="10" r="6.5" style="fill:none; stroke:var(--line); stroke-width:2px;"></circle></svg>
+                    <svg viewBox="0 0 20 20" style="width:10px; height:10px;"><circle cx="10" cy="10" r="6.5" style="fill:none; stroke:var(--line); stroke-width:2px;"></circle></svg>
+                    <svg viewBox="0 0 20 20" style="width:10px; height:10px;"><circle cx="10" cy="10" r="6.5" style="fill:none; stroke:var(--line); stroke-width:2px;"></circle></svg>
+                    <svg viewBox="0 0 20 20" style="width:10px; height:10px;"><circle cx="10" cy="10" r="6.5" style="fill:none; stroke:var(--line); stroke-width:2px;"></circle></svg>
+                  </div>
+                </div>
+              </div>
+              <div style="flex:0 0 1px; background:var(--line);"></div>
+              <div style="flex:1 1 0; padding:36px 0 36px 40px; display:grid; grid-template-columns:1fr 1fr; gap:30px 24px; align-content:center;">
+                <div style="display:flex; flex-direction:column; gap:7px;"><div style="font-family:'Spline Sans Mono',monospace; font-size:30px; line-height:1; color:var(--muted);">—</div><div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">SOLVED</div></div>
+                <div style="display:flex; flex-direction:column; gap:7px;"><div style="font-family:'Spline Sans Mono',monospace; font-size:30px; line-height:1; color:var(--muted);">—</div><div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">BEST TIME</div></div>
+                <div style="display:flex; flex-direction:column; gap:7px;"><div style="font-family:'Spline Sans Mono',monospace; font-size:30px; line-height:1; color:var(--muted);">—</div><div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">AVG TIME</div></div>
+                <div style="display:flex; flex-direction:column; gap:7px;"><div style="font-family:'Spline Sans Mono',monospace; font-size:30px; line-height:1; color:var(--muted);">—</div><div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">BEST STREAK</div></div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:22px; flex-wrap:wrap;">
+              <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#FDFAF3; border:none; border-radius:999px; padding:16px 38px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Sign in to keep score</button>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:16px; color:var(--muted);">Solve signed in, and the record keeps itself.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 1a AUTH ================= -->
+  <section id="a1" style="display:flex; flex-direction:column; gap:26px;">
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <a href="#a1" style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.08em; border:1px solid rgba(237,229,215,.3); border-radius:999px; padding:4px 10px; color:#EDE5D7; text-decoration:none;">1a</a>
+      <span style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7A7161;">AUTH · /auth</span>
+      <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:16px; color:#B4A995;">Passwordless magic link. Guests can always play — the ghost link never disappears.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:48px; align-items:flex-start;">
+
+      <!-- A / ink / desktop -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">STATE A — EMAIL ENTRY · INK · DESKTOP</div>
+        <div data-screen-label="Auth A ink" style="width:1180px; min-height:680px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; gap:10px; padding:20px 40px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; align-items:stretch; padding:0 64px 48px;">
+            <div style="flex:1 1 0; display:flex; flex-direction:column; justify-content:center; gap:22px; max-width:520px; padding-right:64px;">
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">SIGN IN · MAGIC LINK</div>
+              <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:58px; line-height:1; margin:0; letter-spacing:-0.02em; text-wrap:balance;">No password. Just a link.</h2>
+              <p style="margin:0; font-size:16px; line-height:1.6; color:var(--muted); max-width:40ch;">Enter your email and we’ll send a one-tap sign-in link. Your streak and record follow you anywhere.</p>
+              <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+                <label style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.18em; color:var(--muted);">EMAIL</label>
+                <input type="email" placeholder="you@example.com" style="width:100%; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-size:16px; color:var(--ink); font-family:inherit; outline:none;">
+              </div>
+              <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:16px 40px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease; width:fit-content;">Send link</button>
+              <div style="border-top:1px solid var(--line); padding-top:18px; margin-top:8px;">
+                <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:0;">PLAY NOW, SIGN IN LATER →</button>
+              </div>
+            </div>
+            <div style="flex:0 0 1px; align-self:stretch; background:var(--line); margin:24px 0;"></div>
+            <div style="flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px;">
+              <svg viewBox="0 0 200 200" style="width:250px; overflow:visible;">
+                <g style="animation:driftL 3.4s ease-in-out infinite alternate;"><path d="M96 5 A95 95 0 0 0 96 195 Z" style="fill:var(--amber);"></path></g>
+                <g style="animation:driftR 3.4s ease-in-out infinite alternate;"><path d="M104 5 A95 95 0 0 1 104 195 Z" style="fill:var(--teal);"></path></g>
+              </svg>
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.3em; color:var(--muted);">ONE PUZZLE · EVERY DAY</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- A / paper / desktop -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">STATE A — EMAIL ENTRY · PAPER · DESKTOP</div>
+        <div data-screen-label="Auth A paper" style="width:1180px; min-height:680px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#F5F0E6; --surface:#FDFAF3; --line:rgba(31,26,20,.16); --ink:#211B14; --muted:#8A7F6E; --plate:rgba(31,26,20,.055); --hover:rgba(31,26,20,.045); --err:#C0442C; --amber:#DE5F27; --teal:#1E9C8F; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; gap:10px; padding:20px 40px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; align-items:stretch; padding:0 64px 48px;">
+            <div style="flex:1 1 0; display:flex; flex-direction:column; justify-content:center; gap:22px; max-width:520px; padding-right:64px;">
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">SIGN IN · MAGIC LINK</div>
+              <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:58px; line-height:1; margin:0; letter-spacing:-0.02em; text-wrap:balance;">No password. Just a link.</h2>
+              <p style="margin:0; font-size:16px; line-height:1.6; color:var(--muted); max-width:40ch;">Enter your email and we’ll send a one-tap sign-in link. Your streak and record follow you anywhere.</p>
+              <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+                <label style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.18em; color:var(--muted);">EMAIL</label>
+                <input type="email" placeholder="you@example.com" style="width:100%; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-size:16px; color:var(--ink); font-family:inherit; outline:none;">
+              </div>
+              <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#FDFAF3; border:none; border-radius:999px; padding:16px 40px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease; width:fit-content;">Send link</button>
+              <div style="border-top:1px solid var(--line); padding-top:18px; margin-top:8px;">
+                <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:0;">PLAY NOW, SIGN IN LATER →</button>
+              </div>
+            </div>
+            <div style="flex:0 0 1px; align-self:stretch; background:var(--line); margin:24px 0;"></div>
+            <div style="flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px;">
+              <svg viewBox="0 0 200 200" style="width:250px; overflow:visible;">
+                <g style="animation:driftL 3.4s ease-in-out infinite alternate;"><path d="M96 5 A95 95 0 0 0 96 195 Z" style="fill:var(--amber);"></path></g>
+                <g style="animation:driftR 3.4s ease-in-out infinite alternate;"><path d="M104 5 A95 95 0 0 1 104 195 Z" style="fill:var(--teal);"></path></g>
+              </svg>
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.3em; color:var(--muted);">ONE PUZZLE · EVERY DAY</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B / ink -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">STATE B — LINK SENT · INK</div>
+        <div data-screen-label="Auth B link sent" style="width:1180px; min-height:680px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; gap:10px; padding:20px 40px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; align-items:stretch; padding:0 64px 48px;">
+            <div style="flex:1 1 0; display:flex; flex-direction:column; justify-content:center; gap:22px; max-width:520px; padding-right:64px;">
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--amber);">LINK SENT</div>
+              <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:58px; line-height:1; margin:0; letter-spacing:-0.02em;">Check your email.</h2>
+              <p style="margin:0; font-size:16px; line-height:1.6; color:var(--muted); max-width:42ch;">We sent a sign-in link to <span style="color:var(--ink); font-weight:600;">{{ email }}</span>. It’s good for fifteen minutes — one tap and you’re in.</p>
+              <div style="display:flex; flex-direction:column; align-items:flex-start; gap:14px; border-top:1px solid var(--line); padding-top:18px; margin-top:8px;">
+                <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:0;">USE A DIFFERENT EMAIL</button>
+                <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:0;">PLAY NOW, SIGN IN LATER →</button>
+              </div>
+            </div>
+            <div style="flex:0 0 1px; align-self:stretch; background:var(--line); margin:24px 0;"></div>
+            <div style="flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px;">
+              <svg viewBox="0 0 200 200" style="width:250px; overflow:visible;">
+                <path d="M96 5 A95 95 0 0 0 96 195 Z" style="fill:var(--amber); opacity:.25;"></path>
+                <path d="M104 5 A95 95 0 0 1 104 195 Z" style="fill:var(--teal);"></path>
+              </svg>
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.3em; color:var(--muted);">WAITING ON YOUR TAP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- C / expired / paper -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">STATE C — EXPIRED / INVALID LINK · PAPER</div>
+        <div data-screen-label="Auth C expired" style="width:1180px; min-height:680px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#F5F0E6; --surface:#FDFAF3; --line:rgba(31,26,20,.16); --ink:#211B14; --muted:#8A7F6E; --plate:rgba(31,26,20,.055); --hover:rgba(31,26,20,.045); --err:#C0442C; --amber:#DE5F27; --teal:#1E9C8F; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; gap:10px; padding:20px 40px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; align-items:stretch; padding:0 64px 48px;">
+            <div style="flex:1 1 0; display:flex; flex-direction:column; justify-content:center; gap:20px; max-width:520px; padding-right:64px;">
+              <div style="background:rgba(192,68,44,.07); border:1px solid rgba(192,68,44,.45); border-radius:14px; padding:16px 18px; display:flex; flex-direction:column; gap:6px;">
+                <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--err);">LINK EXPIRED</span>
+                <span style="font-size:14.5px; line-height:1.55; color:var(--ink);">That link has expired or was already used. Enter your email and we’ll send a fresh one.</span>
+              </div>
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">SIGN IN · MAGIC LINK</div>
+              <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:52px; line-height:1; margin:0; letter-spacing:-0.02em;">Let’s try that again.</h2>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <label style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.18em; color:var(--muted);">EMAIL</label>
+                <input type="email" defaultvalue="{{ email }}" style="width:100%; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-size:16px; color:var(--ink); font-family:inherit; outline:none;">
+              </div>
+              <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#FDFAF3; border:none; border-radius:999px; padding:16px 40px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease; width:fit-content;">Send a new link</button>
+              <div style="border-top:1px solid var(--line); padding-top:18px; margin-top:4px;">
+                <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:0;">PLAY NOW, SIGN IN LATER →</button>
+              </div>
+            </div>
+            <div style="flex:0 0 1px; align-self:stretch; background:var(--line); margin:24px 0;"></div>
+            <div style="flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px;">
+              <svg viewBox="0 0 200 200" style="width:250px; overflow:visible;">
+                <g style="animation:driftL 3.4s ease-in-out infinite alternate;"><path d="M96 5 A95 95 0 0 0 96 195 Z" style="fill:var(--amber);"></path></g>
+                <g style="animation:driftR 3.4s ease-in-out infinite alternate;"><path d="M104 5 A95 95 0 0 1 104 195 Z" style="fill:var(--teal);"></path></g>
+              </svg>
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.3em; color:var(--muted);">ONE PUZZLE · EVERY DAY</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- A / mobile / ink -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">STATE A — MOBILE · INK · 390W</div>
+        <div data-screen-label="Auth A mobile" style="width:390px; min-height:740px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:center; gap:9px; padding:20px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:19px; height:19px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:20px;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:20px; padding:12px 28px 44px;">
+            <svg viewBox="0 0 200 200" style="width:96px; overflow:visible; align-self:center; margin-bottom:8px;">
+              <g style="animation:driftL 3.4s ease-in-out infinite alternate;"><path d="M96 5 A95 95 0 0 0 96 195 Z" style="fill:var(--amber);"></path></g>
+              <g style="animation:driftR 3.4s ease-in-out infinite alternate;"><path d="M104 5 A95 95 0 0 1 104 195 Z" style="fill:var(--teal);"></path></g>
+            </svg>
+            <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.22em; color:var(--muted); text-align:center;">SIGN IN · MAGIC LINK</div>
+            <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:38px; line-height:1.02; margin:0; letter-spacing:-0.02em; text-align:center; text-wrap:balance;">No password. Just a link.</h2>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+              <label style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.18em; color:var(--muted);">EMAIL</label>
+              <input type="email" placeholder="you@example.com" style="width:100%; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-size:16px; color:var(--ink); font-family:inherit; outline:none;">
+            </div>
+            <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:17px 40px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease; width:100%;">Send link</button>
+            <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:8px 0 0; align-self:center;">PLAY NOW, SIGN IN LATER →</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 1b ONBOARDING ================= -->
+  <section id="a2" style="display:flex; flex-direction:column; gap:26px;">
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <a href="#a2" style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.08em; border:1px solid rgba(237,229,215,.3); border-radius:999px; padding:4px 10px; color:#EDE5D7; text-decoration:none;">1b</a>
+      <span style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7A7161;">ONBOARDING · /onboarding</span>
+      <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:16px; color:#B4A995;">First run after sign-in. One question, one input, skippable. Max 40 characters.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:48px; align-items:flex-start;">
+
+      <!-- default / ink / full -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">DEFAULT · INK</div>
+        <div data-screen-label="Onboarding default" style="width:1180px; min-height:600px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; gap:10px; padding:20px 40px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; padding:12px 40px 56px;">
+            <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">ONE LAST THING</div>
+            <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:56px; line-height:1; margin:0; letter-spacing:-0.02em; text-align:center;">What should we call you?</h2>
+            <p style="margin:0; font-size:16px; line-height:1.6; color:var(--muted); text-align:center; max-width:44ch;">Shown on your stats page — nowhere else.</p>
+            <div style="width:100%; max-width:440px; display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+              <input type="text" defaultvalue="{{ userName }}" maxlength="40" style="width:100%; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-size:16px; color:var(--ink); font-family:inherit; outline:none; text-align:center;">
+              <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.14em; color:var(--muted); text-align:right;">{{ nameCount }} / 40</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:22px;">
+              <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:16px 40px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Save name</button>
+              <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:4px 0;">SKIP FOR NOW</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- saving detail / ink -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">STATE — SAVING · DETAIL</div>
+        <div data-screen-label="Onboarding saving" style="width:560px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 18px 44px rgba(0,0,0,.4); display:flex; flex-direction:column; align-items:center; gap:16px; padding:44px 40px; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <input type="text" defaultvalue="{{ userName }}" readonly="{{ true }}" style="width:100%; max-width:440px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-size:16px; color:var(--ink); font-family:inherit; outline:none; text-align:center; opacity:.6;">
+          <div style="display:flex; align-items:center; gap:22px;">
+            <button style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:16px 40px; font-family:inherit; font-size:16px; font-weight:600; cursor:default; opacity:.8; display:flex; align-items:center; gap:10px;">
+              <span style="width:14px; height:14px; border-radius:50%; border:2px solid rgba(27,20,16,.3); border-top-color:#1B1410; animation:spin .8s linear infinite; display:inline-block;"></span>
+              Saving…
+            </button>
+            <button style="background:none; border:none; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:4px 0; opacity:.5; cursor:default;">SKIP FOR NOW</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- error detail / paper -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">STATE — ERROR · DETAIL · PAPER</div>
+        <div data-screen-label="Onboarding error" style="width:560px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 18px 44px rgba(0,0,0,.3); display:flex; flex-direction:column; align-items:center; gap:12px; padding:44px 40px; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#F5F0E6; --surface:#FDFAF3; --line:rgba(31,26,20,.16); --ink:#211B14; --muted:#8A7F6E; --err:#C0442C; --amber:#DE5F27; --teal:#1E9C8F; background:var(--bg); color:var(--ink);">
+          <input type="text" placeholder="Your name" style="width:100%; max-width:440px; background:var(--surface); border:1.5px solid var(--err); border-radius:12px; padding:16px 18px; font-size:16px; color:var(--ink); font-family:inherit; outline:none; text-align:center;">
+          <div style="display:flex; align-items:center; gap:8px; width:100%; max-width:440px;">
+            <span style="width:5px; height:5px; border-radius:50%; background:var(--err); flex:none;"></span>
+            <span style="font-size:14px; color:var(--err);">Enter a name — or skip for now.</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:22px; margin-top:6px;">
+            <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#FDFAF3; border:none; border-radius:999px; padding:16px 40px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Save name</button>
+            <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:4px 0;">SKIP FOR NOW</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 1c TUTORIAL ================= -->
+  <section id="a3" style="display:flex; flex-direction:column; gap:26px;">
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <a href="#a3" style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.08em; border:1px solid rgba(237,229,215,.3); border-radius:999px; padding:4px 10px; color:#EDE5D7; text-decoration:none;">1c</a>
+      <span style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7A7161;">TUTORIAL · /tutorial</span>
+      <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:16px; color:#B4A995;">Four beats, ending hands-on. Beat 04 is live — the 4×4 board actually solves.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:48px; align-items:flex-start;">
+
+      <!-- BEAT 1 -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">BEAT 01 — TWO SYMBOLS · INK</div>
+        <div data-screen-label="Tutorial beat 1" style="width:1180px; min-height:660px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; padding:4px 0;">SKIP TUTORIAL</button>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; gap:24px; padding:16px 64px 52px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="display:flex; gap:6px;">
+                <span style="width:36px; height:2px; background:var(--amber);"></span>
+                <span style="width:36px; height:2px; background:var(--line);"></span>
+                <span style="width:36px; height:2px; background:var(--line);"></span>
+                <span style="width:36px; height:2px; background:var(--line);"></span>
+              </div>
+              <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">BEAT 01 / 04</span>
+            </div>
+            <div style="flex:1; display:flex; align-items:center; gap:80px;">
+              <div style="flex:1 1 0; max-width:460px; display:flex; flex-direction:column; gap:20px;">
+                <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">HOW IT WORKS</div>
+                <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:56px; line-height:1; margin:0; letter-spacing:-0.02em;">Two symbols.</h2>
+                <p style="margin:0; font-size:16.5px; line-height:1.65; color:var(--muted);">Every cell takes one of two marks: the amber <span style="color:var(--amber); font-weight:600;">disc</span> or the teal <span style="color:var(--teal); font-weight:600;">ring</span>. Tap a cell to cycle — disc, ring, empty.</p>
+                <div style="display:flex; align-items:center; gap:16px; margin-top:8px;">
+                  <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:14px 34px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Next</button>
+                </div>
+              </div>
+              <div style="flex:1 1 0; display:flex; align-items:center; justify-content:center; gap:64px;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:18px;">
+                  <svg viewBox="0 0 40 40" style="width:120px; height:120px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg>
+                  <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">DISC</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:18px;">
+                  <svg viewBox="0 0 40 40" style="width:120px; height:120px;"><circle cx="20" cy="20" r="13" style="fill:none; stroke:var(--teal); stroke-width:5px;"></circle></svg>
+                  <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">RING</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEAT 2 -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">BEAT 02 — READ THE SIGNS · INK</div>
+        <div data-screen-label="Tutorial beat 2" style="width:1180px; min-height:660px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; padding:4px 0;">SKIP TUTORIAL</button>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; gap:24px; padding:16px 64px 52px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="display:flex; gap:6px;">
+                <span style="width:36px; height:2px; background:var(--amber); opacity:.4;"></span>
+                <span style="width:36px; height:2px; background:var(--amber);"></span>
+                <span style="width:36px; height:2px; background:var(--line);"></span>
+                <span style="width:36px; height:2px; background:var(--line);"></span>
+              </div>
+              <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">BEAT 02 / 04</span>
+            </div>
+            <div style="flex:1; display:flex; align-items:center; gap:80px;">
+              <div style="flex:1 1 0; max-width:460px; display:flex; flex-direction:column; gap:20px;">
+                <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">HOW IT WORKS</div>
+                <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:56px; line-height:1; margin:0; letter-spacing:-0.02em;">Read the signs.</h2>
+                <p style="margin:0; font-size:16.5px; line-height:1.65; color:var(--muted);">Some edges carry a sign. <span style="color:var(--ink); font-weight:600;">=</span> means the two cells match. <span style="color:var(--ink); font-weight:600;">≠</span> means they differ. Signs are never wrong — lean on them.</p>
+                <div style="display:flex; align-items:center; gap:16px; margin-top:8px;">
+                  <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:14px 34px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Next</button>
+                  <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:4px 0;">BACK</button>
+                </div>
+              </div>
+              <div style="flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:44px;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
+                  <div style="display:flex; position:relative; border:1px solid var(--line);">
+                    <div style="width:96px; height:96px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);"><svg viewBox="0 0 40 40" style="width:54px; height:54px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg></div>
+                    <div style="width:96px; height:96px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 40 40" style="width:54px; height:54px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg></div>
+                    <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); min-width:27px; height:27px; padding:0 5px; border-radius:999px; background:var(--bg); border:1px solid var(--amber); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; line-height:1;">=</div>
+                  </div>
+                  <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.18em; color:var(--muted);">= — THE PAIR MATCHES</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
+                  <div style="display:flex; position:relative; border:1px solid var(--line);">
+                    <div style="width:96px; height:96px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);"><svg viewBox="0 0 40 40" style="width:54px; height:54px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg></div>
+                    <div style="width:96px; height:96px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 40 40" style="width:54px; height:54px;"><circle cx="20" cy="20" r="13" style="fill:none; stroke:var(--teal); stroke-width:5px;"></circle></svg></div>
+                    <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); min-width:27px; height:27px; padding:0 5px; border-radius:999px; background:var(--bg); border:1px solid var(--amber); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; line-height:1;">≠</div>
+                  </div>
+                  <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.18em; color:var(--muted);">≠ — THE PAIR DIFFERS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEAT 3 -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">BEAT 03 — THE LINE LAW · INK</div>
+        <div data-screen-label="Tutorial beat 3" style="width:1180px; min-height:660px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; padding:4px 0;">SKIP TUTORIAL</button>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; gap:24px; padding:16px 64px 52px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="display:flex; gap:6px;">
+                <span style="width:36px; height:2px; background:var(--amber); opacity:.4;"></span>
+                <span style="width:36px; height:2px; background:var(--amber); opacity:.4;"></span>
+                <span style="width:36px; height:2px; background:var(--amber);"></span>
+                <span style="width:36px; height:2px; background:var(--line);"></span>
+              </div>
+              <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">BEAT 03 / 04</span>
+            </div>
+            <div style="flex:1; display:flex; align-items:center; gap:80px;">
+              <div style="flex:1 1 0; max-width:460px; display:flex; flex-direction:column; gap:20px;">
+                <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">HOW IT WORKS</div>
+                <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:56px; line-height:1; margin:0; letter-spacing:-0.02em;">The line law.</h2>
+                <p style="margin:0; font-size:16.5px; line-height:1.65; color:var(--muted);">Every row and every column ends with <span style="color:var(--ink); font-weight:600;">three discs and three rings</span> — and never three of a kind touching.</p>
+                <div style="display:flex; align-items:center; gap:16px; margin-top:8px;">
+                  <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:14px 34px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Next</button>
+                  <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:4px 0;">BACK</button>
+                </div>
+              </div>
+              <div style="flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:40px;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+                  <div style="display:flex; border:1px solid var(--line);">
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);"><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg></div>
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);"><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="13" style="fill:none; stroke:var(--teal); stroke-width:5px;"></circle></svg></div>
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);"><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg></div>
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);"><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="13" style="fill:none; stroke:var(--teal); stroke-width:5px;"></circle></svg></div>
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);"><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="13" style="fill:none; stroke:var(--teal); stroke-width:5px;"></circle></svg></div>
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg></div>
+                  </div>
+                  <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.18em; color:var(--teal);">THREE OF EACH — BALANCED</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+                  <div style="display:flex; border:1px solid var(--line);">
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line); position:relative;"><div style="position:absolute; inset:8%; border:1.5px solid var(--err); border-radius:10px; opacity:.75;"></div><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg></div>
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line); position:relative;"><div style="position:absolute; inset:8%; border:1.5px solid var(--err); border-radius:10px; opacity:.75;"></div><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg></div>
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line); position:relative;"><div style="position:absolute; inset:8%; border:1.5px solid var(--err); border-radius:10px; opacity:.75;"></div><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg></div>
+                    <div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);"><svg viewBox="0 0 40 40" style="width:34px; height:34px;"><circle cx="20" cy="20" r="13" style="fill:none; stroke:var(--teal); stroke-width:5px;"></circle></svg></div>
+                    <div style="width:60px; height:60px; border-right:1px solid var(--line);"></div>
+                    <div style="width:60px; height:60px;"></div>
+                  </div>
+                  <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.18em; color:var(--err);">THREE ALIKE — NEVER</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEAT 4 — interactive -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">BEAT 04 — TRY ONE YOURSELF · INK · LIVE — SOLVE IT</div>
+        <div data-screen-label="Tutorial beat 4 interactive" style="width:1180px; min-height:660px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; padding:4px 0;">SKIP TUTORIAL</button>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; gap:24px; padding:16px 64px 52px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="display:flex; gap:6px;">
+                <span style="width:36px; height:2px; background:var(--amber); opacity:.4;"></span>
+                <span style="width:36px; height:2px; background:var(--amber); opacity:.4;"></span>
+                <span style="width:36px; height:2px; background:var(--amber); opacity:.4;"></span>
+                <span style="width:36px; height:2px; background:var(--amber);"></span>
+              </div>
+              <span style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--muted);">BEAT 04 / 04</span>
+            </div>
+            <div style="flex:1; display:flex; align-items:center; gap:80px;">
+              <div style="flex:1 1 0; max-width:460px; display:flex; flex-direction:column; gap:20px;">
+                <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">HOW IT WORKS</div>
+                <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:56px; line-height:1; margin:0; letter-spacing:-0.02em;">Try one yourself.</h2>
+                <p style="margin:0; font-size:16.5px; line-height:1.65; color:var(--muted);">A little four-by-four: two of each per line, same laws. The plated cells are given — fill the rest. Stuck? Take a hint.</p>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                  <button onclick="{{ tutHintFn }}" style-hover="border-color: var(--amber); color: var(--amber)" style="background:none; border:1px solid var(--line); border-radius:999px; padding:12px 22px; cursor:pointer; color:inherit; font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; transition:border-color .2s, color .2s;">HINT</button>
+                  <button onclick="{{ tutReset }}" style-hover="border-color: var(--amber); color: var(--amber)" style="background:none; border:1px solid var(--line); border-radius:999px; padding:12px 22px; cursor:pointer; color:inherit; font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; transition:border-color .2s, color .2s;">RESET</button>
+                  <div style="{{ tutFinishWrap }}">
+                    <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:14px 34px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Finish</button>
+                  </div>
+                </div>
+                <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:0; text-align:left; width:fit-content;">BACK</button>
+              </div>
+              <div style="flex:0 1 380px; width:100%;">
+                <div style="width:100%; aspect-ratio:1; border:1px solid var(--line); display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(4,1fr);">
+                  <sc-for list="{{ tutCells }}" as="cell" hint-placeholder-count="16">
+                    <button onclick="{{ cell.tap }}" style-hover="background: var(--hover)" style="{{ cell.style }}">
+                      <div style="{{ cell.plateStyle }}"></div>
+                      <div style="{{ cell.discStyle }}">
+                        <svg viewBox="0 0 40 40" style="width:56%; height:56%;"><circle cx="20" cy="20" r="15" style="fill:var(--amber);"></circle></svg>
+                      </div>
+                      <div style="{{ cell.ringStyle }}">
+                        <svg viewBox="0 0 40 40" style="width:56%; height:56%;"><circle cx="20" cy="20" r="13" style="fill:none; stroke:var(--teal); stroke-width:5px;"></circle></svg>
+                      </div>
+                      <div style="{{ cell.errStyle }}"></div>
+                      <sc-if value="{{ cell.capH }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; right:0; top:50%; transform:translate(50%,-50%); z-index:4; min-width:25px; height:25px; padding:0 5px; border-radius:999px; background:var(--bg); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; pointer-events:none; line-height:1;">{{ cell.capHGlyph }}</div>
+                      </sc-if>
+                      <sc-if value="{{ cell.capV }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:absolute; bottom:0; left:50%; transform:translate(-50%,50%); z-index:4; min-width:25px; height:25px; padding:0 5px; border-radius:999px; background:var(--bg); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; pointer-events:none; line-height:1;">{{ cell.capVGlyph }}</div>
+                      </sc-if>
+                    </button>
+                  </sc-for>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:14px; min-height:22px;">
+                  <span style="{{ tutStatusStyle }}">{{ tutStatus }}</span>
+                  <span style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.14em; color:var(--muted); flex:none;">{{ tutPlaced }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 1d SKELETONS ================= -->
+  <section id="a4" style="display:flex; flex-direction:column; gap:26px;">
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <a href="#a4" style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.08em; border:1px solid rgba(237,229,215,.3); border-radius:999px; padding:4px 10px; color:#EDE5D7; text-decoration:none;">1d</a>
+      <span style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7A7161;">LOADING SKELETONS · PER ROUTE</span>
+      <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:16px; color:#B4A995;">Breathing-pulse placeholders mirroring each route’s silhouette — content never jumps on load. Header chrome renders real.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:48px; align-items:flex-start;">
+
+      <!-- HOME skeleton -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">HOME · INK</div>
+        <div data-screen-label="Skeleton home" style="width:1180px; min-height:620px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <nav style="display:flex; align-items:center; gap:22px;">
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">PRACTICE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">ARCHIVE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">STATS</span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 200 200" style="width:15px; height:15px;"><path d="M95 10 A90 90 0 0 0 95 190 Z" style="fill:var(--ink); opacity:.85;"></path><circle cx="100" cy="100" r="90" style="fill:none; stroke:var(--ink); stroke-width:10px; opacity:.85;"></circle></svg></span>
+            </nav>
+          </header>
+          <div style="flex:1; display:flex; align-items:stretch; padding:0 40px 48px;">
+            <div style="flex:1 1 0; display:flex; flex-direction:column; justify-content:center; gap:26px; padding:24px 48px 24px 0;">
+              <div style="width:150px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite;"></div>
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div style="width:440px; height:82px; background:var(--plate); border-radius:14px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.12s;"></div>
+                <div style="width:350px; height:82px; background:var(--plate); border-radius:14px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.24s;"></div>
+              </div>
+              <div style="width:360px; height:14px; background:var(--plate); border-radius:7px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.36s;"></div>
+              <div style="display:flex; align-items:center; gap:20px;">
+                <div style="width:200px; height:56px; background:var(--plate); border-radius:999px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.48s;"></div>
+                <div style="width:90px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.56s;"></div>
+                <div style="width:110px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.64s;"></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:7px;">
+                <span style="width:11px; height:11px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.0s;"></span>
+                <span style="width:11px; height:11px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.08s;"></span>
+                <span style="width:11px; height:11px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.16s;"></span>
+                <span style="width:11px; height:11px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.24s;"></span>
+                <span style="width:11px; height:11px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.32s;"></span>
+                <span style="width:11px; height:11px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.4s;"></span>
+                <span style="width:11px; height:11px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.48s;"></span>
+              </div>
+            </div>
+            <div style="flex:0 0 1px; align-self:stretch; background:var(--line); margin:36px 0;"></div>
+            <div style="flex:1 1 0; display:flex; align-items:center; justify-content:center;">
+              <div style="width:300px; height:300px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.3s;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAY skeleton -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">PLAY · INK · DIAGONAL WAVE ON THE GRID</div>
+        <div data-screen-label="Skeleton play" style="width:1180px; min-height:620px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <nav style="display:flex; align-items:center; gap:22px;">
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">PRACTICE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">ARCHIVE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">STATS</span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 200 200" style="width:15px; height:15px;"><path d="M95 10 A90 90 0 0 0 95 190 Z" style="fill:var(--ink); opacity:.85;"></path><circle cx="100" cy="100" r="90" style="fill:none; stroke:var(--ink); stroke-width:10px; opacity:.85;"></circle></svg></span>
+            </nav>
+          </header>
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:72px; padding:8px 40px 48px;">
+            <div style="flex:0 1 460px; width:100%;">
+              <div style="width:100%; aspect-ratio:1; border:1px solid var(--line); display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(6,1fr);">
+                <sc-for list="{{ skel36 }}" as="k" hint-placeholder-count="36">
+                  <div style="{{ k.style }}"><div style="{{ k.inner }}"></div></div>
+                </sc-for>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px;">
+                <div style="width:160px; height:12px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite;"></div>
+                <div style="width:90px; height:12px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.2s;"></div>
+              </div>
+              <div style="height:2px; background:var(--line); margin-top:8px;"></div>
+            </div>
+            <div style="flex:0 1 340px; display:flex; flex-direction:column; gap:24px;">
+              <div style="width:140px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite;"></div>
+              <div style="width:220px; height:64px; background:var(--plate); border-radius:12px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.15s;"></div>
+              <div style="display:flex; gap:10px;">
+                <div style="width:100px; height:42px; background:var(--plate); border-radius:999px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.3s;"></div>
+                <div style="width:92px; height:42px; background:var(--plate); border-radius:999px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.4s;"></div>
+                <div style="width:110px; height:42px; background:var(--plate); border-radius:999px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.5s;"></div>
+              </div>
+              <div style="width:240px; height:14px; background:var(--plate); border-radius:7px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.6s;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARCHIVE skeleton -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">ARCHIVE · INK</div>
+        <div data-screen-label="Skeleton archive" style="width:1180px; min-height:620px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <nav style="display:flex; align-items:center; gap:22px;">
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">PRACTICE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">ARCHIVE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">STATS</span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 200 200" style="width:15px; height:15px;"><path d="M95 10 A90 90 0 0 0 95 190 Z" style="fill:var(--ink); opacity:.85;"></path><circle cx="100" cy="100" r="90" style="fill:none; stroke:var(--ink); stroke-width:10px; opacity:.85;"></circle></svg></span>
+            </nav>
+          </header>
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:88px; padding:8px 40px 48px;">
+            <div style="flex:0 1 400px; display:flex; flex-direction:column; gap:22px;">
+              <div style="width:180px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite;"></div>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="width:320px; height:62px; background:var(--plate); border-radius:12px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.12s;"></div>
+                <div style="width:260px; height:62px; background:var(--plate); border-radius:12px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.24s;"></div>
+              </div>
+              <div style="width:340px; height:14px; background:var(--plate); border-radius:7px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.36s;"></div>
+              <div style="display:flex; flex-direction:column; gap:12px; border-top:1px solid var(--line); padding-top:18px;">
+                <div style="display:flex; align-items:center; gap:10px;"><span style="width:12px; height:12px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite;"></span><div style="width:110px; height:10px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.1s;"></div></div>
+                <div style="display:flex; align-items:center; gap:10px;"><span style="width:12px; height:12px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.2s;"></span><div style="width:170px; height:10px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.3s;"></div></div>
+                <div style="display:flex; align-items:center; gap:10px;"><span style="width:12px; height:12px; border-radius:50%; background:var(--plate); animation:breathe 1.9s ease-in-out infinite; animation-delay:.4s;"></span><div style="width:140px; height:10px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.5s;"></div></div>
+              </div>
+            </div>
+            <div style="flex:0 1 480px; display:flex; flex-direction:column; gap:22px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:16px;">
+                <span style="width:34px; height:34px; border-radius:50%; border:1px solid var(--line);"></span>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                  <div style="width:190px; height:26px; background:var(--plate); border-radius:8px; animation:breathe 1.9s ease-in-out infinite;"></div>
+                  <div style="width:120px; height:9px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.15s;"></div>
+                </div>
+                <span style="width:34px; height:34px; border-radius:50%; border:1px solid var(--line);"></span>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px;">
+                <sc-for list="{{ skelCal }}" as="k" hint-placeholder-count="35">
+                  <div style="aspect-ratio:1; display:flex; align-items:center; justify-content:center;"><div style="{{ k.style }}"></div></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS skeleton -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">STATS · INK</div>
+        <div data-screen-label="Skeleton stats" style="width:1180px; min-height:620px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <nav style="display:flex; align-items:center; gap:22px;">
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">PRACTICE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">ARCHIVE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">STATS</span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 200 200" style="width:15px; height:15px;"><path d="M95 10 A90 90 0 0 0 95 190 Z" style="fill:var(--ink); opacity:.85;"></path><circle cx="100" cy="100" r="90" style="fill:none; stroke:var(--ink); stroke-width:10px; opacity:.85;"></circle></svg></span>
+            </nav>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; gap:36px; padding:24px 140px 56px; max-width:1180px;">
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:18px;">
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="width:190px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite;"></div>
+                <div style="width:260px; height:46px; background:var(--plate); border-radius:10px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.15s;"></div>
+              </div>
+              <div style="width:150px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.3s;"></div>
+            </div>
+            <div style="display:flex; align-items:stretch; border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+              <div style="flex:1 1 0; padding:34px 32px 34px 0; display:flex; align-items:center; gap:26px;">
+                <div style="width:130px; height:120px; background:var(--plate); border-radius:14px; animation:breathe 1.9s ease-in-out infinite;"></div>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                  <div style="width:70px; height:10px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.12s;"></div>
+                  <div style="width:96px; height:10px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.24s;"></div>
+                </div>
+              </div>
+              <div style="flex:0 0 1px; background:var(--line);"></div>
+              <div style="flex:1 1 0; padding:34px 0 34px 36px; display:grid; grid-template-columns:1fr 1fr; gap:28px 24px; align-content:center;">
+                <div style="display:flex; flex-direction:column; gap:8px;"><div style="width:88px; height:26px; background:var(--plate); border-radius:8px; animation:breathe 1.9s ease-in-out infinite;"></div><div style="width:66px; height:9px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.1s;"></div></div>
+                <div style="display:flex; flex-direction:column; gap:8px;"><div style="width:88px; height:26px; background:var(--plate); border-radius:8px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.15s;"></div><div style="width:66px; height:9px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.25s;"></div></div>
+                <div style="display:flex; flex-direction:column; gap:8px;"><div style="width:88px; height:26px; background:var(--plate); border-radius:8px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.3s;"></div><div style="width:66px; height:9px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.4s;"></div></div>
+                <div style="display:flex; flex-direction:column; gap:8px;"><div style="width:88px; height:26px; background:var(--plate); border-radius:8px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.45s;"></div><div style="width:66px; height:9px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.55s;"></div></div>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:16px; max-width:400px;">
+              <div style="width:170px; height:10px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite;"></div>
+              <div style="display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px;">
+                <sc-for list="{{ skelCal }}" as="k" hint-placeholder-count="35">
+                  <div style="aspect-ratio:1; display:flex; align-items:center; justify-content:center;"><div style="{{ k.style }}"></div></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRACTICE skeleton -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">PRACTICE · INK</div>
+        <div data-screen-label="Skeleton practice" style="width:1180px; min-height:620px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --plate:rgba(233,223,205,.06); --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <nav style="display:flex; align-items:center; gap:22px;">
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">PRACTICE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">ARCHIVE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">STATS</span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 200 200" style="width:15px; height:15px;"><path d="M95 10 A90 90 0 0 0 95 190 Z" style="fill:var(--ink); opacity:.85;"></path><circle cx="100" cy="100" r="90" style="fill:none; stroke:var(--ink); stroke-width:10px; opacity:.85;"></circle></svg></span>
+            </nav>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; gap:34px; padding:24px 160px 56px;">
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <div style="width:200px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite;"></div>
+              <div style="width:320px; height:52px; background:var(--plate); border-radius:12px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.15s;"></div>
+              <div style="width:420px; height:14px; background:var(--plate); border-radius:7px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.3s;"></div>
+            </div>
+            <div style="border-bottom:1px solid var(--line);">
+              <div style="display:flex; align-items:center; gap:28px; padding:30px 10px; border-top:1px solid var(--line);">
+                <div style="flex:0 0 170px; display:flex; flex-direction:column; gap:10px;"><div style="width:150px; height:32px; background:var(--plate); border-radius:9px; animation:breathe 1.9s ease-in-out infinite;"></div><div style="width:100px; height:9px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.1s;"></div></div>
+                <div style="flex:1; height:14px; background:var(--plate); border-radius:7px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.2s;"></div>
+                <div style="flex:0 0 70px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.3s;"></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:28px; padding:30px 10px; border-top:1px solid var(--line);">
+                <div style="flex:0 0 170px; display:flex; flex-direction:column; gap:10px;"><div style="width:130px; height:32px; background:var(--plate); border-radius:9px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.15s;"></div><div style="width:110px; height:9px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.25s;"></div></div>
+                <div style="flex:1; height:14px; background:var(--plate); border-radius:7px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.35s;"></div>
+                <div style="flex:0 0 70px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.45s;"></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:28px; padding:30px 10px; border-top:1px solid var(--line);">
+                <div style="flex:0 0 170px; display:flex; flex-direction:column; gap:10px;"><div style="width:160px; height:32px; background:var(--plate); border-radius:9px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.3s;"></div><div style="width:90px; height:9px; background:var(--plate); border-radius:5px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.4s;"></div></div>
+                <div style="flex:1; height:14px; background:var(--plate); border-radius:7px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.5s;"></div>
+                <div style="flex:0 0 70px; height:11px; background:var(--plate); border-radius:6px; animation:breathe 1.9s ease-in-out infinite; animation-delay:.6s;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 1e ERRORS ================= -->
+  <section id="a5" style="display:flex; flex-direction:column; gap:26px;">
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <a href="#a5" style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.08em; border:1px solid rgba(237,229,215,.3); border-radius:999px; padding:4px 10px; color:#EDE5D7; text-decoration:none;">1e</a>
+      <span style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7A7161;">ERROR / NOT-FOUND / UNAVAILABLE</span>
+      <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:16px; color:#B4A995;">One motif for all breakage: the two halves, pulled apart. Mono kicker, serif headline, amber action.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:48px; align-items:flex-start;">
+
+      <!-- Error boundary / ink -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">ERROR BOUNDARY · INK</div>
+        <div data-screen-label="Error boundary" style="width:566px; min-height:560px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; gap:10px; padding:20px 32px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:16px 44px 52px; text-align:center;">
+            <svg viewBox="0 0 240 200" style="width:104px; margin-bottom:6px;">
+              <path d="M86 10 A90 90 0 0 0 86 190 Z" style="fill:var(--amber);"></path>
+              <path d="M154 10 A90 90 0 0 1 154 190 Z" style="fill:var(--teal);"></path>
+            </svg>
+            <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">ERROR</div>
+            <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:46px; line-height:1; margin:0; letter-spacing:-0.02em;">Something broke.</h2>
+            <p style="margin:0; font-size:15.5px; line-height:1.6; color:var(--muted); max-width:36ch;">Not the kind of problem you can solve. Try again — or head home.</p>
+            <div style="display:flex; align-items:center; gap:20px; margin-top:8px;">
+              <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:15px 36px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Retry</button>
+              <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:4px 0;">HOME</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 404 / paper -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">404 · PAPER</div>
+        <div data-screen-label="404 not found" style="width:566px; min-height:560px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#F5F0E6; --surface:#FDFAF3; --line:rgba(31,26,20,.16); --ink:#211B14; --muted:#8A7F6E; --err:#C0442C; --amber:#DE5F27; --teal:#1E9C8F; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; gap:10px; padding:20px 32px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:16px 44px 52px; text-align:center;">
+            <svg viewBox="0 0 240 200" style="width:104px; margin-bottom:6px;">
+              <path d="M86 10 A90 90 0 0 0 86 190 Z" style="fill:var(--amber); opacity:.9;"></path>
+              <path d="M154 10 A90 90 0 0 1 154 190 Z" style="fill:none; stroke:var(--teal); stroke-width:8px;"></path>
+            </svg>
+            <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">404 · NOT FOUND</div>
+            <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:46px; line-height:1; margin:0; letter-spacing:-0.02em;">This page isn’t on the grid.</h2>
+            <p style="margin:0; font-size:15.5px; line-height:1.6; color:var(--muted); max-width:36ch;">The address doesn’t match anything we know.</p>
+            <div style="display:flex; align-items:center; gap:20px; margin-top:8px;">
+              <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#FDFAF3; border:none; border-radius:999px; padding:15px 36px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Back home</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily unavailable / ink -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">DAILY UNAVAILABLE · INK</div>
+        <div data-screen-label="Daily unavailable" style="width:566px; min-height:560px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; gap:10px; padding:20px 32px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:16px 44px 52px; text-align:center;">
+            <svg viewBox="0 0 240 200" style="width:104px; margin-bottom:6px;">
+              <path d="M86 10 A90 90 0 0 0 86 190 Z" style="fill:var(--amber); opacity:.35;"></path>
+              <path d="M154 10 A90 90 0 0 1 154 190 Z" style="fill:var(--teal); opacity:.35;"></path>
+            </svg>
+            <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">TODAY’S PUZZLE</div>
+            <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:46px; line-height:1; margin:0; letter-spacing:-0.02em;">The daily didn’t arrive.</h2>
+            <p style="margin:0; font-size:15.5px; line-height:1.6; color:var(--muted); max-width:36ch;">Today’s puzzle failed to generate. Give it another go.</p>
+            <div style="display:flex; align-items:center; gap:20px; margin-top:8px;">
+              <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#1B1410; border:none; border-radius:999px; padding:15px 36px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Retry</button>
+              <button style-hover="color: var(--amber)" style="background:none; border:none; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.18em; padding:4px 0;">HOME</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Practice unavailable / paper -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">PRACTICE UNAVAILABLE · PAPER</div>
+        <div data-screen-label="Practice unavailable" style="width:566px; min-height:560px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.3); display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#F5F0E6; --surface:#FDFAF3; --line:rgba(31,26,20,.16); --ink:#211B14; --muted:#8A7F6E; --err:#C0442C; --amber:#DE5F27; --teal:#1E9C8F; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; gap:10px; padding:20px 32px; flex:none;">
+            <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+            <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+          </header>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:16px 44px 52px; text-align:center;">
+            <svg viewBox="0 0 240 200" style="width:104px; margin-bottom:6px;">
+              <path d="M86 10 A90 90 0 0 0 86 190 Z" style="fill:none; stroke:var(--amber); stroke-width:8px;"></path>
+              <path d="M154 10 A90 90 0 0 1 154 190 Z" style="fill:none; stroke:var(--teal); stroke-width:8px;"></path>
+            </svg>
+            <div style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:var(--muted);">PRACTICE</div>
+            <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:46px; line-height:1; margin:0; letter-spacing:-0.02em;">The pool ran dry.</h2>
+            <p style="margin:0; font-size:15.5px; line-height:1.6; color:var(--muted); max-width:36ch;">No practice puzzles are available right now. Try again in a moment.</p>
+            <div style="display:flex; align-items:center; gap:20px; margin-top:8px;">
+              <button style-hover="transform: translateY(-2px)" style="background:var(--amber); color:#FDFAF3; border:none; border-radius:999px; padding:15px 36px; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; transition:transform .2s ease;">Back to practice</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 1f ACCOUNT MENU ================= -->
+  <section id="a6" style="display:flex; flex-direction:column; gap:26px;">
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <a href="#a6" style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.08em; border:1px solid rgba(237,229,215,.3); border-radius:999px; padding:4px 10px; color:#EDE5D7; text-decoration:none;">1f</a>
+      <span style="font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.22em; color:#7A7161;">ACCOUNT MENU · HEADER MONOGRAM</span>
+      <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-size:16px; color:#B4A995;">Monogram sits after the theme toggle. Popover: signed-in header, statistics, sign out.</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:48px; align-items:flex-start;">
+
+      <!-- ink -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">OPEN · INK</div>
+        <div data-screen-label="Account menu ink" style="width:1180px; min-height:420px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.45); position:relative; display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#161210; --surface:#1F1A15; --line:rgba(233,223,205,.15); --ink:#EDE5D7; --muted:#9A8F7E; --hover:rgba(233,223,205,.05); --err:#D9553B; --amber:#E8703A; --teal:#45BFB2; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <nav style="display:flex; align-items:center; gap:22px;">
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">PRACTICE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">ARCHIVE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">STATS</span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 200 200" style="width:15px; height:15px;"><path d="M95 10 A90 90 0 0 0 95 190 Z" style="fill:var(--ink); opacity:.85;"></path><circle cx="100" cy="100" r="90" style="fill:none; stroke:var(--ink); stroke-width:10px; opacity:.85;"></circle></svg></span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--amber); background:var(--surface); display:flex; align-items:center; justify-content:center; font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:0;">{{ userInitial }}</span>
+            </nav>
+          </header>
+          <div style="flex:1; display:flex; align-items:center; padding:0 40px 40px; opacity:.16; pointer-events:none;">
+            <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:96px; line-height:.92; margin:0; letter-spacing:-0.02em;">Today’s<br>puzzle.</h2>
+          </div>
+          <div style="position:absolute; top:62px; right:40px; width:244px; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:0 24px 48px rgba(0,0,0,.4); padding:8px; z-index:5;">
+            <div style="padding:12px 14px 12px; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'Spline Sans Mono',monospace; font-size:10px; letter-spacing:.22em; color:var(--muted);">SIGNED IN</span>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:20px;">{{ userName }}</span>
+            </div>
+            <div style="height:1px; background:var(--line); margin:2px 6px 6px;"></div>
+            <button style-hover="background: var(--hover); color: var(--amber)" style="display:flex; width:100%; text-align:left; padding:12px 14px; background:none; border:none; border-radius:10px; cursor:pointer; color:var(--ink); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; transition:background .15s, color .15s;">STATISTICS</button>
+            <button style-hover="background: var(--hover); color: var(--err)" style="display:flex; width:100%; text-align:left; padding:12px 14px; background:none; border:none; border-radius:10px; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; transition:background .15s, color .15s;">SIGN OUT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- paper -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:.16em; color:#7A7161;">OPEN · PAPER</div>
+        <div data-screen-label="Account menu paper" style="width:1180px; min-height:420px; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.3); position:relative; display:flex; flex-direction:column; font-family:'Instrument Sans',system-ui,sans-serif; --bg:#F5F0E6; --surface:#FDFAF3; --line:rgba(31,26,20,.16); --ink:#211B14; --muted:#8A7F6E; --hover:rgba(31,26,20,.045); --err:#C0442C; --amber:#DE5F27; --teal:#1E9C8F; background:var(--bg); color:var(--ink);">
+          <header style="display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 40px; flex:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg viewBox="0 0 200 200" style="width:21px; height:21px; flex:none;"><path d="M95 6 A94 94 0 0 0 95 194 Z" style="fill:var(--amber);"></path><path d="M105 6 A94 94 0 0 1 105 194 Z" style="fill:var(--teal);"></path></svg>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:22px; letter-spacing:-0.01em;">Halve</span>
+            </div>
+            <nav style="display:flex; align-items:center; gap:22px;">
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">PRACTICE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">ARCHIVE</span>
+              <span style="color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em;">STATS</span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 200 200" style="width:15px; height:15px;"><path d="M95 10 A90 90 0 0 0 95 190 Z" style="fill:var(--ink); opacity:.85;"></path><circle cx="100" cy="100" r="90" style="fill:none; stroke:var(--ink); stroke-width:10px; opacity:.85;"></circle></svg></span>
+              <span style="width:30px; height:30px; border-radius:50%; border:1px solid var(--amber); background:var(--surface); display:flex; align-items:center; justify-content:center; font-family:'Spline Sans Mono',monospace; font-size:11px; letter-spacing:0;">{{ userInitial }}</span>
+            </nav>
+          </header>
+          <div style="flex:1; display:flex; align-items:center; padding:0 40px 40px; opacity:.14; pointer-events:none;">
+            <h2 style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:96px; line-height:.92; margin:0; letter-spacing:-0.02em;">Today’s<br>puzzle.</h2>
+          </div>
+          <div style="position:absolute; top:62px; right:40px; width:244px; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:0 24px 48px rgba(31,26,20,.18); padding:8px; z-index:5;">
+            <div style="padding:12px 14px 12px; display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'Spline Sans Mono',monospace; font-size:10px; letter-spacing:.22em; color:var(--muted);">SIGNED IN</span>
+              <span style="font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500; font-size:20px;">{{ userName }}</span>
+            </div>
+            <div style="height:1px; background:var(--line); margin:2px 6px 6px;"></div>
+            <button style-hover="background: var(--hover); color: var(--amber)" style="display:flex; width:100%; text-align:left; padding:12px 14px; background:none; border:none; border-radius:10px; cursor:pointer; color:var(--ink); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; transition:background .15s, color .15s;">STATISTICS</button>
+            <button style-hover="background: var(--hover); color: var(--err)" style="display:flex; width:100%; text-align:left; padding:12px 14px; background:none; border:none; border-radius:10px; cursor:pointer; color:var(--muted); font-family:'Spline Sans Mono',monospace; font-size:12px; letter-spacing:.16em; transition:background .15s, color .15s;">SIGN OUT</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;email&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;maya@okafor.dev&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Content&quot;},&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Maya Okafor&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Content&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.SOL = [0,1,0,1, 1,0,1,0, 0,1,1,0, 1,0,0,1];
+    this.GIVENS = { 0: 0, 1: 1, 5: 0, 7: 0, 10: 1, 12: 1, 15: 1 };
+    this.EDGES = [ { a: 2, b: 3, dir: "h" }, { a: 6, b: 10, dir: "v" } ];
+    this.state = { tut: this.freshBoard(), hintIdx: null, wave: false };
+  }
+
+  freshBoard() {
+    const b = new Array(16).fill(null);
+    Object.keys(this.GIVENS).forEach(k => { b[+k] = this.GIVENS[k]; });
+    return b;
+  }
+
+  isGiven(i) { return this.GIVENS[i] !== undefined; }
+  isSolved(b) { return b.every((v, i) => v === this.SOL[i]); }
+
+  violations(b) {
+    const bad = new Set();
+    const lines = [];
+    for (let r = 0; r < 4; r++) lines.push([0, 1, 2, 3].map(c => r * 4 + c));
+    for (let c = 0; c < 4; c++) lines.push([0, 1, 2, 3].map(r => r * 4 + c));
+    lines.forEach(line => {
+      [0, 1].forEach(sym => {
+        const idxs = line.filter(i => b[i] === sym);
+        if (idxs.length > 2) idxs.forEach(i => bad.add(i));
+      });
+      for (let s = 0; s + 2 < 4; s++) {
+        const w = [line[s], line[s + 1], line[s + 2]];
+        if (b[w[0]] !== null && b[w[0]] === b[w[1]] && b[w[1]] === b[w[2]]) w.forEach(i => bad.add(i));
+      }
+    });
+    this.EDGES.forEach(e => {
+      if (b[e.a] !== null && b[e.b] !== null) {
+        const want = this.SOL[e.a] === this.SOL[e.b];
+        if ((b[e.a] === b[e.b]) !== want) { bad.add(e.a); bad.add(e.b); }
+      }
+    });
+    return bad;
+  }
+
+  tap(i) {
+    if (this.isGiven(i) || this.isSolved(this.state.tut)) return;
+    const b = this.state.tut.slice();
+    b[i] = b[i] === null ? 0 : (b[i] === 0 ? 1 : null);
+    this.setState({ tut: b, hintIdx: null, wave: this.isSolved(b) });
+  }
+
+  hint() {
+    const b = this.state.tut.slice();
+    if (this.isSolved(b)) return;
+    const i = b.findIndex((v, idx) => !this.isGiven(idx) && v !== this.SOL[idx]);
+    if (i < 0) return;
+    b[i] = this.SOL[i];
+    this.setState({ tut: b, hintIdx: i, wave: this.isSolved(b) });
+  }
+
+  resetTut() { this.setState({ tut: this.freshBoard(), hintIdx: null, wave: false }); }
+
+  renderVals() {
+    const s = this.state;
+    const b = s.tut;
+    const solved = this.isSolved(b);
+    const viol = this.violations(b);
+    const placed = b.filter(v => v !== null).length;
+
+    const email = this.props.email ?? "maya@okafor.dev";
+    const userName = this.props.userName ?? "Maya Okafor";
+    const userInitial = (String(userName).trim().charAt(0) || "M").toUpperCase();
+    const nameCount = String(userName).length;
+
+    const tutCells = b.map((v, i) => {
+      const r = Math.floor(i / 4), c = i % 4;
+      const given = this.isGiven(i);
+      const wave = s.wave ? ("solvepop .7s " + ((r + c) * 60) + "ms cubic-bezier(.34,1.56,.5,1) both") : "none";
+      const hintAnim = s.hintIdx === i ? "hintpulse .5s cubic-bezier(.34,1.56,.5,1) both" : null;
+      const symBase = show => ({
+        position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+        zIndex: 2, pointerEvents: "none",
+        opacity: show ? 1 : 0,
+        transform: show ? "scale(1)" : "scale(.45)",
+        transition: "transform .26s cubic-bezier(.34,1.56,.5,1), opacity .13s ease",
+        animation: hintAnim && show ? hintAnim : (wave !== "none" && show ? wave : "none")
+      });
+      const edgeH = this.EDGES.find(e => e.dir === "h" && e.a === i);
+      const edgeV = this.EDGES.find(e => e.dir === "v" && e.a === i);
+      const glyphFor = e => this.SOL[e.a] === this.SOL[e.b] ? "=" : "\u2260";
+      return {
+        tap: () => this.tap(i),
+        style: {
+          position: "relative", border: "none", outline: "none", font: "inherit", color: "inherit",
+          background: "transparent", padding: 0, margin: 0,
+          cursor: given || solved ? "default" : "pointer",
+          borderRight: c < 3 ? "1px solid var(--line)" : "none",
+          borderBottom: r < 3 ? "1px solid var(--line)" : "none",
+          WebkitTapHighlightColor: "transparent"
+        },
+        plateStyle: {
+          position: "absolute", inset: "9%", borderRadius: 12, zIndex: 1, pointerEvents: "none",
+          background: given ? "var(--plate)" : "transparent"
+        },
+        discStyle: symBase(v === 0),
+        ringStyle: symBase(v === 1),
+        errStyle: {
+          position: "absolute", left: "50%", bottom: "8%", transform: "translateX(-50%)",
+          width: 5, height: 5, borderRadius: "50%", background: "var(--err)", zIndex: 3,
+          opacity: viol.has(i) ? 1 : 0, transition: "opacity .2s ease"
+        },
+        capH: !!edgeH, capHGlyph: edgeH ? glyphFor(edgeH) : "",
+        capV: !!edgeV, capVGlyph: edgeV ? glyphFor(edgeV) : ""
+      };
+    });
+
+    const tutStatus = solved ? "Solved \u2014 nicely deduced." : (viol.size ? "Check the marked line." : "Two of each, every line.");
+    const tutStatusStyle = {
+      fontFamily: "'Newsreader',Georgia,serif", fontStyle: "italic", fontSize: 17,
+      color: solved ? "var(--amber)" : (viol.size ? "var(--err)" : "var(--muted)"),
+      transition: "color .2s ease"
+    };
+    const tutPlaced = placed + " / 16 PLACED";
+    const tutFinishWrap = { opacity: solved ? 1 : .35, pointerEvents: solved ? "auto" : "none", transition: "opacity .3s ease" };
+
+    const skel36 = Array.from({ length: 36 }, (_, i) => {
+      const r = Math.floor(i / 6), c = i % 6;
+      return {
+        style: {
+          position: "relative",
+          borderRight: c < 5 ? "1px solid var(--line)" : "none",
+          borderBottom: r < 5 ? "1px solid var(--line)" : "none"
+        },
+        inner: {
+          position: "absolute", inset: "12%", borderRadius: 10, background: "var(--plate)",
+          animation: "breathe 1.9s ease-in-out infinite",
+          animationDelay: ((r + c) * 110) + "ms"
+        }
+      };
+    });
+
+    const skelCal = Array.from({ length: 35 }, (_, i) => ({
+      style: {
+        width: "58%", aspectRatio: "1", borderRadius: "50%", background: "var(--plate)",
+        animation: "breathe 1.9s ease-in-out infinite",
+        animationDelay: (i * 40) + "ms"
+      }
+    }));
+
+    return {
+      email, userName, userInitial, nameCount,
+      tutCells, tutStatus, tutStatusStyle, tutPlaced, tutFinishWrap,
+      tutHintFn: () => this.hint(),
+      tutReset: () => this.resetTut(),
+      skel36, skelCal
+    };
+  }
+}
+</script>
+
+
+</body></html>

@@ -172,6 +172,17 @@ input::placeholder { color: var(--fg-3); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* Spinner — used by in-progress buttons (e.g. onboarding "Saving…") */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Skeleton breathe — the redesigned loading placeholders pulse on --plate */
+@keyframes breathe {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
 /* Soft fade for card transitions */
 @keyframes lm-fade {
   from { opacity: 0; }
