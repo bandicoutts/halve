@@ -9,10 +9,35 @@ let mockUser: { id: string } | null = { id: "user-1" };
 let mockProfile: { display_name: string | null } | null = { display_name: "Alice" };
 
 vi.mock("@supabase/ssr", () => ({
-  createServerClient: () => ({
+  createServerClient: (
+    _url: string,
+    _key: string,
+    options: {
+      cookies: {
+        setAll: (
+          cookies: {
+            name: string;
+            value: string;
+            options?: Record<string, unknown>;
+          }[],
+        ) => void;
+      };
+    },
+  ) => ({
     auth: {
       getUser: async () => ({ data: { user: mockUser } }),
-      exchangeCodeForSession: async () => ({ error: mockExchangeError }),
+      exchangeCodeForSession: async () => {
+        if (!mockExchangeError) {
+          options.cookies.setAll([
+            {
+              name: "sb-access-token",
+              value: "access",
+              options: { path: "/", httpOnly: true },
+            },
+          ]);
+        }
+        return { error: mockExchangeError };
+      },
     },
     from: () => ({
       select: () => ({
@@ -70,5 +95,10 @@ describe("proxy /auth/callback", () => {
   it("redirects to the safe next param when code is valid and display_name exists", async () => {
     const response = await proxy(makeRequest("?code=abc&next=%2Fplay"));
     expect(redirectedTo(response)).toBe("/play");
+  });
+
+  it("preserves Supabase session cookies on successful callback redirects", async () => {
+    const response = await proxy(makeRequest("?code=abc&next=%2Fplay"));
+    expect(response.headers.get("set-cookie")).toContain("sb-access-token=access");
   });
 });

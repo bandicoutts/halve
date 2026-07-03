@@ -19,6 +19,19 @@ function safeRedirect(next: string | null): string {
   return "/";
 }
 
+function redirectPreservingCookies(
+  request: NextRequest,
+  responseWithCookies: NextResponse,
+  path: string,
+) {
+  const redirect = NextResponse.redirect(new URL(path, request.url));
+  for (const cookie of responseWithCookies.cookies.getAll()) {
+    const { name, value, ...options } = cookie;
+    redirect.cookies.set(name, value, options);
+  }
+  return redirect;
+}
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -63,15 +76,17 @@ export async function proxy(request: NextRequest) {
             // Strip query string: only carry the pathname into ?next= to
             // prevent a nested ?next= value from bypassing safe-path checks.
             const nextPathname = new URL(next, "http://localhost").pathname;
-            return NextResponse.redirect(
-              new URL(`/onboarding?next=${encodeURIComponent(nextPathname)}`, request.url)
+            return redirectPreservingCookies(
+              request,
+              response,
+              `/onboarding?next=${encodeURIComponent(nextPathname)}`
             );
           }
         }
-        return NextResponse.redirect(new URL(next, request.url));
+        return redirectPreservingCookies(request, response, next);
       }
     }
-    return NextResponse.redirect(new URL("/auth?error=callback", request.url));
+    return redirectPreservingCookies(request, response, "/auth?error=callback");
   }
 
   return response;

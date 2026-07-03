@@ -94,7 +94,7 @@ function GhostAction({ children, onClick, href }: { children: React.ReactNode; o
       {children}
     </Link>
   ) : (
-    <button style={GHOST} onClick={onClick} {...hover}>
+    <button type="button" style={GHOST} onClick={onClick} {...hover}>
       {children}
     </button>
   );
@@ -173,12 +173,18 @@ function SubmitButton({ children, disabled }: { children: React.ReactNode; disab
 
 // ─── Error normalisation ─────────────────────────────────────────────────────
 
+const PASSWORD_MIN_LENGTH = 15;
+
 function friendlyError(msg: string): string {
   const lower = msg.toLowerCase();
   if (lower.includes("rate limit") || lower.includes("429"))
     return "Too many attempts. Wait a minute and try again.";
   if (lower.includes("user already registered"))
     return "An account with this email already exists. Try a magic link.";
+  if (lower.includes("invalid login credentials"))
+    return "That email and password do not match.";
+  if (lower.includes("weak password") || lower.includes("password"))
+    return `Use a password of at least ${PASSWORD_MIN_LENGTH} characters.`;
   if (lower.includes("email not confirmed"))
     return "Please confirm your email first. Check your inbox.";
   return msg;
@@ -186,12 +192,108 @@ function friendlyError(msg: string): string {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
+type AuthMode = "magic" | "password";
+type PasswordIntent = "sign-in" | "create";
+
+function PasswordField({
+  value,
+  onChange,
+  error,
+  autoComplete,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  error?: string | null;
+  autoComplete: "current-password" | "new-password";
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <label htmlFor="auth-password" style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.18em", color: "var(--fg-3)" }}>
+        PASSWORD
+      </label>
+      <input
+        id="auth-password"
+        type="password"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        autoComplete={autoComplete}
+        required
+        aria-invalid={error ? true : undefined}
+        style={{
+          width: "100%",
+          background: "var(--surface)",
+          border: `1px solid ${error ? "var(--err)" : "var(--hairline)"}`,
+          borderRadius: 12,
+          padding: "16px 18px",
+          fontSize: 16,
+          color: "var(--fg-1)",
+          fontFamily: "var(--font-sans)",
+          outline: "none",
+        }}
+      />
+      {error && <span style={{ fontSize: 13.5, color: "var(--err)", lineHeight: 1.4 }}>{error}</span>}
+    </div>
+  );
+}
+
+function AuthModeSwitch({
+  mode,
+  onModeChange,
+}: {
+  mode: AuthMode;
+  onModeChange: (mode: AuthMode) => void;
+}) {
+  return (
+    <div style={{ display: "inline-flex", width: "fit-content", border: "1px solid var(--hairline)", borderRadius: 999, padding: 3, gap: 3, background: "var(--surface)" }}>
+      {[
+        ["magic", "Email link"],
+        ["password", "Password"],
+      ].map(([key, label]) => {
+        const active = mode === key;
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onModeChange(key as AuthMode)}
+            aria-pressed={active}
+            style={{
+              border: "none",
+              borderRadius: 999,
+              background: active ? "var(--fg-1)" : "transparent",
+              color: active ? "var(--bg)" : "var(--fg-3)",
+              cursor: "pointer",
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              letterSpacing: "0.14em",
+              padding: "9px 14px",
+              textTransform: "uppercase",
+              transition: "background 0.16s, color 0.16s",
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function AuthScreen({ initialError }: { initialError?: string | undefined }) {
   const router = useRouter();
+  const [mode, setMode] = useState<AuthMode>("magic");
+  const [passwordIntent, setPasswordIntent] = useState<PasswordIntent>("sign-in");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  function switchMode(nextMode: AuthMode) {
+    setMode(nextMode);
+    setError(null);
+    setNotice(null);
+  }
 
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
@@ -200,6 +302,7 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
       return;
     }
     setError(null);
+    setNotice(null);
     setLoading(true);
     const supabase = createClient();
     const { error: supaError } = await supabase.auth.signInWithOtp({
@@ -212,6 +315,49 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
       return;
     }
     setSent(true);
+  }
+
+  async function handlePasswordAuth(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email) {
+      setError("Enter your email to continue.");
+      return;
+    }
+    if (!password) {
+      setError("Enter your password to continue.");
+      return;
+    }
+    if (passwordIntent === "create" && password.length < PASSWORD_MIN_LENGTH) {
+      setError(`Use at least ${PASSWORD_MIN_LENGTH} characters.`);
+      return;
+    }
+
+    setError(null);
+    setNotice(null);
+    setLoading(true);
+    const supabase = createClient();
+    const result =
+      passwordIntent === "sign-in"
+        ? await supabase.auth.signInWithPassword({ email, password })
+        : await supabase.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+          });
+    setLoading(false);
+
+    if (result.error) {
+      setError(friendlyError(result.error.message));
+      return;
+    }
+
+    if (passwordIntent === "create" && !result.data.session) {
+      setNotice(`Check ${email} to confirm your account.`);
+      return;
+    }
+
+    router.push(passwordIntent === "create" ? "/onboarding" : "/");
+    router.refresh();
   }
 
   // State B — link sent
@@ -243,24 +389,77 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
     <AuthLayout
       brand={<BrandColumn caption="ONE PUZZLE · EVERY DAY" />}
       form={
-        <form onSubmit={handleMagicLink} style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+        <form onSubmit={mode === "magic" ? handleMagicLink : handlePasswordAuth} style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           {initialError && (
             <div style={{ background: "var(--wrong-tint)", border: "1px solid var(--err)", borderRadius: 14, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 6 }}>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em", color: "var(--err)" }}>LINK EXPIRED</span>
               <span style={{ fontSize: 14.5, lineHeight: 1.55, color: "var(--fg-1)" }}>{initialError}</span>
             </div>
           )}
-          <div style={KICKER}>SIGN IN · MAGIC LINK</div>
-          <h1 style={HEADLINE}>{initialError ? "Let’s try that again." : "Sign in with an email link."}</h1>
-          {!initialError && (
+          {notice && (
+            <div style={{ background: "var(--correct-tint)", border: "1px solid var(--correct)", borderRadius: 14, padding: "16px 18px", fontSize: 14.5, lineHeight: 1.55, color: "var(--fg-1)" }}>
+              {notice}
+            </div>
+          )}
+          <AuthModeSwitch mode={mode} onModeChange={switchMode} />
+          <div style={KICKER}>{mode === "magic" ? "SIGN IN · EMAIL LINK" : passwordIntent === "sign-in" ? "SIGN IN · PASSWORD" : "CREATE ACCOUNT · PASSWORD"}</div>
+          <h1 style={HEADLINE}>
+            {initialError
+              ? "Let’s try that again."
+              : mode === "magic"
+                ? "Sign in with an email link."
+                : passwordIntent === "sign-in"
+                  ? "Sign in with your password."
+                  : "Create your account."}
+          </h1>
+          {!initialError && mode === "magic" && (
             <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "40ch" }}>
               Enter your email and we&rsquo;ll send a sign-in link. Sign in to sync your streak and stats.
             </p>
           )}
-          <EmailField value={email} onChange={setEmail} error={error} autoFocus={!initialError} />
+          {!initialError && mode === "password" && (
+            <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "40ch" }}>
+              {passwordIntent === "sign-in"
+                ? "Use a saved password, or switch back to an email link any time."
+                : `Use a passphrase of ${PASSWORD_MIN_LENGTH} characters or more.`}
+            </p>
+          )}
+          {error && mode === "password" && (
+            <span style={{ fontSize: 13.5, color: "var(--err)", lineHeight: 1.4 }}>{error}</span>
+          )}
+          <EmailField value={email} onChange={setEmail} error={mode === "magic" ? error : null} autoFocus={!initialError} />
+          {mode === "password" && (
+            <PasswordField
+              value={password}
+              onChange={setPassword}
+              error={null}
+              autoComplete={passwordIntent === "sign-in" ? "current-password" : "new-password"}
+            />
+          )}
           <SubmitButton disabled={loading}>
-            {loading ? "Sending…" : initialError ? "Send a new link" : "Send link"}
+            {loading
+              ? mode === "magic"
+                ? "Sending…"
+                : "Checking…"
+              : mode === "magic"
+                ? initialError
+                  ? "Send a new link"
+                  : "Send link"
+                : passwordIntent === "sign-in"
+                  ? "Sign in"
+                  : "Create account"}
           </SubmitButton>
+          {mode === "password" && (
+            <GhostAction
+              onClick={() => {
+                setPasswordIntent(passwordIntent === "sign-in" ? "create" : "sign-in");
+                setError(null);
+                setNotice(null);
+              }}
+            >
+              {passwordIntent === "sign-in" ? "CREATE AN ACCOUNT →" : "I ALREADY HAVE AN ACCOUNT →"}
+            </GhostAction>
+          )}
           <div style={{ borderTop: "1px solid var(--hairline)", paddingTop: 18, marginTop: 4 }}>
             <GhostAction onClick={() => router.push("/play")}>PLAY NOW, SIGN IN LATER →</GhostAction>
           </div>
