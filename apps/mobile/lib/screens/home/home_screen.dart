@@ -336,7 +336,7 @@ class _StreakBand extends StatelessWidget {
               ),
               const SizedBox(height: 1),
               Text(
-                solvedToday ? 'Solved today — streak safe' : 'Solve today to keep it going',
+                solvedToday ? 'Solved today. Streak kept.' : 'Solve today to keep it going',
                 style: AppTypography.label.copyWith(
                   letterSpacing: 0,
                   fontWeight: FontWeight.w400,
@@ -632,8 +632,8 @@ class _OfflineNotice extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  'Offline — no saved puzzle available.',
+	                child: Text(
+	                  'Offline. No saved puzzle available.',
                   style: AppTypography.small.copyWith(color: c.fg3, height: 1.5),
                 ),
               ),
@@ -664,8 +664,8 @@ class _OfflineBanner extends StatelessWidget {
       children: [
         Icon(Icons.wifi_off_rounded, size: 14, color: c.fg3),
         const SizedBox(width: 8),
-        Text(
-          'Offline — showing a saved puzzle',
+	        Text(
+	          'Offline. Showing a saved puzzle',
           style: AppTypography.small.copyWith(color: c.fg3),
         ),
       ],
@@ -688,7 +688,7 @@ class _EmptyPuzzleNotice extends StatelessWidget {
         borderRadius: AppRadii.lgR,
       ),
       child: Text(
-        "Today's puzzle isn't ready yet — it usually arrives in the morning.",
+        "Today's puzzle isn't ready yet. It usually arrives in the morning.",
         style: AppTypography.small.copyWith(color: c.fg3, height: 1.5),
       ),
     );
@@ -910,4 +910,3 @@ class _HowToPlayFooter extends StatelessWidget {
     );
   }
 }
-

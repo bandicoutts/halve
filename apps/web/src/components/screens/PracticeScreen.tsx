@@ -17,19 +17,19 @@ const ROWS: Row[] = [
     name: "Easy",
     difficulty: "easy",
     meta: "14 GIVENS · 4 LINKS",
-    desc: "A generous start — most of the logic is laid out for you. Good for learning the shapes.",
+    desc: "More given cells and links. Good for learning the rules.",
   },
   {
     name: "Medium",
     difficulty: "medium",
     meta: "11 GIVENS · 5 LINKS",
-    desc: "The daily's weight. Fewer footholds, steady deduction all the way down.",
+    desc: "Fewer given cells. A steady solve.",
   },
   {
     name: "Hard",
     difficulty: "hard",
     meta: "8 GIVENS · 7 LINKS",
-    desc: "Sparse and slow-burning. Every placement has to be earned.",
+    desc: "Fewer given cells and more links. Take your time.",
   },
 ];
 
@@ -80,8 +80,7 @@ export function PracticeScreen({ isAuthenticated, displayName }: PracticeScreenP
             Off the record.
           </h1>
           <p style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "52ch" }}>
-            As many puzzles as you like, at any difficulty. The streak is never at stake here — just you
-            and the grid.
+            Play any puzzle, at any difficulty. Practice games do not affect your streak.
           </p>
         </div>
 

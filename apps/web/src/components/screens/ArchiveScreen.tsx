@@ -229,7 +229,7 @@ export function ArchiveScreen({ months, initialId, isAuthenticated, displayName 
             catalogue.
           </div>
           <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "38ch" }}>
-            Every daily, kept. Pick any day — catch one you missed, or replay an old favourite.
+            Every daily is kept here. Pick any day you missed, or replay an old favourite.
           </p>
           <div
             style={{
@@ -255,7 +255,7 @@ export function ArchiveScreen({ months, initialId, isAuthenticated, displayName 
                   <circle cx="10" cy="10" r="6.5" fill="none" stroke="var(--hairline-2)" strokeWidth="2" />
                 </svg>
               }
-              label="UNSOLVED — OPEN TO PLAY"
+              label="UNSOLVED · OPEN TO PLAY"
             />
             <LegendRow
               swatch={

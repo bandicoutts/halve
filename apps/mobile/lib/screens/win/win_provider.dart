@@ -125,7 +125,7 @@ String buildShareText({
   required String difficulty,
   int? streak,
 }) {
-  const tail = '\nNo spoilers — play at halve.today';
+  const tail = '\nNo spoilers. Play at halve.today';
   if (dayNo != null) {
     final streakPart = (streak != null && streak > 0) ? ' · streak $streak' : '';
     return 'Halve No. $dayNo · $time · $difficulty$streakPart$tail';

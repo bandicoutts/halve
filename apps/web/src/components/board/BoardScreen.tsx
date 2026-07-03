@@ -208,9 +208,9 @@ export function BoardScreen({
   const kicker = `${kindCaps} · ${diffCaps}${dayNo !== undefined ? ` · NO. ${dayNo}` : ""}`;
 
   const statusMsg = solved
-    ? "Solved — beautifully balanced."
+    ? "Solved."
     : errors.size > 0
-    ? "A rule's broken — check the marked cells."
+    ? "A rule is broken. Check the marked cells."
     : "";
 
   return (
@@ -241,7 +241,7 @@ export function BoardScreen({
             textAlign: "center",
           }}
         >
-          {"Today's puzzle is unavailable — playing a practice puzzle instead. "}
+          {"Today's puzzle is unavailable. Playing a practice puzzle instead. "}
           <button
             onClick={() => window.location.reload()}
             style={{

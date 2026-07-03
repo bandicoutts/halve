@@ -80,8 +80,8 @@ function EdgePair({ right, glyph, label }: { right: "disc" | "ring"; glyph: stri
 function Beat2Art() {
   return (
     <div style={{ flex: "1 1 0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 44 }}>
-      <EdgePair right="disc" glyph="=" label="= — THE PAIR MATCHES" />
-      <EdgePair right="ring" glyph="≠" label="≠ — THE PAIR DIFFERS" />
+      <EdgePair right="disc" glyph="=" label="= PAIR MATCHES" />
+      <EdgePair right="ring" glyph="≠" label="≠ PAIR DIFFERS" />
     </div>
   );
 }
@@ -115,7 +115,7 @@ function Beat3Art() {
             <StripCell key={i} v={v} />
           ))}
         </div>
-        <span style={{ ...monoLabel, color: "var(--symbol-b)" }}>THREE OF EACH — BALANCED</span>
+        <span style={{ ...monoLabel, color: "var(--symbol-b)" }}>THREE OF EACH</span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
         <div style={{ display: "flex", border: "1px solid var(--hairline)" }}>
@@ -126,7 +126,7 @@ function Beat3Art() {
           <StripCell v={null} />
           <StripCell v={null} />
         </div>
-        <span style={{ ...monoLabel, color: "var(--err)" }}>THREE ALIKE — NEVER</span>
+        <span style={{ ...monoLabel, color: "var(--err)" }}>THREE ALIKE BREAKS THE RULE</span>
       </div>
     </div>
   );
@@ -161,9 +161,9 @@ function InteractiveBeat({ onFinish }: { onFinish: () => void }) {
   const placed = cells.reduce((n, row) => n + row.filter((v) => v !== null).length, 0);
   const total = puzzle.size * puzzle.size;
   const status = solved
-    ? "Solved — nicely deduced."
+    ? "Solved."
     : errors.size > 0
-    ? "That breaks a rule — check the marks."
+    ? "That breaks a rule. Check the marks."
     : "";
 
   const onPill = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
@@ -177,7 +177,7 @@ function InteractiveBeat({ onFinish }: { onFinish: () => void }) {
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.22em", color: "var(--fg-3)" }}>HOW IT WORKS</div>
         <h1 style={beatTitle}>Try one yourself.</h1>
         <p style={beatBody}>
-          A little four-by-four: two of each per line, same laws. The plated cells are given — fill the
+          A small four-by-four grid: two of each per line, same rules. The plated cells are given. Fill the
           rest. Stuck? Take a hint.
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
@@ -239,7 +239,7 @@ export function TutorialScreen() {
       body: (
         <>
           Every cell takes one of two marks: the amber <b style={{ color: "var(--accent)" }}>disc</b> or the
-          teal <b style={{ color: "var(--symbol-b)" }}>ring</b>. Tap a cell to cycle — disc, ring, empty.
+          teal <b style={{ color: "var(--symbol-b)" }}>ring</b>. Tap a cell to cycle through disc, ring, and empty.
         </>
       ),
       art: <Beat1Art />,
@@ -249,7 +249,7 @@ export function TutorialScreen() {
       body: (
         <>
           Some edges carry a sign. <b style={{ color: "var(--fg-1)" }}>=</b> means the two cells match.{" "}
-          <b style={{ color: "var(--fg-1)" }}>≠</b> means they differ. Signs are never wrong — lean on them.
+          <b style={{ color: "var(--fg-1)" }}>≠</b> means they differ. Signs are always true.
         </>
       ),
       art: <Beat2Art />,
@@ -259,7 +259,7 @@ export function TutorialScreen() {
       body: (
         <>
           Every row and every column ends with <b style={{ color: "var(--fg-1)" }}>three discs and three
-          rings</b> — and never three of a kind touching.
+          rings</b>. Three of a kind can never touch.
         </>
       ),
       art: <Beat3Art />,

@@ -4,11 +4,11 @@ import { MessageScreen } from "@/components/ui/MessageScreen";
 // any URL that matches no route. Server Component — no client hooks needed.
 export default function NotFound() {
   return (
-    <MessageScreen
-      mark="ring"
-      kicker="404 · NOT FOUND"
-      headline="This page isn’t on the grid."
-      body="The address doesn’t match anything we know — the puzzle may not be published yet, or the link is wrong."
+      <MessageScreen
+        mark="ring"
+        kicker="404 · NOT FOUND"
+        headline="Page not found."
+        body="The address does not match a page. The puzzle may not be published yet, or the link may be wrong."
       primary={{ label: "Back home", href: "/" }}
       secondary={{ label: "BROWSE THE ARCHIVE", href: "/archive" }}
     />

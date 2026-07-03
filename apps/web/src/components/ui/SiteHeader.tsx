@@ -159,7 +159,7 @@ export function SiteHeader({
       <Link
         href="/"
         onClick={go("/")}
-        aria-label="Halve — home"
+        aria-label="Halve home"
         style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "var(--fg-1)" }}
       >
         <Mark size={21} />

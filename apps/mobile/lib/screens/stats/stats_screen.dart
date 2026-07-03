@@ -611,7 +611,7 @@ class _StatsRecord extends ConsumerWidget {
           _Eyebrow(
             'Solve time',
             trailing: Text(
-              'avg ${stats.averageMs != null ? formatMs(stats.averageMs!) : '—'}',
+              'avg ${stats.averageMs != null ? formatMs(stats.averageMs!) : '-'}',
               style: AppTypography.label
                   .copyWith(color: c.fg3, letterSpacing: 0),
             ),
@@ -626,12 +626,12 @@ class _StatsRecord extends ConsumerWidget {
           const SizedBox(height: AppSpacing.s4),
           _StatDivided(items: [
             (
-              value: stats.averageMs != null ? formatMs(stats.averageMs!) : '—',
+              value: stats.averageMs != null ? formatMs(stats.averageMs!) : '-',
               label: 'Average',
               accent: false
             ),
             (
-              value: stats.fastestMs != null ? formatMs(stats.fastestMs!) : '—',
+              value: stats.fastestMs != null ? formatMs(stats.fastestMs!) : '-',
               label: 'Best time',
               accent: false
             ),

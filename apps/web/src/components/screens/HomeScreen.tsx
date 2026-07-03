@@ -152,7 +152,7 @@ export function HomeScreen({
           {fetchError ? (
             <>
               <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "36ch" }}>
-                Today&rsquo;s puzzle is unavailable — try again shortly.
+                Today&rsquo;s puzzle is unavailable. Try again shortly.
               </p>
               <div>
                 <button

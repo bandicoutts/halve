@@ -205,7 +205,7 @@ class _StepBody extends StatelessWidget {
         const SizedBox(height: AppSpacing.s6),
         const _Copy(
           'Halve is played with a disc and a ring. Every square holds one or '
-          'the other — one fills the space, the other defines it.',
+          'the other.',
         ),
       ],
     );
@@ -216,7 +216,7 @@ class _StepBody extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _Copy(
-          'No more than two of the same symbol may touch — across a row or '
+          'No more than two of the same symbol may touch across a row or '
           'down a column.',
         ),
         SizedBox(height: AppSpacing.s4),
@@ -287,8 +287,8 @@ class _StepBody extends StatelessWidget {
         _Copy(
           guided
               ? "This square's column already holds two discs, and the ≠ clue "
-                  'rules out another. It can only be a ring — tap it.'
-              : 'Every square is forced the same way — no guessing. Finish the '
+                  'rules out another. It can only be a ring. Tap it.'
+              : 'Every square can be solved the same way. Finish the '
                   'grid.',
         ),
         const SizedBox(height: AppSpacing.s5),
@@ -415,8 +415,7 @@ class TutorialWin extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.s2),
                       const _Copy(
-                        'Solved by pure deduction — exactly how every Halve is '
-                        'meant to go.',
+                        'Solved by deduction. Every Halve works this way.',
                       ),
                       const SizedBox(height: AppSpacing.s6),
                       Container(

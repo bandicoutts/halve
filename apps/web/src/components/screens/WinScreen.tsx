@@ -78,7 +78,7 @@ export function WinScreen({
 
   const metaLine =
     kind === "practice"
-      ? `${cap(difficulty)} · Practice — the streak was never at stake.`
+      ? `${cap(difficulty)} · Practice · Streak unchanged`
       : kind === "archive"
       ? `${cap(difficulty)}${displayDate ? ` · ${displayDate}` : ""} · From the archive`
       : `${cap(difficulty)}${displayDate ? ` · ${displayDate}` : ""}${streak ? ` · ${streak}-day streak` : ""}`;
@@ -93,7 +93,7 @@ export function WinScreen({
     // share the result line only.
     const streakPart = kind !== "practice" && streak ? ` · streak ${streak}` : "";
     const idPart = kind !== "practice" && dayNo ? `No. ${dayNo} · ` : "";
-    const text = `Halve ${idPart}${time} · ${cap(difficulty)}${streakPart}\nNo spoilers — play at halve.today`;
+    const text = `Halve ${idPart}${time} · ${cap(difficulty)}${streakPart}\nNo spoilers. Play at halve.today`;
     if (navigator.share) {
       navigator.share({ text }).catch(() => {});
     } else {
@@ -234,7 +234,7 @@ export function WinScreen({
               }}
             >
               <span style={{ fontSize: 14, color: "var(--fg-2)" }}>
-                Couldn&apos;t save your result — check your connection.
+                Couldn&apos;t save your result. Check your connection.
               </span>
               <button
                 onClick={onRetrySave}

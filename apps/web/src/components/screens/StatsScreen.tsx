@@ -9,7 +9,7 @@ import type { UserStats } from "@/app/stats/page";
 const DIST_LABELS = ["<2m", "2–3", "3–4", "4–5", "5–6", "6m+"];
 
 function fmtSecs(s: number | null): string {
-  if (s == null) return "—";
+  if (s == null) return "-";
   const m = Math.floor(s / 60);
   return `${m}:${String(s % 60).padStart(2, "0")}`;
 }
@@ -229,7 +229,7 @@ function StatsRecord({ stats }: { stats: UserStats }) {
                   paddingTop: 16,
                 }}
               >
-                Your fastest solve — {fmtSecs(stats.bestTimeSecs)}.
+                Your fastest solve: {fmtSecs(stats.bestTimeSecs)}.
               </div>
             )}
           </div>

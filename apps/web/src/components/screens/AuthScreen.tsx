@@ -176,11 +176,11 @@ function SubmitButton({ children, disabled }: { children: React.ReactNode; disab
 function friendlyError(msg: string): string {
   const lower = msg.toLowerCase();
   if (lower.includes("rate limit") || lower.includes("429"))
-    return "Too many attempts — wait a minute and try again.";
+    return "Too many attempts. Wait a minute and try again.";
   if (lower.includes("user already registered"))
     return "An account with this email already exists. Try a magic link.";
   if (lower.includes("email not confirmed"))
-    return "Please confirm your email first — check your inbox.";
+    return "Please confirm your email first. Check your inbox.";
   return msg;
 }
 
@@ -225,8 +225,8 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
             <h1 style={HEADLINE}>Check your email.</h1>
             <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "42ch" }}>
               We sent a sign-in link to{" "}
-              <span style={{ color: "var(--fg-1)", fontWeight: 600 }}>{email}</span>. It&rsquo;s good for
-              fifteen minutes — one tap and you&rsquo;re in.
+              <span style={{ color: "var(--fg-1)", fontWeight: 600 }}>{email}</span>. It expires in
+              15 minutes.
             </p>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 14, borderTop: "1px solid var(--hairline)", paddingTop: 18, marginTop: 8 }}>
               <GhostAction onClick={() => setSent(false)}>USE A DIFFERENT EMAIL</GhostAction>
@@ -251,11 +251,10 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
             </div>
           )}
           <div style={KICKER}>SIGN IN · MAGIC LINK</div>
-          <h1 style={HEADLINE}>{initialError ? "Let’s try that again." : "No password. Just a link."}</h1>
+          <h1 style={HEADLINE}>{initialError ? "Let’s try that again." : "Sign in with an email link."}</h1>
           {!initialError && (
             <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "40ch" }}>
-              Enter your email and we&rsquo;ll send a one-tap sign-in link. Your streak and record follow
-              you anywhere.
+              Enter your email and we&rsquo;ll send a sign-in link. Sign in to sync your streak and stats.
             </p>
           )}
           <EmailField value={email} onChange={setEmail} error={error} autoFocus={!initialError} />

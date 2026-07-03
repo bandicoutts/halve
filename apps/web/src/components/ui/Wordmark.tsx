@@ -33,7 +33,7 @@ export function Wordmark({ size = 21, href = "/" }: { size?: number; href?: stri
   );
   const style: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "var(--fg-1)" };
   return href ? (
-    <Link href={href} style={style} aria-label="Halve — home">
+    <Link href={href} style={style} aria-label="Halve home">
       {inner}
     </Link>
   ) : (

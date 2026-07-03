@@ -179,12 +179,12 @@ class _EmailStep extends StatelessWidget {
         const HalveMark(size: 30),
         const SizedBox(height: AppSpacing.s4),
         Text(
-          'Sign in to keep your streak safe',
+          'Sign in to sync your streak',
           style: AppTypography.h2.copyWith(color: c.fg1),
         ),
         const SizedBox(height: AppSpacing.s3),
         Text(
-          "We'll send a link to your email — no password needed.",
+          "We'll send a sign-in link to your email.",
           style: AppTypography.small.copyWith(
             fontSize: 15,
             color: c.fg2,
@@ -390,4 +390,3 @@ class _SentStepState extends State<_SentStep> {
     );
   }
 }
-

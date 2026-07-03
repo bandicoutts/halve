@@ -63,7 +63,7 @@ function StreakBand({
           day streak
         </div>
         <div style={{ fontSize: "var(--text-label)", color: "var(--fg-3)", marginTop: 1 }}>
-          {solvedToday ? "Solved today — streak safe" : "Solve today to keep it going"}
+          {solvedToday ? "Solved today. Streak kept." : "Solve today to keep it going"}
         </div>
       </div>
       <div style={{ display: "flex", gap: 5 }}>

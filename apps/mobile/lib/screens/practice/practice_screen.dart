@@ -206,6 +206,6 @@ class _RadioDot extends StatelessWidget {
 String _desc(Difficulty d) => switch (d) {
       Difficulty.easy => 'More edge signs to guide you. Good for learning the rules.',
       Difficulty.medium =>
-        'A balanced challenge — the same level as the daily puzzle.',
+        'Fewer edge signs. A steady solve.',
       Difficulty.hard => 'Fewer edge clues, more room to think.',
     };

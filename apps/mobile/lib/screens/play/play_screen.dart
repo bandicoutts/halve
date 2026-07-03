@@ -225,7 +225,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
             padding: const EdgeInsets.fromLTRB(
                 AppSpacing.s5, AppSpacing.s1, AppSpacing.s5, 0),
             child: Text(
-              'Offline — playing a saved puzzle',
+              'Offline. Playing a saved puzzle',
               textAlign: TextAlign.center,
               style: AppTypography.small.copyWith(color: c.fg3),
             ),
@@ -257,8 +257,6 @@ class _PlayViewState extends ConsumerState<_PlayView> {
                       final cellSize = (side / 6.8).floorToDouble();
                       final gap =
                           math.max(6.0, (cellSize * 0.16).floorToDouble());
-                      final isLandscape =
-                          MediaQuery.orientationOf(ctx) == Orientation.landscape;
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

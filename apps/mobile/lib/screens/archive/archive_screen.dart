@@ -559,9 +559,9 @@ class _EmptyArchive extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.s5),
                 child: Text(
-                  offline
-                      ? "Can't load the archive right now — try again shortly."
-                      : 'No puzzles yet — check back soon.',
+	                  offline
+	                      ? "Can't load the archive right now. Try again shortly."
+	                      : 'No puzzles yet. Check back soon.',
                   textAlign: TextAlign.center,
                   style: AppTypography.small.copyWith(color: c.fg3, height: 1.5),
                 ),

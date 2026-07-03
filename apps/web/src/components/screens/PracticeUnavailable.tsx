@@ -12,7 +12,7 @@ export function PracticeUnavailable({ difficulty }: { difficulty: Difficulty }) 
     <MessageScreen
       mark="outline"
       kicker="PRACTICE"
-      headline="The pool ran dry."
+      headline="Practice is unavailable."
       body={`No ${difficulty} practice puzzles are available right now. Try again in a moment, or pick another difficulty.`}
       primary={{ label: "Back to practice", href: "/practice" }}
     />

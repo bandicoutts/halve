@@ -662,8 +662,8 @@ class _StreakNudge extends StatelessWidget {
                             ),
                           ),
                           const TextSpan(
-                            text: '-day streak lives on this device — '
-                                'sign in to keep it safe',
+                            text: '-day streak is saved on this device. '
+                                'Sign in to sync it.',
                           ),
                         ]),
                         style: base,
@@ -716,7 +716,7 @@ class _SaveRetry extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              "Couldn't save your result — check your connection.",
+              "Couldn't save your result. Check your connection.",
               style: AppTypography.small.copyWith(color: c.fg2),
             ),
           ),

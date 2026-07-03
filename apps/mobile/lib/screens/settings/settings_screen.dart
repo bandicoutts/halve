@@ -729,10 +729,10 @@ class _SettingsContent extends StatelessWidget {
                     ),
                   ]
                 : [
-                    _SettingsRow(
-                      label: 'Sign in',
-                      sublabel:
-                          'Keep your streak safe across devices',
+	                    _SettingsRow(
+	                      label: 'Sign in',
+	                      sublabel:
+	                          'Sync your streak across devices',
                       trailing: const _ChevronIcon(),
                       onTap: () => context.push(Routes.auth),
                     ),

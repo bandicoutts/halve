@@ -19,7 +19,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
     e.preventDefault();
     const trimmed = name.trim();
     if (!trimmed) {
-      setError("Enter a name — or skip for now.");
+      setError("Enter a name, or skip for now.");
       return;
     }
     if (trimmed.length > DISPLAY_NAME_MAX) {
@@ -31,7 +31,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
     const result = await saveDisplayName(trimmed);
     setLoading(false);
     if (!result.ok) {
-      setError(result.invalid ? "Enter a name (up to 40 characters)." : "Couldn’t save — try again.");
+      setError(result.invalid ? "Enter a name (up to 40 characters)." : "Couldn’t save. Try again.");
       return;
     }
     router.push(next);
@@ -79,7 +79,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
           What should we call you?
         </h1>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "44ch" }}>
-          Shown on your stats page — nowhere else.
+          Shown on your stats page.
         </p>
 
         <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: 440, display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
