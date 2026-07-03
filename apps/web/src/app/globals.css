@@ -318,14 +318,17 @@ a:focus-visible {
   .hv-band-rule { display: block; flex: 0 0 1px; background: var(--hairline); }
 }
 
-/* Header nav wraps within the padded container instead of overflowing off the
-   right edge on narrow screens (its items used to exceed the padding). */
-.hv-nav {
-  flex-wrap: wrap;
-  row-gap: 8px;
+/* Header nav: the full inline nav on ≥560px, a hamburger + dropdown below it
+   (the inline links + auth used to overflow / wrap awkwardly on phones). */
+.hv-nav-desktop {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.6vw, 22px);
 }
-@media (max-width: 430px) {
-  .hv-nav { column-gap: 14px; }
+.hv-nav-burger { display: none; }
+@media (max-width: 560px) {
+  .hv-nav-desktop { display: none; }
+  .hv-nav-burger { display: flex; }
 }
 
 /* Respect reduced-motion preferences */

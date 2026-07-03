@@ -87,10 +87,20 @@ function Beat2Art() {
 }
 
 function StripCell({ v, bad }: { v: 0 | 1 | null; bad?: boolean }) {
+  // Fluid so the 6-cell strip never overflows narrow phones (was 60px fixed → 360px).
+  const cell = "clamp(40px, 12.5vw, 60px)";
   return (
-    <div style={{ width: 60, height: 60, display: "flex", alignItems: "center", justifyContent: "center", borderRight: "1px solid var(--hairline)", position: "relative" }}>
+    <div style={{ width: cell, height: cell, display: "flex", alignItems: "center", justifyContent: "center", borderRight: "1px solid var(--hairline)", position: "relative" }}>
       {bad && <div style={{ position: "absolute", inset: "8%", border: "1.5px solid var(--err)", borderRadius: 10, opacity: 0.75 }} />}
-      {v === 0 ? <Disc /> : v === 1 ? <Ring /> : null}
+      {v === 0 ? (
+        <svg viewBox="0 0 40 40" style={{ width: "56%", height: "56%" }} aria-hidden="true">
+          <circle cx="20" cy="20" r="15" style={{ fill: "var(--symbol-a)" }} />
+        </svg>
+      ) : v === 1 ? (
+        <svg viewBox="0 0 40 40" style={{ width: "56%", height: "56%" }} aria-hidden="true">
+          <circle cx="20" cy="20" r="13" style={{ fill: "none", stroke: "var(--symbol-b)", strokeWidth: 5 }} />
+        </svg>
+      ) : null}
     </div>
   );
 }
