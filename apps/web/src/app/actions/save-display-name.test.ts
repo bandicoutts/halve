@@ -6,7 +6,7 @@ import { DISPLAY_NAME_MAX } from "@/lib/display-name";
 
 let mockUser: { id: string } | null = { id: "user-1" };
 let mockUpdateError: { message: string } | null = null;
-let capturedEqArgs: unknown[] = [];
+let capturedUpsertArgs: unknown[] = [];
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
@@ -14,12 +14,10 @@ vi.mock("@/lib/supabase/server", () => ({
       getUser: async () => ({ data: { user: mockUser } }),
     },
     from: () => ({
-      update: () => ({
-        eq: (...args: unknown[]) => {
-          capturedEqArgs = args;
-          return Promise.resolve({ error: mockUpdateError });
-        },
-      }),
+      upsert: (...args: unknown[]) => {
+        capturedUpsertArgs = args;
+        return Promise.resolve({ error: mockUpdateError });
+      },
     }),
   }),
 }));
@@ -29,7 +27,7 @@ vi.mock("@/lib/supabase/server", () => ({
 beforeEach(() => {
   mockUser = { id: "user-1" };
   mockUpdateError = null;
-  capturedEqArgs = [];
+  capturedUpsertArgs = [];
 });
 
 describe("saveDisplayName", () => {
@@ -64,9 +62,12 @@ describe("saveDisplayName", () => {
     expect(await saveDisplayName("Alice")).toEqual({ ok: false });
   });
 
-  it("scopes the update to the authenticated user's own id — not a hardcoded value", async () => {
+  it("upserts the authenticated user's profile row — not a hardcoded id", async () => {
     mockUser = { id: "user-abc-123" };
     await saveDisplayName("Alice");
-    expect(capturedEqArgs).toEqual(["id", "user-abc-123"]);
+    expect(capturedUpsertArgs).toEqual([
+      { id: "user-abc-123", display_name: "Alice" },
+      { onConflict: "id" },
+    ]);
   });
 });

@@ -34,13 +34,11 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
       setError(result.invalid ? "Enter a name (up to 40 characters)." : "Couldn’t save. Try again.");
       return;
     }
-    router.push(next);
-    router.refresh();
+    router.replace(next);
   }
 
   function skip() {
-    router.push(next);
-    router.refresh();
+    router.replace(next);
   }
 
   return (

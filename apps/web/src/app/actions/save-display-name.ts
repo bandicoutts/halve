@@ -26,11 +26,10 @@ export async function saveDisplayName(name: string): Promise<SaveDisplayNameResu
 
   const { error } = await supabase
     .from("profiles")
-    .update({ display_name: trimmed })
-    .eq("id", user.id);
+    .upsert({ id: user.id, display_name: trimmed }, { onConflict: "id" });
 
   if (error) {
-    console.error("saveDisplayName: update failed:", error.message);
+    console.error("saveDisplayName: upsert failed:", error.message);
     return { ok: false };
   }
 
