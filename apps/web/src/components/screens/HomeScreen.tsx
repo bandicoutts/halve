@@ -183,7 +183,6 @@ export function HomeScreen({
                     {solvedToday ? "Review your solve" : "Play today"}
                   </span>
                 </Link>
-                <GhostLink href="/practice">Practice</GhostLink>
                 <GhostLink onClick={() => setShowRules(true)}>How to play</GhostLink>
               </div>
 
