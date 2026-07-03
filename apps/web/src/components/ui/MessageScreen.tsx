@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Wordmark } from "@/components/ui/Wordmark";
+import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
 
 type MarkVariant = "solid" | "ring" | "faded" | "outline";
 
@@ -104,7 +104,7 @@ function GhostAction({ action }: { action: Action }) {
 export function MessageScreen({ mark, kicker, headline, body, primary, secondary }: MessageScreenProps) {
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <header style={{ padding: "20px clamp(24px, 5vw, 32px)", flex: "none" }}>
+      <header style={HEADER_BAR}>
         <Wordmark />
       </header>
       <div

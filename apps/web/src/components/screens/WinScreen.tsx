@@ -4,6 +4,7 @@ import { useTheme } from "@/components/providers/ThemeProvider";
 import { Mark } from "@/components/symbols/Mark";
 import { Disc } from "@/components/symbols/Disc";
 import { Ring } from "@/components/symbols/Ring";
+import { HEADER_BAR } from "@/components/ui/Wordmark";
 import { formatDateLabel } from "@/lib/local-date";
 
 function cap(s: string) {
@@ -119,18 +120,7 @@ export function WinScreen({
       }}
     >
       {/* Minimal header — wordmark + theme toggle + close */}
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 18,
-          padding: "20px clamp(20px, 4vw, 40px)",
-          maxWidth: 1140,
-          width: "100%",
-          margin: "0 auto",
-        }}
-      >
+      <header style={HEADER_BAR}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Mark size={21} />
           <span

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { generatePuzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { Board } from "@/components/board/Board";
-import { Wordmark } from "@/components/ui/Wordmark";
+import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
 
 // ─── Illustration helpers ─────────────────────────────────────────────────────
 
@@ -270,7 +270,7 @@ export function TutorialScreen() {
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18, padding: "20px clamp(24px, 5vw, 40px)", flex: "none" }}>
+      <header style={HEADER_BAR}>
         <Wordmark />
         <button
           onClick={exit}

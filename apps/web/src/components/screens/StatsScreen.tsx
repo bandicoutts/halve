@@ -67,7 +67,7 @@ function StatsRecord({ stats }: { stats: UserStats }) {
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <SiteHeader active="stats" isAuthenticated displayName={stats.displayName} maxWidth={900} />
+      <SiteHeader active="stats" isAuthenticated displayName={stats.displayName} />
       <h1 className="sr-only">Statistics</h1>
 
       <section
@@ -277,7 +277,7 @@ function StatsRecord({ stats }: { stats: UserStats }) {
 function StatsGuest() {
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <SiteHeader active="stats" maxWidth={1140} />
+      <SiteHeader active="stats" />
       <h1 className="sr-only">Statistics</h1>
       <section
         style={{

@@ -286,12 +286,16 @@ a:focus-visible {
   display: flex;
   flex-direction: column-reverse;
   align-items: stretch;
+  /* Stacked: a centered, phone-width column so medium screens aren't a
+     left-pinned block with a big empty right half. */
+  max-width: 620px;
+  margin-inline: auto;
 }
 .hv-split > * { min-width: 0; }
 .hv-split-rule { display: none; }
 
 @media (min-width: 940px) {
-  .hv-split { flex-direction: row; }
+  .hv-split { flex-direction: row; max-width: var(--split-max, 1280px); }
   .hv-split-main { flex: 1 1 var(--split-main, 480px); }
   .hv-split-aside { flex: 1 1 var(--split-aside, 380px); }
   .hv-split-rule {

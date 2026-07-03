@@ -98,16 +98,14 @@ export function HomeScreen({
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <SiteHeader isAuthenticated={isAuthenticated} displayName={displayName} maxWidth={1280} />
+      <SiteHeader isAuthenticated={isAuthenticated} displayName={displayName} />
 
       <section
         className="hv-split"
         style={{
           flex: 1,
           justifyContent: "center",
-          maxWidth: 1280,
           width: "100%",
-          margin: "0 auto",
           padding: "0 clamp(20px, 4vw, 40px) 56px",
           animation: "fadeup 0.5s var(--ease-editorial) both",
         }}
@@ -173,7 +171,7 @@ export function HomeScreen({
                 Six by six. Every row and column, half and half. One solution, no guessing.
               </p>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px 20px", flexWrap: "wrap" }}>
                 <Link href="/play" style={{ textDecoration: "none" }}>
                   <span
                     style={heroButtonStyle}

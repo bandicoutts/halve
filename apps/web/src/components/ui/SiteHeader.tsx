@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { createClient } from "@/lib/supabase/client";
 import { Mark } from "@/components/symbols/Mark";
+import { HEADER_BAR } from "@/components/ui/Wordmark";
 import { AccountMenu } from "@/components/ui/AccountMenu";
 
 type NavKey = "practice" | "archive" | "stats";
@@ -16,8 +17,6 @@ interface SiteHeaderProps {
   displayName?: string | undefined;
   /** Hide the sign-in / account control (e.g. on the focused Play screen). */
   hideAuth?: boolean | undefined;
-  /** Constrains the header to the same column as the page below it. */
-  maxWidth?: number | undefined;
   /**
    * Optional navigation guard. Return `true` to block the default navigation
    * (e.g. the Play screen intercepts to confirm abandoning an in-progress
@@ -109,7 +108,6 @@ export function SiteHeader({
   isAuthenticated,
   displayName,
   hideAuth,
-  maxWidth = 1280,
   interceptHref,
 }: SiteHeaderProps) {
   const router = useRouter();
@@ -157,18 +155,7 @@ export function SiteHeader({
   const displayCasing = (displayName ?? "").includes("@") ? "none" : "capitalize";
 
   return (
-    <header
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 18,
-        padding: "20px clamp(20px, 4vw, 40px)",
-        maxWidth,
-        margin: "0 auto",
-        width: "100%",
-      }}
-    >
+    <header style={HEADER_BAR}>
       <Link
         href="/"
         onClick={go("/")}

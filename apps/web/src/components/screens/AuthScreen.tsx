@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Wordmark } from "@/components/ui/Wordmark";
+import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
 
 // ─── Shared bits ──────────────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ function BrandColumn({ caption, waiting }: { caption: string; waiting?: boolean 
 function AuthLayout({ form, brand }: { form: React.ReactNode; brand: React.ReactNode }) {
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <header style={{ padding: "20px clamp(24px, 5vw, 40px)", flex: "none" }}>
+      <header style={HEADER_BAR}>
         <Wordmark />
       </header>
       <div
@@ -44,9 +44,7 @@ function AuthLayout({ form, brand }: { form: React.ReactNode; brand: React.React
         style={{
           flex: 1,
           justifyContent: "center",
-          maxWidth: 1180,
           width: "100%",
-          margin: "0 auto",
           padding: "0 clamp(24px, 5vw, 64px) 48px",
           animation: "fadeup 0.5s var(--ease-editorial) both",
         }}

@@ -143,7 +143,7 @@ function EmptyArchive({
 }) {
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <SiteHeader active="archive" isAuthenticated={isAuthenticated} displayName={displayName} maxWidth={1140} />
+      <SiteHeader active="archive" isAuthenticated={isAuthenticated} displayName={displayName} />
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px 64px" }}>
         <div style={{ textAlign: "center", maxWidth: 340 }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 20, opacity: 0.6 }}>
@@ -190,7 +190,7 @@ export function ArchiveScreen({ months, initialId, isAuthenticated, displayName 
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <SiteHeader active="archive" isAuthenticated={isAuthenticated} displayName={displayName} maxWidth={1140} />
+      <SiteHeader active="archive" isAuthenticated={isAuthenticated} displayName={displayName} />
       <h1 className="sr-only">Archive</h1>
 
       <section

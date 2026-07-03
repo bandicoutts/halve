@@ -226,7 +226,7 @@ export function BoardScreen({
         {liveMessage}
       </div>
 
-      <SiteHeader hideAuth interceptHref={interceptHref} maxWidth={1200} />
+      <SiteHeader hideAuth interceptHref={interceptHref} />
 
       <h1 style={srOnly}>{`${puzzle.difficulty} puzzle`}</h1>
 

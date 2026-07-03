@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveDisplayName } from "@/app/actions/save-display-name";
 import { DISPLAY_NAME_MAX } from "@/lib/display-name";
-import { Wordmark } from "@/components/ui/Wordmark";
+import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
 
 interface OnboardingScreenProps {
   next: string;
@@ -45,7 +45,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <header style={{ padding: "20px clamp(24px, 5vw, 40px)", flex: "none" }}>
+      <header style={HEADER_BAR}>
         <Wordmark />
       </header>
 

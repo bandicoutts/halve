@@ -48,7 +48,7 @@ export function PracticeScreen({ isAuthenticated, displayName }: PracticeScreenP
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <SiteHeader active="practice" isAuthenticated={isAuthenticated} displayName={displayName} maxWidth={900} />
+      <SiteHeader active="practice" isAuthenticated={isAuthenticated} displayName={displayName} />
 
       <section
         style={{

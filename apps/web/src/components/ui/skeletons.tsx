@@ -1,4 +1,4 @@
-import { Wordmark } from "@/components/ui/Wordmark";
+import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
 
 // Redesigned loading skeletons — each mirrors the silhouette of its screen so
 // content doesn't jump on load. Plain --plate blocks with a staggered breathe.
@@ -38,7 +38,7 @@ function SkHeader() {
     <span style={{ color: "var(--fg-3)", fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.16em" }}>{t}</span>
   );
   return (
-    <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18, padding: "20px clamp(20px,4vw,40px)", flex: "none", maxWidth: 1280, width: "100%", margin: "0 auto" }}>
+    <header style={HEADER_BAR}>
       <Wordmark href={null} />
       <nav style={{ display: "flex", alignItems: "center", gap: 18 }}>
         <div className="hv-nav-desktop">
