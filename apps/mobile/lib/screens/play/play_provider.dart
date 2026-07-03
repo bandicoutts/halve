@@ -77,8 +77,10 @@ class PlayLoad {
 ///   • archive — `fetchByDate(date)`, falling back to the cache;
 ///   • practice— `fetchPracticePuzzle(difficulty)` (NOT cached, NOT recorded).
 /// A genuinely missing puzzle throws [PlayUnavailable].
-final playLoadProvider =
-    FutureProvider.autoDispose.family<PlayLoad, PlayArgs>((ref, args) async {
+final playLoadProvider = FutureProvider.autoDispose.family<PlayLoad, PlayArgs>((
+  ref,
+  args,
+) async {
   final today = localToday();
   final cache = ref.watch(puzzleCacheProvider);
 
@@ -167,13 +169,13 @@ class PlayState {
   });
 
   PlayState.initial(Grid givens)
-      : grid = _clone(givens),
-        history = const [],
-        usedHint = false,
-        elapsedSeconds = 0,
-        running = false,
-        solved = false,
-        violations = const {};
+    : grid = _clone(givens),
+      history = const [],
+      usedHint = false,
+      elapsedSeconds = 0,
+      running = false,
+      solved = false,
+      violations = const {};
 
   final Grid grid;
   final List<Grid> history;
@@ -187,6 +189,19 @@ class PlayState {
   final Set<validator.Coord> violations;
 
   bool get canUndo => history.isNotEmpty;
+  int get placedCount => grid.fold(
+    0,
+    (sum, row) => sum + row.where((cell) => cell != null).length,
+  );
+  int get totalCount => grid.length * (grid.isEmpty ? 0 : grid.first.length);
+  bool get hasProgress => history.isNotEmpty;
+  String get statusText {
+    if (solved) return 'Solved.';
+    if (violations.isNotEmpty) {
+      return 'A rule is broken. Check the marked cells.';
+    }
+    return '';
+  }
 
   PlayState copyWith({
     Grid? grid,
@@ -247,8 +262,9 @@ class PlayController extends AutoDisposeFamilyNotifier<PlayState, Puzzle> {
     if (state.history.isEmpty) return;
     final prev = state.history.last;
     final solved = validator.isSolved(prev, _puzzle.edges);
-    final violations =
-        solved ? const <validator.Coord>{} : validator.findViolations(prev, _puzzle.edges);
+    final violations = solved
+        ? const <validator.Coord>{}
+        : validator.findViolations(prev, _puzzle.edges);
     state = state.copyWith(
       grid: prev,
       history: state.history.sublist(0, state.history.length - 1),
@@ -258,11 +274,19 @@ class PlayController extends AutoDisposeFamilyNotifier<PlayState, Puzzle> {
     if (solved) _stopTimer();
   }
 
+  /// Return to the starting position: givens only, empty history, no hint, and
+  /// a stopped timer. Mirrors the web `restart` action.
+  void restart() {
+    _stopTimer();
+    state = PlayState.initial(_puzzle.givens);
+  }
+
   void _commit(Grid next, {required bool usedHint}) {
     _startTimer();
     final solved = validator.isSolved(next, _puzzle.edges);
-    final violations =
-        solved ? const <validator.Coord>{} : validator.findViolations(next, _puzzle.edges);
+    final violations = solved
+        ? const <validator.Coord>{}
+        : validator.findViolations(next, _puzzle.edges);
     state = state.copyWith(
       grid: next,
       history: [...state.history, state.grid],
@@ -288,10 +312,8 @@ class PlayController extends AutoDisposeFamilyNotifier<PlayState, Puzzle> {
   }
 }
 
-final playControllerProvider =
-    NotifierProvider.autoDispose.family<PlayController, PlayState, Puzzle>(
-  PlayController.new,
-);
+final playControllerProvider = NotifierProvider.autoDispose
+    .family<PlayController, PlayState, Puzzle>(PlayController.new);
 
 /// Everything the Win screen (Phase 8) needs, handed off via `context.push`.
 class PlayResult {
@@ -330,37 +352,36 @@ class PlayResult {
   final RecordSolveResult? saveResult;
 
   Map<String, dynamic> toJson() => {
-        'kind': kind.name,
-        'difficulty': difficulty.name,
-        'durationMs': durationMs,
-        'formattedTime': formattedTime,
-        'usedHint': usedHint,
-        'solution': solution.map((r) => r.toList()).toList(),
-        'size': size,
-        'localDate': localDate,
-        if (puzzleId != null) 'puzzleId': puzzleId,
-        if (date != null) 'date': date,
-        if (saveResult != null) 'saveResult': saveResult!.toJson(),
-      };
+    'kind': kind.name,
+    'difficulty': difficulty.name,
+    'durationMs': durationMs,
+    'formattedTime': formattedTime,
+    'usedHint': usedHint,
+    'solution': solution.map((r) => r.toList()).toList(),
+    'size': size,
+    'localDate': localDate,
+    if (puzzleId != null) 'puzzleId': puzzleId,
+    if (date != null) 'date': date,
+    if (saveResult != null) 'saveResult': saveResult!.toJson(),
+  };
 
   factory PlayResult.fromJson(Map<String, dynamic> j) => PlayResult(
-        kind: PlayKind.values.byName(j['kind'] as String),
-        difficulty: Difficulty.values.byName(j['difficulty'] as String),
-        durationMs: j['durationMs'] as int,
-        formattedTime: j['formattedTime'] as String,
-        usedHint: j['usedHint'] as bool,
-        solution: (j['solution'] as List)
-            .map((r) => (r as List).map((v) => v as int).toList())
-            .toList(),
-        size: j['size'] as int,
-        localDate: j['localDate'] as String,
-        puzzleId: j['puzzleId'] as String?,
-        date: j['date'] as String?,
-        saveResult: j['saveResult'] == null
-            ? null
-            : RecordSolveResult.fromJson(
-                j['saveResult'] as Map<String, dynamic>),
-      );
+    kind: PlayKind.values.byName(j['kind'] as String),
+    difficulty: Difficulty.values.byName(j['difficulty'] as String),
+    durationMs: j['durationMs'] as int,
+    formattedTime: j['formattedTime'] as String,
+    usedHint: j['usedHint'] as bool,
+    solution: (j['solution'] as List)
+        .map((r) => (r as List).map((v) => v as int).toList())
+        .toList(),
+    size: j['size'] as int,
+    localDate: j['localDate'] as String,
+    puzzleId: j['puzzleId'] as String?,
+    date: j['date'] as String?,
+    saveResult: j['saveResult'] == null
+        ? null
+        : RecordSolveResult.fromJson(j['saveResult'] as Map<String, dynamic>),
+  );
 }
 
 /// `m:ss` from whole seconds (mirrors the web timer format).

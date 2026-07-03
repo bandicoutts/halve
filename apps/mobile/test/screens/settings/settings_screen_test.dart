@@ -56,10 +56,7 @@ Future<({GoRouter router, List<String> navLog})> pumpSettings(
     initialLocation: '/settings',
     observers: [_NavLogger(navLog)],
     routes: [
-      GoRoute(
-        path: '/settings',
-        builder: (_, _) => const SettingsScreen(),
-      ),
+      GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/', builder: (_, _) => const Text('HOME')),
       GoRoute(path: '/auth', builder: (_, _) => const Text('AUTH')),
     ],
@@ -71,10 +68,7 @@ Future<({GoRouter router, List<String> navLog})> pumpSettings(
         settingsDataProvider.overrideWith((ref) async => data),
         ...overrides,
       ],
-      child: MaterialApp.router(
-        theme: AppTheme.light(),
-        routerConfig: router,
-      ),
+      child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
     ),
   );
   await tester.pumpAndSettle();
@@ -109,9 +103,7 @@ void main() {
       await pumpSettings(
         tester,
         data: const SettingsData(isSignedIn: false),
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       );
 
       // All three segments render.
@@ -120,17 +112,16 @@ void main() {
       expect(find.text('Dark'), findsOneWidget);
     });
 
-    testWidgets('tapping Light persists halve:theme=light to prefs',
-        (tester) async {
+    testWidgets('tapping Light persists halve:theme=light to prefs', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
 
       await pumpSettings(
         tester,
         data: const SettingsData(isSignedIn: false),
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       );
 
       await tester.tap(find.text('Light'));
@@ -139,17 +130,16 @@ void main() {
       expect(prefs.getString(prefKeyThemeMode), 'light');
     });
 
-    testWidgets('tapping Dark persists halve:theme=dark to prefs',
-        (tester) async {
+    testWidgets('tapping Dark persists halve:theme=dark to prefs', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
 
       await pumpSettings(
         tester,
         data: const SettingsData(isSignedIn: false),
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       );
 
       await tester.tap(find.text('Dark'));
@@ -158,17 +148,16 @@ void main() {
       expect(prefs.getString(prefKeyThemeMode), 'dark');
     });
 
-    testWidgets('tapping System persists halve:theme=system to prefs',
-        (tester) async {
+    testWidgets('tapping System persists halve:theme=system to prefs', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({prefKeyThemeMode: 'dark'});
       final prefs = await SharedPreferences.getInstance();
 
       await pumpSettings(
         tester,
         data: const SettingsData(isSignedIn: false),
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       );
 
       await tester.tap(find.text('System'));
@@ -179,8 +168,9 @@ void main() {
   });
 
   group('SettingsScreen — account (signed in)', () {
-    testWidgets('shows display name, Streak synced, and Sign out',
-        (tester) async {
+    testWidgets('shows display name, Streak synced, and Sign out', (
+      tester,
+    ) async {
       await pumpSettings(
         tester,
         data: const SettingsData(
@@ -196,7 +186,9 @@ void main() {
       expect(find.text('Sign out'), findsOneWidget);
     });
 
-    testWidgets('falls back to email when display name is null', (tester) async {
+    testWidgets('falls back to email when display name is null', (
+      tester,
+    ) async {
       await pumpSettings(
         tester,
         data: const SettingsData(
@@ -225,34 +217,23 @@ void main() {
   });
 
   group('SettingsScreen — account (guest / signed out)', () {
-    testWidgets('shows Sign in prompt with keep-streak sublabel',
-        (tester) async {
-      await pumpSettings(
-        tester,
-        data: const SettingsData(isSignedIn: false),
-      );
+    testWidgets('shows Sign in prompt with keep-streak sublabel', (
+      tester,
+    ) async {
+      await pumpSettings(tester, data: const SettingsData(isSignedIn: false));
 
       expect(find.text('Sign in'), findsOneWidget);
-      expect(
-        find.text('Keep your streak safe across devices'),
-        findsOneWidget,
-      );
+      expect(find.text('Sync your streak across devices'), findsOneWidget);
     });
 
     testWidgets('Sign out row is absent when guest', (tester) async {
-      await pumpSettings(
-        tester,
-        data: const SettingsData(isSignedIn: false),
-      );
+      await pumpSettings(tester, data: const SettingsData(isSignedIn: false));
 
       expect(find.text('Sign out'), findsNothing);
     });
 
     testWidgets('Sign in navigates to /auth', (tester) async {
-      await pumpSettings(
-        tester,
-        data: const SettingsData(isSignedIn: false),
-      );
+      await pumpSettings(tester, data: const SettingsData(isSignedIn: false));
 
       await tester.tap(find.text('Sign in'));
       await tester.pumpAndSettle();
@@ -262,8 +243,9 @@ void main() {
   });
 
   group('SettingsScreen — sign out', () {
-    testWidgets('Sign out calls AuthRepository.signOut and navigates home',
-        (tester) async {
+    testWidgets('Sign out calls AuthRepository.signOut and navigates home', (
+      tester,
+    ) async {
       final fakeAuth = _FakeAuthRepository();
 
       await pumpSettings(
@@ -273,12 +255,14 @@ void main() {
           email: 'test@example.com',
           displayName: 'Test',
         ),
-        overrides: [
-          authRepositoryProvider.overrideWithValue(fakeAuth),
-        ],
+        overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
       );
 
       await tester.tap(find.text('Sign out'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Sign out?'), findsOneWidget);
+      await tester.tap(find.text('Sign out').last);
       await tester.pumpAndSettle();
 
       expect(fakeAuth.signedOut, isTrue);
@@ -290,10 +274,7 @@ void main() {
     testWidgets('shows version string', (tester) async {
       await pumpSettings(
         tester,
-        data: const SettingsData(
-          isSignedIn: false,
-          version: '1.0.0 (42)',
-        ),
+        data: const SettingsData(isSignedIn: false, version: '1.0.0 (42)'),
       );
 
       expect(find.text('Version'), findsOneWidget);
@@ -301,10 +282,7 @@ void main() {
     });
 
     testWidgets('shows Privacy policy and Terms of use rows', (tester) async {
-      await pumpSettings(
-        tester,
-        data: const SettingsData(isSignedIn: false),
-      );
+      await pumpSettings(tester, data: const SettingsData(isSignedIn: false));
 
       expect(find.text('Privacy policy'), findsOneWidget);
       expect(find.text('Terms of use'), findsOneWidget);
@@ -313,10 +291,7 @@ void main() {
 
   group('SettingsScreen — notifications', () {
     testWidgets('Daily reminder row renders', (tester) async {
-      await pumpSettings(
-        tester,
-        data: const SettingsData(isSignedIn: false),
-      );
+      await pumpSettings(tester, data: const SettingsData(isSignedIn: false));
 
       expect(find.text('Daily reminder'), findsOneWidget);
     });
@@ -324,10 +299,7 @@ void main() {
 
   group('SettingsScreen — game', () {
     testWidgets('Haptics row renders', (tester) async {
-      await pumpSettings(
-        tester,
-        data: const SettingsData(isSignedIn: false),
-      );
+      await pumpSettings(tester, data: const SettingsData(isSignedIn: false));
 
       expect(find.text('Haptics'), findsOneWidget);
     });
@@ -336,14 +308,17 @@ void main() {
   group('SettingsScreen — haptics toggle behavior', () {
     // _HvSwitch uses AnimatedContainer(duration: 200ms). In tree order:
     //   .at(0) = notifications (Daily reminder), .at(1) = game (Haptics).
-    Finder hvSwitchAt(int index) => find.byWidgetPredicate(
+    Finder hvSwitchAt(int index) => find
+        .byWidgetPredicate(
           (w) =>
               w is AnimatedContainer &&
               w.duration == const Duration(milliseconds: 200),
-        ).at(index);
+        )
+        .at(index);
 
-    testWidgets('toggling haptics off calls HapticsService.configure(false)',
-        (tester) async {
+    testWidgets('toggling haptics off calls HapticsService.configure(false)', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       final mockHaptics = _MockHapticsService();
@@ -366,58 +341,62 @@ void main() {
   });
 
   group('SettingsScreen — reminder toggle behavior', () {
-    Finder hvSwitchAt(int index) => find.byWidgetPredicate(
+    Finder hvSwitchAt(int index) => find
+        .byWidgetPredicate(
           (w) =>
               w is AnimatedContainer &&
               w.duration == const Duration(milliseconds: 200),
-        ).at(index);
+        )
+        .at(index);
 
     testWidgets(
-        'toggling reminder on calls NotificationService.scheduleDaily',
-        (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final mockNotif = _MockNotificationService();
+      'toggling reminder on calls NotificationService.scheduleDaily',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final mockNotif = _MockNotificationService();
 
-      await pumpSettings(
-        tester,
-        data: const SettingsData(isSignedIn: false),
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-          notificationServiceProvider.overrideWithValue(mockNotif),
-        ],
-      );
+        await pumpSettings(
+          tester,
+          data: const SettingsData(isSignedIn: false),
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            notificationServiceProvider.overrideWithValue(mockNotif),
+          ],
+        );
 
-      // Default _reminderOn == false; toggle → scheduleDaily(8, 'am').
-      await tester.tap(hvSwitchAt(0));
-      await tester.pumpAndSettle();
+        // Default _reminderOn == false; toggle → scheduleDaily(8, 'am').
+        await tester.tap(hvSwitchAt(0));
+        await tester.pumpAndSettle();
 
-      expect(mockNotif.scheduleCalls, [(8, 'am')]);
-      expect(mockNotif.cancelCount, 0);
-    });
+        expect(mockNotif.scheduleCalls, [(8, 'am')]);
+        expect(mockNotif.cancelCount, 0);
+      },
+    );
 
     testWidgets(
-        'toggling reminder off calls NotificationService.cancelReminder',
-        (tester) async {
-      SharedPreferences.setMockInitialValues({prefKeyReminder: true});
-      final prefs = await SharedPreferences.getInstance();
-      final mockNotif = _MockNotificationService();
+      'toggling reminder off calls NotificationService.cancelReminder',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({prefKeyReminder: true});
+        final prefs = await SharedPreferences.getInstance();
+        final mockNotif = _MockNotificationService();
 
-      await pumpSettings(
-        tester,
-        data: const SettingsData(isSignedIn: false),
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-          notificationServiceProvider.overrideWithValue(mockNotif),
-        ],
-      );
+        await pumpSettings(
+          tester,
+          data: const SettingsData(isSignedIn: false),
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            notificationServiceProvider.overrideWithValue(mockNotif),
+          ],
+        );
 
-      // _reminderOn == true from prefs; toggle → cancelReminder().
-      await tester.tap(hvSwitchAt(0));
-      await tester.pumpAndSettle();
+        // _reminderOn == true from prefs; toggle → cancelReminder().
+        await tester.tap(hvSwitchAt(0));
+        await tester.pumpAndSettle();
 
-      expect(mockNotif.cancelCount, 1);
-      expect(mockNotif.scheduleCalls, isEmpty);
-    });
+        expect(mockNotif.cancelCount, 1);
+        expect(mockNotif.scheduleCalls, isEmpty);
+      },
+    );
   });
 }

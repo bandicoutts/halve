@@ -5,6 +5,8 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../data/local_date.dart';
 import '../../data/models/models.dart';
+import '../../data/notification_primer.dart';
+import '../../data/prefs_keys.dart';
 import '../../providers/providers.dart';
 import '../../router/app_router.dart';
 import '../../theme/theme.dart';
@@ -34,6 +36,7 @@ class _WinScreenState extends ConsumerState<WinScreen> {
   /// The latest save outcome (initialised from the hand-off, updated on retry).
   RecordSolveResult? _saveResult;
   bool _retrying = false;
+  bool _checkedReminderPrimer = false;
 
   @override
   void initState() {
@@ -109,6 +112,13 @@ class _WinScreenState extends ConsumerState<WinScreen> {
       );
     }
 
+    if (!_checkedReminderPrimer && r.kind == PlayKind.daily) {
+      _checkedReminderPrimer = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _maybeShowReminderPrimer();
+      });
+    }
+
     final query = WinQuery(kind: r.kind, date: r.date);
     final info = ref.watch(winInfoProvider(query)).valueOrNull;
     final signedIn = ref.watch(isSignedInProvider);
@@ -120,18 +130,16 @@ class _WinScreenState extends ConsumerState<WinScreen> {
     final eyebrow = r.kind == PlayKind.practice
         ? 'Practice'
         : dayNo != null
-            ? 'Puzzle No. $dayNo'
-            : 'Halve';
+        ? 'Puzzle No. $dayNo'
+        : 'Halve';
 
-    final keepsakeDate = r.date ??
-        (r.kind == PlayKind.practice ? null : localToday());
+    final keepsakeDate =
+        r.date ?? (r.kind == PlayKind.practice ? null : localToday());
 
     final showStreakMeta = r.kind == PlayKind.daily && streak > 0;
     final synced = signedIn && (_saveResult?.ok ?? false);
-    final showNudge = !signedIn &&
-        r.kind == PlayKind.daily &&
-        streak >= 3 &&
-        !_dismissed;
+    final showNudge =
+        !signedIn && r.kind == PlayKind.daily && streak >= 3 && !_dismissed;
     final showRetry = _saveResult?.isNetworkError ?? false;
 
     return SafeScaffold(
@@ -142,7 +150,11 @@ class _WinScreenState extends ConsumerState<WinScreen> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.s5, AppSpacing.s1, AppSpacing.s5, AppSpacing.s5),
+                AppSpacing.s5,
+                AppSpacing.s1,
+                AppSpacing.s5,
+                AppSpacing.s5,
+              ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 384),
@@ -150,9 +162,7 @@ class _WinScreenState extends ConsumerState<WinScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Mark — a single confident swell on entry.
-                      Center(
-                        child: _WinMark(reduceMotion: reduceMotion),
-                      ),
+                      Center(child: _WinMark(reduceMotion: reduceMotion)),
                       const SizedBox(height: AppSpacing.s4),
                       Center(
                         child: Text(
@@ -174,8 +184,9 @@ class _WinScreenState extends ConsumerState<WinScreen> {
                       Center(
                         child: Text(
                           r.formattedTime,
-                          style: AppTypography.tabular(AppTypography.display)
-                              .copyWith(color: c.fg1),
+                          style: AppTypography.tabular(
+                            AppTypography.display,
+                          ).copyWith(color: c.fg1),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.s6),
@@ -206,10 +217,7 @@ class _WinScreenState extends ConsumerState<WinScreen> {
                       ],
                       if (showRetry) ...[
                         const SizedBox(height: AppSpacing.s4),
-                        _SaveRetry(
-                          retrying: _retrying,
-                          onRetry: _retrySave,
-                        ),
+                        _SaveRetry(retrying: _retrying, onRetry: _retrySave),
                       ],
                       const SizedBox(height: AppSpacing.s5),
                       HalveButton(
@@ -241,16 +249,84 @@ class _WinScreenState extends ConsumerState<WinScreen> {
   }
 
   String _secondaryLabel(PlayKind kind) => switch (kind) {
-        PlayKind.daily => 'Your stats',
-        PlayKind.archive => 'Back to archive',
-        PlayKind.practice => 'New puzzle',
-      };
+    PlayKind.daily => 'Your stats',
+    PlayKind.archive => 'Back to archive',
+    PlayKind.practice => 'New puzzle',
+  };
 
   String _secondaryRoute(PlayKind kind) => switch (kind) {
-        PlayKind.daily => Routes.stats,
-        PlayKind.archive => Routes.archive,
-        PlayKind.practice => Routes.practice,
-      };
+    PlayKind.daily => Routes.stats,
+    PlayKind.archive => Routes.archive,
+    PlayKind.practice => Routes.practice,
+  };
+
+  Future<void> _maybeShowReminderPrimer() async {
+    final store = ref.read(notificationPrimerStoreProvider);
+    if (!store.shouldShowAfterDailySolve) return;
+
+    final accepted = await showHalveBottomSheet<bool>(
+      context: context,
+      builder: (_) => const _ReminderPrimerSheet(),
+    );
+    if (!mounted) return;
+
+    if (accepted == true) {
+      await store.markAccepted();
+      final prefs = ref.read(sharedPreferencesProvider);
+      final hour = prefs?.getInt(prefKeyReminderHour) ?? 8;
+      final ampm = prefs?.getString(prefKeyReminderAmpm) ?? 'am';
+      await prefs?.setBool(prefKeyReminder, true);
+      await ref.read(notificationServiceProvider).requestPermission();
+      await ref.read(notificationServiceProvider).scheduleDaily(hour, ampm);
+    } else {
+      await store.markDismissed();
+    }
+  }
+}
+
+class _ReminderPrimerSheet extends StatelessWidget {
+  const _ReminderPrimerSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.s5,
+        AppSpacing.s4,
+        AppSpacing.s5,
+        AppSpacing.s5,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Tomorrow, gently',
+            style: AppTypography.h3.copyWith(color: c.fg1),
+          ),
+          const SizedBox(height: AppSpacing.s3),
+          Text(
+            "Get one quiet reminder when tomorrow's puzzle is ready.",
+            style: AppTypography.small.copyWith(color: c.fg2, height: 1.5),
+          ),
+          const SizedBox(height: AppSpacing.s5),
+          HalveButton(
+            label: 'Remind me',
+            full: true,
+            onPressed: () => Navigator.pop(context, true),
+          ),
+          const SizedBox(height: AppSpacing.s3),
+          HalveButton(
+            label: 'Maybe later',
+            variant: HalveButtonVariant.secondary,
+            full: true,
+            onPressed: () => Navigator.pop(context, false),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Close (×) left, centered "COMPLETE" eyebrow, balancing spacer right.
@@ -264,7 +340,9 @@ class _WinTopBar extends StatelessWidget {
     final c = context.halveColors;
     return Padding(
       padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.s2, vertical: AppSpacing.s1),
+        horizontal: AppSpacing.s2,
+        vertical: AppSpacing.s1,
+      ),
       child: SizedBox(
         height: AppLayout.topBarHeight,
         child: Stack(
@@ -303,11 +381,11 @@ class _WinMark extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: reduceMotion ? 1.0 : 0.7, end: 1.0),
-      duration:
-          reduceMotion ? Duration.zero : const Duration(milliseconds: 600),
+      duration: reduceMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 600),
       curve: const Cubic(0.34, 1.56, 0.64, 1), // back-out
-      builder: (_, scale, child) =>
-          Transform.scale(scale: scale, child: child),
+      builder: (_, scale, child) => Transform.scale(scale: scale, child: child),
       child: const HalveMark(size: 46),
     );
   }
@@ -324,8 +402,9 @@ class _Settle extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: reduceMotion ? 0.0 : 10.0, end: 0.0),
-      duration:
-          reduceMotion ? Duration.zero : const Duration(milliseconds: 500),
+      duration: reduceMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 500),
       curve: const Cubic(0.34, 1.4, 0.5, 1),
       builder: (_, dy, child) =>
           Transform.translate(offset: Offset(0, dy), child: child),
@@ -497,9 +576,7 @@ class _SolvedCellState extends State<_SolvedCell>
       vsync: this,
       duration: const Duration(milliseconds: _baseMs),
     );
-    _anim = _controller.drive(
-      CurveTween(curve: _curve),
-    );
+    _anim = _controller.drive(CurveTween(curve: _curve));
 
     if (widget.reduceMotion) {
       _controller.value = 1.0;
@@ -531,10 +608,7 @@ class _SolvedCellState extends State<_SolvedCell>
         final v = _anim.value.clamp(0.0, 1.0);
         return Opacity(
           opacity: 0.45 + 0.55 * v,
-          child: Transform.scale(
-            scale: 0.82 + 0.18 * v,
-            child: child,
-          ),
+          child: Transform.scale(scale: 0.82 + 0.18 * v, child: child),
         );
       },
       child: Container(
@@ -569,8 +643,10 @@ class _MetaLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     final base = AppTypography.small.copyWith(color: c.fg3);
-    final dot = Text('·',
-        style: base.copyWith(color: c.hairline2, letterSpacing: 0));
+    final dot = Text(
+      '·',
+      style: base.copyWith(color: c.hairline2, letterSpacing: 0),
+    );
 
     return Wrap(
       alignment: WrapAlignment.center,
@@ -582,17 +658,19 @@ class _MetaLine extends StatelessWidget {
         if (streak != null) ...[
           dot,
           Text.rich(
-            TextSpan(children: [
-              TextSpan(
-                text: '$streak',
-                style: AppTypography.tabular(base).copyWith(
-                  color: c.accent,
-                  fontWeight: FontWeight.w600,
-                  fontVariations: const [FontVariation('wght', 600)],
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '$streak',
+                  style: AppTypography.tabular(base).copyWith(
+                    color: c.accent,
+                    fontWeight: FontWeight.w600,
+                    fontVariations: const [FontVariation('wght', 600)],
+                  ),
                 ),
-              ),
-              TextSpan(text: '-day streak', style: base),
-            ]),
+                TextSpan(text: '-day streak', style: base),
+              ],
+            ),
           ),
         ],
         if (synced) ...[
@@ -603,8 +681,10 @@ class _MetaLine extends StatelessWidget {
               Container(
                 width: 6,
                 height: 6,
-                decoration:
-                    BoxDecoration(color: c.correct, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: c.correct,
+                  shape: BoxShape.circle,
+                ),
               ),
               const SizedBox(width: AppSpacing.s1),
               Text('Synced', style: base),
@@ -652,20 +732,25 @@ class _StreakNudge extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text.rich(
-                        TextSpan(children: [
-                          const TextSpan(text: 'Your '),
-                          TextSpan(
-                            text: '$streak',
-                            style: AppTypography.tabular(base).copyWith(
-                              fontWeight: FontWeight.w600,
-                              fontVariations: const [FontVariation('wght', 600)],
+                        TextSpan(
+                          children: [
+                            const TextSpan(text: 'Your '),
+                            TextSpan(
+                              text: '$streak',
+                              style: AppTypography.tabular(base).copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontVariations: const [
+                                  FontVariation('wght', 600),
+                                ],
+                              ),
                             ),
-                          ),
-                          const TextSpan(
-                            text: '-day streak is saved on this device. '
-                                'Sign in to sync it.',
-                          ),
-                        ]),
+                            const TextSpan(
+                              text:
+                                  '-day streak is saved on this device. '
+                                  'Sign in to sync it.',
+                            ),
+                          ],
+                        ),
                         style: base,
                       ),
                     ),
@@ -759,8 +844,10 @@ class _Countdown extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Next puzzle in',
-            style: AppTypography.small.copyWith(color: c.fg3)),
+        Text(
+          'Next puzzle in',
+          style: AppTypography.small.copyWith(color: c.fg3),
+        ),
         const SizedBox(width: AppSpacing.s2),
         Text(
           remaining,

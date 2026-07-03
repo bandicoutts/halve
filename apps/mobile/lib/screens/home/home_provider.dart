@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/local_date.dart';
 import '../../data/models/models.dart';
+import '../../data/puzzle_cache.dart';
+import '../../data/repositories/repositories.dart' show DatedPuzzle;
 import '../../data/streak.dart';
 import '../../providers/providers.dart';
 
@@ -88,8 +90,15 @@ final homeDataProvider = FutureProvider.autoDispose<HomeData>((ref) async {
   try {
     final puzzleFuture = puzzleRepo.fetchDaily(today);
     final countFuture = puzzleRepo.fetchPuzzleCount(today);
-    final yesterdayFuture =
-        puzzleRepo.fetchYesterdayDifficulty(offsetDay(today, -1));
+    final yesterdayFuture = puzzleRepo.fetchYesterdayDifficulty(
+      offsetDay(today, -1),
+    );
+    final recentFuture = puzzleRepo
+        .fetchRecentDailies(today, limit: PrefsPuzzleCache.maxEntries)
+        .catchError((Object e, StackTrace st) {
+          debugPrint('recent puzzle cache warm failed: $e\n$st');
+          return <DatedPuzzle>[];
+        });
     final solveFuture = (signedIn && solveRepo != null)
         ? solveRepo.fetchSolves(user.id)
         : Future.value(<SolveRow>[]);
@@ -101,6 +110,10 @@ final homeDataProvider = FutureProvider.autoDispose<HomeData>((ref) async {
 
     if (puzzle != null) {
       await cache.put(today, puzzle);
+    }
+    final recent = await recentFuture;
+    for (final entry in recent) {
+      await cache.put(entry.date, entry.puzzle);
     }
 
     var streak = 0;

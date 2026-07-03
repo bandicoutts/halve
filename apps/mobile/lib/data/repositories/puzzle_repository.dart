@@ -2,6 +2,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/models.dart';
 
+class DatedPuzzle {
+  const DatedPuzzle({required this.date, required this.puzzle});
+
+  final String date;
+  final Puzzle puzzle;
+}
+
 /// Reads puzzles from Supabase. There is NO client-side daily generation (no
 /// Dart generator) — offline support relies on a cache (Phase 6), never on
 /// regeneration. Mirrors the web query shapes.
@@ -28,6 +35,34 @@ class PuzzleRepository {
 
   /// A specific archive day's puzzle.
   Future<Puzzle?> fetchByDate(String date) => fetchDaily(date);
+
+  /// Latest dated daily puzzles up to [today], newest first. Used only to warm
+  /// the offline cache; callers should treat failures as non-fatal.
+  Future<List<DatedPuzzle>> fetchRecentDailies(
+    String today, {
+    int limit = 7,
+  }) async {
+    final rows = await _client
+        .from('puzzles')
+        .select('id, date, difficulty, grid_spec')
+        .not('date', 'is', null)
+        .lte('date', today)
+        .order('date', ascending: false)
+        .limit(limit);
+
+    final out = <DatedPuzzle>[];
+    for (final row in rows) {
+      final date = row['date'];
+      if (date is! String) continue;
+      final puzzle = Puzzle.tryParse(
+        id: row['id'],
+        difficulty: row['difficulty'],
+        gridSpec: row['grid_spec'],
+      );
+      if (puzzle != null) out.add(DatedPuzzle(date: date, puzzle: puzzle));
+    }
+    return out;
+  }
 
   /// Count of dated dailies published up to and including [date]. Used to
   /// derive the ordinal puzzle number shown in the board header.
@@ -106,9 +141,5 @@ class PuzzleRepository {
   static Map<String, Object?> practicePuzzleParams(
     Difficulty difficulty, {
     int? seq,
-  }) =>
-      {
-        'p_difficulty': difficulty.wire,
-        'p_seq': ?seq,
-      };
+  }) => {'p_difficulty': difficulty.wire, 'p_seq': ?seq};
 }

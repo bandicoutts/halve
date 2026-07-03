@@ -98,8 +98,7 @@ class _ThemeSegment extends ConsumerWidget {
                   opt.label,
                   style: AppTypography.small.copyWith(
                     color: active ? c.fg1 : c.fg3,
-                    fontWeight:
-                        active ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: active ? FontWeight.w600 : FontWeight.w400,
                     letterSpacing: -0.14,
                   ),
                 ),
@@ -125,8 +124,7 @@ class _ChevronIcon extends StatelessWidget {
     final c = context.halveColors;
     return CustomPaint(
       size: Size(size, size),
-      painter: _ChevronPainter(
-          color: color ?? c.fg3, direction: direction),
+      painter: _ChevronPainter(color: color ?? c.fg3, direction: direction),
     );
   }
 }
@@ -161,7 +159,6 @@ class _ChevronPainter extends CustomPainter {
       old.color != color || old.direction != direction;
 }
 
-
 // ─── Section / row components ─────────────────────────────────────────────────
 
 /// A grouped settings section with an eyebrow label and a card-like container.
@@ -181,7 +178,9 @@ class _SettingsSection extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(
-                left: AppSpacing.s1, bottom: AppSpacing.s2),
+              left: AppSpacing.s1,
+              bottom: AppSpacing.s2,
+            ),
             child: Text(
               title.toUpperCase(),
               style: AppTypography.label.copyWith(color: c.fg3),
@@ -254,9 +253,12 @@ class _SettingsRowState extends State<_SettingsRow> {
     final c = context.halveColors;
 
     return GestureDetector(
-      onTapDown:
-          widget.onTap != null ? (_) => setState(() => _pressed = true) : null,
-      onTapUp: widget.onTap != null ? (_) => setState(() => _pressed = false) : null,
+      onTapDown: widget.onTap != null
+          ? (_) => setState(() => _pressed = true)
+          : null,
+      onTapUp: widget.onTap != null
+          ? (_) => setState(() => _pressed = false)
+          : null,
       onTapCancel: () => setState(() => _pressed = false),
       onTap: widget.onTap,
       child: AnimatedContainer(
@@ -267,7 +269,9 @@ class _SettingsRowState extends State<_SettingsRow> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.s4, vertical: 14),
+                horizontal: AppSpacing.s4,
+                vertical: 14,
+              ),
               child: Row(
                 children: [
                   if (widget.leading != null) ...[
@@ -291,7 +295,9 @@ class _SettingsRowState extends State<_SettingsRow> {
                           Text(
                             widget.sublabel!,
                             style: AppTypography.small.copyWith(
-                                color: c.fg3, height: 1.3),
+                              color: c.fg3,
+                              height: 1.3,
+                            ),
                           ),
                         ],
                       ],
@@ -307,9 +313,10 @@ class _SettingsRowState extends State<_SettingsRow> {
             if (widget.child != null)
               Padding(
                 padding: const EdgeInsets.only(
-                    left: AppSpacing.s4,
-                    right: AppSpacing.s4,
-                    bottom: 14),
+                  left: AppSpacing.s4,
+                  right: AppSpacing.s4,
+                  bottom: 14,
+                ),
                 child: widget.child,
               ),
           ],
@@ -352,7 +359,9 @@ class _TimePickerRow extends StatelessWidget {
           label,
           style: AppTypography.tabular(
             AppTypography.body.copyWith(
-                color: c.fg1, fontWeight: FontWeight.w600),
+              color: c.fg1,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           textAlign: TextAlign.center,
         ),
@@ -368,7 +377,9 @@ class _TimePickerRow extends StatelessWidget {
           child: Text(
             ampm,
             style: AppTypography.small.copyWith(
-                color: c.fg2, fontWeight: FontWeight.w600),
+              color: c.fg2,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],
@@ -425,6 +436,131 @@ class _StepButtonState extends State<_StepButton> {
   }
 }
 
+class _SignOutSheet extends StatelessWidget {
+  const _SignOutSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.s5,
+        AppSpacing.s4,
+        AppSpacing.s5,
+        AppSpacing.s5,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Sign out?', style: AppTypography.h3.copyWith(color: c.fg1)),
+          const SizedBox(height: AppSpacing.s3),
+          Text(
+            "You'll need to sign in again to sync your streak.",
+            style: AppTypography.small.copyWith(color: c.fg2, height: 1.5),
+          ),
+          const SizedBox(height: AppSpacing.s5),
+          Row(
+            children: [
+              Expanded(
+                child: HalveButton(
+                  label: 'Cancel',
+                  variant: HalveButtonVariant.secondary,
+                  onPressed: () => Navigator.pop(context, false),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.s3),
+              Expanded(
+                child: HalveButton(
+                  label: 'Sign out',
+                  onPressed: () => Navigator.pop(context, true),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DisplayNameSheet extends StatefulWidget {
+  const _DisplayNameSheet({required this.current});
+
+  final String current;
+
+  @override
+  State<_DisplayNameSheet> createState() => _DisplayNameSheetState();
+}
+
+class _DisplayNameSheetState extends State<_DisplayNameSheet> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.current);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    final bottom = MediaQuery.viewInsetsOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.s5,
+        AppSpacing.s4,
+        AppSpacing.s5,
+        AppSpacing.s5 + bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Display name', style: AppTypography.h3.copyWith(color: c.fg1)),
+          const SizedBox(height: AppSpacing.s4),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            textCapitalization: TextCapitalization.words,
+            style: AppTypography.body.copyWith(color: c.fg1),
+            decoration: InputDecoration(
+              hintText: 'Your name',
+              hintStyle: AppTypography.body.copyWith(color: c.fg3),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.s5),
+          Row(
+            children: [
+              Expanded(
+                child: HalveButton(
+                  label: 'Cancel',
+                  variant: HalveButtonVariant.secondary,
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.s3),
+              Expanded(
+                child: HalveButton(
+                  label: 'Save',
+                  onPressed: () =>
+                      Navigator.pop(context, _controller.text.trim()),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── Settings screen ──────────────────────────────────────────────────────────
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -468,7 +604,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       await _prefs?.setBool(prefKeyReminder, on);
       if (on) {
-        await ref.read(notificationServiceProvider).scheduleDaily(_reminderHour, _reminderAmpm);
+        await ref
+            .read(notificationServiceProvider)
+            .scheduleDaily(_reminderHour, _reminderAmpm);
       } else {
         await ref.read(notificationServiceProvider).cancelReminder();
       }
@@ -480,7 +618,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       await _prefs?.setInt(prefKeyReminderHour, hour);
       if (_reminderOn) {
-        await ref.read(notificationServiceProvider).scheduleDaily(hour, _reminderAmpm);
+        await ref
+            .read(notificationServiceProvider)
+            .scheduleDaily(hour, _reminderAmpm);
       }
     } catch (_) {}
   }
@@ -490,7 +630,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       await _prefs?.setString(prefKeyReminderAmpm, ampm);
       if (_reminderOn) {
-        await ref.read(notificationServiceProvider).scheduleDaily(_reminderHour, ampm);
+        await ref
+            .read(notificationServiceProvider)
+            .scheduleDaily(_reminderHour, ampm);
       }
     } catch (_) {}
   }
@@ -511,68 +653,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _confirmSignOut() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showHalveBottomSheet<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Sign out?'),
-        content: const Text(
-            'You\'ll need to sign in again to sync your streak.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sign out'),
-          ),
-        ],
-      ),
+      builder: (_) => const _SignOutSheet(),
     );
     if (confirmed == true) await _signOut();
   }
 
   Future<void> _editDisplayName(String current) async {
-    final controller = TextEditingController(text: current);
-    final bool? confirmed;
-    try {
-      confirmed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Display name'),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: const InputDecoration(hintText: 'Your name'),
-            textCapitalization: TextCapitalization.words,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Save'),
-            ),
-          ],
-        ),
-      );
-    } finally {
-      controller.dispose();
-    }
-    if (confirmed != true) return;
-    final newName = controller.text.trim();
-    if (newName.isEmpty) return;
+    final newName = await showHalveBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => _DisplayNameSheet(current: current),
+    );
+    if (newName == null || newName.isEmpty) return;
     final userId = ref.read(currentUserProvider)?.id;
     if (userId == null) return;
     try {
-      await ref.read(profileRepositoryProvider)?.updateDisplayName(userId, newName);
+      await ref
+          .read(profileRepositoryProvider)
+          ?.updateDisplayName(userId, newName);
       ref.invalidate(settingsDataProvider);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update display name. Please try again.')),
+          const SnackBar(
+            content: Text('Failed to update display name. Please try again.'),
+          ),
         );
       }
     }
@@ -651,24 +758,14 @@ class _SettingsContent extends StatelessWidget {
     final hPad = context.hPagePad;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        hPad,
-        AppSpacing.s4,
-        hPad,
-        AppSpacing.s6,
-      ),
+      padding: EdgeInsets.fromLTRB(hPad, AppSpacing.s4, hPad, AppSpacing.s6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Appearance ────────────────────────────────────────────────
           const _SettingsSection(
             'Appearance',
-            children: [
-              _SettingsRow(
-                label: 'Theme',
-                child: _ThemeSegment(),
-              ),
-            ],
+            children: [_SettingsRow(label: 'Theme', child: _ThemeSegment())],
           ),
 
           // ── Notifications ─────────────────────────────────────────────
@@ -680,8 +777,7 @@ class _SettingsContent extends StatelessWidget {
                 sublabel: reminderOn
                     ? '${reminderHour.toString().padLeft(2, '0')}:00 $reminderAmpm'
                     : 'Off',
-                trailing:
-                    _HvSwitch(on: reminderOn, onToggle: onReminderToggle),
+                trailing: _HvSwitch(on: reminderOn, onToggle: onReminderToggle),
                 child: reminderOn
                     ? _TimePickerRow(
                         hour: reminderHour,
@@ -702,8 +798,7 @@ class _SettingsContent extends StatelessWidget {
               _SettingsRow(
                 label: 'Haptics',
                 sublabel: haptics ? 'On' : 'Off',
-                trailing:
-                    _HvSwitch(on: haptics, onToggle: onHapticsToggle),
+                trailing: _HvSwitch(on: haptics, onToggle: onHapticsToggle),
               ),
             ],
           ),
@@ -719,7 +814,8 @@ class _SettingsContent extends StatelessWidget {
                       sublabel: data.email ?? 'Streak synced',
                       trailing: const _ChevronIcon(),
                       onTap: () => onEditDisplayName(
-                          data.displayName ?? data.email ?? ''),
+                        data.displayName ?? data.email ?? '',
+                      ),
                     ),
                     _SettingsRow(
                       label: 'Sign out',
@@ -729,10 +825,9 @@ class _SettingsContent extends StatelessWidget {
                     ),
                   ]
                 : [
-	                    _SettingsRow(
-	                      label: 'Sign in',
-	                      sublabel:
-	                          'Sync your streak across devices',
+                    _SettingsRow(
+                      label: 'Sign in',
+                      sublabel: 'Sync your streak across devices',
                       trailing: const _ChevronIcon(),
                       onTap: () => context.push(Routes.auth),
                     ),

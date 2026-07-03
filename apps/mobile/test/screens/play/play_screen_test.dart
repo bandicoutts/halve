@@ -50,11 +50,11 @@ Puzzle puzzle({
 
 /// A fully-empty board (no givens) — used to force violations.
 Puzzle emptyPuzzle() => puzzle(
-      emptyCells: {
-        for (var r = 0; r < 6; r++)
-          for (var c = 0; c < 6; c++) (r, c),
-      },
-    );
+  emptyCells: {
+    for (var r = 0; r < 6; r++)
+      for (var c = 0; c < 6; c++) (r, c),
+  },
+);
 
 Finder cell(int r, int c) => find.byKey(ValueKey('cell-$r-$c'));
 
@@ -130,7 +130,10 @@ Future<void> pumpPlayRaw(
             routes: [
               GoRoute(path: '/play', builder: (_, _) => const PlayScreen()),
               GoRoute(path: '/', builder: (_, _) => const SizedBox.shrink()),
-              GoRoute(path: '/tutorial', builder: (_, _) => const SizedBox.shrink()),
+              GoRoute(
+                path: '/tutorial',
+                builder: (_, _) => const SizedBox.shrink(),
+              ),
             ],
           ),
         ),
@@ -148,11 +151,11 @@ void main() {
   });
 
   PlayLoad dailyLoad(Puzzle p) => PlayLoad(
-        puzzle: p,
-        kind: PlayKind.daily,
-        localDate: '2026-06-01',
-        puzzleId: p.id,
-      );
+    puzzle: p,
+    kind: PlayKind.daily,
+    localDate: '2026-06-01',
+    puzzleId: p.id,
+  );
 
   testWidgets('tap cycles a cell empty → disc → ring → empty', (tester) async {
     await pumpPlay(
@@ -180,8 +183,9 @@ void main() {
     await _disposeTree(tester); // cancel the running timer
   });
 
-  testWidgets('a forced three-in-a-row highlights the offending cells',
-      (tester) async {
+  testWidgets('a forced three-in-a-row highlights the offending cells', (
+    tester,
+  ) async {
     await pumpPlay(
       tester,
       load: dailyLoad(emptyPuzzle()),
@@ -221,19 +225,22 @@ void main() {
     await _disposeTree(tester);
   });
 
-  testWidgets('hint fills the empty cell, flags usedHint, and records it',
-      (tester) async {
+  testWidgets('hint fills the empty cell, flags usedHint, and records it', (
+    tester,
+  ) async {
     // One empty cell at (0,1) whose solution value is 1 (ring).
     final p = puzzle(emptyCells: {(0, 1)});
     final user = MockUser();
     when(() => user.id).thenReturn('u1');
-    when(() => solveRepo.recordSolve(
-          puzzleId: any(named: 'puzzleId'),
-          grid: any(named: 'grid'),
-          durationMs: any(named: 'durationMs'),
-          usedHint: any(named: 'usedHint'),
-          localDate: any(named: 'localDate'),
-        )).thenAnswer((_) async => const RecordSolveResult(ok: true));
+    when(
+      () => solveRepo.recordSolve(
+        puzzleId: any(named: 'puzzleId'),
+        grid: any(named: 'grid'),
+        durationMs: any(named: 'durationMs'),
+        usedHint: any(named: 'usedHint'),
+        localDate: any(named: 'localDate'),
+      ),
+    ).thenAnswer((_) async => const RecordSolveResult(ok: true));
 
     await pumpPlay(
       tester,
@@ -249,30 +256,35 @@ void main() {
 
     // Filling the only empty cell completes & solves the board → records with
     // usedHint:true, then hands off to the Win screen.
-    final captured = verify(() => solveRepo.recordSolve(
-          puzzleId: 'p-1',
-          grid: any(named: 'grid'),
-          durationMs: any(named: 'durationMs'),
-          usedHint: captureAny(named: 'usedHint'),
-          localDate: '2026-06-01',
-        )).captured;
+    final captured = verify(
+      () => solveRepo.recordSolve(
+        puzzleId: 'p-1',
+        grid: any(named: 'grid'),
+        durationMs: any(named: 'durationMs'),
+        usedHint: captureAny(named: 'usedHint'),
+        localDate: '2026-06-01',
+      ),
+    ).captured;
     expect(captured.single, isTrue);
     expect(find.byType(WinScreen), findsOneWidget);
   });
 
-  testWidgets('completing the grid records the solve and shows Win',
-      (tester) async {
+  testWidgets('completing the grid records the solve and shows Win', (
+    tester,
+  ) async {
     // Two empties: (0,0)→disc(0), (0,1)→ring(1).
     final p = puzzle(emptyCells: {(0, 0), (0, 1)});
     final user = MockUser();
     when(() => user.id).thenReturn('u1');
-    when(() => solveRepo.recordSolve(
-          puzzleId: any(named: 'puzzleId'),
-          grid: any(named: 'grid'),
-          durationMs: any(named: 'durationMs'),
-          usedHint: any(named: 'usedHint'),
-          localDate: any(named: 'localDate'),
-        )).thenAnswer((_) async => const RecordSolveResult(ok: true));
+    when(
+      () => solveRepo.recordSolve(
+        puzzleId: any(named: 'puzzleId'),
+        grid: any(named: 'grid'),
+        durationMs: any(named: 'durationMs'),
+        usedHint: any(named: 'usedHint'),
+        localDate: any(named: 'localDate'),
+      ),
+    ).thenAnswer((_) async => const RecordSolveResult(ok: true));
 
     await pumpPlay(
       tester,
@@ -290,13 +302,15 @@ void main() {
     await tester.tap(cell(0, 1)); // → ring → solved
     await tester.pumpAndSettle();
 
-    verify(() => solveRepo.recordSolve(
-          puzzleId: 'p-1',
-          grid: any(named: 'grid'),
-          durationMs: any(named: 'durationMs'),
-          usedHint: false,
-          localDate: '2026-06-01',
-        )).called(1);
+    verify(
+      () => solveRepo.recordSolve(
+        puzzleId: 'p-1',
+        grid: any(named: 'grid'),
+        durationMs: any(named: 'durationMs'),
+        usedHint: false,
+        localDate: '2026-06-01',
+      ),
+    ).called(1);
     expect(find.byType(WinScreen), findsOneWidget);
   });
 
@@ -322,31 +336,38 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Hint'));
     await tester.pumpAndSettle();
 
-    verifyNever(() => solveRepo.recordSolve(
-          puzzleId: any(named: 'puzzleId'),
-          grid: any(named: 'grid'),
-          durationMs: any(named: 'durationMs'),
-          usedHint: any(named: 'usedHint'),
-          localDate: any(named: 'localDate'),
-        ));
+    verifyNever(
+      () => solveRepo.recordSolve(
+        puzzleId: any(named: 'puzzleId'),
+        grid: any(named: 'grid'),
+        durationMs: any(named: 'durationMs'),
+        usedHint: any(named: 'usedHint'),
+        localDate: any(named: 'localDate'),
+      ),
+    );
     expect(find.byType(WinScreen), findsOneWidget);
   });
 
-  testWidgets('loading — spinner visible while the future is pending',
-      (tester) async {
+  testWidgets('loading — spinner visible while the future is pending', (
+    tester,
+  ) async {
     final completer = Completer<PlayLoad>();
 
-    await pumpPlayRaw(tester, overrides: [
-      playLoadProvider.overrideWith((ref, args) => completer.future),
-      currentUserProvider.overrideWithValue(null),
-    ]);
+    await pumpPlayRaw(
+      tester,
+      overrides: [
+        playLoadProvider.overrideWith((ref, args) => completer.future),
+        currentUserProvider.overrideWithValue(null),
+      ],
+    );
     await tester.pump(); // one frame — future still pending
 
     // CircularProgressIndicator.adaptive() renders as CircularProgressIndicator
     // on Android/Linux and CupertinoActivityIndicator on iOS/macOS.
     expect(
       find.byWidgetPredicate(
-        (w) => w is CircularProgressIndicator || w is CupertinoActivityIndicator,
+        (w) =>
+            w is CircularProgressIndicator || w is CupertinoActivityIndicator,
       ),
       findsOneWidget,
     );
@@ -355,14 +376,18 @@ void main() {
     completer.completeError(Exception('teardown'));
   });
 
-  testWidgets('error — _UnavailableView shown when the load throws',
-      (tester) async {
-    await pumpPlayRaw(tester, overrides: [
-      playLoadProvider.overrideWith(
-        (ref, args) => Future<PlayLoad>.error(Exception('unavailable')),
-      ),
-      currentUserProvider.overrideWithValue(null),
-    ]);
+  testWidgets('error — _UnavailableView shown when the load throws', (
+    tester,
+  ) async {
+    await pumpPlayRaw(
+      tester,
+      overrides: [
+        playLoadProvider.overrideWith(
+          (ref, args) => Future<PlayLoad>.error(Exception('unavailable')),
+        ),
+        currentUserProvider.overrideWithValue(null),
+      ],
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Reload'), findsOneWidget);
@@ -371,55 +396,85 @@ void main() {
   });
 
   testWidgets(
-      'retry — tapping Reload invalidates the provider and re-loads the board',
-      (tester) async {
-    var attempt = 0;
-    // Pre-complete the completer so the retry future resolves immediately,
-    // landing straight in the data state without a loading-spinner frame that
-    // would cause pumpAndSettle to spin indefinitely.
-    final completer = Completer<PlayLoad>()..complete(dailyLoad(puzzle()));
+    'retry — tapping Reload invalidates the provider and re-loads the board',
+    (tester) async {
+      var attempt = 0;
+      // Pre-complete the completer so the retry future resolves immediately,
+      // landing straight in the data state without a loading-spinner frame that
+      // would cause pumpAndSettle to spin indefinitely.
+      final completer = Completer<PlayLoad>()..complete(dailyLoad(puzzle()));
 
-    await pumpPlayRaw(tester, overrides: [
-      playLoadProvider.overrideWith((ref, args) {
-        if (attempt++ == 0) return Future<PlayLoad>.error(Exception('unavailable'));
-        return completer.future;
-      }),
-      currentUserProvider.overrideWithValue(null),
-    ]);
-    await tester.pumpAndSettle(); // settle into error state
+      await pumpPlayRaw(
+        tester,
+        overrides: [
+          playLoadProvider.overrideWith((ref, args) {
+            if (attempt++ == 0) {
+              return Future<PlayLoad>.error(Exception('unavailable'));
+            }
+            return completer.future;
+          }),
+          currentUserProvider.overrideWithValue(null),
+        ],
+      );
+      await tester.pumpAndSettle(); // settle into error state
 
-    expect(find.text('Reload'), findsOneWidget);
-    expect(find.byType(PlayBoard), findsNothing);
+      expect(find.text('Reload'), findsOneWidget);
+      expect(find.byType(PlayBoard), findsNothing);
 
-    await tester.tap(find.text('Reload'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Reload'));
+      await tester.pumpAndSettle();
 
-    // Provider was re-invoked and resolved: board is visible, error view is gone.
-    expect(find.text('Reload'), findsNothing);
-    expect(find.byType(PlayBoard), findsOneWidget);
-  });
+      // Provider was re-invoked and resolved: board is visible, error view is gone.
+      expect(find.text('Reload'), findsNothing);
+      expect(find.byType(PlayBoard), findsOneWidget);
+    },
+  );
 
-  testWidgets('timer starts on first interaction and counts up', (tester) async {
+  testWidgets('play hides the live timer and shows placed-count progress', (
+    tester,
+  ) async {
     await pumpPlay(
       tester,
       load: dailyLoad(emptyPuzzle()),
       overrides: [currentUserProvider.overrideWithValue(null)],
     );
 
-    expect(find.text('0:00'), findsOneWidget);
+    expect(find.text('0:00'), findsNothing);
+    expect(find.text('0 / 36'), findsOneWidget);
 
-    // No interaction yet → timer stays at 0:00.
     await tester.pump(const Duration(seconds: 2));
-    expect(find.text('0:00'), findsOneWidget);
+    expect(find.text('0:00'), findsNothing);
 
-    await tester.tap(cell(0, 0)); // first interaction starts the clock
+    await tester.tap(cell(0, 0));
     await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    expect(find.text('0:01'), findsOneWidget);
-    await tester.pump(const Duration(seconds: 1));
-    expect(find.text('0:02'), findsOneWidget);
+    expect(find.text('1 / 36'), findsOneWidget);
+    expect(find.text('0:01'), findsNothing);
 
     await _disposeTree(tester); // cancel the running timer
+  });
+
+  testWidgets('restart returns the board to the starting givens', (
+    tester,
+  ) async {
+    await pumpPlay(
+      tester,
+      load: dailyLoad(emptyPuzzle()),
+      overrides: [currentUserProvider.overrideWithValue(null)],
+    );
+
+    await tester.tap(cell(0, 0));
+    await tester.pump();
+    expect(discIn(0, 0), findsOneWidget);
+    expect(find.text('1 / 36'), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Restart'));
+    await tester.pump();
+
+    expect(discIn(0, 0), findsNothing);
+    expect(ringIn(0, 0), findsNothing);
+    expect(find.text('0 / 36'), findsOneWidget);
+
+    await _disposeTree(tester);
   });
 }
 

@@ -20,7 +20,12 @@ import 'play_provider.dart';
 /// ([isPractice]); on solve it records (daily/archive only) and hands off to
 /// the Win screen.
 class PlayScreen extends ConsumerWidget {
-  const PlayScreen({super.key, this.date, this.difficulty, this.isPractice = false});
+  const PlayScreen({
+    super.key,
+    this.date,
+    this.difficulty,
+    this.isPractice = false,
+  });
 
   /// Archive day in `yyyy-MM-dd` (null = today's daily).
   final String? date;
@@ -49,18 +54,18 @@ class PlayScreen extends ConsumerWidget {
       child: SafeScaffold(
         safeBottom: true,
         body: async.when(
-        data: (load) => _PlayView(load: load),
-        loading: () => _ScaffoldedMessage(
-          label: _fallbackLabel(args),
-          child: const Expanded(
-            child: Center(child: CircularProgressIndicator.adaptive()),
+          data: (load) => _PlayView(load: load),
+          loading: () => _ScaffoldedMessage(
+            label: _fallbackLabel(args),
+            child: const Expanded(
+              child: Center(child: CircularProgressIndicator.adaptive()),
+            ),
+          ),
+          error: (_, _) => _UnavailableView(
+            label: _fallbackLabel(args),
+            onReload: () => ref.invalidate(playLoadProvider(args)),
           ),
         ),
-        error: (_, _) => _UnavailableView(
-          label: _fallbackLabel(args),
-          onReload: () => ref.invalidate(playLoadProvider(args)),
-        ),
-      ),
       ),
     );
   }
@@ -131,10 +136,11 @@ class _UnavailableView extends StatelessWidget {
 /// (iOS) / leading (Android) uppercase difficulty label, no trailing action.
 /// [puzzleInfo] is an optional subtitle rendered below (e.g. "#153 · June 2").
 class _PlayTopBar extends StatelessWidget {
-  const _PlayTopBar({required this.label, this.puzzleInfo});
+  const _PlayTopBar({required this.label, this.puzzleInfo, this.onBack});
 
   final String label;
   final String? puzzleInfo;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +149,9 @@ class _PlayTopBar extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         HalveTopBar(
-          onBack: () => context.canPop() ? context.pop() : context.go(Routes.home),
+          onBack:
+              onBack ??
+              () => context.canPop() ? context.pop() : context.go(Routes.home),
           title: null,
           trailing: Padding(
             padding: const EdgeInsets.only(right: AppSpacing.s5),
@@ -205,7 +213,9 @@ class _PlayViewState extends ConsumerState<_PlayView> {
         return;
       }
       if (prev != null && !next.solved) {
-        if (prev.violations.isEmpty && next.violations.isNotEmpty) hapticsOnError();
+        if (prev.violations.isEmpty && next.violations.isNotEmpty) {
+          hapticsOnError();
+        }
         if (_filledLineCount(next.grid) > _filledLineCount(prev.grid)) {
           hapticsOnLineComplete();
         }
@@ -214,16 +224,21 @@ class _PlayViewState extends ConsumerState<_PlayView> {
 
     final isTablet = context.isTablet;
     final reduceMotion = context.reduceMotion;
-    return Column(
+    final content = Column(
       children: [
         _PlayTopBar(
           label: _puzzle.difficulty.wire,
           puzzleInfo: _puzzleInfo(widget.load),
+          onBack: _requestLeave,
         ),
         if (widget.load.isOffline)
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.s5, AppSpacing.s1, AppSpacing.s5, 0),
+              AppSpacing.s5,
+              AppSpacing.s1,
+              AppSpacing.s5,
+              0,
+            ),
             child: Text(
               'Offline. Playing a saved puzzle',
               textAlign: TextAlign.center,
@@ -236,114 +251,136 @@ class _PlayViewState extends ConsumerState<_PlayView> {
         Expanded(
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: reduceMotion ? 0.0 : 8.0, end: 0.0),
-            duration:
-                reduceMotion ? Duration.zero : const Duration(milliseconds: 420),
+            duration: reduceMotion
+                ? Duration.zero
+                : const Duration(milliseconds: 420),
             curve: const Cubic(0.34, 1.4, 0.5, 1),
             builder: (_, dy, child) =>
                 Transform.translate(offset: Offset(0, dy), child: child),
             child: isTablet
-              ? Padding(
-                  padding: EdgeInsets.symmetric(horizontal: context.hPagePad),
-                  child: LayoutBuilder(
-                    builder: (ctx, constraints) {
-                      // Reserve space for spacer + controls + HowToPlay below
-                      // the board so the column never overflows on any tablet.
-                      const maxSide = Breakpoints.contentWidthPortrait;
-                      const controlsReserve = 132.0;
-                      final side = math.min(
-                          math.min(constraints.maxWidth,
-                              constraints.maxHeight - controlsReserve),
-                          maxSide);
-                      final cellSize = (side / 6.8).floorToDouble();
-                      final gap =
-                          math.max(6.0, (cellSize * 0.16).floorToDouble());
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          PlayBoard(
-                            cells: state.grid,
-                            givens: _puzzle.givens,
-                            edges: _puzzle.edges,
-                            violations: state.violations,
-                            cellSize: cellSize,
-                            gap: gap,
-                            readOnly: state.solved,
-                            onCellTap: (r, c) {
-                              hapticsOnTap();
-                              controller.tap(r, c);
-                            },
-                          ),
-                          const SizedBox(height: AppSpacing.s4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _ControlButton(
-                                label: 'Undo',
-                                onPressed: state.canUndo && !state.solved
-                                    ? controller.undo
-                                    : null,
-                                child: const UndoGlyph(),
-                              ),
-                              const SizedBox(width: AppSpacing.s7),
-                              _ControlButton(
-                                label: 'Hint',
-                                onPressed:
-                                    state.solved ? null : controller.hint,
-                                child: const HintGlyph(),
-                              ),
-                            ],
-                          ),
-                          TapFade(
-                            onTap: () => _showRules(context),
-                            child: Container(
-                              constraints:
-                                  const BoxConstraints(minHeight: 44),
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.s2),
-                              child: Text(
-                                'Rules',
-                                style:
-                                    AppTypography.small.copyWith(color: c.fg2),
-                              ),
+                ? Padding(
+                    padding: EdgeInsets.symmetric(horizontal: context.hPagePad),
+                    child: LayoutBuilder(
+                      builder: (ctx, constraints) {
+                        // Reserve space for spacer + controls + HowToPlay below
+                        // the board so the column never overflows on any tablet.
+                        const maxSide = Breakpoints.contentWidthPortrait;
+                        const controlsReserve = 172.0;
+                        final side = math.min(
+                          math.min(
+                            constraints.maxWidth,
+                            math.max(
+                              0.0,
+                              constraints.maxHeight - controlsReserve,
                             ),
                           ),
-                        ],
-                      );
-                    },
+                          maxSide,
+                        );
+                        final cellSize = (side / 6.8).floorToDouble();
+                        final gap = math.max(
+                          6.0,
+                          (cellSize * 0.16).floorToDouble(),
+                        );
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            PlayBoard(
+                              cells: state.grid,
+                              givens: _puzzle.givens,
+                              edges: _puzzle.edges,
+                              violations: state.violations,
+                              cellSize: cellSize,
+                              gap: gap,
+                              readOnly: state.solved,
+                              onCellTap: (r, c) {
+                                hapticsOnTap();
+                                controller.tap(r, c);
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.s3),
+                            _BoardProgress(state: state),
+                            const SizedBox(height: AppSpacing.s4),
+                            _PlayControls(
+                              state: state,
+                              onUndo: controller.undo,
+                              onHint: controller.hint,
+                              onRestart: controller.restart,
+                            ),
+                            TapFade(
+                              onTap: () => _showRules(context),
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  minHeight: 44,
+                                ),
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.s2,
+                                ),
+                                child: Text(
+                                  'Rules',
+                                  style: AppTypography.small.copyWith(
+                                    color: c.fg2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  )
+                : Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      context.hPagePad,
+                      AppSpacing.s4,
+                      context.hPagePad,
+                      AppSpacing.s4,
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        const maxSide = 480.0;
+                        const progressReserve = 48.0;
+                        final side = math.min(
+                          math.min(
+                            constraints.maxWidth,
+                            math.max(
+                              0.0,
+                              constraints.maxHeight - progressReserve,
+                            ),
+                          ),
+                          maxSide,
+                        );
+                        // 6 cells + 5 gaps (gap ≈ 0.16·cell) → total ≈ 6.8·cell.
+                        final cellSize = (side / 6.8).floorToDouble();
+                        final gap = math.max(
+                          6.0,
+                          (cellSize * 0.16).floorToDouble(),
+                        );
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              PlayBoard(
+                                cells: state.grid,
+                                givens: _puzzle.givens,
+                                edges: _puzzle.edges,
+                                violations: state.violations,
+                                cellSize: cellSize,
+                                gap: gap,
+                                readOnly: state.solved,
+                                onCellTap: (r, c) {
+                                  hapticsOnTap();
+                                  controller.tap(r, c);
+                                },
+                              ),
+                              const SizedBox(height: AppSpacing.s3),
+                              _BoardProgress(state: state),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                )
-              : Padding(
-                  padding: EdgeInsets.fromLTRB(context.hPagePad, AppSpacing.s4,
-                      context.hPagePad, AppSpacing.s4),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      const maxSide = 480.0;
-                      final side = math.min(
-                          math.min(constraints.maxWidth, constraints.maxHeight),
-                          maxSide);
-                      // 6 cells + 5 gaps (gap ≈ 0.16·cell) → total ≈ 6.8·cell.
-                      final cellSize = (side / 6.8).floorToDouble();
-                      final gap =
-                          math.max(6.0, (cellSize * 0.16).floorToDouble());
-                      return Center(
-                        child: PlayBoard(
-                          cells: state.grid,
-                          givens: _puzzle.givens,
-                          edges: _puzzle.edges,
-                          violations: state.violations,
-                          cellSize: cellSize,
-                          gap: gap,
-                          readOnly: state.solved,
-                          onCellTap: (r, c) {
-                            hapticsOnTap();
-                            controller.tap(r, c);
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
           ),
         ),
         // Controls and How to play — phone only; tablet renders these inside
@@ -351,23 +388,16 @@ class _PlayViewState extends ConsumerState<_PlayView> {
         if (!isTablet) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.s5, AppSpacing.s1, AppSpacing.s5, AppSpacing.s2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _ControlButton(
-                  label: 'Undo',
-                  onPressed:
-                      state.canUndo && !state.solved ? controller.undo : null,
-                  child: const UndoGlyph(),
-                ),
-                const SizedBox(width: AppSpacing.s7),
-                _ControlButton(
-                  label: 'Hint',
-                  onPressed: state.solved ? null : controller.hint,
-                  child: const HintGlyph(),
-                ),
-              ],
+              AppSpacing.s5,
+              AppSpacing.s1,
+              AppSpacing.s5,
+              AppSpacing.s2,
+            ),
+            child: _PlayControls(
+              state: state,
+              onUndo: controller.undo,
+              onHint: controller.hint,
+              onRestart: controller.restart,
             ),
           ),
           Padding(
@@ -377,8 +407,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
               child: Container(
                 constraints: const BoxConstraints(minHeight: 44),
                 alignment: Alignment.center,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: AppSpacing.s2),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s2),
                 child: Text(
                   'Rules',
                   style: AppTypography.small.copyWith(color: c.fg2),
@@ -389,6 +418,37 @@ class _PlayViewState extends ConsumerState<_PlayView> {
         ],
       ],
     );
+    return PopScope(
+      canPop: !state.hasProgress || state.solved,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        _requestLeave();
+      },
+      child: content,
+    );
+  }
+
+  Future<void> _requestLeave() async {
+    final state = ref.read(playControllerProvider(_puzzle));
+    if (!state.hasProgress || state.solved) {
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go(Routes.home);
+      }
+      return;
+    }
+
+    final leave = await showHalveBottomSheet<bool>(
+      context: context,
+      builder: (_) => const _LeavePuzzleSheet(),
+    );
+    if (!mounted || leave != true) return;
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(Routes.home);
+    }
   }
 
   Future<void> _onSolved(PlayState state) async {
@@ -401,11 +461,13 @@ class _PlayViewState extends ConsumerState<_PlayView> {
 
     // Record the solve (daily/archive only; practice never records — Phase 0).
     // Guests silently skip (reading the repo throws in guest mode).
-    final recordFuture = _record(durationMs: durationMs, usedHint: state.usedHint);
+    final recordFuture = _record(
+      durationMs: durationMs,
+      usedHint: state.usedHint,
+    );
 
     // A brief beat on the solved board (the win-mark moment) before hand-off.
-    await Future<void>.delayed(
-        Duration(milliseconds: reduceMotion ? 0 : 520));
+    await Future<void>.delayed(Duration(milliseconds: reduceMotion ? 0 : 520));
     final saveResult = await recordFuture;
     if (!mounted) return;
 
@@ -471,6 +533,161 @@ class _PlayViewState extends ConsumerState<_PlayView> {
     } catch (_) {
       return RecordSolveResult.networkFailure;
     }
+  }
+}
+
+class _BoardProgress extends StatelessWidget {
+  const _BoardProgress({required this.state});
+
+  final PlayState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    final statusColor = state.solved
+        ? c.accent
+        : state.violations.isNotEmpty
+        ? c.wrong
+        : c.fg3;
+    final progress = state.totalCount == 0
+        ? 0.0
+        : state.placedCount / state.totalCount;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 480),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  state.statusText,
+                  style: AppTypography.small.copyWith(
+                    color: statusColor,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+              Text(
+                '${state.placedCount} / ${state.totalCount}',
+                style: AppTypography.tabular(
+                  AppTypography.micro,
+                ).copyWith(color: c.fg3),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.s1),
+          ClipRRect(
+            borderRadius: AppRadii.fullR,
+            child: SizedBox(
+              height: 2,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ColoredBox(color: c.hairline),
+                  FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: progress.clamp(0.0, 1.0).toDouble(),
+                    child: ColoredBox(color: c.accent),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlayControls extends StatelessWidget {
+  const _PlayControls({
+    required this.state,
+    required this.onUndo,
+    required this.onHint,
+    required this.onRestart,
+  });
+
+  final PlayState state;
+  final VoidCallback onUndo;
+  final VoidCallback onHint;
+  final VoidCallback onRestart;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _ControlButton(
+          label: 'Undo',
+          onPressed: state.canUndo && !state.solved ? onUndo : null,
+          child: const UndoGlyph(),
+        ),
+        const SizedBox(width: AppSpacing.s6),
+        _ControlButton(
+          label: 'Hint',
+          onPressed: state.solved ? null : onHint,
+          child: const HintGlyph(),
+        ),
+        const SizedBox(width: AppSpacing.s6),
+        _ControlButton(
+          label: 'Restart',
+          onPressed: state.hasProgress && !state.solved ? onRestart : null,
+          child: const RestartGlyph(),
+        ),
+      ],
+    );
+  }
+}
+
+class _LeavePuzzleSheet extends StatelessWidget {
+  const _LeavePuzzleSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.s5,
+        AppSpacing.s4,
+        AppSpacing.s5,
+        AppSpacing.s5,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Leave this puzzle?',
+            style: AppTypography.h3.copyWith(color: c.fg1),
+          ),
+          const SizedBox(height: AppSpacing.s3),
+          Text(
+            "Your progress on this grid won't be saved.",
+            style: AppTypography.small.copyWith(color: c.fg2, height: 1.5),
+          ),
+          const SizedBox(height: AppSpacing.s5),
+          Row(
+            children: [
+              Expanded(
+                child: HalveButton(
+                  label: 'Keep playing',
+                  variant: HalveButtonVariant.secondary,
+                  onPressed: () => Navigator.pop(context, false),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.s3),
+              Expanded(
+                child: HalveButton(
+                  label: 'Leave',
+                  onPressed: () => Navigator.pop(context, true),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -551,7 +768,10 @@ class _RulesSheet extends StatelessWidget {
           _RuleRow(
             motif: Text(
               '3+3',
-              style: AppTypography.label.copyWith(color: c.accent, letterSpacing: 0),
+              style: AppTypography.label.copyWith(
+                color: c.accent,
+                letterSpacing: 0,
+              ),
             ),
             heading: 'Balance',
             body: 'Each row and column must contain exactly 3 of each symbol.',
@@ -561,10 +781,14 @@ class _RulesSheet extends StatelessWidget {
           _RuleRow(
             motif: Text(
               '≤2',
-              style: AppTypography.label.copyWith(color: c.accent, letterSpacing: 0),
+              style: AppTypography.label.copyWith(
+                color: c.accent,
+                letterSpacing: 0,
+              ),
             ),
             heading: 'No three in a row',
-            body: 'No three identical symbols may appear side-by-side in any row or column.',
+            body:
+                'No three identical symbols may appear side-by-side in any row or column.',
             c: c,
           ),
           const SizedBox(height: AppSpacing.s4),
@@ -572,13 +796,26 @@ class _RulesSheet extends StatelessWidget {
             motif: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('=', style: AppTypography.label.copyWith(color: c.accent, letterSpacing: 0)),
+                Text(
+                  '=',
+                  style: AppTypography.label.copyWith(
+                    color: c.accent,
+                    letterSpacing: 0,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text('≠', style: AppTypography.label.copyWith(color: c.fg3, letterSpacing: 0)),
+                Text(
+                  '≠',
+                  style: AppTypography.label.copyWith(
+                    color: c.fg3,
+                    letterSpacing: 0,
+                  ),
+                ),
               ],
             ),
             heading: 'Edge clues',
-            body: '= means the two neighbouring cells share a symbol. ≠ means they differ.',
+            body:
+                '= means the two neighbouring cells share a symbol. ≠ means they differ.',
             c: c,
           ),
         ],
@@ -607,10 +844,7 @@ class _RuleRow extends StatelessWidget {
       children: [
         SizedBox(
           width: 36,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: motif,
-          ),
+          child: Padding(padding: const EdgeInsets.only(top: 2), child: motif),
         ),
         const SizedBox(width: AppSpacing.s3),
         Expanded(

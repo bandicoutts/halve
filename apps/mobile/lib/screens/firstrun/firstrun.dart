@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/onboarding.dart';
-import '../../providers/providers.dart';
 import '../../router/app_router.dart';
 import '../tutorial/tutorial_flow.dart';
 
@@ -33,10 +32,6 @@ class _FirstRunScreenState extends ConsumerState<FirstRunScreen> {
   }
 
   Future<void> _playFirstPuzzle() async {
-    // Request OS notification permission when the user accepts (taps Continue).
-    // iOS: requests full authorization (banner + sound + badge) — system permission dialog is shown.
-    // Android 13+: POST_NOTIFICATIONS dialog shown by the OS.
-    await ref.read(notificationServiceProvider).requestPermission();
     await _markOnboarded();
     if (mounted) context.go(Routes.play);
   }
@@ -45,13 +40,13 @@ class _FirstRunScreenState extends ConsumerState<FirstRunScreen> {
   Widget build(BuildContext context) {
     return switch (_phase) {
       _Phase.tutorial => TutorialFlow(
-          onSkip: _skip,
-          onComplete: () => setState(() => _phase = _Phase.win),
-        ),
+        onSkip: _skip,
+        onComplete: () => setState(() => _phase = _Phase.win),
+      ),
       _Phase.win => TutorialWin(
-          continueLabel: "Play today's puzzle",
-          onContinue: _playFirstPuzzle,
-        ),
+        continueLabel: "Play today's puzzle",
+        onContinue: _playFirstPuzzle,
+      ),
     };
   }
 }

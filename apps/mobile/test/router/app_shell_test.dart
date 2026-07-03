@@ -14,14 +14,18 @@ class MockPuzzleRepository extends Mock implements PuzzleRepository {}
 class MockSolveRepository extends Mock implements SolveRepository {}
 
 Puzzle _samplePuzzle() => Puzzle.tryParse(
-      id: 'p-today',
-      difficulty: 'medium',
-      gridSpec: {
-        'solution': [for (var r = 0; r < 6; r++) [for (var c = 0; c < 6; c++) (r + c) % 2]],
-        'givens': [for (var r = 0; r < 6; r++) [for (var c = 0; c < 6; c++) null]],
-        'edges': const <Map<String, Object?>>[],
-      },
-    )!;
+  id: 'p-today',
+  difficulty: 'medium',
+  gridSpec: {
+    'solution': [
+      for (var r = 0; r < 6; r++) [for (var c = 0; c < 6; c++) (r + c) % 2],
+    ],
+    'givens': [
+      for (var r = 0; r < 6; r++) [for (var c = 0; c < 6; c++) null],
+    ],
+    'edges': const <Map<String, Object?>>[],
+  },
+)!;
 
 void main() {
   // Boot the real app with deterministic Home data so the daily CTA renders
@@ -29,9 +33,15 @@ void main() {
   Future<void> pumpApp(WidgetTester tester) async {
     final puzzleRepo = MockPuzzleRepository();
     final solveRepo = MockSolveRepository();
-    when(() => puzzleRepo.fetchDaily(any())).thenAnswer((_) async => _samplePuzzle());
-    when(() => puzzleRepo.fetchByDate(any())).thenAnswer((_) async => _samplePuzzle());
-    when(() => puzzleRepo.fetchArchive(any())).thenAnswer((_) async => <ArchiveDay>[]);
+    when(
+      () => puzzleRepo.fetchDaily(any()),
+    ).thenAnswer((_) async => _samplePuzzle());
+    when(
+      () => puzzleRepo.fetchByDate(any()),
+    ).thenAnswer((_) async => _samplePuzzle());
+    when(
+      () => puzzleRepo.fetchArchive(any()),
+    ).thenAnswer((_) async => <ArchiveDay>[]);
 
     await tester.pumpWidget(
       ProviderScope(
@@ -49,9 +59,9 @@ void main() {
 
   // The nav label, disambiguated from any same-named card on the Home screen.
   Finder navLabel(String label) => find.descendant(
-        of: find.byType(HalveBottomNav),
-        matching: find.text(label),
-      );
+    of: find.byType(HalveBottomNav),
+    matching: find.text(label),
+  );
 
   testWidgets('bottom tabs switch branches', (tester) async {
     await pumpApp(tester);
@@ -80,8 +90,8 @@ void main() {
     await tester.tap(find.text('Play today'));
     await tester.pumpAndSettle();
 
-    // The play board has loaded (timer at zero) — not the placeholder.
-    expect(find.text('0:00'), findsOneWidget);
+    // The play board has loaded (placed-count progress) — not the placeholder.
+    expect(find.text('0 / 36'), findsOneWidget);
     // Play is a full-screen route outside the shell → no bottom nav.
     expect(find.byType(HalveBottomNav), findsNothing);
 
