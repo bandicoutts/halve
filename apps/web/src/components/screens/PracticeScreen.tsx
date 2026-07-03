@@ -1,81 +1,147 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "@/components/providers/ThemeProvider";
-import { TopBar } from "@/components/ui/TopBar";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { IconButton } from "@/components/ui/IconButton";
-import { Button } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
-import { FitToViewport } from "@/components/ui/FitToViewport";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { BackIcon } from "@/components/ui/icons";
 import type { Difficulty } from "@parity/engine";
+import { SiteHeader } from "@/components/ui/SiteHeader";
 
-const DIFFS: Record<string, { blurb: string; givens: string; time: string; difficulty: Difficulty }> = {
-  Easy: { blurb: "More given cells and signs to lean on. A gentle, unhurried solve.", givens: "14+", time: "~2 min", difficulty: "easy" },
-  Medium: { blurb: "A balanced board — enough to start, room to think.", givens: "11", time: "~4 min", difficulty: "medium" },
-  Hard: { blurb: "Few givens. Pure deduction, no shortcuts. For the patient.", givens: "8", time: "~6 min", difficulty: "hard" },
-};
+interface Row {
+  name: string;
+  difficulty: Difficulty;
+  meta: string;
+  desc: string;
+}
 
-export function PracticeScreen() {
+const ROWS: Row[] = [
+  {
+    name: "Easy",
+    difficulty: "easy",
+    meta: "14 GIVENS · 4 LINKS",
+    desc: "A generous start — most of the logic is laid out for you. Good for learning the shapes.",
+  },
+  {
+    name: "Medium",
+    difficulty: "medium",
+    meta: "11 GIVENS · 5 LINKS",
+    desc: "The daily's weight. Fewer footholds, steady deduction all the way down.",
+  },
+  {
+    name: "Hard",
+    difficulty: "hard",
+    meta: "8 GIVENS · 7 LINKS",
+    desc: "Sparse and slow-burning. Every placement has to be earned.",
+  },
+];
+
+interface PracticeScreenProps {
+  isAuthenticated?: boolean | undefined;
+  displayName?: string | undefined;
+}
+
+export function PracticeScreen({ isAuthenticated, displayName }: PracticeScreenProps) {
   const router = useRouter();
-  const { theme, toggle } = useTheme();
-  const [diff, setDiff] = useState("Medium");
-  const d = DIFFS[diff]!;
+  const [hovered, setHovered] = useState<string | null>(null);
 
-  function handleStart() {
-    router.push(`/practice/play?difficulty=${d.difficulty}`);
-  }
+  const start = (d: Difficulty) => router.push(`/practice/play?difficulty=${d}`);
 
   return (
-    <div style={{ height: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", animation: "fade-up 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
-      <TopBar
-        left={<IconButton label="Back" size={40} onClick={() => router.push("/")}><BackIcon /></IconButton>}
-        title={<span style={{ fontWeight: 600, fontSize: 16, color: "var(--fg-1)" }}>Practice</span>}
-        right={<ThemeToggle theme={theme} onToggle={toggle} />}
-      />
-      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
-       <div style={{ width: "100%", maxWidth: 460, paddingBottom: "clamp(16px, 3vh, 40px)" }}>
-        <div style={{ marginTop: 14 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--fg-1)", lineHeight: 1.2 }}>
-            A fresh puzzle,<br />any time.
+    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+      <SiteHeader active="practice" isAuthenticated={isAuthenticated} displayName={displayName} maxWidth={900} />
+
+      <section
+        style={{
+          maxWidth: 900,
+          width: "100%",
+          margin: "0 auto",
+          padding: "16px clamp(20px, 4vw, 40px) 96px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "clamp(32px, 5vw, 48px)",
+          animation: "fadeup 0.45s var(--ease-editorial) both",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.22em", color: "var(--fg-3)" }}>
+            PRACTICE · UNLIMITED
+          </div>
+          <h1
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontStyle: "italic",
+              fontWeight: 500,
+              fontSize: "clamp(40px, 6vw, 64px)",
+              lineHeight: 1,
+              margin: 0,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Off the record.
           </h1>
-          <p style={{ marginTop: 12, fontSize: 16, color: "var(--fg-2)", maxWidth: 300, lineHeight: 1.5 }}>
-            No streak, no pressure. Pick a difficulty and play as many as you like.
+          <p style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "52ch" }}>
+            As many puzzles as you like, at any difficulty. The streak is never at stake here — just you
+            and the grid.
           </p>
         </div>
 
-        <div style={{ marginTop: 32 }}>
-          <Eyebrow style={{ marginBottom: 12 }}>Difficulty</Eyebrow>
-          <SegmentedControl options={["Easy", "Medium", "Hard"]} value={diff} onChange={setDiff} label="Difficulty" />
+        <div style={{ borderBottom: "1px solid var(--hairline)" }}>
+          {ROWS.map((row) => (
+            <button
+              key={row.name}
+              onClick={() => start(row.difficulty)}
+              onMouseEnter={() => setHovered(row.name)}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: "14px 28px",
+                width: "100%",
+                padding: "clamp(22px, 4vw, 32px) clamp(6px, 1.5vw, 14px)",
+                border: "none",
+                borderTop: "1px solid var(--hairline)",
+                background: hovered === row.name ? "var(--hover)" : "transparent",
+                cursor: "pointer",
+                color: "inherit",
+                textAlign: "left",
+                fontFamily: "inherit",
+                transition: "background 0.2s ease",
+                WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              <div style={{ flex: "0 1 190px", minWidth: 150, display: "flex", flexDirection: "column", gap: 8 }}>
+                <span
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    fontStyle: "italic",
+                    fontWeight: 500,
+                    fontSize: "clamp(30px, 4.4vw, 40px)",
+                    lineHeight: 1,
+                  }}
+                >
+                  {row.name}
+                </span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.16em", color: "var(--fg-3)" }}>
+                  {row.meta}
+                </span>
+              </div>
+              <p style={{ flex: "1 1 240px", margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--fg-3)", minWidth: 0 }}>
+                {row.desc}
+              </p>
+              <span
+                style={{
+                  flex: "none",
+                  marginLeft: "auto",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 12,
+                  letterSpacing: "0.16em",
+                  color: "var(--accent)",
+                }}
+              >
+                PLAY →
+              </span>
+            </button>
+          ))}
         </div>
-
-        <div key={diff} style={{ marginTop: 22, background: "var(--surface)", border: "1px solid var(--hairline)", borderRadius: "var(--radius-xl)", padding: 24, animation: "lm-fade 0.22s ease" }}>
-          <div style={{ display: "flex", gap: 22 }}>
-            <div>
-              <div className="tnum" style={{ fontSize: 24, fontWeight: 500, color: "var(--fg-1)" }}>6×6</div>
-              <Eyebrow style={{ marginTop: 6 }}>Grid</Eyebrow>
-            </div>
-            <div>
-              <div className="tnum" style={{ fontSize: 24, fontWeight: 500, color: "var(--fg-1)" }}>{d.givens}</div>
-              <Eyebrow style={{ marginTop: 6 }}>Given</Eyebrow>
-            </div>
-            <div>
-              <div className="tnum" style={{ fontSize: 24, fontWeight: 500, color: "var(--fg-1)" }}>{d.time}</div>
-              <Eyebrow style={{ marginTop: 6 }}>Typical</Eyebrow>
-            </div>
-          </div>
-          <p style={{ marginTop: 18, fontSize: 15, color: "var(--fg-2)", lineHeight: 1.5 }}>{d.blurb}</p>
-        </div>
-
-        <div style={{ marginTop: 28 }}>
-          <Button variant="primary" full onClick={handleStart}>
-            Start {diff.toLowerCase()} puzzle
-          </Button>
-        </div>
-       </div>
-      </FitToViewport>
+      </section>
     </div>
   );
 }

@@ -1,28 +1,12 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { useTheme } from "@/components/providers/ThemeProvider";
-import { TopBar } from "@/components/ui/TopBar";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { IconButton } from "@/components/ui/IconButton";
-import { Eyebrow } from "@/components/ui/Eyebrow";
-import { FitToViewport } from "@/components/ui/FitToViewport";
-import { Button } from "@/components/ui/Button";
-import { Mark } from "@/components/symbols/Mark";
-import { Monogram } from "@/components/ui/Monogram";
-import { BackIcon, SignOutIcon } from "@/components/ui/icons";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { SiteHeader } from "@/components/ui/SiteHeader";
+import { SignOutIcon } from "@/components/ui/icons";
 import type { UserStats } from "@/app/stats/page";
 
-function FlameIcon({ size = 18, color = "var(--accent)" }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
-      <path d="M12 2C12 2 7 8 7 13a5 5 0 0 0 10 0c0-5-5-11-5-11zm0 16a3 3 0 0 1-3-3c0-2.5 3-7 3-7s3 4.5 3 7a3 3 0 0 1-3 3z" />
-    </svg>
-  );
-}
-
-const DIST_LABELS = ["<2m", "2–3", "3–4", "4–5", "5–6", "6+m"];
+const DIST_LABELS = ["<2m", "2–3", "3–4", "4–5", "5–6", "6m+"];
 
 function fmtSecs(s: number | null): string {
   if (s == null) return "—";
@@ -30,137 +14,39 @@ function fmtSecs(s: number | null): string {
   return `${m}:${String(s % 60).padStart(2, "0")}`;
 }
 
-// ─── Streak hero card ─────────────────────────────────────────────────────────
+const KICKER: React.CSSProperties = {
+  fontFamily: "var(--font-mono)",
+  fontSize: 12,
+  letterSpacing: "0.22em",
+  color: "var(--fg-3)",
+};
 
-function StreakHero({ streak, longestStreak }: { streak: number; longestStreak: number }) {
+// ─── Week dots (last 7 days) ──────────────────────────────────────────────────
+
+function WeekDots({ days }: { days: boolean[] }) {
+  const last7 = days.slice(-7);
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid var(--hairline)", borderRadius: "var(--radius-xl)", padding: "22px 22px 20px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-      <div>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-          <FlameIcon size={18} color="var(--accent)" />
-          <span style={{ fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--fg-3)", whiteSpace: "nowrap" }}>Day streak</span>
-        </div>
-        <div className="tnum" style={{ fontSize: 66, fontWeight: 500, letterSpacing: "-0.03em", color: "var(--accent)", lineHeight: 0.95 }}>{streak}</div>
-      </div>
-      <div style={{ textAlign: "right", paddingBottom: 6 }}>
-        <div className="tnum" style={{ fontSize: 24, fontWeight: 500, color: "var(--fg-2)", lineHeight: 1 }}>{longestStreak}</div>
-        <div style={{ fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--fg-3)", marginTop: 6, whiteSpace: "nowrap" }}>Best ever</div>
-      </div>
-    </div>
-  );
-}
-
-// ─── 14-day calendar (two rows) ──────────────────────────────────────────────
-
-function Cal14Weeks({ days }: { days: boolean[] }) {
-  const rows = [
-    { label: "Last week", cells: days.slice(0, 7) },
-    { label: "This week", cells: days.slice(7) },
-  ];
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      {rows.map((row, ri) => (
-        <div key={ri} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ width: 76, fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "0.04em", color: "var(--fg-3)", flexShrink: 0, whiteSpace: "nowrap" }}>{row.label}</span>
-          <div style={{ display: "flex", gap: 6, flex: 1 }}>
-            {row.cells.map((solved, i) => {
-              const isToday = ri === 1 && i === row.cells.length - 1;
-              return (
-                <div key={i} style={{
-                  flex: 1, aspectRatio: "1", borderRadius: "var(--radius-sm)",
-                  background: solved ? "var(--accent)" : "var(--bg-sunken)",
-                  border: isToday ? "2px solid var(--fg-1)" : solved ? "1px solid var(--accent)" : "1px solid var(--hairline)",
-                }} />
-              );
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── SVG area curve ──────────────────────────────────────────────────────────
-
-function smoothPath(pts: { x: number; y: number }[]): string {
-  if (pts.length < 2) return "";
-  let d = `M ${pts[0]!.x} ${pts[0]!.y}`;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] ?? pts[i]!;
-    const p1 = pts[i]!;
-    const p2 = pts[i + 1]!;
-    const p3 = pts[i + 2] ?? p2;
-    const c1x = p1.x + (p2.x - p0.x) / 6, c1y = p1.y + (p2.y - p0.y) / 6;
-    const c2x = p2.x - (p3.x - p1.x) / 6, c2y = p2.y - (p3.y - p1.y) / 6;
-    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2.x} ${p2.y}`;
-  }
-  return d;
-}
-
-function AreaSignature({ dist }: { dist: number[] }) {
-  const W = 320, H = 132, padX = 14, padTop = 22, padBot = 30;
-  const max = Math.max(...dist, 1);
-  const peak = dist.indexOf(Math.max(...dist));
-  const stepX = (W - padX * 2) / (dist.length - 1);
-  const yFor = (c: number) => padTop + (1 - c / max) * (H - padTop - padBot);
-  const pts = dist.map((c, i) => ({ x: padX + i * stepX, y: yFor(c) }));
-  const line = smoothPath(pts);
-  const area = `${line} L ${pts[pts.length - 1]!.x} ${H - padBot} L ${pts[0]!.x} ${H - padBot} Z`;
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" style={{ display: "block", overflow: "visible" }}>
-      <line x1={padX} y1={H - padBot} x2={W - padX} y2={H - padBot} stroke="var(--hairline)" strokeWidth="1" />
-      <path d={area} fill="var(--accent-tint)" />
-      <path d={line} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
-      <circle cx={pts[peak]!.x} cy={pts[peak]!.y} r="4.5" fill="var(--accent)" stroke="var(--surface)" strokeWidth="2" />
-      {pts.map((p, i) => (
-        <text key={i} x={p.x} y={H - 10} textAnchor="middle" fontSize="10.5" fontWeight={i === peak ? 700 : 500}
-          fill={i === peak ? "var(--accent)" : "var(--fg-3)"} fontFamily="var(--font-sans)" style={{ letterSpacing: "0.02em" }}>
-          {DIST_LABELS[i]}
-        </text>
-      ))}
-    </svg>
-  );
-}
-
-// ─── Avg / best time divided card ────────────────────────────────────────────
-
-function StatDivided({ items }: { items: { value: string; label: string; accent?: boolean }[] }) {
-  return (
-    <div style={{ display: "flex", width: "100%", background: "var(--surface)", border: "1px solid var(--hairline)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
-      {items.map((it, i) => (
-        <div key={i} style={{ flex: 1, padding: "16px 12px", textAlign: "center", borderLeft: i ? "1px solid var(--hairline)" : "none" }}>
-          <div className="tnum" style={{ fontSize: 22, fontWeight: 500, color: it.accent ? "var(--accent)" : "var(--fg-1)", lineHeight: 1 }}>{it.value}</div>
-          <div style={{ fontSize: "var(--text-label)", fontWeight: 600, letterSpacing: "var(--tracking-label)", textTransform: "uppercase", color: "var(--fg-3)", marginTop: 8 }}>{it.label}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── Shell ───────────────────────────────────────────────────────────────────
-
-function StatsShell({ onBack, children }: { onBack: () => void; children: React.ReactNode }) {
-  const { theme, toggle } = useTheme();
-  return (
-    <div style={{ height: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
-      <TopBar
-        left={<IconButton label="Back" size={44} onClick={onBack}><BackIcon /></IconButton>}
-        title={<span style={{ fontWeight: 600, fontSize: "var(--text-body)", color: "var(--fg-1)" }}>Statistics</span>}
-        right={<ThemeToggle theme={theme} onToggle={toggle} />}
-      />
-      <FitToViewport style={{ paddingLeft: 24, paddingRight: 24 }}>
-        <div style={{ maxWidth: 560, width: "100%", paddingBottom: 36 }}>
-          <h1 className="sr-only">Statistics</h1>
-          {children}
-        </div>
-      </FitToViewport>
+    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      {last7.map((solved, i) => {
+        const isToday = i === last7.length - 1;
+        const style: React.CSSProperties = solved
+          ? { fill: "var(--accent)" }
+          : isToday
+          ? { fill: "none", stroke: "var(--symbol-b)", strokeWidth: "3px" }
+          : { fill: "none", stroke: "var(--hairline-2)", strokeWidth: "2.5px" };
+        return (
+          <svg key={i} viewBox="0 0 20 20" style={{ width: 10, height: 10 }} aria-hidden="true">
+            <circle cx="10" cy="10" r="7.5" style={style} />
+          </svg>
+        );
+      })}
     </div>
   );
 }
 
 // ─── Authenticated record ────────────────────────────────────────────────────
 
-function StatsRecord({ stats, onBack }: { stats: UserStats; onBack: () => void }) {
+function StatsRecord({ stats }: { stats: UserStats }) {
   const router = useRouter();
 
   async function handleSignOut() {
@@ -170,96 +56,315 @@ function StatsRecord({ stats, onBack }: { stats: UserStats; onBack: () => void }
     router.refresh();
   }
 
+  const statCards = [
+    { label: "BEST STREAK", value: String(stats.longestStreak) },
+    { label: "SOLVED", value: String(stats.totalSolved) },
+    { label: "BEST TIME", value: fmtSecs(stats.bestTimeSecs) },
+    { label: "AVG TIME", value: fmtSecs(stats.avgTimeSecs) },
+  ];
+
+  const maxCount = Math.max(...stats.timeDist, 1);
+
   return (
-    <StatsShell onBack={onBack}>
-      {/* Identity row */}
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 16, marginBottom: 24 }}>
-        <Monogram name={stats.displayName} size={48} />
-        <div>
-          <div style={{ fontSize: 23, fontWeight: 600, letterSpacing: "var(--tracking-snug)", color: "var(--fg-1)", textTransform: "capitalize" }}>{stats.displayName}</div>
-          <div style={{ fontSize: "var(--text-small)", color: "var(--fg-3)", marginTop: 2 }}>
-            <span className="tnum">{stats.totalSolved}</span> solved · since {stats.since}
+    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+      <SiteHeader active="stats" isAuthenticated displayName={stats.displayName} maxWidth={900} />
+      <h1 className="sr-only">Statistics</h1>
+
+      <section
+        style={{
+          maxWidth: 900,
+          width: "100%",
+          margin: "0 auto",
+          padding: "16px clamp(20px, 4vw, 40px) 96px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "clamp(40px, 6vw, 60px)",
+          animation: "fadeup 0.45s var(--ease-editorial) both",
+        }}
+      >
+        {/* Identity */}
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 18, flexWrap: "wrap" }}>
+          <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={KICKER}>PLAYING SINCE {stats.since.toUpperCase()}</div>
+            <div
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontWeight: 500,
+                fontSize: "clamp(40px, 6vw, 56px)",
+                lineHeight: 1,
+                letterSpacing: "-0.01em",
+                textTransform: "capitalize",
+              }}
+            >
+              {stats.displayName}
+            </div>
+          </div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.14em", color: "var(--fg-3)", paddingBottom: 6 }}>
+            {stats.totalSolved} PUZZLES SOLVED
           </div>
         </div>
-      </div>
 
-      {/* Streak hero */}
-      <StreakHero streak={stats.streak} longestStreak={stats.longestStreak} />
-
-      {/* Last 14 days */}
-      <div style={{ marginTop: 28 }}>
-        <Eyebrow style={{ marginBottom: 14 }}>Last 14 days</Eyebrow>
-        <Cal14Weeks days={stats.last14Days} />
-      </div>
-
-      {/* Solve time area chart */}
-      <div style={{ marginTop: 28 }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
-          <Eyebrow>Solve time</Eyebrow>
-          <span style={{ fontSize: "var(--text-label)", color: "var(--fg-3)" }}>avg {fmtSecs(stats.avgTimeSecs)}</span>
+        {/* Streak band + stat cards */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "stretch",
+            borderTop: "1px solid var(--hairline)",
+            borderBottom: "1px solid var(--hairline)",
+          }}
+        >
+          <div style={{ flex: "1 1 300px", padding: "clamp(26px, 4vw, 40px) 32px clamp(26px, 4vw, 40px) 0", display: "flex", alignItems: "center", gap: "clamp(18px, 3vw, 28px)", minWidth: 0 }}>
+            <div
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontWeight: 500,
+                fontSize: "clamp(96px, 13vw, 150px)",
+                lineHeight: 0.85,
+                color: "var(--accent)",
+                letterSpacing: "-0.03em",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {stats.streak}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, paddingTop: 8 }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.2em", color: "var(--fg-3)" }}>
+                DAY
+                <br />
+                STREAK
+              </div>
+              <WeekDots days={stats.last14Days} />
+            </div>
+          </div>
+          <div style={{ flex: "0 0 1px", background: "var(--hairline)" }} />
+          <div
+            style={{
+              flex: "1 1 320px",
+              padding: "clamp(26px, 4vw, 40px) 0 clamp(26px, 4vw, 40px) clamp(24px, 4vw, 40px)",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "clamp(24px, 4vw, 36px) 24px",
+              alignContent: "center",
+              minWidth: 0,
+            }}
+          >
+            {statCards.map((c) => (
+              <div key={c.label} style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                <div className="tnum" style={{ fontFamily: "var(--font-mono)", fontSize: "clamp(26px, 3.4vw, 32px)", lineHeight: 1 }}>
+                  {c.value}
+                </div>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em", color: "var(--fg-3)" }}>
+                  {c.label}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        <AreaSignature dist={stats.timeDist} />
-      </div>
 
-      {/* Avg + best time */}
-      <div style={{ marginTop: 24 }}>
-        <StatDivided items={[
-          { value: fmtSecs(stats.avgTimeSecs), label: "Average" },
-          { value: fmtSecs(stats.bestTimeSecs), label: "Best time" },
-        ]} />
-      </div>
+        {/* Recent activity + solve-time distribution */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "clamp(36px, 6vw, 72px)" }}>
+          <div style={{ flex: "1 1 320px", display: "flex", flexDirection: "column", gap: 18, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16 }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.2em", color: "var(--fg-3)" }}>LAST TWO WEEKS</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.14em", color: "var(--fg-3)" }}>
+                {stats.last14Days.filter(Boolean).length} OF 14 SOLVED
+              </span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: "clamp(6px, 1.4vw, 12px)", maxWidth: 380 }}>
+              {stats.last14Days.map((solved, i) => {
+                const isToday = i === stats.last14Days.length - 1;
+                const style: React.CSSProperties = solved
+                  ? { fill: "var(--accent)" }
+                  : isToday
+                  ? { fill: "none", stroke: "var(--symbol-b)", strokeWidth: "3.5px" }
+                  : { fill: "none", stroke: "var(--hairline-2)", strokeWidth: "2px" };
+                return (
+                  <div key={i} style={{ aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg viewBox="0 0 40 40" style={{ width: "min(80%, 26px)", height: "min(80%, 26px)" }} aria-hidden="true">
+                      <circle cx="20" cy="20" r="14" style={style} />
+                    </svg>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-      {/* Sign out — bordered, unmistakable account action (this is the account page) */}
-      <div style={{ paddingTop: 32, display: "flex", justifyContent: "center" }}>
-        <Button variant="secondary" size="sm" onClick={handleSignOut}>
-          <SignOutIcon size={17} />
-          Sign out
-        </Button>
-      </div>
-    </StatsShell>
+          <div style={{ flex: "1 1 320px", display: "flex", flexDirection: "column", gap: 18, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16 }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.2em", color: "var(--fg-3)" }}>SOLVE TIMES</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.14em", color: "var(--fg-3)" }}>AVG {fmtSecs(stats.avgTimeSecs)}</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+              {stats.timeDist.map((count, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--fg-3)", width: 44, flex: "none", letterSpacing: "0.06em" }}>
+                    {DIST_LABELS[i]}
+                  </span>
+                  <div style={{ flex: 1, height: 12, display: "flex", alignItems: "center" }}>
+                    <div
+                      style={{
+                        height: 12,
+                        borderRadius: 999,
+                        background: count ? "var(--accent)" : "var(--hairline)",
+                        width: count ? `${Math.max(4, (count / maxCount) * 100)}%` : 4,
+                        transition: "width 0.4s ease",
+                      }}
+                    />
+                  </div>
+                  <span className="tnum" style={{ fontFamily: "var(--font-mono)", fontSize: 12, width: 24, textAlign: "right", flex: "none" }}>
+                    {count}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {stats.bestTimeSecs !== null && (
+              <div
+                style={{
+                  fontFamily: "var(--font-serif)",
+                  fontStyle: "italic",
+                  fontSize: 16,
+                  color: "var(--fg-3)",
+                  borderTop: "1px solid var(--hairline)",
+                  paddingTop: 16,
+                }}
+              >
+                Your fastest solve — {fmtSecs(stats.bestTimeSecs)}.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Sign out */}
+        <div style={{ display: "flex", justifyContent: "center", paddingTop: 8 }}>
+          <button
+            onClick={handleSignOut}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: "none",
+              border: "1px solid var(--hairline)",
+              borderRadius: 999,
+              padding: "12px 22px",
+              cursor: "pointer",
+              color: "var(--fg-2)",
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              letterSpacing: "0.16em",
+              transition: "border-color 0.2s, color 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--accent)";
+              e.currentTarget.style.color = "var(--accent)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "var(--hairline)";
+              e.currentTarget.style.color = "var(--fg-2)";
+            }}
+          >
+            <SignOutIcon size={16} />
+            SIGN OUT
+          </button>
+        </div>
+      </section>
+    </div>
   );
 }
 
-// ─── Guest state — blurred backdrop + invite ──────────────────────────────────
+// ─── Guest state ──────────────────────────────────────────────────────────────
 
-function StatsGuest({ onBack }: { onBack: () => void }) {
-  const { theme, toggle } = useTheme();
-  const mockDist = [12, 31, 58, 41, 22, 20];
-
+function StatsGuest() {
   return (
-    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)", position: "relative", overflow: "hidden" }}>
-      <TopBar
-        left={<IconButton label="Back" size={44} onClick={onBack}><BackIcon /></IconButton>}
-        title={<span style={{ fontWeight: 600, fontSize: "var(--text-body)", color: "var(--fg-1)" }}>Statistics</span>}
-        right={<ThemeToggle theme={theme} onToggle={toggle} />}
-      />
+    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+      <SiteHeader active="stats" maxWidth={1140} />
+      <h1 className="sr-only">Statistics</h1>
+      <section
+        style={{
+          flex: 1,
+          display: "flex",
+          flexWrap: "wrap-reverse",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "clamp(36px, 6vw, 88px)",
+          maxWidth: 1140,
+          width: "100%",
+          margin: "0 auto",
+          padding: "8px clamp(20px, 4vw, 40px) 64px",
+          animation: "fadeup 0.5s var(--ease-editorial) both",
+        }}
+      >
+        <div style={{ flex: "1 1 400px", display: "flex", flexDirection: "column", gap: 24, minWidth: 0 }}>
+          <div style={KICKER}>YOUR RECORD</div>
+          <div
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontStyle: "italic",
+              fontWeight: 500,
+              fontSize: "clamp(48px, 7vw, 84px)",
+              lineHeight: 0.95,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Start your
+            <br />
+            record.
+          </div>
+          <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "40ch" }}>
+            Sign in to keep your streak, track your solve times, and build a history of every puzzle
+            you finish.
+          </p>
+          <div>
+            <Link href="/auth" style={{ textDecoration: "none" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  background: "var(--accent)",
+                  color: "var(--on-accent)",
+                  borderRadius: 999,
+                  padding: "16px 36px",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 16,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Sign in
+              </span>
+            </Link>
+          </div>
+        </div>
 
-      {/* Blurred preview backdrop */}
-      <div aria-hidden="true" style={{ position: "absolute", inset: "56px 0 0", overflow: "hidden", pointerEvents: "none", filter: "blur(4px)", opacity: 0.45, WebkitMaskImage: "linear-gradient(#000, transparent 86%)", maskImage: "linear-gradient(#000, transparent 86%)" }}>
-        <div style={{ padding: "14px 24px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 22 }}>
-            <Monogram name="D" size={48} />
-            <div>
-              <div style={{ fontSize: 23, fontWeight: 600, color: "var(--fg-1)" }}>david</div>
-              <div style={{ fontSize: "var(--text-small)", color: "var(--fg-3)", marginTop: 2 }}>184 solved · since January 2026</div>
+        {/* Faded preview of the big streak number */}
+        <div
+          aria-hidden="true"
+          style={{ flex: "1 1 340px", display: "flex", alignItems: "center", justifyContent: "center", minWidth: 0, opacity: 0.5 }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
+            <div
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontWeight: 500,
+                fontSize: "clamp(120px, 18vw, 200px)",
+                lineHeight: 0.85,
+                color: "var(--accent)",
+                letterSpacing: "-0.03em",
+              }}
+            >
+              12
+            </div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.2em", color: "var(--fg-3)" }}>
+              DAY
+              <br />
+              STREAK
             </div>
           </div>
-          <StreakHero streak={8} longestStreak={23} />
-          <div style={{ marginTop: 26 }}><AreaSignature dist={mockDist} /></div>
         </div>
-      </div>
-
-      {/* CTA */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px", position: "relative", zIndex: 2 }}>
-        <div style={{ textAlign: "center", maxWidth: 320 }}>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}><Mark size={40} /></div>
-          <h1 style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--fg-1)", margin: 0, lineHeight: 1.15 }}>Start your record</h1>
-          <p style={{ fontSize: 14.5, color: "var(--fg-2)", lineHeight: 1.5, margin: "10px 0 22px" }}>Sign in to keep your streak, track your solve times, and build a history of every puzzle.</p>
-          <Link href="/auth" style={{ textDecoration: "none" }}>
-            <Button variant="primary" full>Sign in</Button>
-          </Link>
-        </div>
-      </div>
+      </section>
     </div>
   );
 }
@@ -271,10 +376,5 @@ interface StatsScreenProps {
 }
 
 export function StatsScreen({ stats }: StatsScreenProps) {
-  const router = useRouter();
-  const onBack = () => router.push("/");
-
-  return stats
-    ? <StatsRecord stats={stats} onBack={onBack} />
-    : <StatsGuest onBack={onBack} />;
+  return stats ? <StatsRecord stats={stats} /> : <StatsGuest />;
 }
