@@ -5,6 +5,10 @@ import { recordSolve } from "./record-solve";
 // pure resolveLocalToday export can still be exercised without a Next runtime.
 vi.mock("next/headers", () => ({ cookies: vi.fn() }));
 
+// revalidatePath needs Next's request store (absent in unit tests); stub it so
+// recordSolve's cache-invalidation on a fresh solve doesn't throw.
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+
 // ── Mutable mock state ──────────────────────────────────────────────────────
 
 let mockUser: { id: string } | null = { id: "user-1" };

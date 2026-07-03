@@ -1,4 +1,5 @@
 "use server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { resolveLocalToday, isValidDate } from "@/lib/local-date";
@@ -84,6 +85,15 @@ export async function recordSolve(input: RecordSolveInput): Promise<RecordSolveR
   if (error && !alreadySolved) {
     console.error("recordSolve: insert failed:", error.message);
     return { ok: false };
+  }
+
+  // A fresh solve changes the home / archive / stats listings. Invalidate their
+  // caches so navigating (back) to those pages reflects the solve immediately —
+  // without this, the archive keeps showing the day as unsolved (stale RSC).
+  if (!alreadySolved) {
+    revalidatePath("/");
+    revalidatePath("/archive");
+    revalidatePath("/stats");
   }
 
   const { data: solveDays } = await supabase

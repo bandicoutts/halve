@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Difficulty } from "@parity/engine";
 import { SiteHeader } from "@/components/ui/SiteHeader";
+import { freshPracticeSlot } from "@/lib/practice-slot";
 
 interface Row {
   name: string;
@@ -41,7 +42,9 @@ export function PracticeScreen({ isAuthenticated, displayName }: PracticeScreenP
   const router = useRouter();
   const [hovered, setHovered] = useState<string | null>(null);
 
-  const start = (d: Difficulty) => router.push(`/practice/play?difficulty=${d}`);
+  // A fresh random slot each time so practice serves a different puzzle per play.
+  const start = (d: Difficulty) =>
+    router.push(`/practice/play?difficulty=${d}&r=${freshPracticeSlot()}`);
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>

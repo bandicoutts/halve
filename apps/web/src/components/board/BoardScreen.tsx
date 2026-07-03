@@ -13,6 +13,7 @@ import { Disc } from "@/components/symbols/Disc";
 import { Ring } from "@/components/symbols/Ring";
 import { WinScreen } from "@/components/screens/WinScreen";
 import { RulesModal } from "@/components/screens/RulesModal";
+import { freshPracticeSlot } from "@/lib/practice-slot";
 
 // Visually hidden but available to screen readers (for aria-live regions).
 const srOnly: React.CSSProperties = {
@@ -194,8 +195,10 @@ export function BoardScreen({
   const handleSecondary = useCallback(() => {
     if (kind === "daily") router.push("/stats");
     else if (kind === "archive") router.push(backHref);
-    else router.push("/practice");
-  }, [kind, router, backHref]);
+    // Practice "Another puzzle" — start a fresh puzzle of the SAME difficulty
+    // (a new random slot forces a distinct URL, so a new puzzle is fetched).
+    else router.push(`/practice/play?difficulty=${puzzle.difficulty}&r=${freshPracticeSlot()}`);
+  }, [kind, router, backHref, puzzle.difficulty]);
 
   const placed = cells.reduce((n, row) => n + row.filter((v) => v !== null).length, 0);
   const total = puzzle.size * puzzle.size;

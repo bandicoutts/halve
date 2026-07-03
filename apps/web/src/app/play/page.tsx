@@ -57,7 +57,9 @@ export default async function PlayPage() {
   }
 
   return (
+    // key by the day so a date rollover remounts with the new puzzle.
     <BoardScreen
+      key={today}
       puzzle={puzzle}
       puzzleId={puzzleId}
       kind="daily"
