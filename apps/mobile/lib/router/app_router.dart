@@ -1,9 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../data/haptics_service.dart';
+import '../providers/providers.dart';
 import '../screens/archive/archive_screen.dart';
 import '../screens/auth/auth_screen.dart';
 import '../screens/firstrun/firstrun.dart';
@@ -42,9 +46,9 @@ abstract final class Routes {
 /// Extend this set when adding auth-gated screens (e.g. a leaderboard).
 const _authRequired = <String>{};
 
-/// Builds the app's [GoRouter]. The Home/Archive/Stats tabs are a
+/// Builds the app's [GoRouter]. The Home/Practice/Archive/Stats tabs are a
 /// [StatefulShellRoute] (each branch keeps its own navigation state); the
-/// full-screen routes (Play, Practice, Settings, Auth, Tutorial, First-run)
+/// full-screen routes (Play, Settings, Auth, Tutorial, First-run)
 /// are pushed on top, OUTSIDE the shell — so the bottom tab bar is simply
 /// absent there (the Play board owns the screen).
 GoRouter createAppRouter({String initialLocation = Routes.home}) {
@@ -63,16 +67,33 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
             AppShell(navigationShell: navigationShell),
         branches: [
           StatefulShellBranch(
-            routes: [GoRoute(path: Routes.home, builder: (_, _) => const HomeScreen())],
+            routes: [
+              GoRoute(path: Routes.home, builder: (_, _) => const HomeScreen()),
+            ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: Routes.archive, builder: (_, _) => const ArchiveScreen())],
+            routes: [
+              GoRoute(
+                path: Routes.practice,
+                builder: (_, _) => const PracticeScreen(),
+              ),
+            ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: Routes.stats, builder: (_, _) => const StatsScreen())],
+            routes: [
+              GoRoute(
+                path: Routes.archive,
+                builder: (_, _) => const ArchiveScreen(),
+              ),
+            ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: Routes.settings, builder: (_, _) => const SettingsScreen())],
+            routes: [
+              GoRoute(
+                path: Routes.stats,
+                builder: (_, _) => const StatsScreen(),
+              ),
+            ],
           ),
         ],
       ),
@@ -87,16 +108,8 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
       ),
       GoRoute(
         path: Routes.win,
-        pageBuilder: (_, state) => _fade(
-          state,
-          WinScreen(
-            result: state.extra as PlayResult?,
-          ),
-        ),
-      ),
-      GoRoute(
-        path: Routes.practice,
-        pageBuilder: (_, state) => _fade(state, const PracticeScreen()),
+        pageBuilder: (_, state) =>
+            _fade(state, WinScreen(result: state.extra as PlayResult?)),
       ),
       GoRoute(
         path: '/practice/play',
@@ -120,6 +133,10 @@ GoRouter createAppRouter({String initialLocation = Routes.home}) {
         path: Routes.firstrun,
         pageBuilder: (_, state) => _fade(state, const FirstRunScreen()),
       ),
+      GoRoute(
+        path: Routes.settings,
+        pageBuilder: (_, state) => _fade(state, const SettingsScreen()),
+      ),
     ],
   );
 }
@@ -133,9 +150,7 @@ CustomTransitionPage<void> _fade(GoRouterState state, Widget child) {
     transitionDuration: const Duration(milliseconds: 160),
     reverseTransitionDuration: const Duration(milliseconds: 160),
     transitionsBuilder: (_, animation, _, child) => FadeTransition(
-      opacity: animation.drive(
-        CurveTween(curve: const Cubic(0.4, 0, 0.2, 1)),
-      ),
+      opacity: animation.drive(CurveTween(curve: const Cubic(0.4, 0, 0.2, 1))),
       child: child,
     ),
   );
@@ -176,13 +191,13 @@ class _PlayResultDecoder extends Converter<Object?, Object?> {
 
 /// The tab shell: hosts the persistent brand bar, the active branch, and the
 /// anchored bottom nav.
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: context.halveColors.bg,
       body: SafeArea(
@@ -197,39 +212,173 @@ class AppShell extends StatelessWidget {
       ),
       bottomNavigationBar: HalveBottomNav(
         currentIndex: navigationShell.currentIndex,
-        onTap: (index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
-        ),
+        onTap: (index) {
+          if (index != navigationShell.currentIndex) {
+            unawaited(hapticsOnSelection());
+          }
+          navigationShell.goBranch(
+            index,
+            initialLocation: index == navigationShell.currentIndex,
+          );
+        },
       ),
     );
   }
 }
 
 /// Persistent brand bar shown across all shell tabs. Logo + name, centered.
-class _HalveShellBar extends StatelessWidget {
+class _HalveShellBar extends ConsumerWidget {
   const _HalveShellBar();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final c = context.halveColors;
-    final labelStyle = AppTypography.h3.copyWith(
-      color: c.fg1,
-      fontWeight: FontWeight.w600,
-      fontVariations: const [FontVariation('wght', 600)],
-    );
-    return SizedBox(
-      height: AppLayout.topBarHeight,
-      child: Center(
+    final mode = ref.watch(themeModeProvider);
+    final currentUser = ref.watch(currentUserProvider);
+    final email = currentUser?.email;
+    final monogram = email == null || email.isEmpty
+        ? null
+        : email.characters.first.toUpperCase();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
+      child: SizedBox(
+        height: 44,
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            const HalveMark(size: 22),
-            const SizedBox(width: AppSpacing.s2),
-            Text('Halve', style: labelStyle),
+            TapFade(
+              onTap: () => context.go(Routes.home),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const HalveMark(size: 20),
+                  const SizedBox(width: 9),
+                  Text(
+                    'Halve',
+                    style: AppTypography.wordmark.copyWith(color: c.fg1),
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+            _ShellCircleButton(
+              label: 'Toggle theme',
+              onTap: () {
+                final next = mode == ThemeMode.dark
+                    ? ThemeMode.light
+                    : ThemeMode.dark;
+                ref.read(themeModeProvider.notifier).setMode(next);
+              },
+              child: _ThemeGlyph(isDark: mode == ThemeMode.dark),
+            ),
+            const SizedBox(width: 10),
+            _ShellCircleButton(
+              label: 'Account',
+              accented: true,
+              onTap: () => context.push(Routes.settings),
+              child: Text(
+                monogram ?? '?',
+                style: AppTypography.monoMicro.copyWith(
+                  color: c.fg1,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+}
+
+class _ShellCircleButton extends StatelessWidget {
+  const _ShellCircleButton({
+    required this.label,
+    required this.onTap,
+    required this.child,
+    this.accented = false,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+  final Widget child;
+  final bool accented;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    return Semantics(
+      button: true,
+      label: label,
+      child: TapFade(
+        onTap: onTap,
+        child: Container(
+          width: 36,
+          height: 36,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: accented ? c.surface : Colors.transparent,
+            border: Border.all(color: accented ? c.accent : c.hairline2),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeGlyph extends StatelessWidget {
+  const _ThemeGlyph({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    return AnimatedRotation(
+      turns: isDark ? 0 : 0.5,
+      duration: context.reduceMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 450),
+      curve: const Cubic(0.34, 1.56, 0.5, 1),
+      child: CustomPaint(
+        size: const Size.square(15),
+        painter: _ThemeGlyphPainter(color: c.fg1),
+      ),
+    );
+  }
+}
+
+class _ThemeGlyphPainter extends CustomPainter {
+  const _ThemeGlyphPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final stroke = Paint()
+      ..color = color.withValues(alpha: 0.85)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..isAntiAlias = true;
+    final fill = Paint()
+      ..color = color.withValues(alpha: 0.85)
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+    canvas.drawCircle(rect.center, size.width / 2 - 1, stroke);
+    final half = Path()
+      ..moveTo(rect.center.dx, 1)
+      ..arcToPoint(
+        Offset(rect.center.dx, size.height - 1),
+        radius: Radius.circular(size.width / 2 - 1),
+        clockwise: false,
+      )
+      ..close();
+    canvas.drawPath(half, fill);
+  }
+
+  @override
+  bool shouldRepaint(_ThemeGlyphPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

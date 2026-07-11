@@ -5,10 +5,9 @@ import '../../engine/validator.dart' show Coord;
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-/// The 6×6 play surface: a grid of tappable cells with the `=`/`≠` edge signs
-/// floating over the gaps. Ported faithfully from the web `Board.tsx` +
-/// `Cell.tsx` (cell radius, hairlines, given/entered/error styling, edge
-/// positioning). Pure presentation — state lives in the [PlayController].
+/// The 6×6 play surface: a raw bordered square grid with `=`/`≠` edge signs
+/// floating over the lines, matching the mobile prototype. Pure presentation —
+/// state lives in the [PlayController].
 class PlayBoard extends StatelessWidget {
   const PlayBoard({
     super.key,
@@ -34,54 +33,53 @@ class PlayBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final n = cells.length;
-    final total = n * cellSize + (n - 1) * gap;
-    double span(int i) => i * (cellSize + gap);
+    final total = n * cellSize;
+    double span(int i) => i * cellSize;
     final edgeSignSize = (cellSize * 0.42).clamp(20.0, double.infinity);
+    final c = context.halveColors;
 
-    return SizedBox(
+    return Container(
       width: total,
       height: total,
+      decoration: BoxDecoration(border: Border.all(color: c.hairline)),
       child: Stack(
         children: [
-          // Cells.
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (var r = 0; r < n; r++) ...[
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (var c = 0; c < n; c++) ...[
-                      _PlayCell(
-                        key: ValueKey('cell-$r-$c'),
-                        value: cells[r][c],
-                        isGiven: givens[r][c] != null,
-                        isError: violations.contains((r, c)),
-                        size: cellSize,
-                        onTap: readOnly || givens[r][c] != null
-                            ? null
-                            : () => onCellTap?.call(r, c),
-                        semanticLabel: _cellLabel(r, c, cells[r][c],
-                            givens[r][c] != null, violations.contains((r, c))),
-                      ),
-                      if (c < n - 1) SizedBox(width: gap),
-                    ],
-                  ],
+          for (var r = 0; r < n; r++)
+            for (var col = 0; col < n; col++)
+              Positioned(
+                left: span(col),
+                top: span(r),
+                child: _PlayCell(
+                  key: ValueKey('cell-$r-$col'),
+                  value: cells[r][col],
+                  isGiven: givens[r][col] != null,
+                  isError: violations.contains((r, col)),
+                  size: cellSize,
+                  showRightBorder: col < n - 1,
+                  showBottomBorder: r < n - 1,
+                  onTap: readOnly || givens[r][col] != null
+                      ? null
+                      : () => onCellTap?.call(r, col),
+                  semanticLabel: _cellLabel(
+                    r,
+                    col,
+                    cells[r][col],
+                    givens[r][col] != null,
+                    violations.contains((r, col)),
+                  ),
                 ),
-                if (r < n - 1) SizedBox(height: gap),
-              ],
-            ],
-          ),
-          // Edge signs, centered over the gap between their two cells.
+              ),
           for (final e in edges)
             Positioned(
-              left: (e.orientation == EdgeOrientation.h
-                      ? span(e.c) + cellSize + gap / 2
+              left:
+                  (e.orientation == EdgeOrientation.h
+                      ? span(e.c + 1)
                       : span(e.c) + cellSize / 2) -
                   edgeSignSize / 2,
-              top: (e.orientation == EdgeOrientation.h
+              top:
+                  (e.orientation == EdgeOrientation.h
                       ? span(e.r) + cellSize / 2
-                      : span(e.r) + cellSize + gap / 2) -
+                      : span(e.r + 1)) -
                   edgeSignSize / 2,
               child: EqNeBadge(
                 sign: e.kind == EdgeKind.eq ? EdgeSign.eq : EdgeSign.ne,
@@ -116,6 +114,8 @@ class _PlayCell extends StatefulWidget {
     required this.isGiven,
     required this.isError,
     required this.size,
+    required this.showRightBorder,
+    required this.showBottomBorder,
     required this.semanticLabel,
     this.onTap,
   });
@@ -124,6 +124,8 @@ class _PlayCell extends StatefulWidget {
   final bool isGiven;
   final bool isError;
   final double size;
+  final bool showRightBorder;
+  final bool showBottomBorder;
   final String semanticLabel;
   final VoidCallback? onTap;
 
@@ -144,27 +146,15 @@ class _PlayCellState extends State<_PlayCell> {
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    final filled = widget.value != null;
-
-    Color bg;
-    BoxBorder? border;
-    List<BoxShadow>? shadow;
-    if (widget.isGiven) {
-      bg = c.bgSunken;
-      border = null;
-    } else if (widget.isError) {
-      bg = c.wrongTint;
-      border = Border.all(color: c.wrong, width: 2);
-    } else if (filled) {
-      bg = c.surfaceRaised;
-      border = null;
-      shadow = context.halveShadows.cell;
-    } else {
-      bg = c.surfaceRaised;
-      border = Border.all(color: c.hairline, width: 1);
-    }
-
     final symbolSize = widget.size * 0.6;
+    final cellBorder = Border(
+      right: widget.showRightBorder
+          ? BorderSide(color: c.hairline)
+          : BorderSide.none,
+      bottom: widget.showBottomBorder
+          ? BorderSide(color: c.hairline)
+          : BorderSide.none,
+    );
 
     return Semantics(
       button: _enabled,
@@ -185,16 +175,47 @@ class _PlayCellState extends State<_PlayCell> {
             height: widget.size,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: bg,
-              border: border,
-              borderRadius: AppRadii.cellR,
-              boxShadow: shadow,
+              color: widget.isError
+                  ? c.wrongTint
+                  : widget.isGiven
+                  ? c.bgSunken.withValues(alpha: 0.7)
+                  : Colors.transparent,
+              border: cellBorder,
             ),
-            child: widget.value == 0
-                ? SymbolDisc(size: symbolSize)
-                : widget.value == 1
-                    ? SymbolRing(size: symbolSize)
-                    : null,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (widget.isGiven)
+                  Positioned.fill(
+                    child: FractionallySizedBox(
+                      widthFactor: 0.82,
+                      heightFactor: 0.82,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: c.bgSunken,
+                          borderRadius: AppRadii.mdR,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (widget.value == 0)
+                  SymbolDisc(size: symbolSize)
+                else if (widget.value == 1)
+                  SymbolRing(size: symbolSize),
+                if (widget.isError)
+                  Positioned(
+                    bottom: widget.size * 0.08,
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: c.wrong,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

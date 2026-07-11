@@ -5,40 +5,44 @@ import 'package:flutter/material.dart';
 /// Mirrors `packages/design/styles/tokens.css` :root raw palette (canonical).
 abstract final class HalvePalette {
   // Warm paper neutrals (light)
-  static const paper50 = Color(0xFFFBF8F1);
-  static const paper100 = Color(0xFFF6F1E8); // page background
+  static const paper50 = Color(0xFFFDFAF3);
+  static const paper100 = Color(0xFFF5F0E6); // page background
   static const paper200 = Color(0xFFEFE8DA);
   static const paper300 = Color(0xFFE4DDCD); // hairline
   static const paper400 = Color(0xFFD6CCB8);
-  static const clay500 = Color(0xFF9A9080); // decorative muted (fails AA as text)
+  static const clay500 = Color(
+    0xFF9A9080,
+  ); // decorative muted (fails AA as text)
   static const clay550 = Color(0xFF746B5A); // muted fg — AA text
   static const clay600 = Color(0xFF6B6253); // secondary fg
   static const clay700 = Color(0xFF463F33);
-  static const ink900 = Color(0xFF211C15); // primary fg on paper
+  static const ink900 = Color(0xFF211B14); // primary fg on paper
 
   // Warm ink neutrals (dark)
-  static const night950 = Color(0xFF14110B); // page background
-  static const night900 = Color(0xFF1A160F);
-  static const night850 = Color(0xFF221D15); // surface
+  static const night950 = Color(0xFF161210); // page background
+  static const night900 = Color(0xFF1B1410);
+  static const night850 = Color(0xFF1F1A15); // surface
   static const night800 = Color(0xFF2A2418);
   static const night700 = Color(0xFF352E20); // hairline
   static const night600 = Color(0xFF4A4030);
-  static const dust500 = Color(0xFF6E6553); // decorative muted (fails AA as text)
-  static const dust400 = Color(0xFF928873); // muted fg — AA text
+  static const dust500 = Color(
+    0xFF6E6553,
+  ); // decorative muted (fails AA as text)
+  static const dust400 = Color(0xFF9A8F7E); // muted fg — AA text
   static const dust300 = Color(0xFFA79D89); // secondary fg
   static const dust100 = Color(0xFFEFE8D9); // primary fg on ink
 
   // Amber — the hero accent
-  static const amberDisc = Color(0xFFD45220); // the solid game symbol (A)
-  static const amber = Color(0xFFB03E12); // accent on paper
+  static const amberDisc = Color(0xFFE8703A); // the solid game symbol (A)
+  static const amber = Color(0xFFDE5F27); // accent on paper
   static const amberStrong = Color(0xFF943210); // pressed / strong
-  static const amberBright = Color(0xFFE86B38); // accent on ink
+  static const amberBright = Color(0xFFE8703A); // accent on ink
   static const amberTint = Color(0xFFF8E4DC); // soft fill on paper
   static const amberTintDk = Color(0xFF38180E); // soft fill on ink
 
   // Teal — the ring game symbol (B)
-  static const teal = Color(0xFF2A7A6E); // symbol B on paper
-  static const tealBright = Color(0xFF6EC8BC); // symbol B on ink
+  static const teal = Color(0xFF1E9C8F); // symbol B on paper
+  static const tealBright = Color(0xFF45BFB2); // symbol B on ink
   static const tealStrong = Color(0xFF1E5C52);
 
   // Semantic feedback (warm-leaning)
@@ -130,8 +134,8 @@ class HalveColors extends ThemeExtension<HalveColors> {
     fg1: HalvePalette.ink900,
     fg2: HalvePalette.clay600,
     fg3: HalvePalette.clay550,
-    hairline: HalvePalette.paper300,
-    hairline2: HalvePalette.paper400,
+    hairline: Color(0x291F1A14),
+    hairline2: Color(0x3D1F1A14),
     accent: HalvePalette.amber,
     accentStrong: HalvePalette.amberStrong,
     accentTint: HalvePalette.amberTint,
@@ -153,8 +157,8 @@ class HalveColors extends ThemeExtension<HalveColors> {
     fg1: HalvePalette.dust100,
     fg2: HalvePalette.dust300,
     fg3: HalvePalette.dust400,
-    hairline: HalvePalette.night700,
-    hairline2: HalvePalette.night600,
+    hairline: Color(0x26E9DFCD),
+    hairline2: Color(0x40E9DFCD),
     accent: HalvePalette.amberBright,
     accentStrong: HalvePalette.amberDisc,
     accentTint: HalvePalette.amberTintDk,

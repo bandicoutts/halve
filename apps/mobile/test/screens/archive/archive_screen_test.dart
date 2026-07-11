@@ -8,11 +8,7 @@ import 'package:halve/screens/archive/archive_screen.dart';
 import 'package:halve/theme/theme.dart';
 import 'package:halve/widgets/widgets.dart';
 
-ArchiveDay day(
-  String date,
-  Difficulty difficulty, {
-  bool solved = false,
-}) =>
+ArchiveDay day(String date, Difficulty difficulty, {bool solved = false}) =>
     ArchiveDay(
       puzzleId: 'p-$date',
       date: date,
@@ -24,14 +20,14 @@ ArchiveDay day(
 /// A June-2026 archive that also reaches back to March (so the month range
 /// spans March → June). today = 2026-06-15.
 ArchiveData sampleData() => ArchiveData(
-      today: '2026-06-15',
-      days: [
-        day('2026-03-20', Difficulty.medium, solved: true),
-        day('2026-06-10', Difficulty.easy, solved: true),
-        day('2026-06-11', Difficulty.hard), // missed
-        day('2026-06-15', Difficulty.medium, solved: true), // today
-      ],
-    );
+  today: '2026-06-15',
+  days: [
+    day('2026-03-20', Difficulty.medium, solved: true),
+    day('2026-06-10', Difficulty.easy, solved: true),
+    day('2026-06-11', Difficulty.hard), // missed
+    day('2026-06-15', Difficulty.medium, solved: true), // today
+  ],
+);
 
 Finder dayCell(String date) => find.byKey(ValueKey('arc-day-$date'));
 
@@ -42,8 +38,11 @@ BoxDecoration cellDecoration(WidgetTester tester, String date) {
 }
 
 HalveIconButton navButton(WidgetTester tester, String label) =>
-    tester.widget<HalveIconButton>(find.byWidgetPredicate(
-        (w) => w is HalveIconButton && w.semanticLabel == label));
+    tester.widget<HalveIconButton>(
+      find.byWidgetPredicate(
+        (w) => w is HalveIconButton && w.semanticLabel == label,
+      ),
+    );
 
 Future<GoRouter> pumpArchive(
   WidgetTester tester, {
@@ -53,10 +52,7 @@ Future<GoRouter> pumpArchive(
     initialLocation: '/archive',
     routes: [
       GoRoute(path: '/archive', builder: (_, _) => const ArchiveScreen()),
-      GoRoute(
-        path: '/play',
-        builder: (_, _) => const Text('PLAY-TODAY'),
-      ),
+      GoRoute(path: '/play', builder: (_, _) => const Text('PLAY-TODAY')),
       GoRoute(
         path: '/play/:date',
         builder: (_, s) => Text('PLAY-${s.pathParameters['date']}'),
@@ -66,13 +62,8 @@ Future<GoRouter> pumpArchive(
 
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        archiveDataProvider.overrideWith((ref) async => data),
-      ],
-      child: MaterialApp.router(
-        theme: AppTheme.light(),
-        routerConfig: router,
-      ),
+      overrides: [archiveDataProvider.overrideWith((ref) async => data)],
+      child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
     ),
   );
   await tester.pumpAndSettle();
@@ -82,10 +73,12 @@ Future<GoRouter> pumpArchive(
 void main() {
   group('month helpers', () {
     test('monthsBetween spans inclusive, ascending, wrapping the year', () {
-      expect(
-        monthsBetween((2025, 11), (2026, 2)),
-        [(2025, 11), (2025, 12), (2026, 1), (2026, 2)],
-      );
+      expect(monthsBetween((2025, 11), (2026, 2)), [
+        (2025, 11),
+        (2025, 12),
+        (2026, 1),
+        (2026, 2),
+      ]);
       expect(monthsBetween((2026, 6), (2026, 6)), [(2026, 6)]);
     });
 
@@ -119,30 +112,43 @@ void main() {
     });
   });
 
-  testWidgets('day cells render solved / missed / today states',
-      (tester) async {
+  testWidgets('day cells render solved / missed / today states', (
+    tester,
+  ) async {
     await pumpArchive(tester, data: sampleData());
 
-    expect(cellDecoration(tester, '2026-06-10').color,
-        HalveColors.light.accentTint); // solved
-    expect((cellDecoration(tester, '2026-06-15').border! as Border).top.width,
-        2.0); // today
-    expect((cellDecoration(tester, '2026-06-11').border! as Border).top.color,
-        HalveColors.light.hairline2); // missed
+    expect(
+      cellDecoration(tester, '2026-06-10').color,
+      HalveColors.light.accent,
+    ); // solved
+    expect(
+      (cellDecoration(tester, '2026-06-15').border! as Border).top.width,
+      2.5,
+    ); // today
+    expect(
+      (cellDecoration(tester, '2026-06-11').border! as Border).top.color,
+      HalveColors.light.hairline2,
+    ); // missed
   });
 
-  testWidgets('difficulty dots reflect the puzzle difficulty', (tester) async {
+  testWidgets('prototype calendar removes difficulty dots from day cells', (
+    tester,
+  ) async {
     await pumpArchive(tester, data: sampleData());
 
-    // Solved easy (1 dot) vs missed hard (3 dots). Dot Containers are the only
-    // descendants of the day cell Container.
     expect(
-      find.descendant(of: dayCell('2026-06-10'), matching: find.byType(Container)),
-      findsNWidgets(1),
+      find.descendant(
+        of: dayCell('2026-06-10'),
+        matching: find.byType(Container),
+      ),
+      findsNothing,
     );
     expect(
-      find.descendant(of: dayCell('2026-06-11'), matching: find.byType(Container)),
-      findsNWidgets(3),
+      find.descendant(
+        of: dayCell('2026-06-11'),
+        matching: find.byType(Container),
+      ),
+      findsNothing,
     );
   });
 
@@ -150,7 +156,7 @@ void main() {
     await pumpArchive(tester, data: sampleData());
 
     // Default view is the current month (June) → next disabled, prev enabled.
-    expect(find.textContaining('JUNE 2026'), findsOneWidget);
+    expect(find.textContaining('June 2026'), findsOneWidget);
     expect(navButton(tester, 'Next month').onPressed, isNull);
     expect(navButton(tester, 'Previous month').onPressed, isNotNull);
 
@@ -159,7 +165,7 @@ void main() {
       await tester.tap(find.bySemanticsLabel('Previous month'));
       await tester.pumpAndSettle();
     }
-    expect(find.textContaining('MARCH 2026'), findsOneWidget);
+    expect(find.textContaining('March 2026'), findsOneWidget);
     expect(navButton(tester, 'Previous month').onPressed, isNull);
     expect(navButton(tester, 'Next month').onPressed, isNotNull);
   });
@@ -167,18 +173,19 @@ void main() {
   testWidgets('the month picker lists months and jumps', (tester) async {
     await pumpArchive(tester, data: sampleData());
 
-    await tester.tap(find.textContaining('JUNE 2026'));
+    await tester.tap(find.textContaining('June 2026'));
     await tester.pumpAndSettle();
 
     expect(find.text('March 2026'), findsOneWidget);
     await tester.tap(find.text('March 2026'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('MARCH 2026'), findsOneWidget);
+    expect(find.textContaining('March 2026'), findsOneWidget);
   });
 
-  testWidgets('tapping a past solved day opens that archive puzzle',
-      (tester) async {
+  testWidgets('tapping a past solved day opens that archive puzzle', (
+    tester,
+  ) async {
     await pumpArchive(tester, data: sampleData());
 
     await tester.ensureVisible(dayCell('2026-06-10'));
@@ -191,6 +198,8 @@ void main() {
   testWidgets("tapping today opens today's daily", (tester) async {
     await pumpArchive(tester, data: sampleData());
 
+    await tester.drag(find.byType(ListView), const Offset(0, -180));
+    await tester.pumpAndSettle();
     await tester.ensureVisible(dayCell('2026-06-15'));
     await tester.tap(dayCell('2026-06-15'));
     await tester.pumpAndSettle();

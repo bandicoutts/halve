@@ -25,9 +25,11 @@ Future<void> main() async {
   // Supabase (graceful: absent build-time creds → guest mode).
   try {
     final ok = await initSupabase();
-    debugPrint(ok
-        ? 'Supabase initialised.'
-        : 'Supabase credentials absent — running as guest (no backend).');
+    debugPrint(
+      ok
+          ? 'Supabase initialised.'
+          : 'Supabase credentials absent — running as guest (no backend).',
+    );
   } catch (e) {
     debugPrint('Supabase init failed (continuing as guest): $e');
   }
@@ -38,10 +40,10 @@ Future<void> main() async {
   SharedPreferences? prefs;
   try {
     prefs = await SharedPreferences.getInstance();
-    overrides.add(puzzleCacheProvider.overrideWithValue(PrefsPuzzleCache(prefs)));
     overrides.add(
-      sharedPreferencesProvider.overrideWithValue(prefs),
+      puzzleCacheProvider.overrideWithValue(PrefsPuzzleCache(prefs)),
     );
+    overrides.add(sharedPreferencesProvider.overrideWithValue(prefs));
     onboarded = prefs.getBool(prefKeyOnboarded) ?? false;
     HapticsService.instance.configure(prefs.getBool(prefKeyHaptics) ?? true);
   } catch (e) {
@@ -52,13 +54,15 @@ Future<void> main() async {
   // runApp so it doesn't delay the first frame. The routeStream tap handler in
   // HalveApp listens to the same singleton, so notifications that arrive
   // before init completes are queued and handled once the stream is ready.
-  runApp(ProviderScope(
-    overrides: overrides,
-    child: HalveApp(
-      initialLocation: firstRunInitialLocation(onboarded: onboarded),
-      prefsFuture: prefs,
+  runApp(
+    ProviderScope(
+      overrides: overrides,
+      child: HalveApp(
+        initialLocation: firstRunInitialLocation(onboarded: onboarded),
+        prefsFuture: prefs,
+      ),
     ),
-  ));
+  );
 }
 
 class HalveApp extends ConsumerStatefulWidget {
@@ -91,7 +95,10 @@ class _HalveAppState extends ConsumerState<HalveApp> {
   void initState() {
     super.initState();
     _router = createAppRouter(initialLocation: widget.initialLocation);
-    _routeSub = ref.read(notificationServiceProvider).routeStream.listen(_router.go);
+    _routeSub = ref
+        .read(notificationServiceProvider)
+        .routeStream
+        .listen(_router.go);
 
     // Init and reschedule notifications after the first frame so startup
     // latency (initializeTimeZones + platform channels) doesn't block paint.
@@ -124,13 +131,36 @@ class _HalveAppState extends ConsumerState<HalveApp> {
     return Consumer(
       builder: (context, ref, _) {
         final themeMode = ref.watch(themeModeProvider);
-        return MaterialApp.router(
-          title: 'Halve',
-          debugShowCheckedModeBanner: false,
-          theme: _lightTheme,
-          darkTheme: _darkTheme,
-          themeMode: themeMode,
-          routerConfig: _router,
+        final platformBrightness =
+            MediaQuery.maybePlatformBrightnessOf(context) ??
+            WidgetsBinding.instance.platformDispatcher.platformBrightness;
+        final resolvedBrightness = switch (themeMode) {
+          ThemeMode.light => Brightness.light,
+          ThemeMode.dark => Brightness.dark,
+          ThemeMode.system => platformBrightness,
+        };
+        final isDark = resolvedBrightness == Brightness.dark;
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarDividerColor: Colors.transparent,
+            statusBarIconBrightness: isDark
+                ? Brightness.light
+                : Brightness.dark,
+            statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+            systemNavigationBarIconBrightness: isDark
+                ? Brightness.light
+                : Brightness.dark,
+          ),
+          child: MaterialApp.router(
+            title: 'Halve',
+            debugShowCheckedModeBanner: false,
+            theme: _lightTheme,
+            darkTheme: _darkTheme,
+            themeMode: themeMode,
+            routerConfig: _router,
+          ),
         );
       },
     );

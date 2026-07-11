@@ -50,10 +50,7 @@ class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
     return SafeScaffold(
       body: async.when(
         data: (data) => data.isEmpty
-            ? _EmptyArchive(
-                offline: data.offline,
-                onRefresh: _refresh,
-              )
+            ? _EmptyArchive(offline: data.offline, onRefresh: _refresh)
             : _ArchiveBody(
                 data: data,
                 view: _effectiveView(data),
@@ -99,8 +96,8 @@ class _ArchiveBody extends StatelessWidget {
 
     final hPad = context.hPagePad;
     final navBarH = Theme.of(context).platform == TargetPlatform.android
-        ? 64.0
-        : AppLayout.topBarHeight;
+        ? 80.0
+        : 49.0;
     return GestureDetector(
       onHorizontalDragEnd: (d) {
         final v = d.primaryVelocity ?? 0;
@@ -114,10 +111,24 @@ class _ArchiveBody extends StatelessWidget {
         onRefresh: onRefresh,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          // navBarH mirrors the bottom nav height (64dp Android, 52dp iOS) so
+          // navBarH mirrors the bottom nav height (80dp Android, 49dp iOS) so
           // the last row scrolls clear of the bar without a SafeArea wrapper.
-          padding: EdgeInsets.fromLTRB(hPad, AppSpacing.s1, hPad, navBarH + AppSpacing.s4),
+          padding: EdgeInsets.fromLTRB(hPad, 14, hPad, navBarH + AppSpacing.s4),
           children: [
+            Text(
+              'ARCHIVE · SINCE MAY 2026',
+              style: AppTypography.monoLabel.copyWith(
+                color: context.halveColors.fg3,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'The back catalogue.',
+              style: AppTypography.editorialH1.copyWith(
+                color: context.halveColors.fg1,
+              ),
+            ),
+            const SizedBox(height: 20),
             _MonthNav(
               view: view,
               canPrev: prev != null,
@@ -128,10 +139,18 @@ class _ArchiveBody extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.s1),
             _MonthSummary(stats: data.monthStats(view)),
-            const SizedBox(height: AppSpacing.s2),
+            const SizedBox(height: AppSpacing.s4),
             _MonthGrid(data: data, view: view),
             const SizedBox(height: AppSpacing.s4),
             const _Legend(),
+            const SizedBox(height: AppSpacing.s4),
+            Text(
+              "PULL DOWN TO CHECK FOR TODAY'S PUZZLE",
+              textAlign: TextAlign.center,
+              style: AppTypography.monoMicro.copyWith(
+                color: context.halveColors.fg3,
+              ),
+            ),
           ],
         ),
       ),
@@ -183,14 +202,24 @@ class _MonthNav extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           child: Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.s3, vertical: AppSpacing.s2),
-            child: Text(
-              '${kMonthNames[view.$2 - 1]} ${view.$1}'.toUpperCase(),
-              style: AppTypography.label.copyWith(
-                fontSize: 13,
-                letterSpacing: 0.52, // 0.04em
-                color: c.fg1,
-              ),
+              horizontal: AppSpacing.s3,
+              vertical: AppSpacing.s2,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  '${kMonthNames[view.$2 - 1]} ${view.$1}',
+                  style: AppTypography.editorialH2.copyWith(
+                    fontSize: 24,
+                    color: c.fg1,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'TAP TO CHANGE MONTH',
+                  style: AppTypography.monoMicro.copyWith(color: c.fg3),
+                ),
+              ],
             ),
           ),
         ),
@@ -220,21 +249,23 @@ class _MonthSummary extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text.rich(
-          TextSpan(children: [
-            TextSpan(
-              text: '$solved / $total',
-              style: AppTypography.tabular(AppTypography.small).copyWith(
-                fontWeight: FontWeight.w600,
-                fontVariations: const [FontVariation('wght', 600)],
-                color: c.fg1,
+          TextSpan(
+            children: [
+              TextSpan(
+                text: '$solved / $total',
+                style: AppTypography.monoMicro.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: c.fg1,
+                  letterSpacing: 1.2,
+                ),
               ),
-            ),
-            const TextSpan(text: ' '),
-            TextSpan(
-              text: 'SOLVED',
-              style: AppTypography.label.copyWith(color: c.fg3),
-            ),
-          ]),
+              const TextSpan(text: ' '),
+              TextSpan(
+                text: 'SOLVED',
+                style: AppTypography.monoMicro.copyWith(color: c.fg3),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -262,20 +293,13 @@ class _MonthGrid extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.s1),
             child: Text(
               w,
-              style: AppTypography.micro.copyWith(
-                letterSpacing: 0,
-                color: c.fg3,
-              ),
+              style: AppTypography.monoMicro.copyWith(color: c.fg3),
             ),
           ),
         ),
       for (var i = 0; i < offset; i++) const SizedBox.shrink(),
       for (var d = 1; d <= days; d++)
-        _DayCell(
-          date: _dateStr(year, month, d),
-          day: d,
-          data: data,
-        ),
+        _DayCell(date: _dateStr(year, month, d), day: d, data: data),
     ];
 
     return GridView.count(
@@ -283,8 +307,8 @@ class _MonthGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: AppSpacing.s2,
-      crossAxisSpacing: AppSpacing.s2,
-      childAspectRatio: 0.82, // ~56px tall cells
+      crossAxisSpacing: AppSpacing.s1,
+      childAspectRatio: 0.82, // 44px+ wide, ~56px tall on phone
       children: cells,
     );
   }
@@ -310,13 +334,13 @@ class _DayCell extends StatelessWidget {
     final Color numColor;
     switch (state) {
       case _DayState.solved:
-        bg = c.accentTint;
+        bg = c.accent;
         border = Border.all(color: c.accent, width: 1.5);
-        numColor = c.accent;
+        numColor = c.onAccent;
       case _DayState.today:
         bg = Colors.transparent;
-        border = Border.all(color: c.accent, width: 2);
-        numColor = c.accent;
+        border = Border.all(color: c.symbolB, width: 2.5);
+        numColor = c.fg1;
       case _DayState.missed:
       case _DayState.future:
         bg = Colors.transparent;
@@ -328,52 +352,44 @@ class _DayCell extends StatelessWidget {
         numColor = c.fg3;
     }
 
-    final tappable = state == _DayState.today ||
+    final tappable =
+        state == _DayState.today ||
         ((state == _DayState.solved || state == _DayState.missed) &&
             entry != null);
 
-    final showDots =
-        state != _DayState.future && entry != null; // past + today w/ a puzzle
-
-    final cell = Opacity(
-      opacity: state == _DayState.future ? 0.3 : 1,
-      child: Container(
-        key: ValueKey('arc-day-$date'),
-        decoration: BoxDecoration(
-          color: bg,
-          border: border,
-          borderRadius: AppRadii.mdR,
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '$day',
-              style: AppTypography.tabular(AppTypography.label).copyWith(
-                fontSize: 12,
-                letterSpacing: 0,
-                color: numColor,
-              ),
+    final cell = Semantics(
+      button: tappable,
+      enabled: tappable,
+      label: date,
+      child: Opacity(
+        opacity: state == _DayState.future ? 0.3 : 1,
+        child: Container(
+          key: ValueKey('arc-day-$date'),
+          constraints: const BoxConstraints(minHeight: 48),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: bg,
+            border: border,
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            '$day',
+            style: AppTypography.monoMicro.copyWith(
+              fontSize: 13,
+              letterSpacing: 0,
+              color: numColor,
+              fontFeatures: const [FontFeature.tabularFigures()],
+              fontWeight: state == _DayState.solved
+                  ? FontWeight.w600
+                  : FontWeight.w500,
             ),
-            if (showDots)
-              _DifficultyDots(
-                count: entry.difficulty.dots,
-                color: state == _DayState.solved ? c.fg1 : c.fg3,
-              )
-            else
-              const SizedBox(height: 4),
-          ],
+          ),
         ),
       ),
     );
 
     if (!tappable) return cell;
-    return GestureDetector(
-      onTap: () => _open(context, state),
-      behavior: HitTestBehavior.opaque,
-      child: cell,
-    );
+    return TapFade(onTap: () => _open(context, state), child: cell);
   }
 
   _DayState _state() {
@@ -394,34 +410,6 @@ class _DayCell extends StatelessWidget {
   }
 }
 
-class _DifficultyDots extends StatelessWidget {
-  const _DifficultyDots({required this.count, required this.color});
-
-  final int count;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 4,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < count; i++) ...[
-            if (i > 0) const SizedBox(width: 2.5),
-            Container(
-              width: 4,
-              height: 4,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
 /// The inline state legend beneath the grid.
 class _Legend extends StatelessWidget {
   const _Legend();
@@ -430,14 +418,14 @@ class _Legend extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     Widget swatch(Color? bg, BoxBorder border) => Container(
-          width: 11,
-          height: 11,
-          decoration: BoxDecoration(
-            color: bg,
-            border: border,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        );
+      width: 11,
+      height: 11,
+      decoration: BoxDecoration(
+        color: bg,
+        border: border,
+        borderRadius: BorderRadius.circular(3),
+      ),
+    );
 
     final items = <(Widget, String)>[
       (swatch(c.accentTint, Border.all(color: c.accent, width: 1.5)), 'Solved'),
@@ -457,7 +445,7 @@ class _Legend extends StatelessWidget {
             ],
           ],
         ),
-        'Difficulty'
+        'Difficulty',
       ),
     ];
 
@@ -472,8 +460,7 @@ class _Legend extends StatelessWidget {
             children: [
               icon,
               const SizedBox(width: 5),
-              Text(label,
-                  style: AppTypography.micro.copyWith(color: c.fg3)),
+              Text(label, style: AppTypography.micro.copyWith(color: c.fg3)),
             ],
           ),
       ],
@@ -507,7 +494,9 @@ class _MonthPicker extends StatelessWidget {
             constraints: const BoxConstraints(minHeight: 52),
             color: isSel ? c.accentTint : Colors.transparent,
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.s5, vertical: 15),
+              horizontal: AppSpacing.s5,
+              vertical: 15,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -521,15 +510,19 @@ class _MonthPicker extends StatelessWidget {
                   ),
                 ),
                 Text.rich(
-                  TextSpan(children: [
-                    TextSpan(text: '$solved'),
-                    TextSpan(
-                        text: '/', style: TextStyle(color: c.hairline2)),
-                    TextSpan(text: '$total'),
-                  ]),
-                  style: AppTypography.tabular(AppTypography.small).copyWith(
-                    color: isSel ? c.accent : c.fg3,
+                  TextSpan(
+                    children: [
+                      TextSpan(text: '$solved'),
+                      TextSpan(
+                        text: '/',
+                        style: TextStyle(color: c.hairline2),
+                      ),
+                      TextSpan(text: '$total'),
+                    ],
                   ),
+                  style: AppTypography.tabular(
+                    AppTypography.small,
+                  ).copyWith(color: isSel ? c.accent : c.fg3),
                 ),
               ],
             ),
@@ -559,11 +552,14 @@ class _EmptyArchive extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.s5),
                 child: Text(
-	                  offline
-	                      ? "Can't load the archive right now. Try again shortly."
-	                      : 'No puzzles yet. Check back soon.',
+                  offline
+                      ? "Can't load the archive right now. Try again shortly."
+                      : 'No puzzles yet. Check back soon.',
                   textAlign: TextAlign.center,
-                  style: AppTypography.small.copyWith(color: c.fg3, height: 1.5),
+                  style: AppTypography.small.copyWith(
+                    color: c.fg3,
+                    height: 1.5,
+                  ),
                 ),
               ),
             ),

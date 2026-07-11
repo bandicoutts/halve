@@ -42,6 +42,16 @@ void main() {
     when(
       () => puzzleRepo.fetchArchive(any()),
     ).thenAnswer((_) async => <ArchiveDay>[]);
+    when(() => puzzleRepo.fetchPuzzleCount(any())).thenAnswer((_) async => 1);
+    when(
+      () => puzzleRepo.fetchYesterdayDifficulty(any()),
+    ).thenAnswer((_) async => Difficulty.medium);
+    when(
+      () => puzzleRepo.fetchRecentDailies(any(), limit: any(named: 'limit')),
+    ).thenAnswer((_) async => <DatedPuzzle>[]);
+    when(
+      () => solveRepo.fetchSolves(any()),
+    ).thenAnswer((_) async => <SolveRow>[]);
 
     await tester.pumpWidget(
       ProviderScope(
@@ -67,8 +77,13 @@ void main() {
     await pumpApp(tester);
 
     // Starts on Home.
-    expect(find.text("Today's puzzle"), findsOneWidget);
+    expect(find.text('Play today'), findsOneWidget);
     expect(find.byType(HalveBottomNav), findsOneWidget);
+
+    // Switch to Practice.
+    await tester.tap(navLabel('Practice'));
+    await tester.pumpAndSettle();
+    expect(find.text('Off the record.'), findsOneWidget);
 
     // Switch to Archive (empty fetch → the Archive screen's empty notice).
     await tester.tap(navLabel('Archive'));
@@ -78,7 +93,7 @@ void main() {
     // Switch to Stats — guest state (no signed-in user in this test).
     await tester.tap(navLabel('Stats'));
     await tester.pumpAndSettle();
-    expect(find.text('Statistics'), findsOneWidget);
+    expect(find.text('Sign in'), findsOneWidget);
 
     // The tab bar stays mounted across branch switches.
     expect(find.byType(HalveBottomNav), findsOneWidget);

@@ -186,21 +186,29 @@ class _LoadedBody extends StatelessWidget {
     final primary = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Center(
+          child: HalveMark(size: isTablet ? (isLandscape ? 96 : 116) : 108),
+        ),
+        SizedBox(height: gap(AppSpacing.s4, portrait: 22, landscape: 14)),
         if (data.today.isNotEmpty) ...[
-          isTablet ? Center(child: _MetaRow(data: data)) : _MetaRow(data: data),
+          Center(child: _MetaRow(data: data)),
           SizedBox(height: gap(AppSpacing.s3, portrait: 14, landscape: 10)),
         ],
         Text(
-          formatShortDate(data.today),
-          textAlign: isTablet ? TextAlign.center : TextAlign.start,
-          style: AppTypography.h1.copyWith(
-            fontSize: isTablet ? (isLandscape ? 52 : 62) : 44,
-            height: 1.04,
-            letterSpacing: isTablet ? -1.55 : -1.1,
+          "Today's\npuzzle.",
+          textAlign: TextAlign.center,
+          style: AppTypography.editorialDisplay.copyWith(
+            fontSize: isTablet ? (isLandscape ? 54 : 62) : 52,
             color: c.fg1,
           ),
         ),
-        SizedBox(height: gap(AppSpacing.s5 - 2, portrait: 30, landscape: 22)),
+        const SizedBox(height: AppSpacing.s3),
+        Text(
+          'Six by six. Every row and column, half and half. One solution, no guessing.',
+          textAlign: TextAlign.center,
+          style: AppTypography.small.copyWith(color: c.fg3, height: 1.55),
+        ),
+        SizedBox(height: gap(AppSpacing.s5, portrait: 30, landscape: 22)),
         if (offlineNoCache)
           _OfflineNotice(onReload: onReload)
         else if (emptyNoPuzzle)
@@ -222,7 +230,7 @@ class _LoadedBody extends StatelessWidget {
         ],
         // Streak band sits below the CTA — signed-in only, no gap when absent.
         if (data.signedIn) ...[
-          SizedBox(height: gap(AppSpacing.s5 - 2, portrait: 28, landscape: 20)),
+          SizedBox(height: gap(AppSpacing.s4, portrait: 24, landscape: 18)),
           _StreakRegion(data: data),
         ],
       ],
@@ -247,7 +255,7 @@ class _LoadedBody extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         primary,
-        SizedBox(height: gap(AppSpacing.s6, portrait: 30, landscape: 22)),
+        SizedBox(height: gap(AppSpacing.s4, portrait: 26, landscape: 20)),
         footer,
       ],
     );
@@ -302,7 +310,10 @@ class _StreakBand extends StatelessWidget {
         Container(
           width: 38,
           height: 38,
-          decoration: BoxDecoration(color: c.accentTint, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: c.accentTint,
+            shape: BoxShape.circle,
+          ),
           alignment: Alignment.center,
           child: const FlameIcon(size: 20),
         ),
@@ -313,30 +324,35 @@ class _StreakBand extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text.rich(
-                TextSpan(children: [
-                  TextSpan(
-                    text: '$streak',
-                    style: AppTypography.tabular(AppTypography.small).copyWith(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      fontVariations: const [FontVariation('wght', 600)],
-                      color: c.accent,
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '$streak',
+                      style: AppTypography.tabular(AppTypography.small)
+                          .copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            fontVariations: const [FontVariation('wght', 600)],
+                            color: c.accent,
+                          ),
                     ),
-                  ),
-                  TextSpan(
-                    text: ' day streak',
-                    style: AppTypography.small.copyWith(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      fontVariations: const [FontVariation('wght', 600)],
-                      color: c.fg1,
+                    TextSpan(
+                      text: ' day streak',
+                      style: AppTypography.small.copyWith(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        fontVariations: const [FontVariation('wght', 600)],
+                        color: c.fg1,
+                      ),
                     ),
-                  ),
-                ]),
+                  ],
+                ),
               ),
               const SizedBox(height: 1),
               Text(
-                solvedToday ? 'Solved today. Streak kept.' : 'Solve today to keep it going',
+                solvedToday
+                    ? 'Solved today. Streak kept.'
+                    : 'Solve today to keep it going',
                 style: AppTypography.label.copyWith(
                   letterSpacing: 0,
                   fontWeight: FontWeight.w400,
@@ -420,11 +436,11 @@ class _WeekCalendar extends StatelessWidget {
       children: [
         for (var i = 0; i < last7.length; i++)
           _DayCell(
-            letter: _dayLetters[
-                DateTime.parse(
-                  // offsetDay(today, -(6-i)): i=0→6 days ago, i=6→today
-                  _offsetDay(today, -(6 - i)),
-                ).weekday -
+            letter:
+                _dayLetters[DateTime.parse(
+                      // offsetDay(today, -(6-i)): i=0→6 days ago, i=6→today
+                      _offsetDay(today, -(6 - i)),
+                    ).weekday -
                     1],
             solved: last7[i],
             isToday: i == last7.length - 1,
@@ -469,11 +485,12 @@ class _DayCell extends StatelessWidget {
 
     if (solved) {
       // Solved (past or today): filled amber + checkmark.
-      circleDecoration = BoxDecoration(
-        color: c.accent,
-        shape: BoxShape.circle,
+      circleDecoration = BoxDecoration(color: c.accent, shape: BoxShape.circle);
+      circleChild = Icon(
+        Icons.check_rounded,
+        size: circleSize * 0.45,
+        color: Colors.white,
       );
-      circleChild = Icon(Icons.check_rounded, size: circleSize * 0.45, color: Colors.white);
     } else if (isToday) {
       // Today unsolved: amber outline ring with tint fill.
       circleDecoration = BoxDecoration(
@@ -523,7 +540,10 @@ class _EmptyStreakBand extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: 14),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.s4,
+        vertical: 14,
+      ),
       decoration: BoxDecoration(
         color: c.surface,
         border: Border.all(color: c.hairline),
@@ -534,7 +554,10 @@ class _EmptyStreakBand extends StatelessWidget {
           Container(
             width: 38,
             height: 38,
-            decoration: BoxDecoration(color: c.bgSunken, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: c.bgSunken,
+              shape: BoxShape.circle,
+            ),
             alignment: Alignment.center,
             child: const HalveMark(size: 20),
           ),
@@ -581,12 +604,12 @@ class _MetaRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    final style = AppTypography.label.copyWith(color: c.fg3);
+    final style = AppTypography.monoLabel.copyWith(color: c.fg3);
 
     final items = <String>[
       formatDayName(data.today).toUpperCase(),
       if (data.puzzle != null) data.puzzle!.difficulty.label.toUpperCase(),
-      if (data.archiveCount != null) '#${data.archiveCount}',
+      if (data.archiveCount != null) 'NO. ${data.archiveCount}',
     ];
 
     final children = <Widget>[];
@@ -594,7 +617,12 @@ class _MetaRow extends StatelessWidget {
       if (i > 0) {
         children
           ..add(const SizedBox(width: 9))
-          ..add(Text('·', style: style.copyWith(color: c.hairline2, letterSpacing: 0)))
+          ..add(
+            Text(
+              '·',
+              style: style.copyWith(color: c.hairline2, letterSpacing: 0),
+            ),
+          )
           ..add(const SizedBox(width: 9));
       }
       children.add(Text(items[i], style: style));
@@ -617,7 +645,10 @@ class _OfflineNotice extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: 13),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.s4,
+            vertical: 13,
+          ),
           decoration: BoxDecoration(
             color: c.bgSunken,
             border: Border.all(color: c.hairline),
@@ -632,9 +663,12 @@ class _OfflineNotice extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-	                child: Text(
-	                  'Offline. No saved puzzle available.',
-                  style: AppTypography.small.copyWith(color: c.fg3, height: 1.5),
+                child: Text(
+                  'Puzzle unavailable — try again shortly.',
+                  style: AppTypography.small.copyWith(
+                    color: c.fg3,
+                    height: 1.5,
+                  ),
                 ),
               ),
             ],
@@ -664,8 +698,8 @@ class _OfflineBanner extends StatelessWidget {
       children: [
         Icon(Icons.wifi_off_rounded, size: 14, color: c.fg3),
         const SizedBox(width: 8),
-	        Text(
-	          'Offline. Showing a saved puzzle',
+        Text(
+          'Offline — showing a saved puzzle',
           style: AppTypography.small.copyWith(color: c.fg3),
         ),
       ],
@@ -681,7 +715,10 @@ class _EmptyPuzzleNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4, vertical: 13),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.s4,
+        vertical: 13,
+      ),
       decoration: BoxDecoration(
         color: c.bgSunken,
         border: Border.all(color: c.hairline),
@@ -712,24 +749,26 @@ class _SolvedBlock extends StatelessWidget {
             Icon(Icons.check_circle_rounded, size: 22, color: c.correct),
             const SizedBox(width: AppSpacing.s2),
             Text.rich(
-              TextSpan(children: [
-                TextSpan(
-                  text: 'Solved in ',
-                  style: AppTypography.body.copyWith(
-                    fontWeight: FontWeight.w500,
-                    fontVariations: const [FontVariation('wght', 500)],
-                    color: c.fg1,
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Solved in ',
+                    style: AppTypography.body.copyWith(
+                      fontWeight: FontWeight.w500,
+                      fontVariations: const [FontVariation('wght', 500)],
+                      color: c.fg1,
+                    ),
                   ),
-                ),
-                TextSpan(
-                  text: formatMs(durationMs),
-                  style: AppTypography.tabular(AppTypography.body).copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontVariations: const [FontVariation('wght', 600)],
-                    color: c.fg1,
+                  TextSpan(
+                    text: formatMs(durationMs),
+                    style: AppTypography.tabular(AppTypography.body).copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontVariations: const [FontVariation('wght', 600)],
+                      color: c.fg1,
+                    ),
                   ),
-                ),
-              ]),
+                ],
+              ),
             ),
           ],
         ),
@@ -743,17 +782,17 @@ class _SolvedBlock extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.s4),
         HalveButton(
-          label: 'Practice',
+          label: 'See your stats',
           variant: HalveButtonVariant.secondary,
           full: true,
-          onPressed: () => context.push(Routes.practice),
+          onPressed: () => context.go(Routes.stats),
         ),
       ],
     );
   }
 }
 
-/// "Keep playing" — Practice + Archive destination cards.
+/// Prototype-style mono destination rows.
 class _KeepPlaying extends StatelessWidget {
   const _KeepPlaying({required this.data});
 
@@ -762,120 +801,62 @@ class _KeepPlaying extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    final count = data.archiveCount;
-    final last = data.yesterdayDifficulty;
-    final archiveSub = count == null
-        ? 'Past puzzles'
-        : last == null
-            ? '$count puzzles'
-            : '$count puzzles · last ${last.label.toLowerCase()}';
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.s3),
-          child: Text('KEEP PLAYING', style: AppTypography.label.copyWith(color: c.fg3)),
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: _DestCard(
-                motif: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SymbolDisc(size: 24),
-                    SizedBox(width: 6),
-                    SymbolRing(size: 24),
-                  ],
-                ),
-                title: 'Practice',
-                sub: 'Any difficulty',
-                onTap: () => context.push(Routes.practice),
+        Container(
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: c.hairline)),
+          ),
+          child: Column(
+            children: [
+              _HomeRouteRow(
+                label: 'PRACTICE',
+                onTap: () => context.go(Routes.practice),
               ),
-            ),
-            SizedBox(width: context.isTablet ? 14 : AppSpacing.s3),
-            Expanded(
-              child: _DestCard(
-                motif: const HalveMark(size: 26),
-                title: 'Archive',
-                sub: archiveSub,
+              _HomeRouteRow(
+                label: 'ARCHIVE',
                 onTap: () => context.go(Routes.archive),
               ),
-            ),
-          ],
+              _HomeRouteRow(
+                label: 'STATS',
+                onTap: () => context.go(Routes.stats),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 }
 
-class _DestCard extends StatelessWidget {
-  const _DestCard({
-    required this.motif,
-    required this.title,
-    required this.sub,
-    required this.onTap,
-  });
+class _HomeRouteRow extends StatelessWidget {
+  const _HomeRouteRow({required this.label, required this.onTap});
 
-  final Widget motif;
-  final String title;
-  final String sub;
+  final String label;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    final isTablet = context.isTablet;
-    final isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
-    final minH = isTablet ? (isLandscape ? 128.0 : 172.0) : 124.0;
-    final pad = isTablet ? (isLandscape ? 18.0 : 22.0) : 18.0;
     return TapFade(
       onTap: onTap,
       child: Container(
-        constraints: BoxConstraints(minHeight: minH),
-        padding: EdgeInsets.all(pad),
+        constraints: const BoxConstraints(minHeight: 52),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
-          color: c.surface,
-          border: Border.all(color: c.hairline),
-          borderRadius: AppRadii.xlR,
-          boxShadow: context.halveShadows.sm,
+          border: Border(bottom: BorderSide(color: c.hairline)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Row(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 30, child: Center(child: motif)),
-                Icon(Icons.chevron_right_rounded, size: 20, color: c.fg3),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.h3.copyWith(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    fontVariations: const [FontVariation('wght', 600)],
-                    color: c.fg1,
-                    letterSpacing: -0.17,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.s1),
-                Text(
-                  sub,
-                  style: AppTypography.small.copyWith(fontSize: 12.5, color: c.fg3),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ],
+            Text(label, style: AppTypography.monoLabel.copyWith(color: c.fg1)),
+            const Spacer(),
+            Text(
+              '→',
+              style: AppTypography.monoLabel.copyWith(
+                color: c.accent,
+                letterSpacing: 0,
+              ),
             ),
           ],
         ),

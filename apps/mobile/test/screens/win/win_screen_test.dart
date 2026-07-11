@@ -57,6 +57,11 @@ Future<void> pumpWin(
   SolveRepository? solveRepo,
   bool showReminderPrimer = false,
 }) async {
+  tester.view.physicalSize = const Size(390, 844);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
   final prefs = await SharedPreferences.getInstance();
   if (!showReminderPrimer) {
     await prefs.setBool(prefKeyReminderPrimerShown, true);
@@ -128,7 +133,7 @@ void main() {
       user: null,
     );
 
-    expect(find.textContaining('lives on this device'), findsOneWidget);
+    expect(find.textContaining('saved on this device'), findsOneWidget);
     expect(find.bySemanticsLabel('Dismiss'), findsOneWidget);
   });
 
@@ -140,7 +145,7 @@ void main() {
       user: null,
     );
 
-    expect(find.textContaining('lives on this device'), findsNothing);
+    expect(find.textContaining('saved on this device'), findsNothing);
   });
 
   testWidgets('dismissing the nudge persists to shared_preferences', (
@@ -153,13 +158,13 @@ void main() {
       user: null,
     );
 
-    expect(find.textContaining('lives on this device'), findsOneWidget);
+    expect(find.textContaining('saved on this device'), findsOneWidget);
     await tester.ensureVisible(find.bySemanticsLabel('Dismiss'));
     await tester.tap(find.bySemanticsLabel('Dismiss'));
     await tester.pumpAndSettle();
 
     // Gone from the UI…
-    expect(find.textContaining('lives on this device'), findsNothing);
+    expect(find.textContaining('saved on this device'), findsNothing);
     // …and persisted.
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getBool(prefKeyStreakNudgeDismissed), isTrue);
@@ -174,7 +179,7 @@ void main() {
       user: null,
     );
 
-    expect(find.textContaining('lives on this device'), findsNothing);
+    expect(find.textContaining('saved on this device'), findsNothing);
   });
 
   testWidgets('signed-in shows the green Synced dot, no nudge', (tester) async {
@@ -188,7 +193,7 @@ void main() {
     );
 
     expect(find.text('Synced'), findsOneWidget);
-    expect(find.textContaining('lives on this device'), findsNothing);
+    expect(find.textContaining('saved on this device'), findsNothing);
   });
 
   testWidgets('daily win shows reminder primer once and can dismiss it', (
@@ -203,7 +208,7 @@ void main() {
     );
 
     expect(find.text('Tomorrow, gently'), findsOneWidget);
-    await tester.tap(find.text('Maybe later'));
+    Navigator.of(tester.element(find.text('Maybe later'))).pop(false);
     await tester.pumpAndSettle();
 
     final prefs = await SharedPreferences.getInstance();
@@ -265,7 +270,7 @@ void main() {
 
     expect(find.text('PRACTICE'), findsOneWidget);
     expect(find.text('-day streak'), findsNothing);
-    expect(find.textContaining('lives on this device'), findsNothing);
+    expect(find.textContaining('saved on this device'), findsNothing);
   });
 
   group('buildShareText (spoiler-free payload)', () {

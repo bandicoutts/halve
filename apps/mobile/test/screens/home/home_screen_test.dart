@@ -32,19 +32,23 @@ Puzzle samplePuzzle({
     id: id,
     difficulty: difficulty.wire,
     gridSpec: {
-      'solution': [for (var r = 0; r < 6; r++) [for (var c = 0; c < 6; c++) (r + c) % 2]],
-      'givens': [for (var r = 0; r < 6; r++) [for (var c = 0; c < 6; c++) null]],
+      'solution': [
+        for (var r = 0; r < 6; r++) [for (var c = 0; c < 6; c++) (r + c) % 2],
+      ],
+      'givens': [
+        for (var r = 0; r < 6; r++) [for (var c = 0; c < 6; c++) null],
+      ],
       'edges': const <Map<String, Object?>>[],
     },
   )!;
 }
 
 SolveRow solveOn(String day, {int durationMs = 95000}) => SolveRow(
-      solvedAt: DateTime.parse('${day}T12:00:00Z'),
-      durationMs: durationMs,
-      usedHint: false,
-      localDate: day,
-    );
+  solvedAt: DateTime.parse('${day}T12:00:00Z'),
+  durationMs: durationMs,
+  usedHint: false,
+  localDate: day,
+);
 
 Future<void> pumpHome(
   WidgetTester tester, {
@@ -53,10 +57,7 @@ Future<void> pumpHome(
   await tester.pumpWidget(
     ProviderScope(
       overrides: overrides,
-      child: MaterialApp(
-        theme: AppTheme.light(),
-        home: const HomeScreen(),
-      ),
+      child: MaterialApp(theme: AppTheme.light(), home: const HomeScreen()),
     ),
   );
 }
@@ -71,51 +72,69 @@ void main() {
   setUp(() {
     puzzleRepo = MockPuzzleRepository();
     solveRepo = MockSolveRepository();
+    when(() => puzzleRepo.fetchPuzzleCount(any())).thenAnswer((_) async => 2);
+    when(
+      () => puzzleRepo.fetchYesterdayDifficulty(any()),
+    ).thenAnswer((_) async => Difficulty.hard);
+    when(
+      () => puzzleRepo.fetchRecentDailies(any(), limit: any(named: 'limit')),
+    ).thenAnswer((_) async => <DatedPuzzle>[]);
   });
 
-  List<Override> baseOverrides({
-    required User? user,
-    PuzzleCache? cache,
-  }) =>
-      [
-        puzzleRepositoryProvider.overrideWithValue(puzzleRepo),
-        solveRepositoryProvider.overrideWithValue(solveRepo),
-        currentUserProvider.overrideWithValue(user),
-        puzzleCacheProvider.overrideWithValue(cache ?? InMemoryPuzzleCache()),
-      ];
+  List<Override> baseOverrides({required User? user, PuzzleCache? cache}) => [
+    puzzleRepositoryProvider.overrideWithValue(puzzleRepo),
+    solveRepositoryProvider.overrideWithValue(solveRepo),
+    currentUserProvider.overrideWithValue(user),
+    puzzleCacheProvider.overrideWithValue(cache ?? InMemoryPuzzleCache()),
+  ];
 
   void stubArchive() {
     when(() => puzzleRepo.fetchArchive(any())).thenAnswer(
       (_) async => [
-        ArchiveDay(puzzleId: 'p-yest', date: yesterday, difficulty: Difficulty.hard),
-        ArchiveDay(puzzleId: 'p-today', date: today, difficulty: Difficulty.medium),
+        ArchiveDay(
+          puzzleId: 'p-yest',
+          date: yesterday,
+          difficulty: Difficulty.hard,
+        ),
+        ArchiveDay(
+          puzzleId: 'p-today',
+          date: today,
+          difficulty: Difficulty.medium,
+        ),
       ],
     );
   }
 
-  testWidgets('normal — Play today CTA, no streak band when signed out',
-      (tester) async {
-    when(() => puzzleRepo.fetchDaily(any())).thenAnswer((_) async => samplePuzzle());
+  testWidgets('normal — Play today CTA, no streak band when signed out', (
+    tester,
+  ) async {
+    when(
+      () => puzzleRepo.fetchDaily(any()),
+    ).thenAnswer((_) async => samplePuzzle());
     stubArchive();
 
     await pumpHome(tester, overrides: baseOverrides(user: null));
     await tester.pumpAndSettle();
 
-    expect(find.text("Today's puzzle"), findsOneWidget);
+    expect(find.text("Today's\npuzzle."), findsOneWidget);
     expect(find.text('Play today'), findsOneWidget);
     expect(find.byType(FlameIcon), findsNothing); // no streak band signed-out
-    // Archive card subtitle reflects count + yesterday's difficulty.
-    expect(find.textContaining('· last hard'), findsOneWidget);
+    expect(find.text('PRACTICE'), findsOneWidget);
+    expect(find.text('ARCHIVE'), findsOneWidget);
   });
 
-  testWidgets('solved-today — confirmation block + stats CTA, no Play today',
-      (tester) async {
+  testWidgets('solved-today — confirmation block + stats CTA, no Play today', (
+    tester,
+  ) async {
     final user = MockUser();
     when(() => user.id).thenReturn('u1');
-    when(() => puzzleRepo.fetchDaily(any())).thenAnswer((_) async => samplePuzzle());
+    when(
+      () => puzzleRepo.fetchDaily(any()),
+    ).thenAnswer((_) async => samplePuzzle());
     stubArchive();
-    when(() => solveRepo.fetchSolves('u1'))
-        .thenAnswer((_) async => [solveOn(today, durationMs: 95000)]);
+    when(
+      () => solveRepo.fetchSolves('u1'),
+    ).thenAnswer((_) async => [solveOn(today, durationMs: 95000)]);
 
     await pumpHome(tester, overrides: baseOverrides(user: user));
     await tester.pumpAndSettle();
@@ -126,46 +145,63 @@ void main() {
     expect(find.textContaining('1:35', findRichText: true), findsOneWidget);
   });
 
-  testWidgets('streak band — flame + "N day streak" when signed-in & streak>0',
-      (tester) async {
-    final user = MockUser();
-    when(() => user.id).thenReturn('u1');
-    when(() => puzzleRepo.fetchDaily(any())).thenAnswer((_) async => samplePuzzle());
-    stubArchive();
-    when(() => solveRepo.fetchSolves('u1')).thenAnswer(
-      (_) async => [
-        solveOn(offsetDay(today, -2)),
-        solveOn(offsetDay(today, -1)),
-        solveOn(today),
-      ],
-    );
+  testWidgets(
+    'streak band — flame + "N day streak" when signed-in & streak>0',
+    (tester) async {
+      final user = MockUser();
+      when(() => user.id).thenReturn('u1');
+      when(
+        () => puzzleRepo.fetchDaily(any()),
+      ).thenAnswer((_) async => samplePuzzle());
+      stubArchive();
+      when(() => solveRepo.fetchSolves('u1')).thenAnswer(
+        (_) async => [
+          solveOn(offsetDay(today, -2)),
+          solveOn(offsetDay(today, -1)),
+          solveOn(today),
+        ],
+      );
 
-    await pumpHome(tester, overrides: baseOverrides(user: user));
-    await tester.pumpAndSettle();
+      await pumpHome(tester, overrides: baseOverrides(user: user));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(FlameIcon), findsOneWidget);
-    expect(find.textContaining('day streak', findRichText: true), findsOneWidget);
-  });
+      expect(find.byType(FlameIcon), findsOneWidget);
+      expect(
+        find.textContaining('day streak', findRichText: true),
+        findsOneWidget,
+      );
+    },
+  );
 
-  testWidgets('empty streak band — first-run nudge when signed-in & streak==0',
-      (tester) async {
-    final user = MockUser();
-    when(() => user.id).thenReturn('u1');
-    when(() => puzzleRepo.fetchDaily(any())).thenAnswer((_) async => samplePuzzle());
-    stubArchive();
-    when(() => solveRepo.fetchSolves('u1')).thenAnswer((_) async => <SolveRow>[]);
+  testWidgets(
+    'empty streak band — first-run nudge when signed-in & streak==0',
+    (tester) async {
+      final user = MockUser();
+      when(() => user.id).thenReturn('u1');
+      when(
+        () => puzzleRepo.fetchDaily(any()),
+      ).thenAnswer((_) async => samplePuzzle());
+      stubArchive();
+      when(
+        () => solveRepo.fetchSolves('u1'),
+      ).thenAnswer((_) async => <SolveRow>[]);
 
-    await pumpHome(tester, overrides: baseOverrides(user: user));
-    await tester.pumpAndSettle();
+      await pumpHome(tester, overrides: baseOverrides(user: user));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Start your streak today'), findsOneWidget);
-    expect(find.byType(FlameIcon), findsNothing);
-    expect(find.text('Play today'), findsOneWidget);
-  });
+      expect(find.text('Start your streak today'), findsOneWidget);
+      expect(find.byType(FlameIcon), findsNothing);
+      expect(find.text('Play today'), findsOneWidget);
+    },
+  );
 
-  testWidgets('loading — skeletons while the future is pending', (tester) async {
+  testWidgets('loading — skeletons while the future is pending', (
+    tester,
+  ) async {
     final completer = Completer<Puzzle?>();
-    when(() => puzzleRepo.fetchDaily(any())).thenAnswer((_) => completer.future);
+    when(
+      () => puzzleRepo.fetchDaily(any()),
+    ).thenAnswer((_) => completer.future);
     stubArchive();
 
     await pumpHome(tester, overrides: baseOverrides(user: null));
@@ -178,19 +214,25 @@ void main() {
     expect(find.byType(Skeleton), findsNothing);
   });
 
-  testWidgets('offline, no cache — unavailable notice + reload', (tester) async {
+  testWidgets('offline, no cache — unavailable notice + reload', (
+    tester,
+  ) async {
     when(() => puzzleRepo.fetchDaily(any())).thenThrow(Exception('no network'));
 
     await pumpHome(tester, overrides: baseOverrides(user: null));
     await tester.pumpAndSettle();
 
-    expect(find.text('Puzzle unavailable — try again shortly.'), findsOneWidget);
+    expect(
+      find.text('Puzzle unavailable — try again shortly.'),
+      findsOneWidget,
+    );
     expect(find.text('Reload'), findsOneWidget);
     expect(find.text('Play today'), findsNothing);
   });
 
-  testWidgets('offline, with cache — playable CTA + offline banner',
-      (tester) async {
+  testWidgets('offline, with cache — playable CTA + offline banner', (
+    tester,
+  ) async {
     final cache = InMemoryPuzzleCache();
     await cache.put(today, samplePuzzle());
     when(() => puzzleRepo.fetchDaily(any())).thenThrow(Exception('no network'));
@@ -204,7 +246,9 @@ void main() {
 
   testWidgets('empty — no puzzle row for today', (tester) async {
     when(() => puzzleRepo.fetchDaily(any())).thenAnswer((_) async => null);
-    when(() => puzzleRepo.fetchArchive(any())).thenAnswer((_) async => <ArchiveDay>[]);
+    when(
+      () => puzzleRepo.fetchArchive(any()),
+    ).thenAnswer((_) async => <ArchiveDay>[]);
 
     await pumpHome(tester, overrides: baseOverrides(user: null));
     await tester.pumpAndSettle();

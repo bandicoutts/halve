@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_layout.dart';
-import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
 import 'nav_glyphs.dart';
@@ -15,7 +13,7 @@ class HalveNavItem {
   final Widget Function(bool active) glyphBuilder;
 }
 
-/// The Halve bottom tab bar — Today · Archive · Stats · Settings. Anchored (never
+/// The Halve bottom tab bar — Today · Practice · Archive · Stats. Anchored (never
 /// floating), platform-adaptive per the mobile wireframe (`app/screens/nav.jsx`):
 ///   • iOS    — bare labelled icons, active in accent.
 ///   • Android — Material 3 NavigationBar, active glyph seated in an
@@ -33,28 +31,16 @@ class HalveBottomNav extends StatelessWidget {
   final ValueChanged<int> onTap;
 
   static const items = <HalveNavItem>[
-    HalveNavItem(
-      label: 'Today',
-      glyphBuilder: _todayGlyph,
-    ),
-    HalveNavItem(
-      label: 'Archive',
-      glyphBuilder: _archiveGlyph,
-    ),
-    HalveNavItem(
-      label: 'Stats',
-      glyphBuilder: _statsGlyph,
-    ),
-    HalveNavItem(
-      label: 'Settings',
-      glyphBuilder: _settingsGlyph,
-    ),
+    HalveNavItem(label: 'Today', glyphBuilder: _todayGlyph),
+    HalveNavItem(label: 'Practice', glyphBuilder: _practiceGlyph),
+    HalveNavItem(label: 'Archive', glyphBuilder: _archiveGlyph),
+    HalveNavItem(label: 'Stats', glyphBuilder: _statsGlyph),
   ];
 
   static Widget _todayGlyph(bool a) => TodayGlyph(active: a);
+  static Widget _practiceGlyph(bool a) => PracticeGlyph(active: a);
   static Widget _archiveGlyph(bool a) => ArchiveGlyph(active: a);
   static Widget _statsGlyph(bool a) => StatsGlyph(active: a);
-  static Widget _settingsGlyph(bool a) => SettingsGlyph(active: a);
 
   @override
   Widget build(BuildContext context) {
@@ -76,11 +62,13 @@ class _AndroidNavBar extends StatelessWidget {
       data: NavigationBarThemeData(
         backgroundColor: c.bg,
         indicatorColor: c.accentTint,
+        indicatorShape: const StadiumBorder(),
         elevation: 0,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return AppTypography.micro.copyWith(
-            letterSpacing: 0.11, // 0.01em
+            fontSize: 12,
+            letterSpacing: 0,
             fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
             color: selected ? c.fg1 : c.fg3,
           );
@@ -93,7 +81,7 @@ class _AndroidNavBar extends StatelessWidget {
         child: NavigationBar(
           selectedIndex: nav.currentIndex,
           onDestinationSelected: nav.onTap,
-          height: 64,
+          height: 80,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: [
             for (var i = 0; i < HalveBottomNav.items.length; i++)
@@ -125,7 +113,7 @@ class _IOSNavBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: AppLayout.topBarHeight,
+          height: 49,
           child: Row(
             children: [
               for (var i = 0; i < HalveBottomNav.items.length; i++)
@@ -168,13 +156,14 @@ class _IOSTabItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: 28, width: 28, child: item.glyphBuilder(active)),
-            const SizedBox(height: AppSpacing.s1),
+            const SizedBox(height: 2),
             Text(
               item.label,
               style: AppTypography.micro.copyWith(
+                fontSize: 10,
                 letterSpacing: 0,
                 fontWeight: active ? FontWeight.w600 : FontWeight.w500,
-                color: active ? c.fg1 : c.fg3,
+                color: active ? c.accent : c.fg3,
               ),
             ),
           ],

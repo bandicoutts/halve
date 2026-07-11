@@ -168,9 +168,7 @@ void main() {
   });
 
   group('SettingsScreen — account (signed in)', () {
-    testWidgets('shows display name, Streak synced, and Sign out', (
-      tester,
-    ) async {
+    testWidgets('shows display name, email, and Sign out', (tester) async {
       await pumpSettings(
         tester,
         data: const SettingsData(
@@ -182,7 +180,7 @@ void main() {
       );
 
       expect(find.text('Alex'), findsOneWidget);
-      expect(find.text('Streak synced'), findsOneWidget);
+      expect(find.text('alex@example.com'), findsOneWidget);
       expect(find.text('Sign out'), findsOneWidget);
     });
 
@@ -199,7 +197,7 @@ void main() {
       );
 
       expect(find.text('robin@example.com'), findsWidgets);
-      expect(find.text('Streak synced'), findsOneWidget);
+      expect(find.text('Streak synced'), findsNothing);
     });
 
     testWidgets('Sign in row is absent when signed in', (tester) async {

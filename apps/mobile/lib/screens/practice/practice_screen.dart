@@ -16,161 +16,57 @@ class PracticeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(selectedDifficultyProvider);
     final c = context.halveColors;
 
     return SafeScaffold(
       safeBottom: true,
-      body: Column(
-        children: [
-          HalveTopBar(
-            title: 'Practice',
-            onBack: () => context.canPop() ? context.pop() : context.go(Routes.home),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.s5, AppSpacing.s5, AppSpacing.s5, AppSpacing.s3,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          context.hPagePad,
+          14,
+          context.hPagePad,
+          AppSpacing.s7,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'PRACTICE · UNLIMITED',
+              style: AppTypography.monoLabel.copyWith(color: c.fg3),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Off the record.',
+              style: AppTypography.editorialH1.copyWith(color: c.fg1),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'As many puzzles as you like. The streak is never at stake here.',
+              style: AppTypography.small.copyWith(color: c.fg3, height: 1.55),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: c.hairline)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'DIFFICULTY',
-                    style: AppTypography.label.copyWith(color: c.fg3),
-                  ),
-                  const SizedBox(height: AppSpacing.s3),
                   for (final diff in Difficulty.values) ...[
-                    _DifficultyCard(
+                    _DifficultyRow(
                       difficulty: diff,
-                      selected: selected == diff,
-                      onSelect: (d) =>
-                          ref.read(selectedDifficultyProvider.notifier).state = d,
+                      onTap: () {
+                        ref.read(selectedDifficultyProvider.notifier).state =
+                            diff;
+                        context.push(
+                          Routes.practicePlay(difficulty: diff.wire),
+                        );
+                      },
                     ),
-                    if (diff != Difficulty.hard)
-                      const SizedBox(height: AppSpacing.s2 + 2),
                   ],
                 ],
               ),
             ),
-          ),
-          _PlayCta(selected: selected),
-        ],
-      ),
-    );
-  }
-}
-
-class _PlayCta extends StatelessWidget {
-  const _PlayCta({required this.selected});
-
-  final Difficulty selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.halveColors;
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: c.hairline, width: 1)),
-        color: c.bg,
-      ),
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.s5,
-        AppSpacing.s3,
-        AppSpacing.s5,
-        AppSpacing.s4 + MediaQuery.viewPaddingOf(context).bottom,
-      ),
-      child: HalveButton(
-        label: 'Play',
-        full: true,
-        onPressed: () => context.push(
-          Routes.practicePlay(difficulty: selected.wire),
-        ),
-      ),
-    );
-  }
-}
-
-class _DifficultyCard extends StatefulWidget {
-  const _DifficultyCard({
-    required this.difficulty,
-    required this.selected,
-    required this.onSelect,
-  });
-
-  final Difficulty difficulty;
-  final bool selected;
-  final ValueChanged<Difficulty> onSelect;
-
-  @override
-  State<_DifficultyCard> createState() => _DifficultyCardState();
-}
-
-class _DifficultyCardState extends State<_DifficultyCard> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.halveColors;
-    final s = context.halveShadows;
-    final selected = widget.selected;
-
-    final bg = selected
-        ? c.accentTint
-        : _pressed
-            ? c.bgSunken
-            : c.surface;
-    final borderColor = selected ? c.accent : c.hairline;
-    final borderWidth = selected ? 2.0 : 1.0;
-
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onSelect(widget.difficulty);
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 120),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.s4 + 2,
-          vertical: AppSpacing.s4,
-        ),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: AppRadii.lgR,
-          border: Border.all(color: borderColor, width: borderWidth),
-          boxShadow: selected ? [] : s.sm,
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AnimatedDefaultTextStyle(
-                    duration: const Duration(milliseconds: 120),
-                    style: AppTypography.body.copyWith(
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.17,
-                      color: selected ? c.accent : c.fg1,
-                    ),
-                    child: Text(widget.difficulty.label),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _desc(widget.difficulty),
-                    style: AppTypography.small.copyWith(
-                      fontSize: 13,
-                      color: c.fg3,
-                      height: 1.45,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: AppSpacing.s4),
-            _RadioDot(selected: selected),
           ],
         ),
       ),
@@ -178,34 +74,74 @@ class _DifficultyCardState extends State<_DifficultyCard> {
   }
 }
 
-class _RadioDot extends StatelessWidget {
-  const _RadioDot({required this.selected});
+class _DifficultyRow extends StatelessWidget {
+  const _DifficultyRow({required this.difficulty, required this.onTap});
 
-  final bool selected;
+  final Difficulty difficulty;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
-    final borderColor = selected ? c.accent : c.hairline2;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 120),
-      width: 22,
-      height: 22,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: selected ? c.accent : Colors.transparent,
-        border: Border.all(color: borderColor, width: 2),
+    return TapFade(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 2),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: c.hairline)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Expanded(
+                  child: Text(
+                    difficulty.label,
+                    style: AppTypography.editorialH2.copyWith(
+                      fontSize: 27,
+                      color: c.fg1,
+                    ),
+                  ),
+                ),
+                Text(
+                  'PLAY →',
+                  style: AppTypography.monoLabel.copyWith(color: c.accent),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              _meta(difficulty),
+              style: AppTypography.monoMicro.copyWith(color: c.fg3),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              _desc(difficulty),
+              style: AppTypography.small.copyWith(
+                color: c.fg3,
+                height: 1.5,
+                fontSize: 13.5,
+              ),
+            ),
+          ],
+        ),
       ),
-      child: selected ? CheckGlyph(color: c.onAccent, size: 22) : null,
     );
   }
 }
 
+String _meta(Difficulty d) => switch (d) {
+  Difficulty.easy => '14 GIVENS · 4 LINKS',
+  Difficulty.medium => '11 GIVENS · 5 LINKS',
+  Difficulty.hard => '8 GIVENS · 7 LINKS',
+};
 
 String _desc(Difficulty d) => switch (d) {
-      Difficulty.easy => 'More edge signs to guide you. Good for learning the rules.',
-      Difficulty.medium =>
-        'Fewer edge signs. A steady solve.',
-      Difficulty.hard => 'Fewer edge clues, more room to think.',
-    };
+  Difficulty.easy =>
+    'A generous start - most of the logic is laid out for you.',
+  Difficulty.medium => "The daily's weight. Fewer footholds, steady deduction.",
+  Difficulty.hard => 'Sparse and slow-burning. Every placement is earned.',
+};

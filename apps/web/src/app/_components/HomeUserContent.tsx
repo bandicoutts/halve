@@ -39,6 +39,8 @@ function StreakBand({
         border: "1px solid var(--hairline)",
         borderRadius: "var(--radius-lg)",
         padding: "14px 16px",
+        maxWidth: 420,
+        width: "100%",
       }}
     >
       <div

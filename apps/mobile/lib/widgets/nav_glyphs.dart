@@ -10,7 +10,12 @@ import '../theme/app_theme.dart';
 /// Today / daily-puzzle tab — the split circle (brand mark). Active fills the
 /// two halves amber/teal; inactive is a single-color outlined split circle.
 class TodayGlyph extends StatelessWidget {
-  const TodayGlyph({super.key, this.size = 24, this.active = false, this.color});
+  const TodayGlyph({
+    super.key,
+    this.size = 24,
+    this.active = false,
+    this.color,
+  });
 
   final double size;
   final bool active;
@@ -34,7 +39,12 @@ class TodayGlyph extends StatelessWidget {
 
 /// Archive tab — a calendar outline.
 class ArchiveGlyph extends StatelessWidget {
-  const ArchiveGlyph({super.key, this.size = 24, this.active = false, this.color});
+  const ArchiveGlyph({
+    super.key,
+    this.size = 24,
+    this.active = false,
+    this.color,
+  });
 
   final double size;
   final bool active;
@@ -53,9 +63,40 @@ class ArchiveGlyph extends StatelessWidget {
   }
 }
 
+/// Practice tab — a ring, echoing the off-the-record puzzle mode.
+class PracticeGlyph extends StatelessWidget {
+  const PracticeGlyph({
+    super.key,
+    this.size = 24,
+    this.active = false,
+    this.color,
+  });
+
+  final double size;
+  final bool active;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.halveColors;
+    return CustomPaint(
+      size: Size.square(size),
+      painter: _PracticePainter(
+        color: color ?? (active ? c.accent : c.fg3),
+        strokeWidth: active ? 3.0 : 2.2,
+      ),
+    );
+  }
+}
+
 /// Settings tab — three horizontal sliders with knobs.
 class SettingsGlyph extends StatelessWidget {
-  const SettingsGlyph({super.key, this.size = 24, this.active = false, this.color});
+  const SettingsGlyph({
+    super.key,
+    this.size = 24,
+    this.active = false,
+    this.color,
+  });
 
   final double size;
   final bool active;
@@ -76,7 +117,12 @@ class SettingsGlyph extends StatelessWidget {
 
 /// Stats tab — three ascending bars.
 class StatsGlyph extends StatelessWidget {
-  const StatsGlyph({super.key, this.size = 24, this.active = false, this.color});
+  const StatsGlyph({
+    super.key,
+    this.size = 24,
+    this.active = false,
+    this.color,
+  });
 
   final double size;
   final bool active;
@@ -93,6 +139,30 @@ class StatsGlyph extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PracticePainter extends CustomPainter {
+  _PracticePainter({required this.color, required this.strokeWidth});
+
+  final Color color;
+  final double strokeWidth;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 24, size.height / 24);
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..isAntiAlias = true;
+    canvas.drawCircle(const Offset(12, 12), 7.5, p);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_PracticePainter old) =>
+      old.color != color || old.strokeWidth != strokeWidth;
 }
 
 class _TodayPainter extends CustomPainter {

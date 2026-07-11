@@ -18,6 +18,9 @@ class HapticsService {
   /// Light impact: cell tap cycle.
   Future<void> onTap() => _fire(HapticFeedback.lightImpact);
 
+  /// Selection click: bottom tab changes and similar mode switches.
+  Future<void> onSelection() => _fire(HapticFeedback.selectionClick);
+
   /// Medium impact: puzzle solved.
   Future<void> onWin() => _fire(HapticFeedback.mediumImpact);
 
@@ -30,6 +33,8 @@ class HapticsService {
 
 /// Convenience top-level wrappers (call-site API unchanged).
 Future<void> hapticsOnTap() => HapticsService.instance.onTap();
+Future<void> hapticsOnSelection() => HapticsService.instance.onSelection();
 Future<void> hapticsOnWin() => HapticsService.instance.onWin();
 Future<void> hapticsOnError() => HapticsService.instance.onError();
-Future<void> hapticsOnLineComplete() => HapticsService.instance.onLineComplete();
+Future<void> hapticsOnLineComplete() =>
+    HapticsService.instance.onLineComplete();

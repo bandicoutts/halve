@@ -148,6 +148,9 @@ void main() {
   setUp(() {
     solveRepo = MockSolveRepository();
     registerFallbackValue(<List<int?>>[]);
+    when(
+      () => solveRepo.fetchSolves(any()),
+    ).thenAnswer((_) async => <SolveRow>[]);
   });
 
   PlayLoad dailyLoad(Puzzle p) => PlayLoad(
@@ -391,7 +394,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Reload'), findsOneWidget);
-    expect(find.textContaining('unavailable'), findsOneWidget);
+    expect(find.text("Couldn't load the puzzle."), findsOneWidget);
     expect(find.byType(PlayBoard), findsNothing);
   });
 

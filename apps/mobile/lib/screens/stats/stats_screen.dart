@@ -17,7 +17,6 @@ import '../../theme/breakpoints.dart';
 import '../../widgets/widgets.dart';
 import 'stats_provider.dart';
 
-
 // ─── Eyebrow label ───────────────────────────────────────────────────────────
 
 class _Eyebrow extends StatelessWidget {
@@ -34,7 +33,7 @@ class _Eyebrow extends StatelessWidget {
       children: [
         Text(
           text.toUpperCase(),
-          style: AppTypography.label.copyWith(color: c.fg3),
+          style: AppTypography.monoLabel.copyWith(color: c.fg3),
         ),
         ?trailing,
       ],
@@ -54,60 +53,42 @@ class _StreakHero extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.halveColors;
     return Container(
-      padding: const EdgeInsets.fromLTRB(
-          AppSpacing.s5, 22, AppSpacing.s5, 20),
+      padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
-        color: c.surface,
-        border: Border.all(color: c.hairline),
-        borderRadius: AppRadii.xlR,
+        border: Border(
+          top: BorderSide(color: c.hairline),
+          bottom: BorderSide(color: c.hairline),
+        ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  FlameIcon(size: 18, color: c.accent),
-                  const SizedBox(width: AppSpacing.s2),
-                  Text(
-                    'Day streak',
-                    style: AppTypography.label.copyWith(color: c.fg3),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.s1),
-              Text(
-                '$streak',
-                key: const ValueKey('stat-streak'),
-                style: AppTypography.tabular(
-                  AppTypography.display.copyWith(
-                    color: c.accent,
-                    fontSize: 66,
-                    height: 0.95,
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            '$streak',
+            key: const ValueKey('stat-streak'),
+            style: AppTypography.editorialDisplay.copyWith(
+              color: c.accent,
+              fontSize: 84,
+              height: 0.85,
+            ),
           ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+          const SizedBox(width: 20),
+          Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$longestStreak',
-                  key: const ValueKey('stat-longest'),
-                  style: AppTypography.tabular(
-                    AppTypography.h2.copyWith(color: c.fg2, height: 1),
+                  'DAY\nSTREAK',
+                  style: AppTypography.monoLabel.copyWith(
+                    color: c.fg3,
+                    height: 1.35,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.s1 + 2),
+                const SizedBox(height: 10),
                 Text(
-                  'Best ever',
-                  style: AppTypography.label.copyWith(color: c.fg3),
+                  'BEST EVER $longestStreak',
+                  key: const ValueKey('stat-longest'),
+                  style: AppTypography.monoMicro.copyWith(color: c.fg3),
                 ),
               ],
             ),
@@ -161,7 +142,8 @@ class _Cal14 extends StatelessWidget {
                         Expanded(
                           child: Padding(
                             padding: EdgeInsets.only(
-                                left: i == 0 ? 0 : AppSpacing.s1 + 2),
+                              left: i == 0 ? 0 : AppSpacing.s1 + 2,
+                            ),
                             child: AspectRatio(
                               aspectRatio: 1,
                               child: Container(
@@ -171,13 +153,15 @@ class _Cal14 extends StatelessWidget {
                                       : c.bgSunken,
                                   borderRadius: AppRadii.smR,
                                   border: Border.all(
-                                    color: ri == 1 &&
+                                    color:
+                                        ri == 1 &&
                                             i == rows[ri].cells.length - 1
                                         ? c.fg1
                                         : rows[ri].cells[i]
-                                            ? c.accent
-                                            : c.hairline,
-                                    width: ri == 1 &&
+                                        ? c.accent
+                                        : c.hairline,
+                                    width:
+                                        ri == 1 &&
                                             i == rows[ri].cells.length - 1
                                         ? 2
                                         : 1,
@@ -311,8 +295,7 @@ class _AreaPainter extends CustomPainter {
         ),
       );
       tp.layout();
-      tp.paint(
-          canvas, Offset(xFor(i) - tp.width / 2, H - padBot + 6));
+      tp.paint(canvas, Offset(xFor(i) - tp.width / 2, H - padBot + 6));
     }
   }
 
@@ -324,9 +307,13 @@ class _AreaPainter extends CustomPainter {
       final p2 = pts[i + 1];
       final p3 = i + 2 < pts.length ? pts[i + 2] : p2;
       final c1 = Offset(
-          p1.dx + (p2.dx - p0.dx) / 6, p1.dy + (p2.dy - p0.dy) / 6);
+        p1.dx + (p2.dx - p0.dx) / 6,
+        p1.dy + (p2.dy - p0.dy) / 6,
+      );
       final c2 = Offset(
-          p2.dx - (p3.dx - p1.dx) / 6, p2.dy - (p3.dy - p1.dy) / 6);
+        p2.dx - (p3.dx - p1.dx) / 6,
+        p2.dy - (p3.dy - p1.dy) / 6,
+      );
       path.cubicTo(c1.dx, c1.dy, c2.dx, c2.dy, p2.dx, p2.dy);
     }
     return path;
@@ -429,11 +416,17 @@ class _SignOutPainter extends CustomPainter {
     final door = Path()
       ..moveTo(9, 21)
       ..lineTo(5, 21)
-      ..arcToPoint(const Offset(3, 19),
-          radius: const Radius.circular(2), clockwise: false)
+      ..arcToPoint(
+        const Offset(3, 19),
+        radius: const Radius.circular(2),
+        clockwise: false,
+      )
       ..lineTo(3, 5)
-      ..arcToPoint(const Offset(5, 3),
-          radius: const Radius.circular(2), clockwise: false)
+      ..arcToPoint(
+        const Offset(5, 3),
+        radius: const Radius.circular(2),
+        clockwise: false,
+      )
       ..lineTo(9, 3);
     canvas.drawPath(door, paint);
 
@@ -508,9 +501,10 @@ class _LoadingSkeleton extends StatelessWidget {
         Row(
           children: [
             Skeleton(
-                width: 48,
-                height: 48,
-                borderRadius: BorderRadius.circular(24)),
+              width: 48,
+              height: 48,
+              borderRadius: BorderRadius.circular(24),
+            ),
             const SizedBox(width: AppSpacing.s4),
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -552,44 +546,21 @@ class _StatsRecord extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Identity row
-        Row(
-          children: [
-            HalveMonogram(name: name),
-            const SizedBox(width: AppSpacing.s4),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: AppTypography.h3.copyWith(
-                    color: c.fg1,
-                    fontSize: 23,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.01,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                RichText(
-                  text: TextSpan(
-                    style: AppTypography.small.copyWith(color: c.fg3),
-                    children: [
-                      TextSpan(
-                        text: '${stats.totalSolved}',
-                        style: AppTypography.tabular(
-                          AppTypography.small.copyWith(color: c.fg3),
-                        ),
-                      ),
-                      const TextSpan(text: ' solved'),
-                      if (since.isNotEmpty) TextSpan(text: ' · $since'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+        Text(
+          since.isEmpty ? 'PLAYING' : 'PLAYING ${since.toUpperCase()}',
+          style: AppTypography.monoLabel.copyWith(color: c.fg3),
         ),
-        const SizedBox(height: AppSpacing.s5),
+        const SizedBox(height: 8),
+        Text(
+          name.isEmpty ? 'Player' : name,
+          style: AppTypography.editorialH1.copyWith(fontSize: 34, color: c.fg1),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${stats.totalSolved} PUZZLES SOLVED',
+          style: AppTypography.monoLabel.copyWith(color: c.fg3),
+        ),
+        const SizedBox(height: 20),
 
         // Streak hero
         _StreakHero(
@@ -609,11 +580,10 @@ class _StatsRecord extends ConsumerWidget {
           // Solve-time chart
           const SizedBox(height: 28),
           _Eyebrow(
-            'Solve time',
+            'Solve times',
             trailing: Text(
               'avg ${stats.averageMs != null ? formatMs(stats.averageMs!) : '-'}',
-              style: AppTypography.label
-                  .copyWith(color: c.fg3, letterSpacing: 0),
+              style: AppTypography.monoMicro.copyWith(color: c.fg3),
             ),
           ),
           const SizedBox(height: 14),
@@ -624,18 +594,24 @@ class _StatsRecord extends ConsumerWidget {
 
           // Avg + best time
           const SizedBox(height: AppSpacing.s4),
-          _StatDivided(items: [
-            (
-              value: stats.averageMs != null ? formatMs(stats.averageMs!) : '-',
-              label: 'Average',
-              accent: false
-            ),
-            (
-              value: stats.fastestMs != null ? formatMs(stats.fastestMs!) : '-',
-              label: 'Best time',
-              accent: false
-            ),
-          ]),
+          _StatDivided(
+            items: [
+              (
+                value: stats.averageMs != null
+                    ? formatMs(stats.averageMs!)
+                    : '-',
+                label: 'Average',
+                accent: false,
+              ),
+              (
+                value: stats.fastestMs != null
+                    ? formatMs(stats.fastestMs!)
+                    : '-',
+                label: 'Best time',
+                accent: false,
+              ),
+            ],
+          ),
         ],
 
         // Sign out
@@ -688,11 +664,14 @@ class _StatsGuest extends StatelessWidget {
                 ).createShader(bounds),
                 blendMode: BlendMode.dstIn,
                 child: ImageFiltered(
-                  imageFilter:
-                      ui.ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                  imageFilter: ui.ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.s5, 14, AppSpacing.s5, 0),
+                      AppSpacing.s5,
+                      14,
+                      AppSpacing.s5,
+                      0,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -714,8 +693,9 @@ class _StatsGuest extends StatelessWidget {
                                 const SizedBox(height: 2),
                                 Text(
                                   '184 solved · since January 2026',
-                                  style:
-                                      AppTypography.small.copyWith(color: c.fg3),
+                                  style: AppTypography.small.copyWith(
+                                    color: c.fg3,
+                                  ),
                                 ),
                               ],
                             ),
@@ -748,10 +728,7 @@ class _StatsGuest extends StatelessWidget {
                 const SizedBox(height: 18),
                 Text(
                   'Start your record',
-                  style: AppTypography.h2.copyWith(
-                    color: c.fg1,
-                    height: 1.15,
-                  ),
+                  style: AppTypography.h2.copyWith(color: c.fg1, height: 1.15),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
@@ -765,21 +742,23 @@ class _StatsGuest extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 22),
-                Builder(builder: (context) {
-                  final btn = HalveButton(
-                    label: 'Sign in',
-                    full: true,
-                    onPressed: () => context.push('/auth'),
-                  );
-                  return context.isTablet
-                      ? Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 300),
-                            child: btn,
-                          ),
-                        )
-                      : btn;
-                }),
+                Builder(
+                  builder: (context) {
+                    final btn = HalveButton(
+                      label: 'Sign in',
+                      full: true,
+                      onPressed: () => context.push('/auth'),
+                    );
+                    return context.isTablet
+                        ? Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 300),
+                              child: btn,
+                            ),
+                          )
+                        : btn;
+                  },
+                ),
               ],
             ),
           ),
@@ -824,23 +803,37 @@ class StatsScreen extends ConsumerWidget {
 
     return SafeScaffold(
       body: async.when(
-        loading: () => Builder(builder: (context) {
-          final hPad = context.hPagePad;
-          return SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(hPad, AppSpacing.s3, hPad, AppSpacing.s7),
-            child: const _LoadingSkeleton(),
-          );
-        }),
+        loading: () => Builder(
+          builder: (context) {
+            final hPad = context.hPagePad;
+            return SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                hPad,
+                AppSpacing.s3,
+                hPad,
+                AppSpacing.s7,
+              ),
+              child: const _LoadingSkeleton(),
+            );
+          },
+        ),
         error: (_, _) => const _ErrorState(),
         data: (data) {
           if (!data.signedIn) return const _StatsGuest();
-          return Builder(builder: (context) {
-            final hPad = context.hPagePad;
-            return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(hPad, AppSpacing.s3, hPad, AppSpacing.s7),
-              child: _StatsRecord(data: data),
-            );
-          });
+          return Builder(
+            builder: (context) {
+              final hPad = context.hPagePad;
+              return SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  hPad,
+                  AppSpacing.s3,
+                  hPad,
+                  AppSpacing.s7,
+                ),
+                child: _StatsRecord(data: data),
+              );
+            },
+          );
         },
       ),
     );

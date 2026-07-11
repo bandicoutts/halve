@@ -13,30 +13,25 @@ import 'package:halve/widgets/widgets.dart';
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 SolveRow solve(String localDate, {int durationMs = 180000}) => SolveRow(
-      solvedAt: DateTime.parse('${localDate}T12:00:00Z'),
-      durationMs: durationMs,
-      usedHint: false,
-      localDate: localDate,
-    );
+  solvedAt: DateTime.parse('${localDate}T12:00:00Z'),
+  durationMs: durationMs,
+  usedHint: false,
+  localDate: localDate,
+);
 
-Stats statsFromDays(List<String> days, String today,
-    {int durationMs = 180000}) =>
-    Stats.fromSolves(
-      [for (final d in days) solve(d, durationMs: durationMs)],
-      today: today,
-    );
+Stats statsFromDays(
+  List<String> days,
+  String today, {
+  int durationMs = 180000,
+}) => Stats.fromSolves([
+  for (final d in days) solve(d, durationMs: durationMs),
+], today: today);
 
-Future<void> pumpStats(
-  WidgetTester tester, {
-  required StatsData data,
-}) async {
+Future<void> pumpStats(WidgetTester tester, {required StatsData data}) async {
   final router = GoRouter(
     initialLocation: '/stats',
     routes: [
-      GoRoute(
-        path: '/stats',
-        builder: (_, _) => const StatsScreen(),
-      ),
+      GoRoute(path: '/stats', builder: (_, _) => const StatsScreen()),
       GoRoute(path: '/auth', builder: (_, _) => const Text('AUTH')),
       GoRoute(path: '/', builder: (_, _) => const Text('HOME')),
     ],
@@ -44,13 +39,8 @@ Future<void> pumpStats(
 
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        statsDataProvider.overrideWith((ref) async => data),
-      ],
-      child: MaterialApp.router(
-        theme: AppTheme.light(),
-        routerConfig: router,
-      ),
+      overrides: [statsDataProvider.overrideWith((ref) async => data)],
+      child: MaterialApp.router(theme: AppTheme.light(), routerConfig: router),
     ),
   );
   await tester.pumpAndSettle();
@@ -117,10 +107,12 @@ void main() {
 
   group('StatsScreen — signed-in', () {
     testWidgets('shows streak hero with headline values', (tester) async {
-      final stats = statsFromDays(
-        ['2026-05-29', '2026-05-30', '2026-05-31', '2026-06-01'],
+      final stats = statsFromDays([
+        '2026-05-29',
+        '2026-05-30',
+        '2026-05-31',
         '2026-06-01',
-      );
+      ], '2026-06-01');
 
       await pumpStats(
         tester,
@@ -135,14 +127,11 @@ void main() {
       // Streak tiles via ValueKeys
       final streakFinder = find.byKey(const ValueKey('stat-streak'));
       expect(streakFinder, findsOneWidget);
-      expect(
-        (tester.widget(streakFinder) as Text).data,
-        '4',
-      );
+      expect((tester.widget(streakFinder) as Text).data, '4');
 
       final longestFinder = find.byKey(const ValueKey('stat-longest'));
       expect(longestFinder, findsOneWidget);
-      expect((tester.widget(longestFinder) as Text).data, '4');
+      expect((tester.widget(longestFinder) as Text).data, 'BEST EVER 4');
     });
 
     testWidgets('shows displayName in identity row', (tester) async {
@@ -161,8 +150,9 @@ void main() {
       expect(find.text('alice'), findsOneWidget);
     });
 
-    testWidgets('shows average and best time tiles when solves exist',
-        (tester) async {
+    testWidgets('shows average and best time tiles when solves exist', (
+      tester,
+    ) async {
       final stats = statsFromDays(
         ['2026-05-31', '2026-06-01'],
         '2026-06-01',

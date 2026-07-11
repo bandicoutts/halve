@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_radii.dart';
 import '../theme/app_theme.dart';
+import 'safe_scaffold.dart';
 
 /// A loading placeholder block — a calm breathing fade (opacity 1 ↔ 0.42 over
 /// 1.5s), never a sweeping shimmer (anti-AI-aesthetic guardrail). Filled with
@@ -22,7 +23,8 @@ class Skeleton extends StatefulWidget {
   State<Skeleton> createState() => _SkeletonState();
 }
 
-class _SkeletonState extends State<Skeleton> with SingleTickerProviderStateMixin {
+class _SkeletonState extends State<Skeleton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _opacity;
 
@@ -33,9 +35,10 @@ class _SkeletonState extends State<Skeleton> with SingleTickerProviderStateMixin
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-    _opacity = Tween<double>(begin: 1.0, end: 0.42).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _opacity = Tween<double>(
+      begin: 1.0,
+      end: 0.42,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -46,16 +49,17 @@ class _SkeletonState extends State<Skeleton> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _opacity,
-      child: Container(
-        width: widget.width,
-        height: widget.height,
-        decoration: BoxDecoration(
-          color: context.halveColors.bgSunken,
-          borderRadius: widget.borderRadius,
-        ),
+    final block = Container(
+      width: widget.width,
+      height: widget.height,
+      decoration: BoxDecoration(
+        color: context.halveColors.bgSunken,
+        borderRadius: widget.borderRadius,
       ),
     );
+
+    if (context.reduceMotion) return block;
+
+    return FadeTransition(opacity: _opacity, child: block);
   }
 }

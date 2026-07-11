@@ -276,11 +276,8 @@ class _PlayViewState extends ConsumerState<_PlayView> {
                           ),
                           maxSide,
                         );
-                        final cellSize = (side / 6.8).floorToDouble();
-                        final gap = math.max(
-                          6.0,
-                          (cellSize * 0.16).floorToDouble(),
-                        );
+                        final cellSize = (side / 6).floorToDouble();
+                        const gap = 0.0;
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -350,12 +347,8 @@ class _PlayViewState extends ConsumerState<_PlayView> {
                           ),
                           maxSide,
                         );
-                        // 6 cells + 5 gaps (gap ≈ 0.16·cell) → total ≈ 6.8·cell.
-                        final cellSize = (side / 6.8).floorToDouble();
-                        final gap = math.max(
-                          6.0,
-                          (cellSize * 0.16).floorToDouble(),
-                        );
+                        final cellSize = (side / 6).floorToDouble();
+                        const gap = 0.0;
                         return Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -409,8 +402,11 @@ class _PlayViewState extends ConsumerState<_PlayView> {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s2),
                 child: Text(
-                  'Rules',
-                  style: AppTypography.small.copyWith(color: c.fg2),
+                  'TAP TO CYCLE  ·  HOLD FOR RING',
+                  style: AppTypography.editorialH2.copyWith(
+                    fontSize: 15,
+                    color: c.fg3,
+                  ),
                 ),
               ),
             ),
@@ -618,22 +614,25 @@ class _PlayControls extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _ControlButton(
-          label: 'Undo',
-          onPressed: state.canUndo && !state.solved ? onUndo : null,
-          child: const UndoGlyph(),
+        Expanded(
+          child: _ControlButton(
+            label: 'Undo',
+            onPressed: state.canUndo && !state.solved ? onUndo : null,
+          ),
         ),
-        const SizedBox(width: AppSpacing.s6),
-        _ControlButton(
-          label: 'Hint',
-          onPressed: state.solved ? null : onHint,
-          child: const HintGlyph(),
+        const SizedBox(width: AppSpacing.s2),
+        Expanded(
+          child: _ControlButton(
+            label: 'Hint',
+            onPressed: state.solved ? null : onHint,
+          ),
         ),
-        const SizedBox(width: AppSpacing.s6),
-        _ControlButton(
-          label: 'Restart',
-          onPressed: state.hasProgress && !state.solved ? onRestart : null,
-          child: const RestartGlyph(),
+        const SizedBox(width: AppSpacing.s2),
+        Expanded(
+          child: _ControlButton(
+            label: 'Restart',
+            onPressed: state.hasProgress && !state.solved ? onRestart : null,
+          ),
         ),
       ],
     );
@@ -695,36 +694,40 @@ class _LeavePuzzleSheet extends StatelessWidget {
 /// `ControlButton`: a 48px [HalveIconButton] + an uppercase tracked label that
 /// dims to the hairline color when disabled.
 class _ControlButton extends StatelessWidget {
-  const _ControlButton({
-    required this.label,
-    required this.child,
-    this.onPressed,
-  });
+  const _ControlButton({required this.label, this.onPressed});
 
   final String label;
-  final Widget child;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
     final disabled = onPressed == null;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        HalveIconButton(
-          semanticLabel: label,
-          onPressed: onPressed,
-          child: child,
-        ),
-        const SizedBox(height: AppSpacing.s1 + 3),
-        Text(
-          label.toUpperCase(),
-          style: AppTypography.micro.copyWith(
-            color: disabled ? c.hairline2 : c.fg3,
+    return Opacity(
+      opacity: disabled ? 0.35 : 1,
+      child: Semantics(
+        button: true,
+        enabled: !disabled,
+        label: label,
+        child: TapFade(
+          onTap: onPressed,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 44),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              border: Border.all(color: c.hairline2),
+              borderRadius: AppRadii.fullR,
+            ),
+            child: Text(
+              label.toUpperCase(),
+              style: AppTypography.monoLabel.copyWith(
+                color: disabled ? c.hairline2 : c.fg1,
+                letterSpacing: 1.54,
+              ),
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
