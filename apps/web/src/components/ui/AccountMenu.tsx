@@ -21,12 +21,114 @@ const menuItemBase: React.CSSProperties = {
 };
 
 /**
+ * Shared "signed in / Statistics / Sign out" block — rendered by both the
+ * desktop popover (below) and SiteHeader's mobile sheet. `itemStyle` lets
+ * each context keep its own touch-target sizing (the mobile sheet needs a
+ * 44px-tall row; the desktop popover doesn't).
+ */
+export function SignedInMenuItems({
+  displayName,
+  itemStyle,
+  onClose,
+}: {
+  displayName: string;
+  itemStyle: React.CSSProperties;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  const name = displayName.trim() || "Account";
+  const nameCasing = name.includes("@") ? "none" : "capitalize";
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut({ scope: "local" });
+    onClose();
+    router.push("/");
+    router.refresh();
+  }
+
+  return (
+    <>
+      <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 4 }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.22em", color: "var(--fg-3)" }}>SIGNED IN</span>
+        <span
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontStyle: "italic",
+            fontWeight: 500,
+            fontSize: 20,
+            textTransform: nameCasing,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {name}
+        </span>
+      </div>
+
+      <div style={{ height: 1, background: "var(--hairline)", margin: "2px 6px 6px" }} />
+
+      <Link
+        href="/stats"
+        role="menuitem"
+        onClick={onClose}
+        style={{ ...itemStyle, color: "var(--fg-1)" }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "var(--hover)";
+          e.currentTarget.style.color = "var(--accent)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "none";
+          e.currentTarget.style.color = "var(--fg-1)";
+        }}
+      >
+        STATISTICS
+      </Link>
+
+      <Link
+        href="/auth?mode=password"
+        role="menuitem"
+        onClick={onClose}
+        style={{ ...itemStyle, color: "var(--fg-1)" }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "var(--hover)";
+          e.currentTarget.style.color = "var(--accent)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "none";
+          e.currentTarget.style.color = "var(--fg-1)";
+        }}
+      >
+        SET PASSWORD
+      </Link>
+
+      <button
+        type="button"
+        role="menuitem"
+        onClick={handleSignOut}
+        style={{ ...itemStyle, color: "var(--fg-3)" }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "var(--hover)";
+          e.currentTarget.style.color = "var(--err)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "none";
+          e.currentTarget.style.color = "var(--fg-3)";
+        }}
+      >
+        SIGN OUT
+      </button>
+    </>
+  );
+}
+
+/**
  * Account affordance for the header: a monogram avatar that opens a small
  * popover (signed-in name → Statistics · Sign out). Click/tap-to-open on both
  * surfaces, with full keyboard support (Escape, arrow nav, outside-click).
  */
 export function AccountMenu({ displayName }: { displayName: string }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -71,17 +173,7 @@ export function AccountMenu({ displayName }: { displayName: string }) {
     next?.focus();
   }
 
-  async function handleSignOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut({ scope: "local" });
-    setOpen(false);
-    router.push("/");
-    router.refresh();
-  }
-
-  const name = displayName.trim() || "Account";
-  const nameCasing = name.includes("@") ? "none" : "capitalize";
-  const initial = (name[0] ?? "?").toUpperCase();
+  const initial = (displayName.trim() || "Account")[0]!.toUpperCase();
 
   return (
     <div ref={rootRef} style={{ position: "relative", display: "inline-flex" }}>
@@ -134,59 +226,7 @@ export function AccountMenu({ displayName }: { displayName: string }) {
             animation: "fadeup .16s var(--ease-editorial) both",
           }}
         >
-          <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 4 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.22em", color: "var(--fg-3)" }}>SIGNED IN</span>
-            <span
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontStyle: "italic",
-                fontWeight: 500,
-                fontSize: 20,
-                textTransform: nameCasing,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {name}
-            </span>
-          </div>
-
-          <div style={{ height: 1, background: "var(--hairline)", margin: "2px 6px 6px" }} />
-
-          <Link
-            href="/stats"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            style={{ ...menuItemBase, color: "var(--fg-1)" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--hover)";
-              e.currentTarget.style.color = "var(--accent)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "none";
-              e.currentTarget.style.color = "var(--fg-1)";
-            }}
-          >
-            STATISTICS
-          </Link>
-
-          <button
-            type="button"
-            role="menuitem"
-            onClick={handleSignOut}
-            style={{ ...menuItemBase, color: "var(--fg-3)" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--hover)";
-              e.currentTarget.style.color = "var(--err)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "none";
-              e.currentTarget.style.color = "var(--fg-3)";
-            }}
-          >
-            SIGN OUT
-          </button>
+          <SignedInMenuItems displayName={displayName} itemStyle={menuItemBase} onClose={() => setOpen(false)} />
         </div>
       )}
     </div>

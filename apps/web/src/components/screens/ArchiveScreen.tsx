@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { Mark } from "@/components/symbols/Mark";
+import { Button } from "@/components/ui/Button";
 import { formatDateLabel } from "@/lib/local-date";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -152,9 +153,12 @@ function EmptyArchive({
           <h1 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: 34, margin: 0 }}>
             The back catalogue.
           </h1>
-          <p style={{ fontSize: 16, lineHeight: 1.55, color: "var(--fg-3)", margin: "12px 0 0" }}>
+          <p style={{ fontSize: 16, lineHeight: 1.55, color: "var(--fg-3)", margin: "12px 0 0 0" }}>
             Every daily is kept here. Play today&rsquo;s board and it&rsquo;ll be the first.
           </p>
+          <div style={{ marginTop: 22 }}>
+            <Button href="/play">Play today</Button>
+          </div>
         </div>
       </div>
     </div>

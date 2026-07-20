@@ -1,9 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { SignOutIcon } from "@/components/ui/icons";
+import { Button } from "@/components/ui/Button";
 import type { UserStats } from "@/app/stats/page";
 
 const DIST_LABELS = ["<2m", "2–3", "3–4", "4–5", "5–6", "6m+"];
@@ -237,35 +237,10 @@ function StatsRecord({ stats }: { stats: UserStats }) {
 
         {/* Sign out */}
         <div style={{ display: "flex", justifyContent: "center", paddingTop: 8 }}>
-          <button
-            onClick={handleSignOut}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              background: "none",
-              border: "1px solid var(--hairline)",
-              borderRadius: 999,
-              padding: "12px 22px",
-              cursor: "pointer",
-              color: "var(--fg-2)",
-              fontFamily: "var(--font-mono)",
-              fontSize: 12,
-              letterSpacing: "0.16em",
-              transition: "border-color 0.2s, color 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--accent)";
-              e.currentTarget.style.color = "var(--accent)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--hairline)";
-              e.currentTarget.style.color = "var(--fg-2)";
-            }}
-          >
+          <Button variant="secondary" size="sm" onClick={handleSignOut}>
             <SignOutIcon size={16} />
             SIGN OUT
-          </button>
+          </Button>
         </div>
       </section>
     </div>
@@ -315,24 +290,7 @@ function StatsGuest() {
             you finish.
           </p>
           <div>
-            <Link href="/auth" style={{ textDecoration: "none" }}>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  background: "var(--accent)",
-                  color: "var(--on-accent)",
-                  borderRadius: 999,
-                  padding: "16px 36px",
-                  fontFamily: "var(--font-sans)",
-                  fontSize: 16,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                Sign in
-              </span>
-            </Link>
+            <Button href="/auth">Sign in</Button>
           </div>
         </div>
 

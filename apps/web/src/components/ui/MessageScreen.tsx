@@ -1,6 +1,7 @@
 "use client";
-import Link from "next/link";
 import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
+import { GhostLink } from "@/components/ui/GhostLink";
+import { Button } from "@/components/ui/Button";
 
 type MarkVariant = "solid" | "ring" | "faded" | "outline";
 
@@ -38,68 +39,6 @@ function MarkGlyph({ variant }: { variant: MarkVariant }) {
   );
 }
 
-const primaryStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "var(--accent)",
-  color: "var(--on-accent)",
-  border: "none",
-  borderRadius: 999,
-  padding: "15px 36px",
-  fontFamily: "var(--font-sans)",
-  fontSize: 16,
-  fontWeight: 600,
-  cursor: "pointer",
-  transition: "transform 0.2s ease",
-  textDecoration: "none",
-};
-
-const ghostStyle: React.CSSProperties = {
-  background: "none",
-  border: "none",
-  cursor: "pointer",
-  color: "var(--fg-3)",
-  fontFamily: "var(--font-mono)",
-  fontSize: 12,
-  letterSpacing: "0.18em",
-  padding: "4px 0",
-  transition: "color 0.18s ease",
-  textDecoration: "none",
-};
-
-function PrimaryAction({ action }: { action: Action }) {
-  const hover = {
-    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.transform = "translateY(-2px)"),
-    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.transform = "none"),
-  };
-  return action.href ? (
-    <Link href={action.href} style={primaryStyle} {...hover}>
-      {action.label}
-    </Link>
-  ) : (
-    <button style={primaryStyle} onClick={action.onClick} {...hover}>
-      {action.label}
-    </button>
-  );
-}
-
-function GhostAction({ action }: { action: Action }) {
-  const hover = {
-    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "var(--accent)"),
-    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "var(--fg-3)"),
-  };
-  return action.href ? (
-    <Link href={action.href} style={ghostStyle} {...hover}>
-      {action.label}
-    </Link>
-  ) : (
-    <button style={ghostStyle} onClick={action.onClick} {...hover}>
-      {action.label}
-    </button>
-  );
-}
-
 /** Centered, editorial message screen for error / 404 / unavailable states. */
 export function MessageScreen({ mark, kicker, headline, body, primary, secondary }: MessageScreenProps) {
   return (
@@ -127,8 +66,14 @@ export function MessageScreen({ mark, kicker, headline, body, primary, secondary
         </h1>
         <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "36ch" }}>{body}</p>
         <div style={{ display: "flex", alignItems: "center", gap: 20, marginTop: 8, flexWrap: "wrap", justifyContent: "center" }}>
-          <PrimaryAction action={primary} />
-          {secondary && <GhostAction action={secondary} />}
+          <Button href={primary.href} onClick={primary.onClick}>
+            {primary.label}
+          </Button>
+          {secondary && (
+            <GhostLink href={secondary.href} onClick={secondary.onClick}>
+              {secondary.label}
+            </GhostLink>
+          )}
         </div>
       </div>
     </div>

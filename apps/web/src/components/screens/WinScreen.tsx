@@ -5,6 +5,8 @@ import { Mark } from "@/components/symbols/Mark";
 import { Disc } from "@/components/symbols/Disc";
 import { Ring } from "@/components/symbols/Ring";
 import { HEADER_BAR } from "@/components/ui/Wordmark";
+import { GhostLink } from "@/components/ui/GhostLink";
+import { Button } from "@/components/ui/Button";
 import { formatDateLabel } from "@/lib/local-date";
 
 function cap(s: string) {
@@ -157,23 +159,7 @@ export function WinScreen({
               <circle cx="100" cy="100" r="90" style={{ fill: "none", stroke: "var(--fg-1)", strokeWidth: "10px", opacity: 0.85 }} />
             </svg>
           </button>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            suppressHydrationWarning
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "var(--fg-3)",
-              fontFamily: "var(--font-mono)",
-              fontSize: 12,
-              letterSpacing: "0.16em",
-              padding: "4px 0",
-            }}
-          >
-            CLOSE
-          </button>
+          <GhostLink onClick={onClose}>CLOSE</GhostLink>
         </div>
       </header>
 
@@ -256,50 +242,8 @@ export function WinScreen({
           )}
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 6 }}>
-            <button
-              onClick={handleShare}
-              style={{
-                background: "var(--accent)",
-                color: "var(--on-accent)",
-                border: "none",
-                borderRadius: 999,
-                padding: "16px 36px",
-                fontFamily: "var(--font-sans)",
-                fontSize: 16,
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "transform 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-            >
-              Share result
-            </button>
-            <button
-              onClick={onSecondary}
-              style={{
-                background: "none",
-                color: "var(--fg-1)",
-                border: "1px solid var(--hairline)",
-                borderRadius: 999,
-                padding: "16px 30px",
-                fontFamily: "var(--font-sans)",
-                fontSize: 15,
-                fontWeight: 500,
-                cursor: "pointer",
-                transition: "border-color 0.2s, color 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "var(--accent)";
-                e.currentTarget.style.color = "var(--accent)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "var(--hairline)";
-                e.currentTarget.style.color = "var(--fg-1)";
-              }}
-            >
-              {secondaryLabel}
-            </button>
+            <Button onClick={handleShare}>Share result</Button>
+            <Button variant="secondary" onClick={onSecondary}>{secondaryLabel}</Button>
           </div>
 
           {kind === "daily" && nextIn && (
@@ -323,7 +267,7 @@ export function WinScreen({
             style={{
               background: "var(--surface)",
               border: "1px solid var(--hairline)",
-              borderRadius: 20,
+              borderRadius: "var(--radius-xl)",
               padding: "clamp(20px, 3vw, 28px)",
               display: "flex",
               flexDirection: "column",

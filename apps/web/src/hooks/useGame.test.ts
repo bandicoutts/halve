@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { Grid, Edge } from "@parity/engine";
-import { computeErrors, reducer, type GameState } from "./useGame";
+import { computeErrors, initialGameState, reducer, type GameState } from "./useGame";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -313,5 +313,32 @@ describe("reducer — hint", () => {
     const state = makeState(emptyGrid());
     const next = reducer(state, { type: "hint", r: 2, c: 2, sym: 1 });
     expect(next.history).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// initialGameState — seeds a puzzle already solved by the player (review mode)
+// ---------------------------------------------------------------------------
+
+describe("initialGameState", () => {
+  it("seeds cells from givens when no initialCells is provided", () => {
+    const givens = makeGrid([[0, null], [null, 1]]);
+    expect(initialGameState(givens).cells).toEqual(givens);
+  });
+
+  it("seeds cells from initialCells when provided, e.g. an already-solved puzzle", () => {
+    const givens = makeGrid([[0, null], [null, 1]]);
+    const solution = makeGrid([[0, 1], [0, 1]]);
+    const state = initialGameState(givens, solution);
+    expect(state.cells).toEqual(solution);
+    expect(state.history).toEqual([]);
+    expect(state.usedHint).toBe(false);
+  });
+
+  it("does not mutate the source grid", () => {
+    const givens = makeGrid([[0, null]]);
+    const state = initialGameState(givens);
+    state.cells[0]![1] = 1;
+    expect(givens[0]![1]).toBe(null);
   });
 });

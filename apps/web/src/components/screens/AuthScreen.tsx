@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
+import { GhostLink } from "@/components/ui/GhostLink";
+import { Button } from "@/components/ui/Button";
 
 // ─── Shared bits ──────────────────────────────────────────────────────────────
 
@@ -70,36 +71,6 @@ const HEADLINE: React.CSSProperties = {
   letterSpacing: "-0.02em",
   textWrap: "balance",
 };
-const GHOST: React.CSSProperties = {
-  background: "none",
-  border: "none",
-  cursor: "pointer",
-  color: "var(--fg-3)",
-  fontFamily: "var(--font-mono)",
-  fontSize: 12,
-  letterSpacing: "0.18em",
-  padding: 0,
-  transition: "color 0.18s ease",
-  textAlign: "left",
-  textDecoration: "none",
-};
-
-function GhostAction({ children, onClick, href }: { children: React.ReactNode; onClick?: () => void; href?: string }) {
-  const hover = {
-    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "var(--accent)"),
-    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "var(--fg-3)"),
-  };
-  return href ? (
-    <Link href={href} style={GHOST} {...hover}>
-      {children}
-    </Link>
-  ) : (
-    <button type="button" style={GHOST} onClick={onClick} {...hover}>
-      {children}
-    </button>
-  );
-}
-
 function EmailField({
   value,
   onChange,
@@ -143,33 +114,6 @@ function EmailField({
   );
 }
 
-function SubmitButton({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) {
-  return (
-    <button
-      type="submit"
-      disabled={disabled}
-      style={{
-        background: "var(--accent)",
-        color: "var(--on-accent)",
-        border: "none",
-        borderRadius: 999,
-        padding: "16px 40px",
-        fontFamily: "var(--font-sans)",
-        fontSize: 16,
-        fontWeight: 600,
-        cursor: disabled ? "default" : "pointer",
-        opacity: disabled ? 0.7 : 1,
-        transition: "transform 0.2s ease",
-        width: "fit-content",
-        alignSelf: "flex-start",
-      }}
-      onMouseEnter={(e) => !disabled && (e.currentTarget.style.transform = "translateY(-2px)")}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-    >
-      {children}
-    </button>
-  );
-}
 
 // ─── Error normalisation ─────────────────────────────────────────────────────
 
@@ -278,7 +222,13 @@ function AuthModeSwitch({
   );
 }
 
-export function AuthScreen({ initialError }: { initialError?: string | undefined }) {
+export function AuthScreen({
+  initialError,
+  setPasswordMode,
+}: {
+  initialError?: string | undefined;
+  setPasswordMode?: boolean | undefined;
+}) {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("magic");
   const [passwordIntent, setPasswordIntent] = useState<PasswordIntent>("sign-in");
@@ -293,6 +243,53 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
     setMode(nextMode);
     setError(null);
     setNotice(null);
+  }
+
+  async function handleSetPassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (password.length < PASSWORD_MIN_LENGTH) {
+      setError(`Use at least ${PASSWORD_MIN_LENGTH} characters.`);
+      return;
+    }
+    setError(null);
+    setLoading(true);
+    const supabase = createClient();
+    // updateUser, not signUp — this account already has a session; signUp is
+    // for creating a brand-new (unauthenticated) account.
+    const { error: supaError } = await supabase.auth.updateUser({ password });
+    setLoading(false);
+    if (supaError) {
+      setError(friendlyError(supaError.message));
+      return;
+    }
+    router.push("/");
+    router.refresh();
+  }
+
+  // Signed-in visitor adding a password to their magic-link account — a
+  // distinct, focused flow, not another tab on the signed-out form below.
+  if (setPasswordMode) {
+    return (
+      <AuthLayout
+        brand={<BrandColumn caption="ONE PUZZLE · EVERY DAY" />}
+        form={
+          <form onSubmit={handleSetPassword} style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+            <div style={KICKER}>ACCOUNT · SET PASSWORD</div>
+            <h1 style={HEADLINE}>Set a password.</h1>
+            <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "40ch" }}>
+              Sign in with this instead of an email link next time. Use a passphrase of{" "}
+              {PASSWORD_MIN_LENGTH} characters or more.
+            </p>
+            {error && <span style={{ fontSize: 13.5, color: "var(--err)", lineHeight: 1.4 }}>{error}</span>}
+            <PasswordField value={password} onChange={setPassword} error={null} autoComplete="new-password" />
+            <Button type="submit" disabled={loading} style={{ alignSelf: "flex-start" }}>
+              {loading ? "Saving…" : "Set password"}
+            </Button>
+            <GhostLink onClick={() => router.push("/")}>CANCEL</GhostLink>
+          </form>
+        }
+      />
+    );
   }
 
   async function handleMagicLink(e: React.FormEvent) {
@@ -375,8 +372,8 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
               15 minutes.
             </p>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 14, borderTop: "1px solid var(--hairline)", paddingTop: 18, marginTop: 8 }}>
-              <GhostAction onClick={() => setSent(false)}>USE A DIFFERENT EMAIL</GhostAction>
-              <GhostAction onClick={() => router.push("/play")}>PLAY NOW, SIGN IN LATER →</GhostAction>
+              <GhostLink onClick={() => setSent(false)}>USE A DIFFERENT EMAIL</GhostLink>
+              <GhostLink onClick={() => router.push("/play")}>PLAY NOW, SIGN IN LATER →</GhostLink>
             </div>
           </>
         }
@@ -391,13 +388,13 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
       form={
         <form onSubmit={mode === "magic" ? handleMagicLink : handlePasswordAuth} style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           {initialError && (
-            <div style={{ background: "var(--wrong-tint)", border: "1px solid var(--err)", borderRadius: 14, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ background: "var(--wrong-tint)", border: "1px solid var(--err)", borderRadius: "var(--radius-lg)", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 6 }}>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em", color: "var(--err)" }}>LINK EXPIRED</span>
               <span style={{ fontSize: 14.5, lineHeight: 1.55, color: "var(--fg-1)" }}>{initialError}</span>
             </div>
           )}
           {notice && (
-            <div style={{ background: "var(--correct-tint)", border: "1px solid var(--correct)", borderRadius: 14, padding: "16px 18px", fontSize: 14.5, lineHeight: 1.55, color: "var(--fg-1)" }}>
+            <div style={{ background: "var(--correct-tint)", border: "1px solid var(--correct)", borderRadius: "var(--radius-lg)", padding: "16px 18px", fontSize: 14.5, lineHeight: 1.55, color: "var(--fg-1)" }}>
               {notice}
             </div>
           )}
@@ -436,7 +433,7 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
               autoComplete={passwordIntent === "sign-in" ? "current-password" : "new-password"}
             />
           )}
-          <SubmitButton disabled={loading}>
+          <Button type="submit" disabled={loading} style={{ alignSelf: "flex-start" }}>
             {loading
               ? mode === "magic"
                 ? "Sending…"
@@ -448,9 +445,9 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
                 : passwordIntent === "sign-in"
                   ? "Sign in"
                   : "Create account"}
-          </SubmitButton>
+          </Button>
           {mode === "password" && (
-            <GhostAction
+            <GhostLink
               onClick={() => {
                 setPasswordIntent(passwordIntent === "sign-in" ? "create" : "sign-in");
                 setError(null);
@@ -458,10 +455,10 @@ export function AuthScreen({ initialError }: { initialError?: string | undefined
               }}
             >
               {passwordIntent === "sign-in" ? "CREATE AN ACCOUNT →" : "I ALREADY HAVE AN ACCOUNT →"}
-            </GhostAction>
+            </GhostLink>
           )}
           <div style={{ borderTop: "1px solid var(--hairline)", paddingTop: 18, marginTop: 4 }}>
-            <GhostAction onClick={() => router.push("/play")}>PLAY NOW, SIGN IN LATER →</GhostAction>
+            <GhostLink onClick={() => router.push("/play")}>PLAY NOW, SIGN IN LATER →</GhostLink>
           </div>
         </form>
       }

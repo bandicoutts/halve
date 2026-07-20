@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { saveDisplayName } from "@/app/actions/save-display-name";
 import { DISPLAY_NAME_MAX } from "@/lib/display-name";
 import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
+import { GhostLink } from "@/components/ui/GhostLink";
+import { Button } from "@/components/ui/Button";
 
 interface OnboardingScreenProps {
   next: string;
@@ -121,28 +123,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
           )}
 
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 22, marginTop: 6 }}>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 10,
-                background: "var(--accent)",
-                color: "var(--on-accent)",
-                border: "none",
-                borderRadius: 999,
-                padding: "16px 40px",
-                fontFamily: "var(--font-sans)",
-                fontSize: 16,
-                fontWeight: 600,
-                cursor: loading ? "default" : "pointer",
-                opacity: loading ? 0.85 : 1,
-                transition: "transform 0.2s ease",
-              }}
-              onMouseEnter={(e) => !loading && (e.currentTarget.style.transform = "translateY(-2px)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-            >
+            <Button type="submit" disabled={loading}>
               {loading && (
                 <span
                   style={{
@@ -150,35 +131,17 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
                     height: 14,
                     borderRadius: "50%",
                     border: "2px solid rgba(27,20,16,.3)",
-                    borderTopColor: "#1B1410",
+                    borderTopColor: "var(--on-accent)",
                     animation: "spin .8s linear infinite",
                     display: "inline-block",
                   }}
                 />
               )}
               {loading ? "Saving…" : "Save name"}
-            </button>
-            <button
-              type="button"
-              onClick={skip}
-              disabled={loading}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: loading ? "default" : "pointer",
-                color: "var(--fg-3)",
-                fontFamily: "var(--font-mono)",
-                fontSize: 12,
-                letterSpacing: "0.18em",
-                padding: "4px 0",
-                opacity: loading ? 0.5 : 1,
-                transition: "color 0.18s ease",
-              }}
-              onMouseEnter={(e) => !loading && (e.currentTarget.style.color = "var(--accent)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-3)")}
-            >
+            </Button>
+            <GhostLink type="button" onClick={skip} disabled={loading}>
               SKIP FOR NOW
-            </button>
+            </GhostLink>
           </div>
         </form>
       </div>

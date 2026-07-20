@@ -72,6 +72,7 @@ export const colors = {
     correctTint: palette.correctTintL,
     wrong: palette.wrongL,
     wrongTint: palette.wrongTintL,
+    scrim: 'rgba(10, 8, 6, 0.62)',
   },
   dark: {
     bg: palette.night950,
@@ -96,6 +97,7 @@ export const colors = {
     correctTint: palette.correctTintD,
     wrong: palette.wrongD,
     wrongTint: palette.wrongTintD,
+    scrim: 'rgba(10, 8, 6, 0.62)',
   },
 } as const;
 

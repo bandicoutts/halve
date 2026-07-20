@@ -1,5 +1,6 @@
 "use client";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { GhostLink } from "@/components/ui/GhostLink";
 
 interface RulesModalProps {
   open: boolean;
@@ -24,7 +25,7 @@ export function RulesModal({ open, onClose }: RulesModalProps) {
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(10, 8, 6, 0.62)",
+        background: "var(--scrim)",
         zIndex: 60,
         display: "flex",
         alignItems: "center",
@@ -68,23 +69,7 @@ export function RulesModal({ open, onClose }: RulesModalProps) {
           >
             How to play
           </h2>
-          <button
-            onClick={onClose}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "var(--fg-3)",
-              fontFamily: "var(--font-mono)",
-              fontSize: 12,
-              letterSpacing: "0.16em",
-              padding: "4px 0",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-3)")}
-          >
-            CLOSE
-          </button>
+          <GhostLink onClick={onClose}>CLOSE</GhostLink>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>

@@ -87,13 +87,19 @@ export async function recordSolve(input: RecordSolveInput): Promise<RecordSolveR
     return { ok: false };
   }
 
-  // A fresh solve changes the home / archive / stats listings. Invalidate their
-  // caches so navigating (back) to those pages reflects the solve immediately —
-  // without this, the archive keeps showing the day as unsolved (stale RSC).
+  // A fresh solve changes the home / archive / stats listings, and this exact
+  // puzzle's own play page (which now needs to render in review mode instead
+  // of a fresh board — see DECISIONS.md WEB-BOARD-REVIEW-1). Invalidate their
+  // caches so navigating (back) to those pages reflects the solve immediately.
   if (!alreadySolved) {
     revalidatePath("/");
     revalidatePath("/archive");
     revalidatePath("/stats");
+    revalidatePath("/play");
+    // puzzle.date (not validatedLocalDate) — it's the exact [date] URL segment
+    // this puzzle is served at; the two usually match but validatedLocalDate is
+    // clamped for streak-day attribution and can diverge near a midnight edge.
+    revalidatePath(`/play/${puzzle.date}`);
   }
 
   const { data: solveDays } = await supabase

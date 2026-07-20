@@ -1,48 +1,10 @@
 "use client";
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { useState } from "react";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { RulesModal } from "@/components/screens/RulesModal";
-
-// ─── Ghost (mono) link ────────────────────────────────────────────────────────
-
-function GhostLink({
-  children,
-  href,
-  onClick,
-}: {
-  children: ReactNode;
-  href?: string;
-  onClick?: () => void;
-}) {
-  const [hot, setHot] = useState(false);
-  const style: React.CSSProperties = {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    color: hot ? "var(--accent)" : "var(--fg-3)",
-    fontFamily: "var(--font-mono)",
-    fontSize: 12,
-    letterSpacing: "0.18em",
-    textTransform: "uppercase",
-    textDecoration: "none",
-    padding: "8px 0",
-    transition: "color 0.18s ease",
-  };
-  if (href) {
-    return (
-      <Link href={href} style={style} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
-        {children}
-      </Link>
-    );
-  }
-  return (
-    <button style={style} onClick={onClick} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
-      {children}
-    </button>
-  );
-}
+import { GhostLink } from "@/components/ui/GhostLink";
+import { Button } from "@/components/ui/Button";
 
 // ─── Hero mark — the split circle that drifts apart and back ───────────────────
 
@@ -155,14 +117,7 @@ export function HomeScreen({
                 Today&rsquo;s puzzle is unavailable. Try again shortly.
               </p>
               <div>
-                <button
-                  onClick={() => window.location.reload()}
-                  style={heroButtonStyle}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-                >
-                  Try again
-                </button>
+                <Button onClick={() => window.location.reload()}>Try again</Button>
               </div>
             </>
           ) : (
@@ -172,16 +127,8 @@ export function HomeScreen({
               </p>
 
               <div style={{ display: "flex", alignItems: "center", gap: "12px 20px", flexWrap: "wrap" }}>
-                <Link href="/play" style={{ textDecoration: "none" }}>
-                  <span
-                    style={heroButtonStyle}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-                  >
-                    {solvedToday ? "Review your solve" : "Play today"}
-                  </span>
-                </Link>
-                <GhostLink onClick={() => setShowRules(true)}>How to play</GhostLink>
+                <Button href="/play">{solvedToday ? "Review your solve" : "Play today"}</Button>
+                <GhostLink onClick={() => setShowRules(true)}>HOW TO PLAY</GhostLink>
               </div>
 
               {/* Streak band — streamed in for authenticated users */}
@@ -211,20 +158,3 @@ export function HomeScreen({
     </div>
   );
 }
-
-const heroButtonStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "var(--accent)",
-  color: "var(--on-accent)",
-  border: "none",
-  borderRadius: 999,
-  padding: "18px 42px",
-  fontFamily: "var(--font-sans)",
-  fontSize: 17,
-  fontWeight: 600,
-  cursor: "pointer",
-  transition: "transform 0.2s ease",
-  letterSpacing: "0.01em",
-};

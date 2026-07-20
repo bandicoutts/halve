@@ -41,6 +41,9 @@
   --wrong-l:    #C0442C;  --wrong-tint-l:   #F6E2DD;
   --correct-d:  #6FB389;  --correct-tint-d: #1E2C22;
   --wrong-d:    #D9553B;  --wrong-tint-d:   #2E1C18;
+
+  /* Modal/dialog backdrop — same in both themes */
+  --scrim: rgba(10, 8, 6, 0.62);
 }
 
 /* ---------- SEMANTIC TOKENS — LIGHT (Paper) is the default ---------- */

@@ -1,12 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/components/providers/ThemeProvider";
-import { createClient } from "@/lib/supabase/client";
 import { Mark } from "@/components/symbols/Mark";
 import { HEADER_BAR } from "@/components/ui/Wordmark";
-import { AccountMenu } from "@/components/ui/AccountMenu";
+import { AccountMenu, SignedInMenuItems } from "@/components/ui/AccountMenu";
 
 type NavKey = "practice" | "archive" | "stats";
 
@@ -110,7 +108,6 @@ export function SiteHeader({
   hideAuth,
   interceptHref,
 }: SiteHeaderProps) {
-  const router = useRouter();
   const [hovered, setHovered] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
@@ -143,16 +140,6 @@ export function SiteHeader({
       if (interceptHref?.(href)) e.preventDefault();
     };
   }
-
-  async function handleSignOut() {
-    setMenuOpen(false);
-    const supabase = createClient();
-    await supabase.auth.signOut({ scope: "local" });
-    router.push("/");
-    router.refresh();
-  }
-
-  const displayCasing = (displayName ?? "").includes("@") ? "none" : "capitalize";
 
   return (
     <header style={HEADER_BAR}>
@@ -189,7 +176,7 @@ export function SiteHeader({
           })}
           {!hideAuth &&
             (isAuthenticated ? (
-              <AccountMenu displayName={displayName || "?"} />
+              <AccountMenu displayName={displayName || "You"} />
             ) : (
               <Link
                 href="/auth"
@@ -278,30 +265,11 @@ export function SiteHeader({
               <>
                 <div style={{ height: 1, background: "var(--hairline)", margin: "6px 6px" }} />
                 {isAuthenticated ? (
-                  <>
-                    <div style={{ padding: "8px 14px 6px", display: "flex", flexDirection: "column", gap: 3 }}>
-                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.22em", color: "var(--fg-3)" }}>SIGNED IN</span>
-                      <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: 18, textTransform: displayCasing, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {displayName || "You"}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={handleSignOut}
-                      style={{ ...sheetItem, color: "var(--fg-3)" }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "var(--hover)";
-                        e.currentTarget.style.color = "var(--err)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "none";
-                        e.currentTarget.style.color = "var(--fg-3)";
-                      }}
-                    >
-                      SIGN OUT
-                    </button>
-                  </>
+                  <SignedInMenuItems
+                    displayName={displayName || "You"}
+                    itemStyle={sheetItem}
+                    onClose={() => setMenuOpen(false)}
+                  />
                 ) : (
                   <Link
                     href="/auth"

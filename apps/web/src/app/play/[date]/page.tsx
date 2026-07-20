@@ -27,11 +27,12 @@ export default async function PlayDatePage({ params }: Props) {
   // redirects are kept OUTSIDE the try so NEXT_REDIRECT is never swallowed.
   let puzzleRow: { id: string; difficulty: string; grid_spec: unknown } | null = null;
   let dayNo: number | undefined;
+  let initialSolveDurationMs: number | undefined;
 
   try {
     const supabase = await createClient();
 
-    const [{ data }, { count }] = await Promise.all([
+    const [{ data }, { count }, { data: { user } }] = await Promise.all([
       supabase
         .from("puzzles")
         .select("id, difficulty, grid_spec")
@@ -42,10 +43,24 @@ export default async function PlayDatePage({ params }: Props) {
         .select("id", { count: "exact", head: true })
         .not("date", "is", null)
         .lte("date", date),
+      supabase.auth.getUser(),
     ]);
 
     puzzleRow = data;
     if (data) dayNo = count ?? undefined;
+
+    // Already solved this day? Tell BoardScreen so it mounts in review mode
+    // instead of a fresh playable board (was always fresh, regardless of
+    // solve history — see DECISIONS.md WEB-BOARD-REVIEW-1).
+    if (data && user) {
+      const { data: solve } = await supabase
+        .from("solves")
+        .select("duration_ms")
+        .eq("user_id", user.id)
+        .eq("puzzle_id", data.id)
+        .maybeSingle();
+      if (solve) initialSolveDurationMs = solve.duration_ms ?? 0;
+    }
   } catch {
     redirect("/archive");
   }
@@ -71,6 +86,7 @@ export default async function PlayDatePage({ params }: Props) {
       date={date}
       kind="archive"
       backHref="/archive"
+      initialSolveDurationMs={initialSolveDurationMs}
     />
   );
 }

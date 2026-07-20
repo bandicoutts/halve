@@ -54,6 +54,12 @@ export function computeErrors(cells: Grid, edges: Edge[]): Set<string> {
   return findViolations(cells, edges);
 }
 
+/** Starting state — `initialCells` (e.g. the solution) seeds an already-solved
+ *  board for review; otherwise play starts from `givens`. */
+export function initialGameState(givens: Grid, initialCells?: Grid): GameState {
+  return { cells: (initialCells ?? givens).map((row) => row.slice()), history: [], usedHint: false };
+}
+
 // Intentionally different from the engine's isSolved: this checks that the
 // board matches the stored solution cell-for-cell, so it works on a partial
 // grid without needing edge constraints at call-time. The engine's isSolved
@@ -66,14 +72,12 @@ interface UseGameOptions {
   givens: Grid;
   solution: Solution;
   edges: Edge[];
+  /** Seeds the board already solved (e.g. reviewing a puzzle solved earlier). */
+  initialCells?: Grid | undefined;
 }
 
-export function useGame({ givens, solution, edges }: UseGameOptions) {
-  const [state, dispatch] = useReducer(reducer, {
-    cells: givens.map((row) => row.slice()),
-    history: [],
-    usedHint: false,
-  });
+export function useGame({ givens, solution, edges, initialCells }: UseGameOptions) {
+  const [state, dispatch] = useReducer(reducer, initialGameState(givens, initialCells));
 
   const errors = useMemo(() => computeErrors(state.cells, edges), [state.cells, edges]);
   const solved = useMemo(() => isSolved(state.cells, solution), [state.cells, solution]);

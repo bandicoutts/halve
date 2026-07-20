@@ -14,6 +14,7 @@ import { Ring } from "@/components/symbols/Ring";
 import { WinScreen } from "@/components/screens/WinScreen";
 import { RulesModal } from "@/components/screens/RulesModal";
 import { freshPracticeSlot } from "@/lib/practice-slot";
+import { formatDuration } from "@/lib/format";
 
 // Visually hidden but available to screen readers (for aria-live regions).
 const srOnly: React.CSSProperties = {
@@ -87,6 +88,9 @@ export interface BoardScreenProps {
   backHref?: string | undefined;
   /** True when DB was unavailable and a generated fallback is being played */
   isOffline?: boolean | undefined;
+  /** Duration (ms) of an existing solve for this puzzle by the signed-in user —
+   *  when set, the board mounts already solved (review mode) instead of playable. */
+  initialSolveDurationMs?: number | undefined;
 }
 
 export function BoardScreen({
@@ -97,7 +101,9 @@ export function BoardScreen({
   kind = "daily",
   backHref = "/",
   isOffline,
+  initialSolveDurationMs,
 }: BoardScreenProps) {
+  const alreadySolved = initialSolveDurationMs !== undefined;
   const router = useRouter();
   const [showWin, setShowWin] = useState(false);
   const [winTime, setWinTime] = useState("");
@@ -111,6 +117,7 @@ export function BoardScreen({
     givens: puzzle.givens,
     solution: puzzle.solution,
     edges: puzzle.edges,
+    initialCells: alreadySolved ? puzzle.solution : undefined,
   });
 
   // Keep the ref current so the solve-recording effect reads the latest cells
@@ -135,13 +142,18 @@ export function BoardScreen({
 
   useEffect(() => {
     if (solved && !showWin) {
-      const t = setTimeout(() => {
-        setWinTime(getFormatted());
-        setShowWin(true);
-      }, 900); // let the diagonal solve wave complete first
+      // Already-solved (review mode) skips the wave-reveal delay and shows the
+      // real recorded duration — there's no fresh solve animation to wait for.
+      const t = setTimeout(
+        () => {
+          setWinTime(alreadySolved ? formatDuration(initialSolveDurationMs!) : getFormatted());
+          setShowWin(true);
+        },
+        alreadySolved ? 0 : 900
+      );
       return () => clearTimeout(t);
     }
-  }, [solved, showWin]);
+  }, [solved, showWin, alreadySolved, initialSolveDurationMs]);
 
   // Record solve once when solved. solveRecorded guards against re-entry.
   useEffect(() => {
@@ -422,7 +434,7 @@ export function BoardScreen({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(10, 8, 6, 0.62)",
+            background: "var(--scrim)",
             zIndex: 60,
             display: "flex",
             alignItems: "center",

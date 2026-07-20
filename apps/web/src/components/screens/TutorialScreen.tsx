@@ -5,6 +5,8 @@ import { generatePuzzle } from "@parity/engine";
 import { useGame } from "@/hooks/useGame";
 import { Board } from "@/components/board/Board";
 import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
+import { GhostLink } from "@/components/ui/GhostLink";
+import { Button } from "@/components/ui/Button";
 
 // ─── Illustration helpers ─────────────────────────────────────────────────────
 
@@ -187,16 +189,7 @@ function InteractiveBeat({ onFinish }: { onFinish: () => void }) {
           <button style={pill()} onClick={restart} disabled={!canUndo} onMouseEnter={(e) => onPill(e, true)} onMouseLeave={(e) => onPill(e, false)}>
             RESET
           </button>
-          {solved && (
-            <button
-              onClick={onFinish}
-              style={{ background: "var(--accent)", color: "var(--on-accent)", border: "none", borderRadius: 999, padding: "14px 34px", fontFamily: "var(--font-sans)", fontSize: 16, fontWeight: 600, cursor: "pointer", transition: "transform .2s ease" }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-            >
-              Finish
-            </button>
-          )}
+          {solved && <Button onClick={onFinish}>Finish</Button>}
         </div>
       </div>
       <div style={{ flex: "0 1 380px", width: "100%", minWidth: "min(100%,260px)" }}>
@@ -272,14 +265,12 @@ export function TutorialScreen() {
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
       <header style={HEADER_BAR}>
         <Wordmark />
-        <button
-          onClick={exit}
-          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--fg-3)", fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.16em", padding: "4px 0" }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-3)")}
-        >
+        {/* Bordered pill (not a plain text GhostLink) so this reads as a more
+            deliberate action than the in-flow "BACK" control below — the two
+            were previously visually identical text links, easy to conflate. */}
+        <Button variant="secondary" size="sm" onClick={exit}>
           SKIP TUTORIAL
-        </button>
+        </Button>
       </header>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 24, maxWidth: 1180, width: "100%", margin: "0 auto", padding: "16px clamp(24px, 5vw, 64px) 52px", animation: "fadeup 0.45s var(--ease-editorial) both" }}>
@@ -308,24 +299,8 @@ export function TutorialScreen() {
                 <h1 style={beatTitle}>{BEATS[beat]!.title}</h1>
                 <p style={beatBody}>{BEATS[beat]!.body}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 8 }}>
-                  <button
-                    onClick={() => setBeat((b) => b + 1)}
-                    style={{ background: "var(--accent)", color: "var(--on-accent)", border: "none", borderRadius: 999, padding: "14px 34px", fontFamily: "var(--font-sans)", fontSize: 16, fontWeight: 600, cursor: "pointer", transition: "transform .2s ease" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-                  >
-                    Next
-                  </button>
-                  {beat > 0 && (
-                    <button
-                      onClick={() => setBeat((b) => b - 1)}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--fg-3)", fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.18em", padding: "4px 0" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-3)")}
-                    >
-                      BACK
-                    </button>
-                  )}
+                  <Button onClick={() => setBeat((b) => b + 1)}>Next</Button>
+                  {beat > 0 && <GhostLink onClick={() => setBeat((b) => b - 1)}>BACK</GhostLink>}
                 </div>
               </div>
               {BEATS[beat]!.art}
@@ -333,16 +308,7 @@ export function TutorialScreen() {
           )}
         </div>
 
-        {isInteractive && (
-          <button
-            onClick={() => setBeat(2)}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--fg-3)", fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.18em", padding: 0, textAlign: "left", width: "fit-content" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-3)")}
-          >
-            BACK
-          </button>
-        )}
+        {isInteractive && <GhostLink onClick={() => setBeat(2)}>BACK</GhostLink>}
       </div>
     </div>
   );

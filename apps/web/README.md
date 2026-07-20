@@ -23,6 +23,11 @@ Next.js 16 app (iOS + Android) for [Halve](https://halve.today) — a premium da
 
 Open [http://localhost:3000](http://localhost:3000) to see the app.
 
+## Testing
+
+- `pnpm test` — unit tests (Vitest).
+- `pnpm test:e2e` — end-to-end tests (Playwright) against a real dev server + Supabase project, authenticated via the dev-only `/api/dev-login` route. Requires `DEV_LOGIN_SECRET` and `DEV_TEST_EMAIL` in `.env.local` (a real, already-onboarded test user; see `src/app/api/dev-login/route.ts` for the safety gates). Start the dev server first, or let Playwright's `webServer` config start one for you. `pnpm test:e2e:ui` opens Playwright's interactive UI mode.
+
 ## Further reading
 
 - [docs/ARCHITECTURE.md](../../docs/ARCHITECTURE.md) — system overview, data model, request flows

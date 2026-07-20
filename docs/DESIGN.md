@@ -2,7 +2,7 @@
 
 **Direction: refined minimalism.** Generous whitespace, restrained palette, one confident accent, impeccable typography and hierarchy. The bar is the calm, premium feel of Things / Linear — never a generic dashboard or component-library look. Tokens live in `packages/design` and are the single source of truth; Tailwind reads from them via CSS variables.
 
-> **Locked v1 (2026-05-29):** original tokens and type locked from the Claude Design handoff. **Updated 2026-05-30:** symbols and master mark replaced as part of the Halve rebrand (fire/water teardrops → solid circle / ring; split-circle mark). Canonical values live in `packages/design` — `styles/tokens.css` (CSS custom properties) and `src/tokens.ts` (typed mirror). The tables here are the human-readable record; the package is authoritative.
+> **Locked v1 (2026-05-29):** original tokens and type locked from the Claude Design handoff. **Updated 2026-05-30:** symbols and master mark replaced as part of the Halve rebrand (fire/water teardrops → solid circle / ring; split-circle mark). **Superseded 2026-07-03 (WEB-DESIGN-1, see DECISIONS.md):** the single-typeface system and original amber/teal hex values below were replaced by the editorial three-family type system and retuned palette — see the updated tables below, which now match `packages/design` exactly. Canonical values live in `packages/design` — `styles/tokens.css` (CSS custom properties) and `src/tokens.ts` (typed mirror). The tables here are the human-readable record; the package is authoritative.
 
 ## Brand device: halved circle (solid ↔ ring)
 The two game pieces are abstract geometric opposites — a **solid circle** (symbol A, amber) and an **outlined ring** (symbol B, teal). Together they form a complete circle: one fills space, the other defines it. This directly embodies the puzzle's core mechanic — every row and column is exactly half one, half the other. The warm/cool colour contrast provides the fastest visual read across the 36-cell grid. Light + dark modes are supported (warm "paper" / deep "ink"); the signature is the geometric duality, not any elemental metaphor.
@@ -12,20 +12,20 @@ Neutrals are **warm**, never cold grey. Exactly **one accent** (amber); teal is 
 
 | Role | Light (paper) | Dark (ink) |
 |---|---|---|
-| Page bg | `#F6F1E8` | `#14110B` |
-| Surface | `#FBF8F1` | `#221D15` |
+| Page bg | `#F5F0E6` | `#161210` |
+| Surface | `#FDFAF3` | `#1F1A15` |
 | Surface raised | `#FFFFFF` | `#2A2418` |
-| Primary fg | `#211C15` | `#EFE8D9` |
-| Secondary fg | `#6B6253` | `#A79D89` |
-| Muted fg | `#9A9080` | `#6E6553` |
-| Hairline | `#E4DDCD` | `#352E20` |
-| **Accent (amber)** | `#B03E12` | `#E86B38` |
-| Accent strong (pressed) | `#943210` | `#D45220` |
-| Accent tint | `#F8E4DC` | `#38180E` |
-| Symbol A (solid disc) | `#D45220` | `#D45220` |
-| Symbol B (ring) | `#2A7A6E` | `#6EC8BC` |
+| Primary fg | `#211B14` | `#EDE5D7` |
+| Secondary fg | `#6E6455` | `#B4A990` |
+| Muted fg | `#8A7F6E` | `#9A8F7E` |
+| Hairline | `rgba(31,26,20,0.16)` | `rgba(233,223,205,0.15)` |
+| **Accent (amber) — also symbol A** | `#DE5F27` | `#E8703A` |
+| Accent strong (pressed) | `#C24E1C` | `#F2895A` |
+| Accent tint | `rgba(222,95,39,0.12)` | `rgba(232,112,58,0.16)` |
+| Symbol B (ring) | `#1E9C8F` | `#45BFB2` |
 | Correct | `#4E8A66` | `#6FB389` |
-| Wrong | `#C2564B` | `#DC7A6E` |
+| Wrong | `#C0442C` | `#D9553B` |
+| Scrim (modal backdrop) | `rgba(10,8,6,0.62)` | `rgba(10,8,6,0.62)` |
 
 Shadows are warm-tinted and soft on paper; **dark mode uses hairlines + surface lightening, not shadow.** Backgrounds are flat warm solids — no gradients, images, textures, or glassmorphism.
 
@@ -36,17 +36,17 @@ Drawn as **custom minimal vector art — never emoji**. Both on a `0 0 100 100` 
 
 The warm/cool contrast + solid/outline contrast together ensure the two read instantly apart across the 36-cell grid. The **master mark** (`Mark.tsx`, `0 0 100 100`) is a single circle split by a vertical line: left half filled amber (A), right half filled teal (B), with a hairline divider. Directly represents the name *Halve* — one shape, cleanly bisected. The **logo** pairs the mark with the wordmark "Halve" in Space Grotesk 600.
 
-## Typography (locked)
-- **Single typeface: Space Grotesk** (Google Fonts), weights 300–700 — wordmark through body. Display/headings 500 with `-0.02em` tracking. **No second typeface. No Inter.** *(Substitution flag: swap to a licensed brand face by replacing `--font-sans` if commissioned.)*
+## Typography (locked, updated 2026-07-03)
+- **Three-family editorial system** (Google Fonts, `next/font`): **Newsreader** italic serif for display headlines (`--font-serif`), **Instrument Sans** for body/UI (`--font-sans`), **Spline Sans Mono** for kickers/labels/the timer (`--font-mono`). Replaces the original single-Space-Grotesk system — see DECISIONS.md WEB-DESIGN-1 (2026-07-03). **No Inter.**
 - Numbers that change (timer, streak, stats) use **tabular numerals** (`font-variant-numeric: tabular-nums`) so digits never shift width.
-- Scale (px): display 56 · h1 36 · h2 26 · h3 20 · body 16 · small 14 · label 12 (uppercase, `0.08em` tracked) · timer 44.
+- Scale (rem, `--text-*` tokens): h1 2.25 · h2 1.625 · h3 1.25 · body 1 · small 0.875 · label 0.75 (uppercase, `0.18em` tracked). Fluid display sizes via `clamp()`: `--text-display` (section headlines), `--text-hero` (home headline), `--text-jumbo` (win time / big stat numbers), `--text-timer` (play-screen timer).
 
 ## Spacing & radii (locked)
-- **8-point spacing:** 0 · 4 · 8 · 12 · 16 · 24 · 32 · 40 · 48 · 64 · 80 · 96.
-- **Radii:** sm 6 · md 10 · **cell 12** · lg 16 · xl 22 (large cards/sheets) · full (pills).
+- **8-point spacing:** 0 · 4 · 8 · 12 · 16 · 24 · 32 · 40 · 48 · 64 · 80 · 96. `--space-*` tokens exist in `packages/design` but components currently write raw px values on the 8pt grid rather than `var(--space-*)` — a deliberate, recorded choice (DECISIONS.md 2026-05-31) to keep spacing consistent app-wide rather than tokenizing one screen at a time. Adopting `var(--space-*)` everywhere is a valid future app-wide pass, not a one-file fix.
+- **Radii:** sm 6 · md 10 · **cell 12** · lg 16 · xl 22 (large cards/sheets) · full (pills). Unlike spacing, radius values should always match this scale exactly — an off-scale radius (e.g. 14 or 20) is a bug, not a style choice.
 
 ## Icons
-UI icons: **Lucide** (CDN), even ~1.75px stroke, 20–22px, color secondary fg — used only where unavoidable (undo, hint, share, settings, chevrons, close, stats, streak flame-as-line-glyph). *(Substitution flag: no icon set was provided; swap if custom icons are commissioned.)* The `=` / `≠` signs are typographic glyphs in a bg-filled capsule on cell edges — not icons.
+The shipped app settled on **text-first controls**, not an icon set: close/undo/hint/restart/share/stats are mono, uppercase, tracked text buttons or pills (`Pill`, `Button` with `variant="secondary"`), matching the editorial voice. Hand-drawn SVGs (`components/ui/icons.tsx`) exist only for a small set of genuinely wordless controls — theme toggle, hamburger/nav, sign-out — using ~1.75px stroke on a 24-unit viewBox to read like Lucide without the dependency. *(No `lucide-react`/CDN import exists in the app — the earlier "Lucide" substitution flag was superseded by this text-first direction. If icon-first controls are wanted for close/undo/hint/share/stats, that's a deliberate design change, not a missing implementation.)* The `=` / `≠` signs are typographic glyphs in a bg-filled capsule on cell edges — not icons.
 
 ## Layout & motion
 - 8pt spacing system; generous whitespace.

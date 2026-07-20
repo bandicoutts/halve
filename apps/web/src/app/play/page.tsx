@@ -16,14 +16,14 @@ export default async function PlayPage() {
 
   let puzzleId: string | undefined;
   let puzzle: ReturnType<typeof generateDaily>["puzzle"] | undefined;
+  let initialSolveDurationMs: number | undefined;
 
   try {
     const supabase = await createClient();
-    const { data } = await supabase
-      .from("puzzles")
-      .select("id, difficulty, grid_spec")
-      .eq("date", today)
-      .maybeSingle();
+    const [{ data }, { data: { user } }] = await Promise.all([
+      supabase.from("puzzles").select("id, difficulty, grid_spec").eq("date", today).maybeSingle(),
+      supabase.auth.getUser(),
+    ]);
 
     if (data) {
       const spec = parseGridSpec(data.grid_spec);
@@ -38,6 +38,19 @@ export default async function PlayPage() {
       console.error(
         `[daily-puzzle] no puzzles row for ${today} — serving deterministic offline fallback; solves will NOT record`,
       );
+    }
+
+    // Already solved today? Tell BoardScreen so it mounts in review mode
+    // instead of a fresh playable board (was always fresh, regardless of
+    // solve history — see DECISIONS.md WEB-BOARD-REVIEW-1).
+    if (puzzleId && user) {
+      const { data: solve } = await supabase
+        .from("solves")
+        .select("duration_ms")
+        .eq("user_id", user.id)
+        .eq("puzzle_id", puzzleId)
+        .maybeSingle();
+      if (solve) initialSolveDurationMs = solve.duration_ms ?? 0;
     }
   } catch (err) {
     // DB unavailable — serve the deterministic fallback below.
@@ -66,6 +79,7 @@ export default async function PlayPage() {
       date={today}
       backHref="/"
       isOffline={!puzzleId}
+      initialSolveDurationMs={initialSolveDurationMs}
     />
   );
 }
