@@ -27,7 +27,7 @@ const style: React.CSSProperties = {
 /** Shared mono-text dismiss/secondary control — CLOSE, BACK, SKIP, "use a different email", etc. */
 export function GhostLink({ children, href, onClick, type = "button", disabled }: GhostLinkProps) {
   const onMouseEnter = (e: MouseEvent<HTMLElement>) => {
-    if (!disabled) e.currentTarget.style.color = "var(--accent)";
+    if (!disabled) e.currentTarget.style.color = "var(--accent-text)";
   };
   const onMouseLeave = (e: MouseEvent<HTMLElement>) => {
     e.currentTarget.style.color = "var(--fg-3)";

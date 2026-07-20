@@ -362,7 +362,7 @@ export function AuthScreen({
         brand={<BrandColumn caption="WAITING ON YOUR TAP" waiting />}
         form={
           <>
-            <div style={{ ...KICKER, color: "var(--accent)" }}>LINK SENT</div>
+            <div style={{ ...KICKER, color: "var(--accent-text)" }}>LINK SENT</div>
             <h1 style={HEADLINE}>Check your email.</h1>
             <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "42ch" }}>
               We sent a sign-in link to{" "}

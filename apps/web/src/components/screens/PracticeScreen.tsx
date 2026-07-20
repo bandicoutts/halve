@@ -135,7 +135,7 @@ export function PracticeScreen({ isAuthenticated, displayName }: PracticeScreenP
                   fontFamily: "var(--font-mono)",
                   fontSize: 12,
                   letterSpacing: "0.16em",
-                  color: "var(--accent)",
+                  color: "var(--accent-text)",
                 }}
               >
                 PLAY →

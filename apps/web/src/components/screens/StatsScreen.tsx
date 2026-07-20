@@ -121,7 +121,7 @@ function StatsRecord({ stats }: { stats: UserStats }) {
                 fontWeight: 500,
                 fontSize: "clamp(96px, 13vw, 150px)",
                 lineHeight: 0.85,
-                color: "var(--accent)",
+                color: "var(--accent-text)",
                 letterSpacing: "-0.03em",
                 fontVariantNumeric: "tabular-nums",
               }}
@@ -307,7 +307,7 @@ function StatsGuest() {
                 fontWeight: 500,
                 fontSize: "clamp(120px, 18vw, 200px)",
                 lineHeight: 0.85,
-                color: "var(--accent)",
+                color: "var(--accent-text)",
                 letterSpacing: "-0.03em",
               }}
             >

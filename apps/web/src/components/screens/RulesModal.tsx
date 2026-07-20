@@ -81,7 +81,7 @@ export function RulesModal({ open, onClose }: RulesModalProps) {
                   fontSize: 14,
                   width: 44,
                   flex: "none",
-                  color: "var(--accent)",
+                  color: "var(--accent-text)",
                 }}
               >
                 {rule.glyph}

@@ -164,7 +164,7 @@ export function WinScreen({
               fontFamily: "var(--font-mono)",
               fontSize: 12,
               letterSpacing: "0.22em",
-              color: "var(--accent)",
+              color: "var(--accent-text)",
             }}
           >
             {kicker}
@@ -206,7 +206,7 @@ export function WinScreen({
                 style={{
                   background: "none",
                   border: "none",
-                  color: "var(--accent)",
+                  color: "var(--accent-text)",
                   fontSize: 14,
                   fontWeight: 600,
                   cursor: "pointer",

@@ -75,7 +75,7 @@ function NavArrow({ dir, disabled, onClick }: { dir: "prev" | "next"; disabled: 
       onMouseEnter={(e) => {
         if (disabled) return;
         e.currentTarget.style.borderColor = "var(--accent)";
-        e.currentTarget.style.color = "var(--accent)";
+        e.currentTarget.style.color = "var(--accent-text)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = "var(--hairline)";

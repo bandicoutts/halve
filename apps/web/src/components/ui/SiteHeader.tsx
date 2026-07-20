@@ -57,6 +57,7 @@ export function ThemeGlyph() {
       aria-label="Toggle theme"
       onClick={toggle}
       suppressHydrationWarning
+      className="hv-tap44"
       style={{ ...circleBtn, display: "flex" }}
       onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
       onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--hairline)")}
@@ -169,7 +170,7 @@ export function SiteHeader({
                 onMouseEnter={() => setHovered(key)}
                 onMouseLeave={() => setHovered(null)}
                 aria-current={active === key ? "page" : undefined}
-                style={{ ...MONO_LINK, color: isHot ? "var(--accent)" : "var(--fg-3)" }}
+                style={{ ...MONO_LINK, color: isHot ? "var(--accent-text)" : "var(--fg-3)" }}
               >
                 {label}
               </Link>
@@ -184,7 +185,7 @@ export function SiteHeader({
                 onClick={go("/auth")}
                 onMouseEnter={() => setHovered("signin")}
                 onMouseLeave={() => setHovered(null)}
-                style={{ ...MONO_LINK, color: hovered === "signin" ? "var(--accent)" : "var(--fg-3)" }}
+                style={{ ...MONO_LINK, color: hovered === "signin" ? "var(--accent-text)" : "var(--fg-3)" }}
               >
                 Sign in
               </Link>
@@ -197,7 +198,7 @@ export function SiteHeader({
         <button
           ref={burgerRef}
           type="button"
-          className="hv-nav-burger"
+          className="hv-nav-burger hv-tap44"
           aria-label="Menu"
           aria-haspopup="menu"
           aria-expanded={menuOpen}
@@ -248,14 +249,14 @@ export function SiteHeader({
                 role="menuitem"
                 onClick={go(href, true)}
                 aria-current={active === key ? "page" : undefined}
-                style={{ ...sheetItem, color: active === key ? "var(--accent)" : "var(--fg-1)" }}
+                style={{ ...sheetItem, color: active === key ? "var(--accent-text)" : "var(--fg-1)" }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "var(--hover)";
-                  e.currentTarget.style.color = "var(--accent)";
+                  e.currentTarget.style.color = "var(--accent-text)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = "none";
-                  e.currentTarget.style.color = active === key ? "var(--accent)" : "var(--fg-1)";
+                  e.currentTarget.style.color = active === key ? "var(--accent-text)" : "var(--fg-1)";
                 }}
               >
                 {label.toUpperCase()}
@@ -279,7 +280,7 @@ export function SiteHeader({
                     style={{ ...sheetItem, color: "var(--fg-1)" }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = "var(--hover)";
-                      e.currentTarget.style.color = "var(--accent)";
+                      e.currentTarget.style.color = "var(--accent-text)";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = "none";

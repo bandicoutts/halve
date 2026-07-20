@@ -63,7 +63,7 @@ function Pill({
       onMouseEnter={(e) => {
         if (disabled) return;
         e.currentTarget.style.borderColor = "var(--accent)";
-        e.currentTarget.style.color = "var(--accent)";
+        e.currentTarget.style.color = "var(--accent-text)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = "var(--hairline)";
@@ -325,7 +325,7 @@ export function BoardScreen({
                 fontStyle: "italic",
                 fontSize: 17,
                 lineHeight: 1.4,
-                color: solved ? "var(--accent)" : errors.size > 0 ? "var(--err)" : "var(--fg-3)",
+                color: solved ? "var(--accent-text)" : errors.size > 0 ? "var(--err)" : "var(--fg-3)",
               }}
             >
               {statusMsg}
@@ -426,7 +426,7 @@ export function BoardScreen({
               textAlign: "left",
               width: "fit-content",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-text)")}
             onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-3)")}
           >
             RULES

@@ -173,7 +173,7 @@ function InteractiveBeat({ onFinish }: { onFinish: () => void }) {
 
   const onPill = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
     e.currentTarget.style.borderColor = on ? "var(--accent)" : "var(--hairline)";
-    e.currentTarget.style.color = on ? "var(--accent)" : "inherit";
+    e.currentTarget.style.color = on ? "var(--accent-text)" : "inherit";
   };
 
   return (
@@ -198,7 +198,7 @@ function InteractiveBeat({ onFinish }: { onFinish: () => void }) {
       <div style={{ flex: "0 1 380px", width: "100%", minWidth: "min(100%,260px)" }}>
         <Board cells={cells} givens={puzzle.givens} edges={puzzle.edges} errors={errors} onCellTap={tap} readOnly={solved} solved={solved} />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginTop: 14, minHeight: 22 }}>
-          <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 16, color: solved ? "var(--accent)" : errors.size > 0 ? "var(--err)" : "var(--fg-3)" }}>{status}</span>
+          <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontSize: 16, color: solved ? "var(--accent-text)" : errors.size > 0 ? "var(--err)" : "var(--fg-3)" }}>{status}</span>
           <span className="tnum" style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.14em", color: "var(--fg-3)", flex: "none" }}>
             {placed} / {total}
           </span>
@@ -234,7 +234,7 @@ export function TutorialScreen() {
       title: "Two symbols.",
       body: (
         <>
-          Every cell takes one of two marks: the amber <b style={{ color: "var(--accent)" }}>disc</b> or the
+          Every cell takes one of two marks: the amber <b style={{ color: "var(--accent-text)" }}>disc</b> or the
           teal <b style={{ color: "var(--symbol-b)" }}>ring</b>. Tap a cell to cycle through disc, ring, and empty.
         </>
       ),

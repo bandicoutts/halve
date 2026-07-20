@@ -59,7 +59,7 @@ function StreakBand({
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 15, fontWeight: 600, color: "var(--fg-1)" }}>
-          <span className="tnum" style={{ color: "var(--accent)" }}>
+          <span className="tnum" style={{ color: "var(--accent-text)" }}>
             {streak}
           </span>{" "}
           day streak

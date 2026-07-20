@@ -76,7 +76,7 @@ export function SignedInMenuItems({
         style={{ ...itemStyle, color: "var(--fg-1)" }}
         onMouseEnter={(e) => {
           e.currentTarget.style.background = "var(--hover)";
-          e.currentTarget.style.color = "var(--accent)";
+          e.currentTarget.style.color = "var(--accent-text)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = "none";
@@ -93,7 +93,7 @@ export function SignedInMenuItems({
         style={{ ...itemStyle, color: "var(--fg-1)" }}
         onMouseEnter={(e) => {
           e.currentTarget.style.background = "var(--hover)";
-          e.currentTarget.style.color = "var(--accent)";
+          e.currentTarget.style.color = "var(--accent-text)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = "none";
@@ -184,6 +184,7 @@ export function AccountMenu({ displayName }: { displayName: string }) {
         aria-expanded={open}
         aria-label="Your account"
         onClick={() => setOpen((v) => !v)}
+        className="hv-tap44"
         style={{
           width: 30,
           height: 30,

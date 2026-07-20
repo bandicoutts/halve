@@ -235,6 +235,14 @@ input::placeholder { color: var(--fg-3); opacity: 1; }
 /* Remove browser tap highlight; add custom focus ring */
 a, button { -webkit-tap-highlight-color: transparent; }
 
+/* Expands the invisible tap/click target of the 30px circular icon buttons
+   (theme toggle, hamburger, account menu trigger) to the 44px platform
+   touch-target convention, WITHOUT changing their 30px visual size — the
+   ::before extends 7px past each edge (30 + 7*2 = 44) and, as generated
+   content of the button, still counts as part of it for hit-testing. */
+.hv-tap44 { position: relative; }
+.hv-tap44::before { content: ""; position: absolute; inset: -7px; }
+
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {

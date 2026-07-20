@@ -14,7 +14,7 @@ export const palette = {
   paperSurface: '#FDFAF3',
   clay700: '#463F33',
   clay600: '#6E6455', // secondary fg
-  clay500: '#8A7F6E', // muted fg
+  clay500: '#756B5B', // muted fg — darkened 2026-07-20 (WEB-AUDIT-1), see tokens.css
   ink900: '#211B14', // primary fg on paper
 
   // Warm ink neutrals (dark)
@@ -63,6 +63,10 @@ export const colors = {
     accentStrong: palette.amberPaperStrong,
     accentTint: 'rgba(222, 95, 39, 0.12)',
     onAccent: '#1B1410',
+    /** accent as TEXT color only (kickers, nav hover/active, streak numbers) —
+     * --accent itself is 3.20:1 on light --bg, below WCAG AA; this is 4.89:1.
+     * Never use for backgrounds/borders/the disc symbol — those stay --accent. */
+    accentText: '#B44414',
     symbolA: palette.amberPaper,
     symbolB: palette.tealPaper,
     plate: 'rgba(31, 26, 20, 0.055)',
@@ -88,6 +92,7 @@ export const colors = {
     accentStrong: palette.amberInkStrong,
     accentTint: 'rgba(232, 112, 58, 0.16)',
     onAccent: '#1B1410',
+    accentText: palette.amberInk, // already 6.04:1 on dark bg — no separate value needed
     symbolA: palette.amberInk,
     symbolB: palette.tealInk,
     plate: 'rgba(233, 223, 205, 0.06)',
