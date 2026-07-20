@@ -106,7 +106,6 @@ function EmailField({
           fontSize: 16,
           color: "var(--fg-1)",
           fontFamily: "var(--font-sans)",
-          outline: "none",
         }}
       />
       {error && <span style={{ fontSize: 13.5, color: "var(--err)", lineHeight: 1.4 }}>{error}</span>}
@@ -172,7 +171,6 @@ function PasswordField({
           fontSize: 16,
           color: "var(--fg-1)",
           fontFamily: "var(--font-sans)",
-          outline: "none",
         }}
       />
       {error && <span style={{ fontSize: 13.5, color: "var(--err)", lineHeight: 1.4 }}>{error}</span>}

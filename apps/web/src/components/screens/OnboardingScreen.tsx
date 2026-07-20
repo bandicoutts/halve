@@ -106,7 +106,6 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
               fontSize: 16,
               color: "var(--fg-1)",
               fontFamily: "var(--font-sans)",
-              outline: "none",
               textAlign: "center",
               opacity: loading ? 0.6 : 1,
             }}
@@ -130,7 +129,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
                     width: 14,
                     height: 14,
                     borderRadius: "50%",
-                    border: "2px solid rgba(27,20,16,.3)",
+                    border: "2px solid color-mix(in srgb, var(--on-accent) 30%, transparent)",
                     borderTopColor: "var(--on-accent)",
                     animation: "spin .8s linear infinite",
                     display: "inline-block",

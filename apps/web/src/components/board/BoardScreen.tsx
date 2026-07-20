@@ -45,10 +45,13 @@ function Pill({
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       style={{
+        display: "inline-flex",
+        alignItems: "center",
+        minHeight: 44,
         background: "none",
         border: "1px solid var(--hairline)",
         borderRadius: 999,
-        padding: "12px 22px",
+        padding: "0 22px",
         cursor: disabled ? "default" : "pointer",
         color: "inherit",
         fontFamily: "var(--font-mono)",
@@ -344,9 +347,11 @@ export function BoardScreen({
             <div
               style={{
                 height: 2,
+                width: "100%",
                 background: "var(--accent)",
-                width: `${(placed / total) * 100}%`,
-                transition: "width 0.3s ease",
+                transform: `scaleX(${placed / total})`,
+                transformOrigin: "left",
+                transition: "transform 0.3s ease",
               }}
             />
           </div>

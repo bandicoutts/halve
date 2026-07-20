@@ -138,10 +138,13 @@ function Beat3Art() {
 
 function pill(): React.CSSProperties {
   return {
+    display: "inline-flex",
+    alignItems: "center",
+    minHeight: 44,
     background: "none",
     border: "1px solid var(--hairline)",
     borderRadius: 999,
-    padding: "12px 22px",
+    padding: "0 22px",
     cursor: "pointer",
     color: "inherit",
     fontFamily: "var(--font-mono)",

@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { Edge, EdgeKind, EdgeOrientation, Grid } from "@parity/engine";
 import { Cell } from "./Cell";
 
@@ -41,15 +41,22 @@ export function Board({
   // Per-cell edge data. The visual cap is owned by the edge's top-left cell
   // ('h' links to the right, 'v' to the cell below). The same ownership feeds
   // the screen-reader phrase so a non-sighted solver hears every constraint.
-  const edgeCapByCell = new Map<string, { kind: EdgeKind; orientation: EdgeOrientation }>();
-  const edgeHintByCell = new Map<string, string>();
-  for (const e of edges) {
-    const key = `${e.r}-${e.c}`;
-    if (!edgeCapByCell.has(key)) edgeCapByCell.set(key, { kind: e.kind, orientation: e.orientation });
-    const phrase = `${e.kind === "eq" ? "Same symbol as" : "Opposite symbol to"} the cell ${e.orientation === "h" ? "to the right" : "below"}`;
-    const prev = edgeHintByCell.get(key);
-    edgeHintByCell.set(key, prev ? `${prev}; ${phrase}` : phrase);
-  }
+  // Memoized on `edges` (stable for the component's lifetime — a puzzle's
+  // edges never change) so each cell's `edge` prop keeps a stable identity
+  // across re-renders, letting Cell's React.memo actually skip untouched
+  // edge-owning cells instead of re-rendering them on every tap.
+  const { edgeCapByCell, edgeHintByCell } = useMemo(() => {
+    const caps = new Map<string, { kind: EdgeKind; orientation: EdgeOrientation }>();
+    const hints = new Map<string, string>();
+    for (const e of edges) {
+      const key = `${e.r}-${e.c}`;
+      if (!caps.has(key)) caps.set(key, { kind: e.kind, orientation: e.orientation });
+      const phrase = `${e.kind === "eq" ? "Same symbol as" : "Opposite symbol to"} the cell ${e.orientation === "h" ? "to the right" : "below"}`;
+      const prev = hints.get(key);
+      hints.set(key, prev ? `${prev}; ${phrase}` : phrase);
+    }
+    return { edgeCapByCell: caps, edgeHintByCell: hints };
+  }, [edges]);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     const delta = ARROW_DELTA[e.key];

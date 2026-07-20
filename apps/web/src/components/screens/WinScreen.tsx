@@ -1,10 +1,10 @@
 "use client";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
-import { useTheme } from "@/components/providers/ThemeProvider";
 import { Mark } from "@/components/symbols/Mark";
 import { Disc } from "@/components/symbols/Disc";
 import { Ring } from "@/components/symbols/Ring";
 import { HEADER_BAR } from "@/components/ui/Wordmark";
+import { ThemeGlyph } from "@/components/ui/SiteHeader";
 import { GhostLink } from "@/components/ui/GhostLink";
 import { Button } from "@/components/ui/Button";
 import { formatDateLabel } from "@/lib/local-date";
@@ -63,7 +63,6 @@ export function WinScreen({
   onClose,
   onSecondary,
 }: WinScreenProps) {
-  const { toggle } = useTheme();
   // The win screen is a full-screen overlay: trap focus while shown, restore on close.
   const dialogRef = useFocusTrap<HTMLDivElement>(true, onClose);
 
@@ -138,27 +137,7 @@ export function WinScreen({
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <button
-            onClick={toggle}
-            aria-label="Toggle theme"
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: "50%",
-              border: "1px solid var(--hairline)",
-              background: "none",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 0,
-            }}
-          >
-            <svg viewBox="0 0 200 200" className="theme-glyph" style={{ width: 15, height: 15 }} aria-hidden="true">
-              <path d="M95 10 A90 90 0 0 0 95 190 Z" style={{ fill: "var(--fg-1)", opacity: 0.85 }} />
-              <circle cx="100" cy="100" r="90" style={{ fill: "none", stroke: "var(--fg-1)", strokeWidth: "10px", opacity: 0.85 }} />
-            </svg>
-          </button>
+          <ThemeGlyph />
           <GhostLink onClick={onClose}>CLOSE</GhostLink>
         </div>
       </header>

@@ -1,0 +1,70 @@
+name: web-e2e
+
+# Playwright E2E for apps/web — runs against the real dev Supabase project via
+# the same dev-only /api/dev-login and /api/dev-reset-onboarding routes used
+# locally (both require NODE_ENV=development + localhost + a matching secret;
+# `pnpm dev` here satisfies the first two). See docs/DECISIONS.md WEB-E2E-1.
+#
+# Serialized (concurrency group, no cancel-in-progress) rather than one job
+# per run: every run shares ONE Supabase test account and ONE daily puzzle
+# row, so overlapping runs would race on solve/profile state. Triggered on
+# push to main only, not on pull_request — these secrets should not be
+# exposed to workflow runs triggered by external/untrusted PRs.
+#
+# Requires these repository secrets (Settings → Secrets and variables →
+# Actions), matching apps/web/.env.local.example:
+#   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+#   SUPABASE_SERVICE_ROLE_KEY, DEV_LOGIN_SECRET, DEV_TEST_EMAIL
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "packages/engine/**"
+      - "packages/design/**"
+      - ".github/workflows/web-e2e.yml"
+
+concurrency:
+  group: web-e2e
+  cancel-in-progress: false
+
+jobs:
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      DEV_LOGIN_SECRET: ${{ secrets.DEV_LOGIN_SECRET }}
+      DEV_TEST_EMAIL: ${{ secrets.DEV_TEST_EMAIL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build engine + design
+        run: pnpm --filter @parity/engine --filter @parity/design build
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @parity/web exec playwright install --with-deps chromium
+
+      - name: Run E2E suite
+        run: pnpm --filter @parity/web test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 14

@@ -236,7 +236,8 @@ input::placeholder { color: var(--fg-3); opacity: 1; }
 a, button { -webkit-tap-highlight-color: transparent; }
 
 button:focus-visible,
-a:focus-visible {
+a:focus-visible,
+input:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);

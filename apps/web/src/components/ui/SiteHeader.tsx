@@ -45,8 +45,9 @@ const MONO_LINK: React.CSSProperties = {
   whiteSpace: "nowrap",
 };
 
-/** Split-circle glyph that rotates 180° between themes (see globals.css). */
-function ThemeGlyph() {
+/** Split-circle glyph that rotates 180° between themes (see globals.css).
+ *  Shared with WinScreen, which needs the same control in its own header. */
+export function ThemeGlyph() {
   const { theme, toggle } = useTheme();
   return (
     <button

@@ -57,8 +57,8 @@ function NavArrow({ dir, disabled, onClick }: { dir: "prev" | "next"; disabled: 
       disabled={disabled}
       aria-label={dir === "prev" ? "Previous month" : "Next month"}
       style={{
-        width: 40,
-        height: 40,
+        width: 44,
+        height: 44,
         borderRadius: "50%",
         flex: "none",
         border: "1px solid var(--hairline)",

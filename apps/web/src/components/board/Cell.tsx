@@ -104,7 +104,6 @@ export const Cell = memo(function Cell({
       style={{
         position: "relative",
         border: "none",
-        outline: "none",
         font: "inherit",
         color: "inherit",
         background: "transparent",
