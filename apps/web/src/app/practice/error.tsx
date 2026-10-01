@@ -12,8 +12,7 @@ export default function PracticeError(props: {
       tag="practice"
       body={
         <>
-          An unexpected error interrupted practice. You can try again, or head
-          back home.
+          Practice didn’t load. Try again, or return home.
         </>
       }
     />

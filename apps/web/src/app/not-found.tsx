@@ -8,7 +8,7 @@ export default function NotFound() {
         mark="ring"
         kicker="404 · NOT FOUND"
         headline="Page not found."
-        body="The address does not match a page. The puzzle may not be published yet, or the link may be wrong."
+        body="We couldn’t find that page. The link may be wrong, or that puzzle may not be available yet."
       primary={{ label: "Back home", href: "/" }}
       secondary={{ label: "BROWSE THE ARCHIVE", href: "/archive" }}
     />

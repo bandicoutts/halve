@@ -15,17 +15,17 @@ const ROWS: Row[] = [
   {
     name: "Easy",
     difficulty: "easy",
-    desc: "More starting clues. Good for learning the rules.",
+    desc: "More clues to get you started.",
   },
   {
     name: "Medium",
     difficulty: "medium",
-    desc: "Fewer given cells. A steady solve.",
+    desc: "Fewer clues. A little more to work out.",
   },
   {
     name: "Hard",
     difficulty: "hard",
-    desc: "More demanding deductions. Take your time.",
+    desc: "Fewer clues and trickier deductions.",
   },
 ];
 
@@ -72,10 +72,10 @@ export function PracticeScreen({ isAuthenticated, displayName }: PracticeScreenP
               letterSpacing: "-0.01em",
             }}
           >
-            Off the record.
+            Choose a difficulty.
           </h1>
           <p style={{ margin: "6px 0 0", fontSize: 16, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "52ch" }}>
-            Play any puzzle, at any difficulty. Practice games do not affect your streak.
+            Play as many as you like. Your streak can have the day off.
           </p>
         </div>
 

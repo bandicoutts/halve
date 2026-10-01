@@ -151,10 +151,10 @@ function EmptyArchive({
             <Mark size={36} />
           </div>
           <h1 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: 34, margin: 0 }}>
-            The back catalogue.
+            Puzzle archive.
           </h1>
           <p style={{ fontSize: 16, lineHeight: 1.55, color: "var(--fg-3)", margin: "12px 0 0 0" }}>
-            Every daily is kept here. Play today&rsquo;s board and it&rsquo;ll be the first.
+            Today&rsquo;s puzzle will be the first one here. Solve it to start your archive.
           </p>
           <div style={{ marginTop: 22 }}>
             <Button href="/play">Play today</Button>
@@ -233,7 +233,7 @@ export function ArchiveScreen({ months, initialId, isAuthenticated, displayName 
             catalogue.
           </div>
           <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "38ch" }}>
-            Every daily is kept here. Pick any day you missed, or replay an old favourite.
+            Play a puzzle from any day. Revisit one you solved or try one you missed.
           </p>
           <div
             style={{
@@ -259,7 +259,7 @@ export function ArchiveScreen({ months, initialId, isAuthenticated, displayName 
                   <circle cx="10" cy="10" r="6.5" fill="none" stroke="var(--hairline-2)" strokeWidth="2" />
                 </svg>
               }
-              label="UNSOLVED · OPEN TO PLAY"
+              label="UNSOLVED · READY TO PLAY"
             />
             <LegendRow
               swatch={

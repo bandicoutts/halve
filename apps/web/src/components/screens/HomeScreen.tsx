@@ -98,7 +98,7 @@ export function HomeScreen({
               <p className={styles.description}>
                 {solvedToday
                   ? "You’re done for today. Come back tomorrow for a new puzzle."
-                  : "Six by six. Every row and column, half and half. One solution, no guessing."}
+                  : "A daily 6×6 puzzle. Balance the discs and rings, follow the edge clues, and solve it by deduction."}
               </p>
               {solvedToday && (
                 <p className={styles.solved}>

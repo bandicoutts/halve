@@ -281,13 +281,12 @@ function StatsGuest() {
               letterSpacing: "-0.02em",
             }}
           >
-            Start your
+            Save your
             <br />
-            record.
+            progress.
           </div>
           <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "40ch" }}>
-            Sign in to keep your streak, track your solve times, and build a history of every puzzle
-            you finish.
+            Sign in to save your streak, solve times and puzzle history.
           </p>
           <div>
             <Button href="/auth">Sign in</Button>

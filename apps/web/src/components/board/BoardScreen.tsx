@@ -227,7 +227,7 @@ export function BoardScreen({
   const statusMsg = solved
     ? "Solved."
     : errors.size > 0
-    ? "A rule is broken. Check the marked cells."
+    ? "Some cells break a rule. Check the marks."
     : "";
 
   return (
@@ -390,7 +390,7 @@ export function BoardScreen({
               letterSpacing: "-0.01em",
             }}
           >
-            Find the balance.
+            Fill the grid.
           </div>
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -486,7 +486,7 @@ export function BoardScreen({
               Leave this puzzle?
             </p>
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5, color: "var(--fg-3)" }}>
-              Your progress on this grid won&rsquo;t be saved.
+              Your progress on this puzzle won&rsquo;t be saved.
             </p>
             <div style={{ display: "flex", gap: 10 }}>
               <Button

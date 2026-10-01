@@ -12,8 +12,7 @@ export default function PracticePlayError(props: {
       tag="practice/play"
       body={
         <>
-          Couldn&rsquo;t load the practice puzzle. You can try again or pick a
-          different difficulty.
+          We couldn&rsquo;t load this puzzle. Try again, or choose another difficulty.
         </>
       }
       backHref="/practice"

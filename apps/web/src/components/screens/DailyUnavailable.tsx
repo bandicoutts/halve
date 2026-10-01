@@ -7,8 +7,8 @@ export function DailyUnavailable() {
     <MessageScreen
       mark="faded"
       kicker="TODAY’S PUZZLE"
-      headline="Today’s puzzle is unavailable."
-      body="Today’s puzzle failed to generate. Give it another go."
+      headline="Today’s puzzle isn’t ready."
+      body="Try again in a moment."
       primary={{ label: "Retry", onClick: () => window.location.reload() }}
       secondary={{ label: "HOME", href: "/" }}
     />

@@ -40,7 +40,7 @@ export function RouteError({
     <MessageScreen
       mark="solid"
       kicker="ERROR"
-      headline="Something went wrong."
+      headline="We couldn’t show this page."
       body={body}
       primary={{ label: "Retry", onClick: () => retry?.() }}
       secondary={{ label: backLabel.toUpperCase(), href: backHref }}

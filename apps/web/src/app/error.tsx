@@ -13,8 +13,7 @@ export default function Error(props: {
       {...props}
       body={
         <>
-          An unexpected error interrupted this page. You can try again, or head
-          back to today&rsquo;s puzzle.
+          Try again, or return to today&rsquo;s puzzle.
         </>
       }
     />

@@ -101,7 +101,7 @@ export function RulesModal({ open, onClose }: RulesModalProps) {
             paddingTop: 18,
           }}
         >
-          Tap a cell to cycle empty, disc, ring. Every puzzle can be solved by deduction.
+          Tap a cell to cycle through empty, disc and ring. Every puzzle can be solved by deduction.
         </p>
       </div>
     </div>

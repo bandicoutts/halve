@@ -8,12 +8,13 @@ import { MessageScreen } from "@/components/ui/MessageScreen";
  * non-essential, so we fail softly with a clear message instead of crashing.
  */
 export function PracticeUnavailable({ difficulty }: { difficulty: Difficulty }) {
+  const difficultyLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   return (
     <MessageScreen
       mark="outline"
       kicker="PRACTICE"
       headline="Practice is unavailable."
-      body={`No ${difficulty} practice puzzles are available right now. Try again in a moment, or pick another difficulty.`}
+      body={`There are no ${difficultyLabel} puzzles available right now. Try again in a moment, or choose another difficulty.`}
       primary={{ label: "Back to practice", href: "/practice" }}
     />
   );

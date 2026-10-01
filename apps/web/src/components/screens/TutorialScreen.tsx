@@ -168,7 +168,7 @@ function InteractiveBeat({ onFinish }: { onFinish: () => void }) {
   const status = solved
     ? "Solved."
     : errors.size > 0
-    ? "That breaks a rule. Check the marks."
+    ? "That breaks a rule. Check the marked cells."
     : "";
 
   const onPill = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
@@ -180,10 +180,10 @@ function InteractiveBeat({ onFinish }: { onFinish: () => void }) {
     <div style={{ display: "flex", alignItems: "center", gap: "clamp(32px,6vw,80px)", flexWrap: "wrap", width: "100%" }}>
       <div style={{ flex: "1 1 300px", maxWidth: 460, display: "flex", flexDirection: "column", gap: 20, minWidth: 0 }}>
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.22em", color: "var(--fg-3)" }}>HOW IT WORKS</div>
-        <h1 style={beatTitle}>Try one yourself.</h1>
+        <h1 style={beatTitle}>Try the puzzle.</h1>
         <p style={beatBody}>
-          A small four-by-four grid: two of each per line, same rules. The plated cells are given. Fill the
-          rest. Stuck? Take a hint.
+          This is a 4×4 puzzle. Each row and column needs two discs and two rings. Never place three alike in
+          a row or column. Fill the empty cells, or ask for a hint.
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
           <button style={pill()} onClick={hint} disabled={solved} onMouseEnter={(e) => onPill(e, true)} onMouseLeave={(e) => onPill(e, false)}>
@@ -251,11 +251,11 @@ export function TutorialScreen() {
       art: <Beat2Art />,
     },
     {
-      title: "The line law.",
+      title: "Balance each line.",
       body: (
         <>
-          Every row and every column ends with <b style={{ color: "var(--fg-1)" }}>three discs and three
-          rings</b>. Three of a kind can never touch.
+          Every row and column has <b style={{ color: "var(--fg-1)" }}>three discs and three rings</b>. You
+          can place two alike together, but never three alike consecutively, across or down.
         </>
       ),
       art: <Beat3Art />,

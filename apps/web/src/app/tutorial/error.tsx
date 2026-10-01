@@ -12,8 +12,7 @@ export default function TutorialError(props: {
       tag="tutorial"
       body={
         <>
-          An unexpected error interrupted the tutorial. You can try again, or
-          head back home.
+          The tutorial didn’t load. Try again, or return home.
         </>
       }
     />

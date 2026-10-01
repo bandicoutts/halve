@@ -33,7 +33,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
     const result = await saveDisplayName(trimmed);
     setLoading(false);
     if (!result.ok) {
-      setError(result.invalid ? "Enter a name (up to 40 characters)." : "Couldn’t save. Try again.");
+      setError(result.invalid ? `Use ${DISPLAY_NAME_MAX} characters or fewer.` : "We couldn’t save your name. Try again.");
       return;
     }
     router.replace(next);
@@ -63,7 +63,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
         }}
       >
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.22em", color: "var(--fg-3)" }}>
-          ONE LAST THING
+          YOUR PROFILE
         </div>
         <h1
           style={{
@@ -79,7 +79,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
           What should we call you?
         </h1>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: "var(--fg-3)", maxWidth: "44ch" }}>
-          Shown on your stats page.
+          This appears on your stats page. You can skip this for now.
         </p>
 
         <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: 440, display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
@@ -139,7 +139,7 @@ export function OnboardingScreen({ next }: OnboardingScreenProps) {
               {loading ? "Saving…" : "Save name"}
             </Button>
             <GhostLink type="button" onClick={skip} disabled={loading}>
-              SKIP FOR NOW
+              SKIP
             </GhostLink>
           </div>
         </form>

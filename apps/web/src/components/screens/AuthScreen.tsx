@@ -269,7 +269,7 @@ export function AuthScreen({
   if (setPasswordMode) {
     return (
       <AuthLayout
-        brand={<BrandColumn caption="ONE PUZZLE · EVERY DAY" />}
+        brand={<BrandColumn caption="DAILY LOGIC PUZZLE" />}
         form={
           <form onSubmit={handleSetPassword} style={{ display: "flex", flexDirection: "column", gap: 22 }}>
             <div style={KICKER}>ACCOUNT · SET PASSWORD</div>
@@ -359,7 +359,7 @@ export function AuthScreen({
   if (sent) {
     return (
       <AuthLayout
-        brand={<BrandColumn caption="WAITING ON YOUR TAP" waiting />}
+        brand={<BrandColumn caption="CHECK YOUR EMAIL" waiting />}
         form={
           <>
             <div style={{ ...KICKER, color: "var(--accent-text)" }}>LINK SENT</div>
@@ -371,7 +371,7 @@ export function AuthScreen({
             </p>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 14, borderTop: "1px solid var(--hairline)", paddingTop: 18, marginTop: 8 }}>
               <GhostLink onClick={() => setSent(false)}>USE A DIFFERENT EMAIL</GhostLink>
-              <GhostLink onClick={() => router.push("/play")}>PLAY NOW, SIGN IN LATER →</GhostLink>
+              <GhostLink onClick={() => router.push("/play")}>PLAY WITHOUT AN ACCOUNT →</GhostLink>
             </div>
           </>
         }
@@ -382,7 +382,7 @@ export function AuthScreen({
   // State C — expired/invalid link (initialError). State A otherwise.
   return (
     <AuthLayout
-      brand={<BrandColumn caption="ONE PUZZLE · EVERY DAY" />}
+      brand={<BrandColumn caption="DAILY LOGIC PUZZLE" />}
       form={
         <form onSubmit={mode === "magic" ? handleMagicLink : handlePasswordAuth} style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           {initialError && (
@@ -456,7 +456,7 @@ export function AuthScreen({
             </GhostLink>
           )}
           <div style={{ borderTop: "1px solid var(--hairline)", paddingTop: 18, marginTop: 4 }}>
-            <GhostLink onClick={() => router.push("/play")}>PLAY NOW, SIGN IN LATER →</GhostLink>
+            <GhostLink onClick={() => router.push("/play")}>PLAY WITHOUT AN ACCOUNT →</GhostLink>
           </div>
         </form>
       }

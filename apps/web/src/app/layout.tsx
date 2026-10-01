@@ -31,7 +31,7 @@ const splineSansMono = Spline_Sans_Mono({
 
 export const metadata: Metadata = {
   title: "Halve",
-  description: "A premium daily logic puzzle. Fill the grid. Find the balance.",
+  description: "A daily logic puzzle with discs, rings and one solution to find by deduction.",
 };
 
 export default function RootLayout({
