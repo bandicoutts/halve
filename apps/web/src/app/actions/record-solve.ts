@@ -49,16 +49,15 @@ export async function recordSolve(input: RecordSolveInput): Promise<RecordSolveR
 
   if (!puzzle) return { ok: false };
 
-  // Reject solves for puzzles dated in the future. Future puzzles are readable
-  // (RLS allows select), so without this a client could pull tomorrow's solution
-  // from grid_spec and pre-record a solve to inflate streaks.
   const todayUtc = new Date().toISOString().slice(0, 10);
-  if (!puzzle.date || puzzle.date > todayUtc) return { ok: false };
-
-  // Clamp localDate to ±1 day of server UTC — same window resolveLocalToday uses
-  // for the tz_date cookie. Prevents a client from shaping its streak day by
-  // submitting an arbitrary date (e.g. backdating to fill a streak gap).
   const validatedLocalDate = resolveLocalToday(localDate, todayUtc);
+
+  // The daily puzzle follows the player's validated local calendar day, which
+  // can be one day ahead of UTC. Reject only puzzles beyond that day; comparing
+  // directly to UTC incorrectly blocks players east of UTC after local midnight.
+  // resolveLocalToday clamps the client date to ±1 day, so an arbitrary date
+  // cannot move this boundary further ahead or backfill an older streak day.
+  if (!puzzle.date || puzzle.date > validatedLocalDate) return { ok: false };
 
   const spec = parseGridSpec(puzzle.grid_spec);
   if (!spec) return { ok: false };

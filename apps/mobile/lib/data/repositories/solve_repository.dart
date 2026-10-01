@@ -12,10 +12,10 @@ class SolveRepository {
   final SupabaseClient _client;
 
   /// Record a completed solve. The RPC validates grid == solution, rejects
-  /// future/dateless puzzles, and clamps `local_date` ±1 day. An already-solved
-  /// puzzle returns `ok:true, alreadySolved:true` (idempotent). A transport
-  /// failure becomes [RecordSolveResult.networkFailure] so the Win screen can
-  /// offer a retry.
+  /// puzzles beyond the validated local date, and clamps `local_date` ±1 day.
+  /// An already-solved puzzle returns `ok:true, alreadySolved:true`
+  /// (idempotent). A transport failure becomes
+  /// [RecordSolveResult.networkFailure] so the Win screen can offer a retry.
   Future<RecordSolveResult> recordSolve({
     required String puzzleId,
     required Grid grid,
@@ -49,14 +49,13 @@ class SolveRepository {
     required int durationMs,
     required bool usedHint,
     required String localDate,
-  }) =>
-      {
-        'p_puzzle_id': puzzleId,
-        'p_grid': grid,
-        'p_duration_ms': durationMs,
-        'p_used_hint': usedHint,
-        'p_local_date': localDate,
-      };
+  }) => {
+    'p_puzzle_id': puzzleId,
+    'p_grid': grid,
+    'p_duration_ms': durationMs,
+    'p_used_hint': usedHint,
+    'p_local_date': localDate,
+  };
 
   /// All of the user's solves, oldest first — the basis for streaks, stats, and
   /// archive intersection. RLS restricts rows to the caller.

@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { recordSolve } from "./record-solve";
 
 // next/headers is imported at module level by local-date.ts; stub it so the
@@ -86,6 +86,10 @@ beforeEach(() => {
   insertCallCount = 0;
 });
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe("recordSolve", () => {
   it("returns ok:false when user is unauthenticated", async () => {
     mockUser = null;
@@ -113,9 +117,33 @@ describe("recordSolve", () => {
     expect(await recordSolve(BASE_INPUT)).toEqual({ ok: false });
   });
 
-  it("returns ok:false when puzzle date is in the future", async () => {
-    mockPuzzleData = { ...VALID_PUZZLE, date: "2099-12-31" };
-    expect(await recordSolve(BASE_INPUT)).toEqual({ ok: false });
+  it("accepts a puzzle on the validated local date when UTC is still the previous day", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-01T11:00:00.000Z"));
+    mockPuzzleData = { ...VALID_PUZZLE, date: "2026-10-02" };
+
+    const result = await recordSolve({ ...BASE_INPUT, localDate: "2026-10-02" });
+
+    expect(result).toMatchObject({ ok: true, alreadySolved: false });
+    expect(insertCallCount).toBe(1);
+  });
+
+  it("returns ok:false when puzzle is later than the validated local date", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-01T11:00:00.000Z"));
+    mockPuzzleData = { ...VALID_PUZZLE, date: "2026-10-03" };
+
+    expect(await recordSolve({ ...BASE_INPUT, localDate: "2026-10-02" })).toEqual({ ok: false });
+    expect(insertCallCount).toBe(0);
+  });
+
+  it("does not let an out-of-range client date extend the future puzzle boundary", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-01T11:00:00.000Z"));
+    mockPuzzleData = { ...VALID_PUZZLE, date: "2026-10-03" };
+
+    expect(await recordSolve({ ...BASE_INPUT, localDate: "2026-10-03" })).toEqual({ ok: false });
+    expect(insertCallCount).toBe(0);
   });
 
   it("returns ok:false when grid has a wrong cell", async () => {
