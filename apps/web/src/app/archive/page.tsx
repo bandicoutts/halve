@@ -3,11 +3,13 @@ import { ArchiveScreen } from "@/components/screens/ArchiveScreen";
 import type { ArchiveDayEntry, ArchiveMonth } from "@/components/screens/ArchiveScreen";
 import { getLocalToday } from "@/lib/local-date.server";
 import { getPublicPuzzleArchive } from "@/lib/puzzle-data.server";
+import { measureServer, startServerTimer } from "@/lib/perf.server";
 
 // revalidate is omitted: cookies()/getUser() force dynamic rendering anyway.
 
 export default async function ArchivePage() {
-  const today = await getLocalToday();
+  const elapsedRouteMs = startServerTimer();
+  const today = await measureServer("/archive", "local-date", () => getLocalToday());
 
   const months: ArchiveMonth[] = [];
   let initialId: string | undefined;
@@ -15,15 +17,15 @@ export default async function ArchivePage() {
   let displayName: string | undefined;
 
   try {
-    const supabase = await createClient();
+    const supabase = await measureServer("/archive", "create-supabase-client", () => createClient());
     const [
       {
         data: { user },
       },
       puzzles,
     ] = await Promise.all([
-      supabase.auth.getUser(),
-      getPublicPuzzleArchive(today),
+      measureServer("/archive", "auth.getUser", () => supabase.auth.getUser()),
+      measureServer("/archive", "public-archive-cache", () => getPublicPuzzleArchive(today)),
     ]);
 
     isAuthenticated = !!user;
@@ -39,16 +41,16 @@ export default async function ArchivePage() {
       // which silently breaks past ~200 puzzles (PostgREST/proxy URL limits).
       // RLS already restricts rows to this user; we intersect in memory below.
       const [{ data: profile }, { data: solves }] = await Promise.all([
-        supabase
+        measureServer("/archive", "profile-query", () => supabase
           .from("profiles")
           .select("display_name")
           .eq("id", user.id)
-          .maybeSingle(),
+          .maybeSingle()),
         rows.length > 0
-          ? supabase
+          ? measureServer("/archive", "solves-query", () => supabase
               .from("solves")
               .select("puzzle_id, duration_ms")
-              .eq("user_id", user.id)
+              .eq("user_id", user.id))
           : Promise.resolve({ data: null }),
       ]);
       displayName = profile?.display_name ?? user.email ?? undefined;
@@ -102,6 +104,8 @@ export default async function ArchivePage() {
   } catch {
     // DB unavailable — render empty state
   }
+
+  console.info("[perf]", JSON.stringify({ route: "/archive", operation: "server-page-work", durationMs: elapsedRouteMs(), outcome: "ok" }));
 
   return (
     <ArchiveScreen

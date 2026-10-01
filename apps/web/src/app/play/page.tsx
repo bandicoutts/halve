@@ -6,24 +6,26 @@ import { getLocalToday } from "@/lib/local-date.server";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { BoardScreen } from "@/components/board/BoardScreen";
 import { DailyUnavailable } from "@/components/screens/DailyUnavailable";
+import { measureServer, startServerTimer } from "@/lib/perf.server";
 
 // revalidate is omitted: cookies()/getUser() force dynamic rendering anyway,
 // so the value had no effect.
 
 export default async function PlayPage() {
+  const elapsedRouteMs = startServerTimer();
   // Gate by the user's local day (same source as streaks) so the served puzzle's
   // date matches the streak's "today" near the UTC midnight boundary (EPIC-B).
-  const today = await getLocalToday();
+  const today = await measureServer("/play", "local-date", () => getLocalToday());
 
   let puzzleId: string | undefined;
   let puzzle: ReturnType<typeof generateDaily>["puzzle"] | undefined;
   let initialSolveDurationMs: number | undefined;
 
   try {
-    const supabase = await createClient();
+    const supabase = await measureServer("/play", "create-supabase-client", () => createClient());
     const [data, { data: { user } }] = await Promise.all([
-      getPublicPuzzleByDate(today),
-      supabase.auth.getUser(),
+      measureServer("/play", "public-puzzle-cache", () => getPublicPuzzleByDate(today)),
+      measureServer("/play", "auth.getUser", () => supabase.auth.getUser()),
     ]);
 
     if (data) {
@@ -45,18 +47,21 @@ export default async function PlayPage() {
     // instead of a fresh playable board (was always fresh, regardless of
     // solve history — see DECISIONS.md WEB-BOARD-REVIEW-1).
     if (puzzleId && user) {
-      const { data: solve } = await supabase
+      const currentPuzzleId = puzzleId;
+      const { data: solve } = await measureServer("/play", "today-solve-query", () => supabase
         .from("solves")
         .select("duration_ms")
         .eq("user_id", user.id)
-        .eq("puzzle_id", puzzleId)
-        .maybeSingle();
+        .eq("puzzle_id", currentPuzzleId)
+        .maybeSingle());
       if (solve) initialSolveDurationMs = solve.duration_ms ?? 0;
     }
   } catch (err) {
     // DB unavailable — serve the deterministic fallback below.
     console.error(`[daily-puzzle] DB unavailable serving ${today}:`, err);
   }
+
+  console.info("[perf]", JSON.stringify({ route: "/play", operation: "server-page-work", durationMs: elapsedRouteMs(), outcome: "ok" }));
 
   if (!puzzle) {
     // Deterministic offline fallback: the SAME seed+difficulty policy every other

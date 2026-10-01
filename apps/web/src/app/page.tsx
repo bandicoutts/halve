@@ -5,6 +5,7 @@ import { getLocalToday } from "@/lib/local-date.server";
 import { formatDateLabel } from "@/lib/local-date";
 import { HomeScreen } from "@/components/screens/HomeScreen";
 import { HomeUserContent } from "./_components/HomeUserContent";
+import { measureServer, startServerTimer } from "@/lib/perf.server";
 
 export default async function Home() {
   let fetchError = false;
@@ -16,20 +17,21 @@ export default async function Home() {
   let solveDurationMs: number | undefined;
   let displayName: string | undefined;
   let userId: string | undefined;
+  const elapsedRouteMs = startServerTimer();
 
   // Gate "today" by the user's local calendar day — the SAME source streaks use
   // (getLocalToday reads the tz_date cookie). Computed on the server and the hero
   // label is derived from it + passed as a prop, so the client never calls
   // `new Date()` at render (avoids the SSR/CSR hydration mismatch — NXT-1).
-  const today = await getLocalToday();
+  const today = await measureServer("/", "local-date", () => getLocalToday());
   const todayLabel = formatDateLabel(today);
 
   try {
-    const supabase = await createClient();
+    const supabase = await measureServer("/", "create-supabase-client", () => createClient());
 
     const [{ data: { user } }, todayPuzzle] = await Promise.all([
-      supabase.auth.getUser(),
-      getPublicPuzzleByDate(today),
+      measureServer("/", "auth.getUser", () => supabase.auth.getUser()),
+      measureServer("/", "public-puzzle-cache", () => getPublicPuzzleByDate(today)),
     ]);
 
     isAuthenticated = !!user;
@@ -43,15 +45,16 @@ export default async function Home() {
     // parallel batch instead of serially (NXT-3). The solve is keyed by puzzle_id
     // so it's timezone-agnostic; it drives the hero's solved-confirmation state.
     if (user) {
+      const currentPuzzleId = todayPuzzleId;
       const [{ data: profile }, solve] = await Promise.all([
-        supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
-        todayPuzzleId
-          ? supabase
+        measureServer("/", "profile-query", () => supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle()),
+        currentPuzzleId
+          ? measureServer("/", "today-solve-query", () => supabase
               .from("solves")
               .select("duration_ms")
               .eq("user_id", user.id)
-              .eq("puzzle_id", todayPuzzleId)
-              .maybeSingle()
+              .eq("puzzle_id", currentPuzzleId)
+              .maybeSingle())
           : Promise.resolve({ data: null }),
       ]);
       displayName = profile?.display_name ?? user.email ?? undefined;
@@ -63,6 +66,8 @@ export default async function Home() {
   } catch {
     fetchError = true;
   }
+
+  console.info("[perf]", JSON.stringify({ route: "/", operation: "server-page-work", durationMs: elapsedRouteMs(), outcome: fetchError ? "partial" : "ok" }));
 
   return (
     <HomeScreen

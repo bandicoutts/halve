@@ -6,6 +6,7 @@ import { isValidDate } from "@/lib/local-date";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { getPublicPuzzleByDate, getPublicPuzzleDayNumber } from "@/lib/puzzle-data.server";
 import { BoardScreen } from "@/components/board/BoardScreen";
+import { measureServer, startServerTimer } from "@/lib/perf.server";
 
 // revalidate is omitted: cookies()/getUser() in createClient() force dynamic
 // rendering anyway, so an ISR directive here would be silently ignored.
@@ -15,13 +16,14 @@ interface Props {
 }
 
 export default async function PlayDatePage({ params }: Props) {
+  const elapsedRouteMs = startServerTimer();
   const { date } = await params;
 
   if (!isValidDate(date)) redirect("/archive");
 
   // Gate the "future date" guard by the user's local day so a UTC+ user near
   // midnight can still open their local-today archive entry (EPIC-B).
-  const today = await getLocalToday();
+  const today = await measureServer("/play/[date]", "local-date", () => getLocalToday());
   if (date > today) redirect("/archive");
 
   // Fetch puzzle + day number; DB errors redirect to archive via the catch.
@@ -31,12 +33,12 @@ export default async function PlayDatePage({ params }: Props) {
   let initialSolveDurationMs: number | undefined;
 
   try {
-    const supabase = await createClient();
+    const supabase = await measureServer("/play/[date]", "create-supabase-client", () => createClient());
 
     const [data, count, { data: { user } }] = await Promise.all([
-      getPublicPuzzleByDate(date),
-      getPublicPuzzleDayNumber(date),
-      supabase.auth.getUser(),
+      measureServer("/play/[date]", "public-puzzle-cache", () => getPublicPuzzleByDate(date)),
+      measureServer("/play/[date]", "day-number-cache", () => getPublicPuzzleDayNumber(date)),
+      measureServer("/play/[date]", "auth.getUser", () => supabase.auth.getUser()),
     ]);
 
     puzzleRow = data;
@@ -46,17 +48,19 @@ export default async function PlayDatePage({ params }: Props) {
     // instead of a fresh playable board (was always fresh, regardless of
     // solve history — see DECISIONS.md WEB-BOARD-REVIEW-1).
     if (data && user) {
-      const { data: solve } = await supabase
+      const { data: solve } = await measureServer("/play/[date]", "solve-query", () => supabase
         .from("solves")
         .select("duration_ms")
         .eq("user_id", user.id)
         .eq("puzzle_id", data.id)
-        .maybeSingle();
+        .maybeSingle());
       if (solve) initialSolveDurationMs = solve.duration_ms ?? 0;
     }
   } catch {
     redirect("/archive");
   }
+
+  console.info("[perf]", JSON.stringify({ route: "/play/[date]", operation: "server-page-work", durationMs: elapsedRouteMs(), outcome: "ok" }));
 
   // No puzzle exists for this (valid, non-future) date → genuine 404, render the
   // branded not-found boundary rather than silently bouncing to /archive.

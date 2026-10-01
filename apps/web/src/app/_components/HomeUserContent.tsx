@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { solveDay } from "@/lib/local-date";
 import { computeStreak, computeLastDays, offsetDay } from "@/lib/streak";
+import { measureServer } from "@/lib/perf.server";
 
 function FlameIcon() {
   return (
@@ -97,14 +98,14 @@ interface Props {
 export async function HomeUserContent({ userId, today, solvedToday }: Props) {
   let band: { streak: number; last7: boolean[] } | null = null;
   try {
-    const supabase = await createClient();
+    const supabase = await measureServer("/", "streak-create-supabase-client", () => createClient());
 
-    const { data } = await supabase
+    const { data } = await measureServer("/", "streak-solves-query", () => supabase
       .from("solves")
       .select("solved_at, local_date")
       .eq("user_id", userId)
       .gte("local_date", offsetDay(today, -60))
-      .order("solved_at", { ascending: false });
+      .order("solved_at", { ascending: false }));
 
     const rows = data ?? [];
     const days = [...new Set(rows.map(solveDay))];
