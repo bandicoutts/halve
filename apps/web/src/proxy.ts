@@ -54,9 +54,6 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  /* Refresh session — keeps cookies fresh */
-  await supabase.auth.getUser();
-
   /* Handle /auth/callback (magic link / OAuth redirect) */
   const { pathname, searchParams } = request.nextUrl;
   if (pathname === "/auth/callback") {
