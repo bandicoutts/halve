@@ -208,12 +208,14 @@ export function BoardScreen({
   }, [canUndo, solved, undo]);
 
   const handleSecondary = useCallback(() => {
-    if (kind === "daily") router.push("/stats");
+    if (kind === "daily") router.push("/");
     else if (kind === "archive") router.push(backHref);
     // Practice "Another puzzle" — start a fresh puzzle of the SAME difficulty
     // (a new random slot forces a distinct URL, so a new puzzle is fetched).
     else router.push(`/practice/play?difficulty=${puzzle.difficulty}&r=${freshPracticeSlot()}`);
   }, [kind, router, backHref, puzzle.difficulty]);
+
+  const handleStats = useCallback(() => router.push("/stats"), [router]);
 
   const placed = cells.reduce((n, row) => n + row.filter((v) => v !== null).length, 0);
   const total = puzzle.size * puzzle.size;
@@ -522,6 +524,7 @@ export function BoardScreen({
           onRetrySave={() => void recordAndFetch()}
           onClose={() => router.push(backHref)}
           onSecondary={handleSecondary}
+          onTertiary={kind === "daily" ? handleStats : undefined}
         />
       )}
     </div>

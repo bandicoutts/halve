@@ -48,6 +48,7 @@ export interface WinScreenProps {
   onRetrySave?: (() => void) | undefined;
   onClose: () => void;
   onSecondary: () => void;
+  onTertiary?: (() => void) | undefined;
 }
 
 export function WinScreen({
@@ -64,6 +65,7 @@ export function WinScreen({
   onRetrySave,
   onClose,
   onSecondary,
+  onTertiary,
 }: WinScreenProps) {
   // The win screen is a full-screen overlay: trap focus while shown, restore on close.
   const dialogRef = useFocusTrap<HTMLDivElement>(true, onClose);
@@ -89,7 +91,8 @@ export function WinScreen({
       : `${cap(difficulty)}${displayDate ? ` · ${displayDate}` : ""}${streak ? ` · ${streak}-day streak` : ""}`;
 
   const secondaryLabel =
-    kind === "daily" ? "See your stats" : kind === "archive" ? "Back to archive" : "Another puzzle";
+    kind === "daily" ? "Back to home" : kind === "archive" ? "Back to archive" : "Another puzzle";
+  const closeLabel = kind === "daily" ? "HOME" : kind === "archive" ? "ARCHIVE" : "PRACTICE";
 
   const cardNo = dayNo !== undefined ? `NO. ${dayNo}` : kind === "practice" ? "PRACTICE" : "";
 
@@ -151,7 +154,7 @@ export function WinScreen({
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <ThemeGlyph />
-          <GhostLink onClick={onClose}>CLOSE</GhostLink>
+          <GhostLink onClick={onClose}>{closeLabel}</GhostLink>
         </div>
       </header>
 
@@ -237,6 +240,9 @@ export function WinScreen({
             <Button onClick={handleShare} disabled={sharing}>{sharing ? "Sharing…" : "Share result"}</Button>
             <Button variant="secondary" onClick={onSecondary}>{secondaryLabel}</Button>
           </div>
+          {kind === "daily" && onTertiary && (
+            <GhostLink onClick={onTertiary}>SEE YOUR STATS</GhostLink>
+          )}
 
           <p role="status" style={{ margin: 0, minHeight: "1.5em", fontSize: "var(--text-small)", color: "var(--fg-2)" }}>
             {shareMessage}
