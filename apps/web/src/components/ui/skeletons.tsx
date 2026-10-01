@@ -1,3 +1,4 @@
+import homeStyles from "@/components/screens/HomeScreen.module.css";
 import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
 
 // Redesigned loading skeletons — each mirrors the silhouette of its screen so
@@ -88,28 +89,22 @@ const SECTION = (extra?: React.CSSProperties): React.CSSProperties => ({
 export function SkeletonHome() {
   return (
     <Shell srLabel="Loading today’s puzzle">
-      <div style={{ ...SECTION({ maxWidth: 1280, alignItems: "stretch", flexWrap: "wrap-reverse", justifyContent: "center" }) }}>
-        <div style={{ flex: "1 1 480px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 26, padding: "40px clamp(0px,4vw,48px) 40px 0", minWidth: 0 }}>
-          <Sk w={150} h={11} />
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <Sk w="min(440px,90%)" h={72} r={14} delay={0.12} />
-            <Sk w="min(340px,70%)" h={72} r={14} delay={0.24} />
+      <div className={homeStyles.hero}>
+        <div className={homeStyles.copy}>
+          <Sk w="75%" h="var(--text-label)" />
+          <div style={{ width: "100%", fontSize: "var(--text-hero)", lineHeight: "var(--leading-tight)" }}>
+            <Sk w="85%" h="0.85em" />
+            <Sk w="70%" h="0.85em" style={{ marginTop: "0.07em" }} />
           </div>
-          <Sk w="min(360px,80%)" h={14} r={7} delay={0.36} />
-          <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-            <Sk w={200} h={56} r={999} delay={0.48} />
-            <Sk w={90} h={11} delay={0.56} />
-            <Sk w={110} h={11} delay={0.64} />
-          </div>
-          <div style={{ display: "flex", gap: 7 }}>
-            {Array.from({ length: 7 }, (_, i) => (
-              <Sk key={i} w={11} h={11} r="50%" delay={i * 0.08} />
-            ))}
+          <Sk w="90%" h="3rem" />
+          <div className={homeStyles.actions}>
+            <Sk w="9rem" h="calc(var(--space-7) + var(--space-3))" r="var(--radius-full)" />
+            <Sk w="7rem" h="var(--text-label)" />
           </div>
         </div>
-        <div style={{ flex: "0 0 1px", alignSelf: "stretch", background: "var(--hairline)", margin: "48px 0" }} />
-        <div style={{ flex: "1 1 380px", display: "flex", alignItems: "center", justifyContent: "center", minWidth: 0 }}>
-          <Sk w="min(300px,60vw)" h="min(300px,60vw)" r="50%" delay={0.3} />
+        <div className={homeStyles.preview}>
+          <Sk w="100%" h="auto" style={{ aspectRatio: 1 }} />
+          <Sk w="70%" h="var(--text-label)" style={{ marginTop: "var(--space-5)" }} />
         </div>
       </div>
     </Shell>

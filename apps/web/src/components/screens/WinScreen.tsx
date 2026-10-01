@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { Mark } from "@/components/symbols/Mark";
 import { Disc } from "@/components/symbols/Disc";
@@ -8,6 +9,7 @@ import { ThemeGlyph } from "@/components/ui/SiteHeader";
 import { GhostLink } from "@/components/ui/GhostLink";
 import { Button } from "@/components/ui/Button";
 import { formatDateLabel } from "@/lib/local-date";
+import { shareResult } from "@/lib/share-result";
 
 function cap(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -65,6 +67,8 @@ export function WinScreen({
 }: WinScreenProps) {
   // The win screen is a full-screen overlay: trap focus while shown, restore on close.
   const dialogRef = useFocusTrap<HTMLDivElement>(true, onClose);
+  const [sharing, setSharing] = useState(false);
+  const [shareMessage, setShareMessage] = useState("");
 
   const displayDate = date ? formatDateLabel(date) : undefined;
 
@@ -89,17 +93,26 @@ export function WinScreen({
 
   const cardNo = dayNo !== undefined ? `NO. ${dayNo}` : kind === "practice" ? "PRACTICE" : "";
 
-  function handleShare() {
+  async function handleShare() {
+    if (sharing) return;
+    setSharing(true);
+    setShareMessage("");
     // Deliberately no solved-grid emoji (spoiler-free — see product decision):
     // share the result line only.
     const streakPart = kind !== "practice" && streak ? ` · streak ${streak}` : "";
     const idPart = kind !== "practice" && dayNo ? `No. ${dayNo} · ` : "";
     const text = `Halve ${idPart}${time} · ${cap(difficulty)}${streakPart}\nNo spoilers. Play at halve.today`;
-    if (navigator.share) {
-      navigator.share({ text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text).catch(() => {});
-    }
+    const outcome = await shareResult(text, {
+      share: navigator.share?.bind(navigator),
+      writeText: navigator.clipboard?.writeText.bind(navigator.clipboard),
+    });
+    setSharing(false);
+    setShareMessage({
+      shared: "Result shared.",
+      copied: "Result copied. Ready to paste.",
+      cancelled: "",
+      failed: "Couldn’t share your result. Please try again.",
+    }[outcome]);
   }
 
   return (
@@ -221,9 +234,13 @@ export function WinScreen({
           )}
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 6 }}>
-            <Button onClick={handleShare}>Share result</Button>
+            <Button onClick={handleShare} disabled={sharing}>{sharing ? "Sharing…" : "Share result"}</Button>
             <Button variant="secondary" onClick={onSecondary}>{secondaryLabel}</Button>
           </div>
+
+          <p role="status" style={{ margin: 0, minHeight: "1.5em", fontSize: "var(--text-small)", color: "var(--fg-2)" }}>
+            {shareMessage}
+          </p>
 
           {kind === "daily" && nextIn && (
             <div

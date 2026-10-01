@@ -1,14 +1,13 @@
 "use client";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Difficulty } from "@parity/engine";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { freshPracticeSlot } from "@/lib/practice-slot";
+import styles from "./PracticeScreen.module.css";
 
 interface Row {
   name: string;
   difficulty: Difficulty;
-  meta: string;
   desc: string;
 }
 
@@ -16,20 +15,17 @@ const ROWS: Row[] = [
   {
     name: "Easy",
     difficulty: "easy",
-    meta: "14 GIVENS · 4 LINKS",
-    desc: "More given cells and links. Good for learning the rules.",
+    desc: "More starting clues. Good for learning the rules.",
   },
   {
     name: "Medium",
     difficulty: "medium",
-    meta: "11 GIVENS · 5 LINKS",
     desc: "Fewer given cells. A steady solve.",
   },
   {
     name: "Hard",
     difficulty: "hard",
-    meta: "8 GIVENS · 7 LINKS",
-    desc: "Fewer given cells and more links. Take your time.",
+    desc: "More demanding deductions. Take your time.",
   },
 ];
 
@@ -40,7 +36,6 @@ interface PracticeScreenProps {
 
 export function PracticeScreen({ isAuthenticated, displayName }: PracticeScreenProps) {
   const router = useRouter();
-  const [hovered, setHovered] = useState<string | null>(null);
 
   // A fresh random slot each time so practice serves a different puzzle per play.
   const start = (d: Difficulty) =>
@@ -84,62 +79,17 @@ export function PracticeScreen({ isAuthenticated, displayName }: PracticeScreenP
           </p>
         </div>
 
-        <div style={{ borderBottom: "1px solid var(--hairline)" }}>
+        <div className={styles.choices}>
           {ROWS.map((row) => (
             <button
               key={row.name}
+              type="button"
               onClick={() => start(row.difficulty)}
-              onMouseEnter={() => setHovered(row.name)}
-              onMouseLeave={() => setHovered(null)}
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                gap: "14px 28px",
-                width: "100%",
-                padding: "clamp(22px, 4vw, 32px) clamp(6px, 1.5vw, 14px)",
-                border: "none",
-                borderTop: "1px solid var(--hairline)",
-                background: hovered === row.name ? "var(--hover)" : "transparent",
-                cursor: "pointer",
-                color: "inherit",
-                textAlign: "left",
-                fontFamily: "inherit",
-                transition: "background 0.2s ease",
-                WebkitTapHighlightColor: "transparent",
-              }}
+              className={styles.choice}
             >
-              <div style={{ flex: "0 1 190px", minWidth: 150, display: "flex", flexDirection: "column", gap: 8 }}>
-                <span
-                  style={{
-                    fontFamily: "var(--font-serif)",
-                    fontStyle: "italic",
-                    fontWeight: 500,
-                    fontSize: "clamp(30px, 4.4vw, 40px)",
-                    lineHeight: 1,
-                  }}
-                >
-                  {row.name}
-                </span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.16em", color: "var(--fg-3)" }}>
-                  {row.meta}
-                </span>
-              </div>
-              <p style={{ flex: "1 1 240px", margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--fg-3)", minWidth: 0 }}>
-                {row.desc}
-              </p>
-              <span
-                style={{
-                  flex: "none",
-                  marginLeft: "auto",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 12,
-                  letterSpacing: "0.16em",
-                  color: "var(--accent-text)",
-                }}
-              >
-                PLAY →
-              </span>
+              <span className={styles.name}>{row.name}</span>
+              <span className={styles.description}>{row.desc}</span>
+              <span className={styles.action} aria-hidden="true">PLAY <span>→</span></span>
             </button>
           ))}
         </div>

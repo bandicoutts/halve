@@ -5,19 +5,41 @@ import { SiteHeader } from "@/components/ui/SiteHeader";
 import { RulesModal } from "@/components/screens/RulesModal";
 import { GhostLink } from "@/components/ui/GhostLink";
 import { Button } from "@/components/ui/Button";
+import { formatDuration } from "@/lib/format";
+import styles from "./HomeScreen.module.css";
 
-// ─── Hero mark — the split circle that drifts apart and back ───────────────────
+// An illustrative board, independent of today's puzzle so it never reveals clues.
+const EXAMPLE = [
+  [0, 1, 1, 0, 0, 1],
+  [1, null, 1, 1, null, 0],
+  [null, 0, null, null, 1, null],
+  [0, null, 1, null, null, 1],
+  [null, 1, null, 0, null, null],
+  [1, null, 0, null, 1, 0],
+];
 
-function DriftMark() {
+function PuzzlePreview() {
   return (
-    <svg viewBox="0 0 200 200" style={{ width: "clamp(190px, 28vw, 380px)", overflow: "visible" }} aria-hidden="true">
-      <g style={{ animation: "driftL 5.5s ease-in-out infinite alternate" }}>
-        <path d="M96 5 A95 95 0 0 0 96 195 Z" style={{ fill: "var(--symbol-a)" }} />
-      </g>
-      <g style={{ animation: "driftR 5.5s ease-in-out infinite alternate" }}>
-        <path d="M104 5 A95 95 0 0 1 104 195 Z" style={{ fill: "var(--symbol-b)" }} />
-      </g>
-    </svg>
+    <figure className={styles.preview}>
+      <svg viewBox="0 0 360 360" role="img" aria-label="Example six by six puzzle with discs, rings and empty cells. The top row has three of each symbol." className={styles.board}>
+        <path d="M0 0H360V360H0Z M60 0V360 M120 0V360 M180 0V360 M240 0V360 M300 0V360 M0 60H360 M0 120H360 M0 180H360 M0 240H360 M0 300H360" fill="none" stroke="var(--hairline)" />
+        {EXAMPLE.flatMap((row, r) => row.map((value, c) => value === null ? null : (
+          value === 0
+            ? <circle key={`${r}-${c}`} cx={c * 60 + 30} cy={r * 60 + 30} r={14} fill="var(--symbol-a)" />
+            : <circle key={`${r}-${c}`} cx={c * 60 + 30} cy={r * 60 + 30} r={12} fill="none" stroke="var(--symbol-b)" strokeWidth={4} />
+        )))}
+        <g className={styles.edge}>
+          <rect x={110} y={20} width={20} height={20} rx={10} />
+          <text x={120} y={30}>=</text>
+          <rect x={260} y={170} width={20} height={20} rx={10} />
+          <text x={270} y={180}>≠</text>
+        </g>
+      </svg>
+      <figcaption className={styles.caption}>
+        <span className={styles.eyebrow}>An example board</span>
+        <span>Three discs. Three rings.<br />Every row and column.</span>
+      </figcaption>
+    </figure>
   );
 }
 
@@ -49,6 +71,7 @@ export function HomeScreen({
   isAuthenticated,
   displayName,
   solvedToday,
+  solveDurationMs,
   streakBand,
 }: HomeScreenProps) {
   const [showRules, setShowRules] = useState(false);
@@ -59,101 +82,39 @@ export function HomeScreen({
     .toUpperCase();
 
   return (
-    <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
+    <div className={styles.screen}>
       <SiteHeader isAuthenticated={isAuthenticated} displayName={displayName} />
-
-      <section
-        className="hv-split"
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          width: "100%",
-          padding: "0 clamp(20px, 4vw, 40px) 56px",
-          animation: "fadeup 0.5s var(--ease-editorial) both",
-        }}
-      >
-        {/* Left — the hero */}
-        <div
-          className="hv-split-main"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: 30,
-            padding: "40px 0",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 12,
-              letterSpacing: "0.22em",
-              color: "var(--fg-3)",
-            }}
-          >
-            {kicker}
-          </div>
-
-          <h1
-            style={{
-              fontFamily: "var(--font-serif)",
-              fontStyle: "italic",
-              fontWeight: 500,
-              fontSize: "var(--text-hero)",
-              lineHeight: 0.92,
-              margin: 0,
-              letterSpacing: "-0.02em",
-              textWrap: "balance",
-            }}
-          >
-            Today&rsquo;s
-            <br />
-            puzzle.
-          </h1>
-
+      <section className={styles.hero}>
+        <div className={styles.copy}>
+          <p className={styles.eyebrow}>{kicker}</p>
+          <h1 className={styles.title}>Today&rsquo;s<br />puzzle.</h1>
           {fetchError ? (
             <>
-              <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "36ch" }}>
-                Today&rsquo;s puzzle is unavailable. Try again shortly.
-              </p>
-              <div>
-                <Button onClick={() => window.location.reload()}>Try again</Button>
-              </div>
+              <p className={styles.description}>Today&rsquo;s puzzle is unavailable. Try again shortly.</p>
+              <div><Button onClick={() => window.location.reload()}>Try again</Button></div>
             </>
           ) : (
             <>
-              <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--fg-3)", maxWidth: "36ch" }}>
+              <p className={styles.description}>
                 Six by six. Every row and column, half and half. One solution, no guessing.
               </p>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "12px 20px", flexWrap: "wrap" }}>
+              {solvedToday && (
+                <p className={styles.solved}>
+                  {solveDurationMs !== undefined
+                    ? <>Solved today in <span className="tnum">{formatDuration(solveDurationMs)}</span>.</>
+                    : "Today’s puzzle is complete."}
+                </p>
+              )}
+              <div className={styles.actions}>
                 <Button href="/play">{solvedToday ? "Review your solve" : "Play today"}</Button>
                 <GhostLink onClick={() => setShowRules(true)}>HOW TO PLAY</GhostLink>
               </div>
-
-              {/* Streak band — streamed in for authenticated users */}
               {streakBand}
             </>
           )}
         </div>
-
-        {/* Divider — only present in the two-column layout (see .hv-split) */}
-        <div className="hv-split-rule" />
-
-        {/* Right — the drifting mark */}
-        <div
-          className="hv-split-aside"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "clamp(24px, 4vw, 56px)",
-          }}
-        >
-          <DriftMark />
-        </div>
+        <PuzzlePreview />
       </section>
-
       <RulesModal open={showRules} onClose={() => setShowRules(false)} />
     </div>
   );

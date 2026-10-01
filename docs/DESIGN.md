@@ -51,6 +51,7 @@ The shipped app settled on **text-first controls**, not an icon set: close/undo/
 ## Layout & motion
 - 8pt spacing system; generous whitespace.
 - The **6×6 puzzle grid is the hero** of every game screen. `=`/`≠` signs sit on the edges between cells.
+- Home pairs the daily entry with a static, labelled example board, independent of the daily puzzle. On narrow screens the title and play action come first; on desktop they sit beside the board. See `TASTE-REDESIGN-2026-10-01.md` for the audit and verification.
 - Use asymmetry where it earns attention.
 - Motion is tactile and confirming, never decorative: cell tap cycles empty → A → B → empty; a satisfying solve animation; subtle haptics on mobile; restrained transitions.
 
