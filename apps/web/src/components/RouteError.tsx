@@ -32,7 +32,7 @@ export function RouteError({
   useEffect(() => {
     // Surface for monitoring; in prod the message is already redacted by Next.
     console.error(`[error-boundary${tag ? `/${tag}` : ""}]`, error);
-  }, [error]);
+  }, [error, tag]);
 
   const retry = unstable_retry ?? reset;
 

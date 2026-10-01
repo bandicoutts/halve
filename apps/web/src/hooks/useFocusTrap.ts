@@ -18,7 +18,9 @@ export function useFocusTrap<T extends HTMLElement>(
   const ref = useRef<T>(null);
   // Keep the latest onEscape without re-running the effect (and re-stealing focus).
   const onEscapeRef = useRef(onEscape);
-  onEscapeRef.current = onEscape;
+  useEffect(() => {
+    onEscapeRef.current = onEscape;
+  }, [onEscape]);
 
   useEffect(() => {
     if (!active) return;

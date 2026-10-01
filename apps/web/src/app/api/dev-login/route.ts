@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
   }
 
   // 3. Persist the session as cookies on a redirect response.
-  let response = NextResponse.redirect(new URL("/", request.url), { status: 303 });
+  const response = NextResponse.redirect(new URL("/", request.url), { status: 303 });
   const supabase = createServerClient(url, anonKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),

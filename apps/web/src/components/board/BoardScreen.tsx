@@ -156,7 +156,7 @@ export function BoardScreen({
       );
       return () => clearTimeout(t);
     }
-  }, [solved, showWin, alreadySolved, initialSolveDurationMs]);
+  }, [solved, showWin, alreadySolved, initialSolveDurationMs, getFormatted]);
 
   // Record solve once when solved. solveRecorded guards against re-entry.
   useEffect(() => {

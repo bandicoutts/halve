@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Counts elapsed whole seconds while `active`.
@@ -34,8 +34,8 @@ export function useTimer(active: boolean, live = false) {
     };
   }, [active, live]);
 
-  const getFormatted = () =>
-    `${Math.floor(secsRef.current / 60)}:${String(secsRef.current % 60).padStart(2, "0")}`;
+  const getFormatted = useCallback(() =>
+    `${Math.floor(secsRef.current / 60)}:${String(secsRef.current % 60).padStart(2, "0")}`, []);
 
   return { secsRef, getFormatted };
 }

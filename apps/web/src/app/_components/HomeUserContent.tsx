@@ -95,6 +95,7 @@ interface Props {
 }
 
 export async function HomeUserContent({ userId, today, solvedToday }: Props) {
+  let band: { streak: number; last7: boolean[] } | null = null;
   try {
     const supabase = await createClient();
 
@@ -110,9 +111,9 @@ export async function HomeUserContent({ userId, today, solvedToday }: Props) {
     const streak = computeStreak(days, today);
     if (streak <= 0) return null;
 
-    const last7 = computeLastDays(days, today, 7);
-    return <StreakBand streak={streak} last7={last7} solvedToday={solvedToday} />;
+    band = { streak, last7: computeLastDays(days, today, 7) };
   } catch {
     return null;
   }
+  return band ? <StreakBand streak={band.streak} last7={band.last7} solvedToday={solvedToday} /> : null;
 }
