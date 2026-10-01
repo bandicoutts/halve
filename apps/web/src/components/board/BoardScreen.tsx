@@ -94,6 +94,8 @@ export interface BoardScreenProps {
   /** Duration (ms) of an existing solve for this puzzle by the signed-in user —
    *  when set, the board mounts already solved (review mode) instead of playable. */
   initialSolveDurationMs?: number | undefined;
+  /** Whether an existing solve used a hint, for honest review-time context. */
+  initialSolveUsedHint?: boolean | undefined;
 }
 
 export function BoardScreen({
@@ -105,6 +107,7 @@ export function BoardScreen({
   backHref = "/",
   isOffline,
   initialSolveDurationMs,
+  initialSolveUsedHint = false,
 }: BoardScreenProps) {
   const alreadySolved = initialSolveDurationMs !== undefined;
   const router = useRouter();
@@ -217,6 +220,13 @@ export function BoardScreen({
 
   const handleStats = useCallback(() => router.push("/stats"), [router]);
 
+  const handleClose = useCallback(() => {
+    router.push(backHref);
+    // Revalidate once the destination is active. Refreshing synchronously here
+    // can refresh the board route before the client navigation has completed.
+    requestAnimationFrame(() => router.refresh());
+  }, [router, backHref]);
+
   const placed = cells.reduce((n, row) => n + row.filter((v) => v !== null).length, 0);
   const total = puzzle.size * puzzle.size;
 
@@ -243,7 +253,12 @@ export function BoardScreen({
         {liveMessage}
       </div>
 
-      <SiteHeader hideAuth interceptHref={interceptHref} />
+      <SiteHeader
+        focused
+        backHref={backHref}
+        backLabel={kind === "archive" ? "Back to archive" : kind === "practice" ? "Back to practice" : "Back"}
+        interceptHref={interceptHref}
+      />
 
       <h1 style={srOnly}>{`${puzzle.difficulty} puzzle`}</h1>
 
@@ -518,11 +533,12 @@ export function BoardScreen({
           dayNo={dayNo}
           date={date}
           difficulty={puzzle.difficulty}
+          usedHint={alreadySolved ? initialSolveUsedHint : usedHint}
           streak={streakData?.streak}
           nextIn={streakData?.nextIn}
           saveError={saveError}
           onRetrySave={() => void recordAndFetch()}
-          onClose={() => router.push(backHref)}
+          onClose={handleClose}
           onSecondary={handleSecondary}
           onTertiary={kind === "daily" ? handleStats : undefined}
         />

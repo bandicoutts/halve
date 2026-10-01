@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/local_date.dart';
-import '../../providers/providers.dart';
 import '../../theme/app_layout.dart';
 import '../../theme/app_radii.dart';
 import '../../theme/app_spacing.dart';
@@ -383,68 +382,6 @@ class _StatDivided extends StatelessWidget {
   }
 }
 
-// ─── Sign-out icon ────────────────────────────────────────────────────────────
-
-class _SignOutIcon extends StatelessWidget {
-  const _SignOutIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(17, 17),
-      painter: _SignOutPainter(color: context.halveColors.fg2),
-    );
-  }
-}
-
-class _SignOutPainter extends CustomPainter {
-  _SignOutPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.scale(size.width / 24, size.height / 24);
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.75
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..isAntiAlias = true;
-
-    // Door frame: M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4
-    final door = Path()
-      ..moveTo(9, 21)
-      ..lineTo(5, 21)
-      ..arcToPoint(
-        const Offset(3, 19),
-        radius: const Radius.circular(2),
-        clockwise: false,
-      )
-      ..lineTo(3, 5)
-      ..arcToPoint(
-        const Offset(5, 3),
-        radius: const Radius.circular(2),
-        clockwise: false,
-      )
-      ..lineTo(9, 3);
-    canvas.drawPath(door, paint);
-
-    // Arrow
-    final arrow = Path()
-      ..moveTo(16, 17)
-      ..lineTo(21, 12)
-      ..lineTo(16, 7);
-    canvas.drawPath(arrow, paint);
-
-    // Shaft
-    canvas.drawLine(const Offset(21, 12), const Offset(9, 12), paint);
-  }
-
-  @override
-  bool shouldRepaint(_SignOutPainter old) => old.color != color;
-}
-
 // ─── Since-date formatter ─────────────────────────────────────────────────────
 
 String _fmtSince(String? iso) {
@@ -580,10 +517,17 @@ class _StatsRecord extends ConsumerWidget {
           // Solve-time chart
           const SizedBox(height: 28),
           _Eyebrow(
-            'Solve times',
+            'Solve times · without hints',
             trailing: Text(
               'avg ${stats.averageMs != null ? formatMs(stats.averageMs!) : '-'}',
               style: AppTypography.monoMicro.copyWith(color: c.fg3),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.s1),
+            child: Text(
+              '${stats.timedSolves} timed ${stats.timedSolves == 1 ? 'solve' : 'solves'}${stats.hintedSolves > 0 ? ' · ${stats.hintedSolves} with hints excluded' : ''}',
+              style: AppTypography.small.copyWith(color: c.fg3),
             ),
           ),
           const SizedBox(height: 14),
@@ -600,35 +544,19 @@ class _StatsRecord extends ConsumerWidget {
                 value: stats.averageMs != null
                     ? formatMs(stats.averageMs!)
                     : '-',
-                label: 'Average',
+                label: 'Average · no hints',
                 accent: false,
               ),
               (
                 value: stats.fastestMs != null
                     ? formatMs(stats.fastestMs!)
                     : '-',
-                label: 'Best time',
+                label: 'Best · no hints',
                 accent: false,
               ),
             ],
           ),
         ],
-
-        // Sign out
-        const SizedBox(height: AppSpacing.s6),
-        Center(
-          child: HalveButton(
-            label: 'Sign out',
-            variant: HalveButtonVariant.secondary,
-            leadingIcon: const _SignOutIcon(),
-            onPressed: () async {
-              final repo = ref.read(authRepositoryProvider);
-              await repo.signOut();
-              if (context.mounted) context.go('/');
-            },
-          ),
-        ),
-        const SizedBox(height: AppSpacing.s4),
       ],
     );
   }

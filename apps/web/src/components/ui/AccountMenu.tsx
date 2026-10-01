@@ -21,7 +21,7 @@ const menuItemBase: React.CSSProperties = {
 };
 
 /**
- * Shared "signed in / Statistics / Sign out" block — rendered by both the
+ * Shared signed-in account actions — rendered by both the
  * desktop popover (below) and SiteHeader's mobile sheet. `itemStyle` lets
  * each context keep its own touch-target sizing (the mobile sheet needs a
  * 44px-tall row; the desktop popover doesn't).
@@ -68,23 +68,6 @@ export function SignedInMenuItems({
       </div>
 
       <div style={{ height: 1, background: "var(--hairline)", margin: "2px 6px 6px" }} />
-
-      <Link
-        href="/stats"
-        role="menuitem"
-        onClick={onClose}
-        style={{ ...itemStyle, color: "var(--fg-1)" }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = "var(--hover)";
-          e.currentTarget.style.color = "var(--accent-text)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "none";
-          e.currentTarget.style.color = "var(--fg-1)";
-        }}
-      >
-        STATISTICS
-      </Link>
 
       <Link
         href="/auth?mode=password"

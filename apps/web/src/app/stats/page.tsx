@@ -11,6 +11,8 @@ export interface UserStats {
   streak: number;
   longestStreak: number;
   totalSolved: number;
+  hintedSolves: number;
+  timedSolves: number;
   avgTimeSecs: number | null;
   bestTimeSecs: number | null;
   last14Days: boolean[];
@@ -42,13 +44,14 @@ export default async function StatsPage() {
       const today = await getLocalToday();
 
       const [{ data: solves }, { data: profile }] = await Promise.all([
-        supabase.from("solves").select("solved_at, duration_ms, local_date").eq("user_id", user.id).order("solved_at"),
+        supabase.from("solves").select("solved_at, duration_ms, local_date, used_hint").eq("user_id", user.id).order("solved_at"),
         supabase.from("profiles").select("display_name, created_at").eq("id", user.id).maybeSingle(),
       ]);
 
       const rows = solves ?? [];
       const days = [...new Set(rows.map(solveDay))];
-      const durations = rows.map((r) => r.duration_ms);
+      const unhintedRows = rows.filter((r) => !r.used_hint);
+      const durations = unhintedRows.map((r) => r.duration_ms);
       const avg = durations.length ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length / 1000) : null;
       const best = durations.length ? Math.round(Math.min(...durations) / 1000) : null;
 
@@ -63,6 +66,8 @@ export default async function StatsPage() {
         streak: computeStreak(days, today),
         longestStreak: computeLongestStreak(days),
         totalSolved: rows.length,
+        hintedSolves: rows.length - unhintedRows.length,
+        timedSolves: unhintedRows.length,
         avgTimeSecs: avg,
         bestTimeSecs: best,
         last14Days: computeLastDays(days, today, 14),

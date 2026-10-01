@@ -1,8 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/ui/SiteHeader";
-import { SignOutIcon } from "@/components/ui/icons";
 import { Button } from "@/components/ui/Button";
 import type { UserStats } from "@/app/stats/page";
 
@@ -47,15 +44,6 @@ function WeekDots({ days }: { days: boolean[] }) {
 // ─── Authenticated record ────────────────────────────────────────────────────
 
 function StatsRecord({ stats }: { stats: UserStats }) {
-  const router = useRouter();
-
-  async function handleSignOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut({ scope: "local" });
-    router.push("/");
-    router.refresh();
-  }
-
   const statCards = [
     { label: "BEST STREAK", value: String(stats.longestStreak) },
     { label: "SOLVED", value: String(stats.totalSolved) },
@@ -155,7 +143,7 @@ function StatsRecord({ stats }: { stats: UserStats }) {
                   {c.value}
                 </div>
                 <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em", color: "var(--fg-3)" }}>
-                  {c.label}
+            {c.label === "BEST TIME" ? "BEST · NO HINTS" : c.label === "AVG TIME" ? "AVG · NO HINTS" : c.label}
                 </div>
               </div>
             ))}
@@ -191,9 +179,14 @@ function StatsRecord({ stats }: { stats: UserStats }) {
           </div>
 
           <div style={{ flex: "1 1 320px", display: "flex", flexDirection: "column", gap: 18, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16 }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.2em", color: "var(--fg-3)" }}>SOLVE TIMES</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.14em", color: "var(--fg-3)" }}>AVG {fmtSecs(stats.avgTimeSecs)}</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16 }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.2em", color: "var(--fg-3)" }}>SOLVE TIMES · WITHOUT HINTS</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.14em", color: "var(--fg-3)" }}>AVG {fmtSecs(stats.avgTimeSecs)}</span>
+              </div>
+              <span style={{ fontSize: 13, color: "var(--fg-3)" }}>
+                {stats.timedSolves} timed {stats.timedSolves === 1 ? "solve" : "solves"}{stats.hintedSolves > 0 ? ` · ${stats.hintedSolves} with hints excluded` : ""}
+              </span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
               {stats.timeDist.map((count, i) => (
@@ -229,19 +222,12 @@ function StatsRecord({ stats }: { stats: UserStats }) {
                   paddingTop: 16,
                 }}
               >
-                Your fastest solve: {fmtSecs(stats.bestTimeSecs)}.
+                Your fastest solve without hints: {fmtSecs(stats.bestTimeSecs)}.
               </div>
             )}
           </div>
         </div>
 
-        {/* Sign out */}
-        <div style={{ display: "flex", justifyContent: "center", paddingTop: 8 }}>
-          <Button variant="secondary" size="sm" onClick={handleSignOut}>
-            <SignOutIcon size={16} />
-            SIGN OUT
-          </Button>
-        </div>
       </section>
     </div>
   );

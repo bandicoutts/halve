@@ -13,8 +13,12 @@ interface SiteHeaderProps {
   active?: NavKey | undefined;
   isAuthenticated?: boolean | undefined;
   displayName?: string | undefined;
-  /** Hide the sign-in / account control (e.g. on the focused Play screen). */
+  /** Hide the sign-in / account control while retaining primary navigation. */
   hideAuth?: boolean | undefined;
+  /** Render only the brand, contextual back action, and theme control. */
+  focused?: boolean | undefined;
+  backHref?: string | undefined;
+  backLabel?: string | undefined;
   /**
    * Optional navigation guard. Return `true` to block the default navigation
    * (e.g. the Play screen intercepts to confirm abandoning an in-progress
@@ -108,6 +112,9 @@ export function SiteHeader({
   isAuthenticated,
   displayName,
   hideAuth,
+  focused = false,
+  backHref,
+  backLabel = "Back",
   interceptHref,
 }: SiteHeaderProps) {
   const [hovered, setHovered] = useState<string | null>(null);
@@ -145,21 +152,32 @@ export function SiteHeader({
 
   return (
     <header style={HEADER_BAR}>
-      <Link
-        href="/"
-        onClick={go("/")}
-        aria-label="Halve home"
-        style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "var(--fg-1)" }}
-      >
-        <Mark size={21} />
-        <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: 22, letterSpacing: "-0.01em" }}>
-          Halve
-        </span>
-      </Link>
+      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        {focused && backHref && (
+          <Link href={backHref} onClick={go(backHref)} aria-label={backLabel} className="hv-tap44" style={{ ...MONO_LINK, display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span aria-hidden="true">←</span>{backLabel.toUpperCase()}
+          </Link>
+        )}
+        {focused ? (
+          <div role="img" aria-label="Halve" style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--fg-1)" }}>
+            <Mark size={21} />
+            <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: 22, letterSpacing: "-0.01em" }}>
+              Halve
+            </span>
+          </div>
+        ) : (
+          <Link href="/" onClick={go("/")} aria-label="Halve home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "var(--fg-1)" }}>
+            <Mark size={21} />
+            <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: 22, letterSpacing: "-0.01em" }}>
+              Halve
+            </span>
+          </Link>
+        )}
+      </div>
 
       <nav ref={navRef} style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 18 }}>
         {/* Desktop inline nav (≥560px) */}
-        <div className="hv-nav-desktop">
+        {!focused && <div className="hv-nav-desktop">
           {NAV.map(({ key, label, href }) => {
             const isHot = hovered === key || active === key;
             return (
@@ -190,12 +208,12 @@ export function SiteHeader({
                 Sign in
               </Link>
             ))}
-        </div>
+        </div>}
 
         <ThemeGlyph />
 
         {/* Hamburger (<560px) */}
-        <button
+        {!focused && <button
           ref={burgerRef}
           type="button"
           className="hv-nav-burger hv-tap44"
@@ -221,10 +239,10 @@ export function SiteHeader({
               </>
             )}
           </svg>
-        </button>
+        </button>}
 
         {/* Mobile dropdown menu */}
-        {menuOpen && (
+        {!focused && menuOpen && (
           <div
             role="menu"
             aria-label="Menu"

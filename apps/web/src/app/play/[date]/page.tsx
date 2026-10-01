@@ -31,6 +31,7 @@ export default async function PlayDatePage({ params }: Props) {
   let puzzleRow: { id: string; difficulty: string; grid_spec: unknown } | null = null;
   let dayNo: number | undefined;
   let initialSolveDurationMs: number | undefined;
+  let initialSolveUsedHint = false;
 
   try {
     const supabase = await measureServer("/play/[date]", "create-supabase-client", () => createClient());
@@ -50,11 +51,14 @@ export default async function PlayDatePage({ params }: Props) {
     if (data && user) {
       const { data: solve } = await measureServer("/play/[date]", "solve-query", () => supabase
         .from("solves")
-        .select("duration_ms")
+        .select("duration_ms, used_hint")
         .eq("user_id", user.id)
         .eq("puzzle_id", data.id)
         .maybeSingle());
-      if (solve) initialSolveDurationMs = solve.duration_ms ?? 0;
+      if (solve) {
+        initialSolveDurationMs = solve.duration_ms ?? 0;
+        initialSolveUsedHint = solve.used_hint;
+      }
     }
   } catch {
     redirect("/archive");
@@ -84,6 +88,7 @@ export default async function PlayDatePage({ params }: Props) {
       kind="archive"
       backHref="/archive"
       initialSolveDurationMs={initialSolveDurationMs}
+      initialSolveUsedHint={initialSolveUsedHint}
     />
   );
 }

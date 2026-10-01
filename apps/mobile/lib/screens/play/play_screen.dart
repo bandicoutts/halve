@@ -14,6 +14,12 @@ import '../../widgets/widgets.dart';
 import 'play_board.dart';
 import 'play_provider.dart';
 
+String _fallbackRouteForLoad(PlayLoad load) {
+  if (load.kind == PlayKind.practice) return Routes.practice;
+  if (load.kind == PlayKind.archive) return Routes.archive;
+  return Routes.home;
+}
+
 /// The play board (Phase 7) — a full-screen route that lives OUTSIDE the tab
 /// shell, so the bottom nav is simply absent here. Header is just back +
 /// difficulty. Loads the daily, an archive day ([date]), or a practice puzzle
@@ -49,7 +55,7 @@ class PlayScreen extends ConsumerWidget {
     return PopScope(
       canPop: context.canPop(),
       onPopInvokedWithResult: (bool didPop, _) {
-        if (!didPop) context.go(Routes.home);
+        if (!didPop) context.go(_fallbackRoute(args));
       },
       child: SafeScaffold(
         safeBottom: true,
@@ -57,12 +63,14 @@ class PlayScreen extends ConsumerWidget {
           data: (load) => _PlayView(load: load),
           loading: () => _ScaffoldedMessage(
             label: _fallbackLabel(args),
+            onBack: () => _goBack(context, args),
             child: const Expanded(
               child: Center(child: CircularProgressIndicator.adaptive()),
             ),
           ),
           error: (_, _) => _UnavailableView(
             label: _fallbackLabel(args),
+            onBack: () => _goBack(context, args),
             onReload: () => ref.invalidate(playLoadProvider(args)),
           ),
         ),
@@ -76,20 +84,39 @@ class PlayScreen extends ConsumerWidget {
     }
     return args.date == null ? 'Daily' : args.date!;
   }
+
+  String _fallbackRoute(PlayArgs args) {
+    if (args.isPractice) return Routes.practice;
+    if (args.date != null) return Routes.archive;
+    return Routes.home;
+  }
+
+  void _goBack(BuildContext context, PlayArgs args) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(_fallbackRoute(args));
+    }
+  }
 }
 
 /// A back-only top bar plus arbitrary body — used by the loading + error states.
 class _ScaffoldedMessage extends StatelessWidget {
-  const _ScaffoldedMessage({required this.label, required this.child});
+  const _ScaffoldedMessage({
+    required this.label,
+    required this.child,
+    this.onBack,
+  });
 
   final String label;
   final Widget child;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _PlayTopBar(label: label),
+        _PlayTopBar(label: label, onBack: onBack),
         child,
       ],
     );
@@ -97,16 +124,22 @@ class _ScaffoldedMessage extends StatelessWidget {
 }
 
 class _UnavailableView extends StatelessWidget {
-  const _UnavailableView({required this.label, required this.onReload});
+  const _UnavailableView({
+    required this.label,
+    required this.onReload,
+    this.onBack,
+  });
 
   final String label;
   final VoidCallback onReload;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
     final c = context.halveColors;
     return _ScaffoldedMessage(
       label: label,
+      onBack: onBack,
       child: Expanded(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s5),
@@ -430,7 +463,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
       if (context.canPop()) {
         context.pop();
       } else {
-        context.go(Routes.home);
+        context.go(_fallbackRouteForLoad(widget.load));
       }
       return;
     }
@@ -443,7 +476,7 @@ class _PlayViewState extends ConsumerState<_PlayView> {
     if (context.canPop()) {
       context.pop();
     } else {
-      context.go(Routes.home);
+      context.go(_fallbackRouteForLoad(widget.load));
     }
   }
 

@@ -20,6 +20,7 @@ export default async function PlayPage() {
   let puzzleId: string | undefined;
   let puzzle: ReturnType<typeof generateDaily>["puzzle"] | undefined;
   let initialSolveDurationMs: number | undefined;
+  let initialSolveUsedHint = false;
 
   try {
     const supabase = await measureServer("/play", "create-supabase-client", () => createClient());
@@ -50,11 +51,14 @@ export default async function PlayPage() {
       const currentPuzzleId = puzzleId;
       const { data: solve } = await measureServer("/play", "today-solve-query", () => supabase
         .from("solves")
-        .select("duration_ms")
+        .select("duration_ms, used_hint")
         .eq("user_id", user.id)
         .eq("puzzle_id", currentPuzzleId)
         .maybeSingle());
-      if (solve) initialSolveDurationMs = solve.duration_ms ?? 0;
+      if (solve) {
+        initialSolveDurationMs = solve.duration_ms ?? 0;
+        initialSolveUsedHint = solve.used_hint;
+      }
     }
   } catch (err) {
     // DB unavailable — serve the deterministic fallback below.
@@ -86,6 +90,7 @@ export default async function PlayPage() {
       backHref="/"
       isOffline={!puzzleId}
       initialSolveDurationMs={initialSolveDurationMs}
+      initialSolveUsedHint={initialSolveUsedHint}
     />
   );
 }

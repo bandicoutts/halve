@@ -14,6 +14,8 @@ class Stats {
     required this.longestStreak,
     required this.last14Days,
     required this.timeDist,
+    this.hintedSolves = 0,
+    this.timedSolves = 0,
     this.fastestMs,
     this.averageMs,
     this.since,
@@ -29,6 +31,8 @@ class Stats {
 
   /// 6-bucket solve-time histogram: [<2m, 2–3, 3–4, 4–5, 5–6, 6+m].
   final List<int> timeDist;
+  final int hintedSolves;
+  final int timedSolves;
 
   final int? fastestMs;
   final int? averageMs;
@@ -37,13 +41,13 @@ class Stats {
   final String? since;
 
   static Stats emptyFor(String today, {DateTime? createdAt}) => Stats(
-        totalSolved: 0,
-        currentStreak: 0,
-        longestStreak: 0,
-        last14Days: computeLastDays([], today, 14),
-        timeDist: [0, 0, 0, 0, 0, 0],
-        since: createdAt != null ? formatDay(createdAt) : null,
-      );
+    totalSolved: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+    last14Days: computeLastDays([], today, 14),
+    timeDist: [0, 0, 0, 0, 0, 0],
+    since: createdAt != null ? formatDay(createdAt) : null,
+  );
 
   static const empty = Stats(
     totalSolved: 0,
@@ -59,7 +63,11 @@ class Stats {
   /// Uses [computeStreak] / [computeLongestStreak] / [computeLastDays] from
   /// `streak.dart` (the web-mirroring functions) so the home streak band and
   /// the stats screen always agree.
-  static Stats fromSolves(List<SolveRow> solves, {required String today, DateTime? createdAt}) {
+  static Stats fromSolves(
+    List<SolveRow> solves, {
+    required String today,
+    DateTime? createdAt,
+  }) {
     if (solves.isEmpty) return emptyFor(today, createdAt: createdAt);
 
     // Extract the canonical local day for each solve (local_date preferred,
@@ -76,7 +84,9 @@ class Stats {
 
     // 6-bucket solve-time histogram (<2m, 2–3, 3–4, 4–5, 5–6, 6+m).
     final timeDist = [0, 0, 0, 0, 0, 0];
-    for (final s in solves) {
+    final timedSolves = solves.where((s) => !s.usedHint).toList();
+    final hintedSolves = solves.length - timedSolves.length;
+    for (final s in timedSolves) {
       final secs = s.durationMs ~/ 1000;
       if (secs < 120) {
         timeDist[0]++;
@@ -93,9 +103,13 @@ class Stats {
       }
     }
 
-    final durations = [for (final s in solves) s.durationMs];
-    final fastest = durations.reduce((a, b) => a < b ? a : b);
-    final average = (durations.reduce((a, b) => a + b) / durations.length).round();
+    final durations = [for (final s in timedSolves) s.durationMs];
+    final fastest = durations.isEmpty
+        ? null
+        : durations.reduce((a, b) => a < b ? a : b);
+    final average = durations.isEmpty
+        ? null
+        : (durations.reduce((a, b) => a + b) / durations.length).round();
 
     return Stats(
       totalSolved: solves.length,
@@ -103,6 +117,8 @@ class Stats {
       longestStreak: longestStreak,
       last14Days: last14Days,
       timeDist: timeDist,
+      hintedSolves: hintedSolves,
+      timedSolves: timedSolves.length,
       fastestMs: fastest,
       averageMs: average,
       since: since,

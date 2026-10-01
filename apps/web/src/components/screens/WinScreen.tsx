@@ -40,6 +40,7 @@ export interface WinScreenProps {
   dayNo?: number | undefined;
   date?: string | undefined;
   difficulty: string;
+  usedHint?: boolean | undefined;
   streak?: number | undefined;
   nextIn?: string | undefined;
   /** True when recording the solve failed — shows a retry prompt. */
@@ -59,6 +60,7 @@ export function WinScreen({
   dayNo,
   date,
   difficulty,
+  usedHint = false,
   streak,
   nextIn,
   saveError,
@@ -85,10 +87,10 @@ export function WinScreen({
 
   const metaLine =
     kind === "practice"
-      ? `${cap(difficulty)} · Practice · Streak unchanged`
+      ? `${cap(difficulty)} · Practice${usedHint ? " · Hints used" : ""} · Streak unchanged`
       : kind === "archive"
-      ? `${cap(difficulty)}${displayDate ? ` · ${displayDate}` : ""} · From the archive`
-      : `${cap(difficulty)}${displayDate ? ` · ${displayDate}` : ""}${streak ? ` · ${streak}-day streak` : ""}`;
+      ? `${cap(difficulty)}${displayDate ? ` · ${displayDate}` : ""} · From the archive${usedHint ? " · Hints used" : ""}`
+      : `${cap(difficulty)}${displayDate ? ` · ${displayDate}` : ""}${streak ? ` · ${streak}-day streak` : ""}${usedHint ? " · Hints used" : ""}`;
 
   const secondaryLabel =
     kind === "daily" ? "Back to home" : kind === "archive" ? "Back to archive" : "Another puzzle";
@@ -104,7 +106,8 @@ export function WinScreen({
     // share the result line only.
     const streakPart = kind !== "practice" && streak ? ` · streak ${streak}` : "";
     const idPart = kind !== "practice" && dayNo ? `No. ${dayNo} · ` : "";
-    const text = `Halve ${idPart}${time} · ${cap(difficulty)}${streakPart}\nNo spoilers. Play at halve.today`;
+    const hintPart = usedHint ? " · hints used" : "";
+    const text = `Halve ${idPart}${time} · ${cap(difficulty)}${streakPart}${hintPart}\nNo spoilers. Play at halve.today`;
     const outcome = await shareResult(text, {
       share: navigator.share?.bind(navigator),
       writeText: navigator.clipboard?.writeText.bind(navigator.clipboard),
