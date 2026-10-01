@@ -31,30 +31,31 @@ export default async function ArchivePage() {
     ]);
 
     isAuthenticated = !!user;
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("display_name")
-        .eq("id", user.id)
-        .maybeSingle();
-      displayName = profile?.display_name ?? user.email ?? undefined;
-    }
-
     const rows = puzzles ?? [];
 
     // Fetch solve data (puzzle_id + best duration) for the current user
     const solvedIds = new Set<string>();
     const solveTimeMap = new Map<string, number>();
 
-    if (user && rows.length > 0) {
+    if (user) {
       // Fetch all the user's solves rather than filtering by puzzle id. A
       // `.in("puzzle_id", ids)` filter encodes every UUID into the request URL,
       // which silently breaks past ~200 puzzles (PostgREST/proxy URL limits).
       // RLS already restricts rows to this user; we intersect in memory below.
-      const { data: solves } = await supabase
-        .from("solves")
-        .select("puzzle_id, duration_ms")
-        .eq("user_id", user.id);
+      const [{ data: profile }, { data: solves }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("id", user.id)
+          .maybeSingle(),
+        rows.length > 0
+          ? supabase
+              .from("solves")
+              .select("puzzle_id, duration_ms")
+              .eq("user_id", user.id)
+          : Promise.resolve({ data: null }),
+      ]);
+      displayName = profile?.display_name ?? user.email ?? undefined;
 
       for (const s of solves ?? []) {
         solvedIds.add(s.puzzle_id);
