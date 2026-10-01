@@ -5,7 +5,7 @@ import { MessageScreen } from "@/components/ui/MessageScreen";
 export default function NotFound() {
   return (
       <MessageScreen
-        mark="ring"
+        mark="soft"
         kicker="404 · NOT FOUND"
         headline="Page not found."
         body="We couldn’t find that page. The link may be wrong, or that puzzle may not be available yet."

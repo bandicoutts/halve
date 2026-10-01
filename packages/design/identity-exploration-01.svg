@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 930" role="img" aria-labelledby="title desc">
+  <title id="title">Halve symbol shape exploration</title>
+  <desc id="desc">Three early amber and teal symbol pair studies, shown separately and combined.</desc>
+  <defs>
+    <style>
+      .sans { font-family: 'Avenir Next', Avenir, sans-serif; }
+      .serif { font-family: Georgia, serif; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    </style>
+    <path id="left-piece" d="M50 9 A41 41 0 0 0 50 91 L50 63 C68 63 68 37 50 37 Z"/>
+    <path id="right-piece" d="M50 9 A41 41 0 0 1 50 91 L50 63 C68 63 68 37 50 37 Z"/>
+    <path id="crescent-left" d="M72 10 A42 42 0 1 0 72 90 C45 73 42 28 72 10 Z"/>
+    <path id="crescent-right" d="M28 10 A42 42 0 1 1 28 90 C55 73 58 28 28 10 Z"/>
+    <path id="petal" d="M50 5 C70 28 84 43 84 59 C84 78 69 93 50 93 C31 93 16 78 16 59 C16 43 30 28 50 5 Z"/>
+  </defs>
+
+  <rect width="1200" height="930" fill="#F5F0E6"/>
+  <text x="72" y="66" class="mono" font-size="14" font-weight="600" letter-spacing="2.2" fill="#6E6455">HALVE · EARLY SHAPE STUDIES · 01</text>
+  <text x="72" y="126" class="serif" font-size="46" fill="#211B14">Two pieces, one small surprise.</text>
+  <text x="72" y="164" class="sans" font-size="18" fill="#6E6455">Amber and teal stay. The question is whether the shapes can feel more like a pair.</text>
+
+  <!-- Study 1 -->
+  <rect x="72" y="208" width="1056" height="198" rx="18" fill="#FDFAF3" stroke="#D8CFC0"/>
+  <text x="100" y="246" class="mono" font-size="12" font-weight="700" letter-spacing="1.5" fill="#DE5F27">01 · FIT TOGETHER</text>
+  <text x="100" y="280" class="serif" font-size="26" fill="#211B14">A shared seam</text>
+  <text x="100" y="310" class="sans" font-size="14" fill="#6E6455">Two soft halves interlock to make</text>
+  <text x="100" y="330" class="sans" font-size="14" fill="#6E6455">one round mark.</text>
+  <g transform="translate(426 247) scale(1.08)"><use href="#left-piece" fill="#DE5F27"/></g>
+  <text x="480" y="374" text-anchor="middle" class="mono" font-size="10" letter-spacing="1.1" fill="#6E6455">AMBER</text>
+  <g transform="translate(542 247) scale(1.08)"><use href="#right-piece" fill="#1E8E83"/></g>
+  <text x="596" y="374" text-anchor="middle" class="mono" font-size="10" letter-spacing="1.1" fill="#6E6455">TEAL</text>
+  <path d="M654 306h48m-8-8 8 8-8 8" fill="none" stroke="#A89B88" stroke-width="1.5"/>
+  <g transform="translate(735 247) scale(1.08)"><use href="#left-piece" fill="#DE5F27"/><use href="#right-piece" fill="#1E8E83"/></g>
+  <text x="789" y="374" text-anchor="middle" class="mono" font-size="10" letter-spacing="1.1" fill="#6E6455">JOINED</text>
+  <text x="927" y="296" class="sans" font-size="13" fill="#6E6455">Board read</text>
+  <g transform="translate(927 309)">
+    <circle cx="18" cy="18" r="14" fill="#DE5F27"/><circle cx="58" cy="18" r="14" fill="#1E8E83"/>
+    <circle cx="98" cy="18" r="14" fill="#DE5F27"/><circle cx="138" cy="18" r="14" fill="#1E8E83"/>
+  </g>
+
+  <!-- Study 2 -->
+  <rect x="72" y="427" width="1056" height="198" rx="18" fill="#FDFAF3" stroke="#D8CFC0"/>
+  <text x="100" y="465" class="mono" font-size="12" font-weight="700" letter-spacing="1.5" fill="#DE5F27">02 · REVEAL A SPACE</text>
+  <text x="100" y="499" class="serif" font-size="26" fill="#211B14">A hidden almond</text>
+  <text x="100" y="529" class="sans" font-size="14" fill="#6E6455">Opposing crescents make a small</text>
+  <text x="100" y="549" class="sans" font-size="14" fill="#6E6455">eye-shaped space between them.</text>
+  <g transform="translate(428 465) scale(1.02)"><use href="#crescent-left" fill="#DE5F27"/></g>
+  <text x="480" y="592" text-anchor="middle" class="mono" font-size="10" letter-spacing="1.1" fill="#6E6455">AMBER</text>
+  <g transform="translate(544 465) scale(1.02)"><use href="#crescent-right" fill="#1E8E83"/></g>
+  <text x="596" y="592" text-anchor="middle" class="mono" font-size="10" letter-spacing="1.1" fill="#6E6455">TEAL</text>
+  <path d="M654 524h48m-8-8 8 8-8 8" fill="none" stroke="#A89B88" stroke-width="1.5"/>
+  <g transform="translate(735 465) scale(1.02)"><use href="#crescent-left" fill="#DE5F27"/><use href="#crescent-right" fill="#1E8E83" transform="translate(100 0) scale(-1 1)"/></g>
+  <text x="789" y="592" text-anchor="middle" class="mono" font-size="10" letter-spacing="1.1" fill="#6E6455">MEETING</text>
+  <text x="927" y="514" class="sans" font-size="13" fill="#6E6455">Board read</text>
+  <g transform="translate(927 527)">
+    <path d="M18 4a14 14 0 1 0 0 28c-9-5-9-19 0-28Z" fill="#DE5F27"/>
+    <path d="M58 4a14 14 0 1 1 0 28c9-5 9-19 0-28Z" fill="#1E8E83"/>
+    <path d="M98 4a14 14 0 1 0 0 28c-9-5-9-19 0-28Z" fill="#DE5F27"/>
+    <path d="M138 4a14 14 0 1 1 0 28c9-5 9-19 0-28Z" fill="#1E8E83"/>
+  </g>
+
+  <!-- Study 3 -->
+  <rect x="72" y="646" width="1056" height="198" rx="18" fill="#FDFAF3" stroke="#D8CFC0"/>
+  <text x="100" y="684" class="mono" font-size="12" font-weight="700" letter-spacing="1.5" fill="#DE5F27">03 · ROTATE INTO A WHOLE</text>
+  <text x="100" y="718" class="serif" font-size="26" fill="#211B14">A two-petal rosette</text>
+  <text x="100" y="748" class="sans" font-size="14" fill="#6E6455">Each piece has a direction; together</text>
+  <text x="100" y="768" class="sans" font-size="14" fill="#6E6455">they suggest a four-part flower.</text>
+  <g transform="translate(428 683) scale(.96)"><use href="#petal" fill="#DE5F27"/></g>
+  <text x="480" y="811" text-anchor="middle" class="mono" font-size="10" letter-spacing="1.1" fill="#6E6455">AMBER</text>
+  <g transform="translate(544 683) scale(.96)"><use href="#petal" fill="#1E8E83" transform="rotate(90 50 50)"/></g>
+  <text x="596" y="811" text-anchor="middle" class="mono" font-size="10" letter-spacing="1.1" fill="#6E6455">TEAL</text>
+  <path d="M654 742h48m-8-8 8 8-8 8" fill="none" stroke="#A89B88" stroke-width="1.5"/>
+  <g transform="translate(752 683) scale(.96)"><use href="#petal" fill="#DE5F27"/><use href="#petal" fill="#1E8E83" transform="rotate(90 50 50)"/></g>
+  <text x="800" y="811" text-anchor="middle" class="mono" font-size="10" letter-spacing="1.1" fill="#6E6455">CROSS</text>
+  <text x="927" y="733" class="sans" font-size="13" fill="#6E6455">Board read</text>
+  <g transform="translate(927 746)">
+    <path d="M18 0c7 8 12 13 12 20a12 12 0 0 1-24 0C6 13 11 8 18 0Z" fill="#DE5F27"/>
+    <path d="M58 0c7 8 12 13 12 20a12 12 0 0 1-24 0C46 13 51 8 58 0Z" fill="#1E8E83" transform="rotate(90 58 20)"/>
+    <path d="M98 0c7 8 12 13 12 20a12 12 0 0 1-24 0C86 13 91 8 98 0Z" fill="#DE5F27"/>
+    <path d="M138 0c7 8 12 13 12 20a12 12 0 0 1-24 0C126 13 131 8 138 0Z" fill="#1E8E83" transform="rotate(90 138 20)"/>
+  </g>
+  <text x="72" y="893" class="sans" font-size="13" fill="#6E6455">Early sketches only · Shapes should stay easy to tell apart at small board sizes.</text>
+</svg>

@@ -10,21 +10,23 @@ import { Button } from "@/components/ui/Button";
 
 /** Right-column brand mark. `waiting` = static, dimmed-left (link-sent state). */
 function BrandColumn({ caption, waiting }: { caption: string; waiting?: boolean }) {
+  const leftHalf = "M100 5 A95 95 0 0 0 100 195 L100 148 A48 48 0 0 1 100 52 Z";
+  const rightHalf = "M100 5 A95 95 0 0 1 100 195 L100 148 A48 48 0 0 0 100 52 Z";
   return (
     <div className="hv-split-aside" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 28, padding: "24px 0" }}>
       <svg viewBox="0 0 200 200" style={{ width: "clamp(120px, 22vw, 250px)", overflow: "visible" }} aria-hidden="true">
         {waiting ? (
           <>
-            <path d="M96 5 A95 95 0 0 0 96 195 Z" style={{ fill: "var(--accent)", opacity: 0.25 }} />
-            <path d="M104 5 A95 95 0 0 1 104 195 Z" style={{ fill: "var(--symbol-b)" }} />
+            <path d={leftHalf} style={{ fill: "var(--accent)", opacity: 0.25 }} />
+            <path d={rightHalf} style={{ fill: "var(--symbol-b)" }} />
           </>
         ) : (
           <>
             <g style={{ animation: "driftL 3.4s ease-in-out infinite alternate" }}>
-              <path d="M96 5 A95 95 0 0 0 96 195 Z" style={{ fill: "var(--accent)" }} />
+              <path d={leftHalf} style={{ fill: "var(--accent)" }} />
             </g>
             <g style={{ animation: "driftR 3.4s ease-in-out infinite alternate" }}>
-              <path d="M104 5 A95 95 0 0 1 104 195 Z" style={{ fill: "var(--symbol-b)" }} />
+              <path d={rightHalf} style={{ fill: "var(--symbol-b)" }} />
             </g>
           </>
         )}

@@ -10,17 +10,17 @@ import { Button } from "@/components/ui/Button";
 
 // ─── Illustration helpers ─────────────────────────────────────────────────────
 
-function Disc({ size = 34 }: { size?: number }) {
+function AmberRing({ size = 34 }: { size?: number }) {
   return (
-    <svg viewBox="0 0 40 40" style={{ width: size, height: size }} aria-hidden="true">
-      <circle cx="20" cy="20" r="15" style={{ fill: "var(--symbol-a)" }} />
+    <svg viewBox="0 0 100 100" style={{ width: size, height: size }} aria-hidden="true">
+      <circle cx="50" cy="50" r="32" style={{ fill: "none", stroke: "var(--symbol-a)", strokeWidth: 20 }} />
     </svg>
   );
 }
-function Ring({ size = 34 }: { size?: number }) {
+function TealRing({ size = 34 }: { size?: number }) {
   return (
-    <svg viewBox="0 0 40 40" style={{ width: size, height: size }} aria-hidden="true">
-      <circle cx="20" cy="20" r="13" style={{ fill: "none", stroke: "var(--symbol-b)", strokeWidth: 5 }} />
+    <svg viewBox="0 0 100 100" style={{ width: size, height: size }} aria-hidden="true">
+      <circle cx="50" cy="50" r="35.75" style={{ fill: "none", stroke: "var(--symbol-b)", strokeWidth: 12.5 }} />
     </svg>
   );
 }
@@ -31,26 +31,26 @@ function Beat1Art() {
   return (
     <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center", gap: "clamp(32px,6vw,64px)", flexWrap: "wrap" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
-        <Disc size={120} />
-        <span style={monoLabel}>DISC</span>
+        <AmberRing size={120} />
+        <span style={monoLabel}>BROAD AMBER RING</span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
-        <Ring size={120} />
-        <span style={monoLabel}>RING</span>
+        <TealRing size={120} />
+        <span style={monoLabel}>FINE TEAL RING</span>
       </div>
     </div>
   );
 }
 
-function EdgePair({ right, glyph, label }: { right: "disc" | "ring"; glyph: string; label: string }) {
+function EdgePair({ right, glyph, label }: { right: "amber" | "teal"; glyph: string; label: string }) {
   const cellStyle: React.CSSProperties = { width: 96, height: 96, display: "flex", alignItems: "center", justifyContent: "center" };
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
       <div style={{ display: "flex", position: "relative", border: "1px solid var(--hairline)" }}>
         <div style={{ ...cellStyle, borderRight: "1px solid var(--hairline)" }}>
-          <Disc size={54} />
+          <AmberRing size={54} />
         </div>
-        <div style={cellStyle}>{right === "disc" ? <Disc size={54} /> : <Ring size={54} />}</div>
+        <div style={cellStyle}>{right === "amber" ? <AmberRing size={54} /> : <TealRing size={54} />}</div>
         <div
           style={{
             position: "absolute",
@@ -82,8 +82,8 @@ function EdgePair({ right, glyph, label }: { right: "disc" | "ring"; glyph: stri
 function Beat2Art() {
   return (
     <div style={{ flex: "1 1 0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 44 }}>
-      <EdgePair right="disc" glyph="=" label="= PAIR MATCHES" />
-      <EdgePair right="ring" glyph="≠" label="≠ PAIR DIFFERS" />
+      <EdgePair right="amber" glyph="=" label="= PAIR MATCHES" />
+      <EdgePair right="teal" glyph="≠" label="≠ PAIR DIFFERS" />
     </div>
   );
 }
@@ -95,12 +95,12 @@ function StripCell({ v, bad }: { v: 0 | 1 | null; bad?: boolean }) {
     <div style={{ width: cell, height: cell, display: "flex", alignItems: "center", justifyContent: "center", borderRight: "1px solid var(--hairline)", position: "relative" }}>
       {bad && <div style={{ position: "absolute", inset: "8%", border: "1.5px solid var(--err)", borderRadius: 10, opacity: 0.75 }} />}
       {v === 0 ? (
-        <svg viewBox="0 0 40 40" style={{ width: "56%", height: "56%" }} aria-hidden="true">
-          <circle cx="20" cy="20" r="15" style={{ fill: "var(--symbol-a)" }} />
+        <svg viewBox="0 0 100 100" style={{ width: "56%", height: "56%" }} aria-hidden="true">
+          <circle cx="50" cy="50" r="32" style={{ fill: "none", stroke: "var(--symbol-a)", strokeWidth: 20 }} />
         </svg>
       ) : v === 1 ? (
-        <svg viewBox="0 0 40 40" style={{ width: "56%", height: "56%" }} aria-hidden="true">
-          <circle cx="20" cy="20" r="13" style={{ fill: "none", stroke: "var(--symbol-b)", strokeWidth: 5 }} />
+        <svg viewBox="0 0 100 100" style={{ width: "56%", height: "56%" }} aria-hidden="true">
+          <circle cx="50" cy="50" r="35.75" style={{ fill: "none", stroke: "var(--symbol-b)", strokeWidth: 12.5 }} />
         </svg>
       ) : null}
     </div>
@@ -182,7 +182,7 @@ function InteractiveBeat({ onFinish }: { onFinish: () => void }) {
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.22em", color: "var(--fg-3)" }}>HOW IT WORKS</div>
         <h1 style={beatTitle}>Try the puzzle.</h1>
         <p style={beatBody}>
-          This is a 4×4 puzzle. Each row and column needs two discs and two rings. Never place three alike in
+          This is a 4×4 puzzle. Each row and column needs two amber rings and two teal rings. Never place three alike in
           a row or column. Fill the empty cells, or ask for a hint.
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
@@ -234,8 +234,7 @@ export function TutorialScreen() {
       title: "Two symbols.",
       body: (
         <>
-          Every cell takes one of two marks: the amber <b style={{ color: "var(--accent-text)" }}>disc</b> or the
-          teal <b style={{ color: "var(--symbol-b)" }}>ring</b>. Tap a cell to cycle through disc, ring, and empty.
+          Every cell takes one of two marks: a broad amber ring or a finer teal ring. Tap a cell to cycle through amber, teal, and empty.
         </>
       ),
       art: <Beat1Art />,
@@ -254,7 +253,7 @@ export function TutorialScreen() {
       title: "Balance each line.",
       body: (
         <>
-          Every row and column has <b style={{ color: "var(--fg-1)" }}>three discs and three rings</b>. You
+          Every row and column has <b style={{ color: "var(--fg-1)" }}>three amber rings and three teal rings</b>. You
           can place two alike together, but never three alike consecutively, across or down.
         </>
       ),

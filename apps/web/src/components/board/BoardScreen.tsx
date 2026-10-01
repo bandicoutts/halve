@@ -9,8 +9,8 @@ import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { Board } from "./Board";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { Button } from "@/components/ui/Button";
-import { Disc } from "@/components/symbols/Disc";
-import { Ring } from "@/components/symbols/Ring";
+import { SymbolA } from "@/components/symbols/SymbolA";
+import { SymbolB } from "@/components/symbols/SymbolB";
 import { WinScreen } from "@/components/screens/WinScreen";
 import { RulesModal } from "@/components/screens/RulesModal";
 import { freshPracticeSlot } from "@/lib/practice-slot";
@@ -425,8 +425,8 @@ export function BoardScreen({
             >
               Tap a cell to cycle
             </span>
-            <Disc size={13} />
-            <Ring size={13} strokeWidth={6} />
+            <SymbolA size={13} />
+            <SymbolB size={13} />
           </div>
 
           <button

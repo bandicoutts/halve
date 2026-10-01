@@ -2,8 +2,9 @@
 import { HEADER_BAR, Wordmark } from "@/components/ui/Wordmark";
 import { GhostLink } from "@/components/ui/GhostLink";
 import { Button } from "@/components/ui/Button";
+import { Mark } from "@/components/symbols/Mark";
 
-type MarkVariant = "solid" | "ring" | "faded" | "outline";
+type MarkTone = "standard" | "soft" | "faint" | "quiet";
 
 interface Action {
   label: string;
@@ -12,8 +13,8 @@ interface Action {
 }
 
 interface MessageScreenProps {
-  /** Brand-mark treatment that colours the message (solid / ring / faded / outline). */
-  mark: MarkVariant;
+  /** Brand-mark visibility for the message state. */
+  mark: MarkTone;
   kicker: string;
   headline: string;
   body: React.ReactNode;
@@ -22,21 +23,9 @@ interface MessageScreenProps {
   secondary?: Action | undefined;
 }
 
-function MarkGlyph({ variant }: { variant: MarkVariant }) {
-  const amber =
-    variant === "outline"
-      ? { fill: "none", stroke: "var(--accent)", strokeWidth: "8px" }
-      : { fill: "var(--accent)", opacity: variant === "faded" ? 0.35 : variant === "ring" ? 0.9 : 1 };
-  const teal =
-    variant === "ring" || variant === "outline"
-      ? { fill: "none", stroke: "var(--symbol-b)", strokeWidth: "8px" }
-      : { fill: "var(--symbol-b)", opacity: variant === "faded" ? 0.35 : 1 };
-  return (
-    <svg viewBox="0 0 240 200" style={{ width: 104, marginBottom: 6 }} aria-hidden="true">
-      <path d="M86 10 A90 90 0 0 0 86 190 Z" style={amber} />
-      <path d="M154 10 A90 90 0 0 1 154 190 Z" style={teal} />
-    </svg>
-  );
+function MarkGlyph({ tone }: { tone: MarkTone }) {
+  const opacity = tone === "faint" ? 0.35 : tone === "quiet" ? 0.65 : tone === "soft" ? 0.9 : 1;
+  return <Mark size={104} decorative style={{ marginBottom: 6, opacity }} />;
 }
 
 /** Centered, editorial message screen for error / 404 / unavailable states. */
@@ -59,7 +48,7 @@ export function MessageScreen({ mark, kicker, headline, body, primary, secondary
           animation: "fadeup 0.5s var(--ease-editorial) both",
         }}
       >
-        <MarkGlyph variant={mark} />
+        <MarkGlyph tone={mark} />
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, letterSpacing: "0.22em", color: "var(--fg-3)" }}>{kicker}</div>
         <h1 style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: "clamp(36px, 5vw, 46px)", lineHeight: 1, margin: 0, letterSpacing: "-0.02em" }}>
           {headline}

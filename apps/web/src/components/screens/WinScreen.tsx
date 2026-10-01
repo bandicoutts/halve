@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { Mark } from "@/components/symbols/Mark";
-import { Disc } from "@/components/symbols/Disc";
-import { Ring } from "@/components/symbols/Ring";
+import { SymbolA } from "@/components/symbols/SymbolA";
+import { SymbolB } from "@/components/symbols/SymbolB";
 import { HEADER_BAR } from "@/components/ui/Wordmark";
 import { ThemeGlyph } from "@/components/ui/SiteHeader";
 import { GhostLink } from "@/components/ui/GhostLink";
@@ -15,7 +15,7 @@ function cap(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-/** The solved grid, rendered small as a keepsake (disc / ring). */
+/** The solved grid, rendered small as a keepsake (amber / teal rings). */
 function MiniGrid({ solution, gridSize }: { solution: number[][]; gridSize: number }) {
   const flat = solution.flat();
   return (
@@ -25,7 +25,7 @@ function MiniGrid({ solution, gridSize }: { solution: number[][]; gridSize: numb
           key={`${Math.floor(i / gridSize)}-${i % gridSize}`}
           style={{ aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center" }}
         >
-          {s === 0 ? <Disc size={22} /> : <Ring size={22} strokeWidth={5} />}
+          {s === 0 ? <SymbolA size={22} /> : <SymbolB size={22} />}
         </div>
       ))}
     </div>

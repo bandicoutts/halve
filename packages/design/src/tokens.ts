@@ -3,7 +3,7 @@
  * Light/dark duality is the brand device: warm "paper" light, deep "ink" dark.
  * Editorial voice: Newsreader (italic serif display) + Instrument Sans (body) +
  * Spline Sans Mono (labels/kickers/timer). Amber is both the hero accent and the
- * solid game symbol (A); teal is the ring game symbol (B).
+ * broad hollow ring (A); teal is the finer hollow ring (B).
  */
 
 /** Raw palette — reference values; theme via the semantic tokens, not these. */
@@ -26,13 +26,13 @@ export const palette = {
   dust400: '#9A8F7E', // muted fg on ink
   dust100: '#EDE5D7', // primary fg on ink
 
-  // Amber — the hero accent AND the solid game symbol (A). Unified.
-  amberPaper: '#DE5F27', // accent + disc on paper
+  // Amber — the hero accent AND the broad hollow ring (A). Unified.
+  amberPaper: '#DE5F27', // accent + symbol A on paper
   amberPaperStrong: '#C24E1C',
-  amberInk: '#E8703A', // accent + disc on ink
+  amberInk: '#E8703A', // accent + symbol A on ink
   amberInkStrong: '#F2895A',
 
-  // Teal — the ring game symbol (B)
+  // Teal — the finer hollow ring (B)
   tealPaper: '#1E9C8F',
   tealInk: '#45BFB2',
 

@@ -38,7 +38,7 @@ export function RouteError({
 
   return (
     <MessageScreen
-      mark="solid"
+      mark="standard"
       kicker="ERROR"
       headline="We couldn’t show this page."
       body={body}

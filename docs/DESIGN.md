@@ -2,10 +2,12 @@
 
 **Direction: refined minimalism.** Generous whitespace, restrained palette, one confident accent, impeccable typography and hierarchy. The bar is the calm, premium feel of Things / Linear — never a generic dashboard or component-library look. Tokens live in `packages/design` and are the single source of truth; Tailwind reads from them via CSS variables.
 
-> **Locked v1 (2026-05-29):** original tokens and type locked from the Claude Design handoff. **Updated 2026-05-30:** symbols and master mark replaced as part of the Halve rebrand (fire/water teardrops → solid circle / ring; split-circle mark). **Superseded 2026-07-03 (WEB-DESIGN-1, see DECISIONS.md):** the single-typeface system and original amber/teal hex values below were replaced by the editorial three-family type system and retuned palette — see the updated tables below, which now match `packages/design` exactly. Canonical values live in `packages/design` — `styles/tokens.css` (CSS custom properties) and `src/tokens.ts` (typed mirror). The tables here are the human-readable record; the package is authoritative.
+> **Updated 2026-10-02 (BRAND-SYMBOLS-1, see DECISIONS.md):** the board symbols are now two complete hollow rings with different band widths; the website master mark uses matching amber and teal half-rings to form one open circle. Earlier fire/water and disc/ring descriptions remain only in frozen handoff files. Canonical colors remain in `packages/design` — `styles/tokens.css` and `src/tokens.ts`.
 
-## Brand device: halved circle (solid ↔ ring)
-The two game pieces are abstract geometric opposites — a **solid circle** (symbol A, amber) and an **outlined ring** (symbol B, teal). Together they form a complete circle: one fills space, the other defines it. This directly embodies the puzzle's core mechanic — every row and column is exactly half one, half the other. The warm/cool colour contrast provides the fastest visual read across the 36-cell grid. Light + dark modes are supported (warm "paper" / deep "ink"); the signature is the geometric duality, not any elemental metaphor.
+## Brand device: two rings, one open centre
+The board symbols share a hollow circular form. **Symbol A** is a broad amber ring with a smaller transparent aperture; **symbol B** is a finer teal ring with a larger aperture. Their common outline makes them feel like a deliberate pair, while band width and colour keep them distinguishable at board size. The hole is transparent, so the cell or page surface shows through in paper and ink themes.
+
+The website master mark joins two complementary half-rings into a complete circle. Its centre remains open. The mark connects to *Halve* through the two-part construction, without relying on elemental motifs or a literal yin-yang symbol.
 
 ## Palette (locked)
 Neutrals are **warm**, never cold grey. Exactly **one accent** (amber); teal is the secondary symbol color, not a UI accent. Feedback colors appear only for correctness and stay distinct from the symbol colors.
@@ -22,7 +24,7 @@ Neutrals are **warm**, never cold grey. Exactly **one accent** (amber); teal is 
 | **Accent (amber) — also symbol A** | `#DE5F27` | `#E8703A` |
 | Accent strong (pressed) | `#C24E1C` | `#F2895A` |
 | Accent tint | `rgba(222,95,39,0.12)` | `rgba(232,112,58,0.16)` |
-| Symbol B (ring) | `#1E9C8F` | `#45BFB2` |
+| Symbol B (fine ring) | `#1E9C8F` | `#45BFB2` |
 | Correct | `#4E8A66` | `#6FB389` |
 | Wrong | `#C0442C` | `#D9553B` |
 | Scrim (modal backdrop) | `rgba(10,8,6,0.62)` | `rgba(10,8,6,0.62)` |
@@ -30,11 +32,11 @@ Neutrals are **warm**, never cold grey. Exactly **one accent** (amber); teal is 
 Shadows are warm-tinted and soft on paper; **dark mode uses hairlines + surface lightening, not shadow.** Backgrounds are flat warm solids — no gradients, images, textures, or glassmorphism.
 
 ## Symbols & master mark
-Drawn as **custom minimal vector art — never emoji**. Both on a `0 0 100 100` viewBox:
-- **Symbol A** (solid): `<circle cx="50" cy="50" r="42" fill="--symbol-a" />` — amber filled disc.
-- **Symbol B** (ring): `<circle cx="50" cy="50" r="36" stroke="--symbol-b" strokeWidth="12" fill="none" />` — teal outlined ring. Outer radius matches symbol A (42px) for visual balance.
+Drawn as **custom minimal vector art — never emoji**. Both board symbols share the same outer radius and use a transparent centre on a `0 0 100 100` viewBox:
+- **Symbol A:** amber stroke, centreline radius 32, stroke width 20 — broad band, smaller aperture.
+- **Symbol B:** teal stroke, centreline radius 35.75, stroke width 12.5 — finer band, larger aperture.
 
-The warm/cool contrast + solid/outline contrast together ensure the two read instantly apart across the 36-cell grid. The **master mark** (`Mark.tsx`, `0 0 100 100`) is a single circle split by a vertical line: left half filled amber (A), right half filled teal (B), with a hairline divider. Directly represents the name *Halve* — one shape, cleanly bisected. The **logo** pairs the mark with the wordmark "Halve" in Space Grotesk 600.
+The **website master mark** (`Mark.tsx`) combines a left amber half-ring and a right teal half-ring, each with a 42-unit outer radius and a 22-unit inner radius. A short background-coloured divider separates the halves only where the ring material touches; the centre remains transparent. The **logo** pairs the mark with the wordmark "Halve".
 
 ## Typography (locked, updated 2026-07-03)
 - **Three-family editorial system** (Google Fonts, `next/font`): **Newsreader** italic serif for display headlines (`--font-serif`), **Instrument Sans** for body/UI (`--font-sans`), **Spline Sans Mono** for kickers/labels/the timer (`--font-mono`). Replaces the original single-Space-Grotesk system — see DECISIONS.md WEB-DESIGN-1 (2026-07-03). **No Inter.**

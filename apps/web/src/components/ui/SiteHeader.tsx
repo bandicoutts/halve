@@ -160,14 +160,14 @@ export function SiteHeader({
         )}
         {focused ? (
           <div role="img" aria-label="Halve" style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--fg-1)" }}>
-            <Mark size={21} />
+            <Mark size={21} decorative />
             <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: 22, letterSpacing: "-0.01em" }}>
               Halve
             </span>
           </div>
         ) : (
           <Link href="/" onClick={go("/")} aria-label="Halve home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "var(--fg-1)" }}>
-            <Mark size={21} />
+            <Mark size={21} decorative />
             <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: 22, letterSpacing: "-0.01em" }}>
               Halve
             </span>

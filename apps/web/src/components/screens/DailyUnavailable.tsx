@@ -5,7 +5,7 @@ import { MessageScreen } from "@/components/ui/MessageScreen";
 export function DailyUnavailable() {
   return (
     <MessageScreen
-      mark="faded"
+      mark="faint"
       kicker="TODAY’S PUZZLE"
       headline="Today’s puzzle isn’t ready."
       body="Try again in a moment."

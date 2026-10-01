@@ -11,7 +11,7 @@ export function PracticeUnavailable({ difficulty }: { difficulty: Difficulty }) 
   const difficultyLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   return (
     <MessageScreen
-      mark="outline"
+      mark="quiet"
       kicker="PRACTICE"
       headline="Practice is unavailable."
       body={`There are no ${difficultyLabel} puzzles available right now. Try again in a moment, or choose another difficulty.`}

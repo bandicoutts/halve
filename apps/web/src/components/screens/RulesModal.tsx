@@ -8,7 +8,7 @@ interface RulesModalProps {
 }
 
 const RULES: { glyph: string; text: string }[] = [
-  { glyph: "3 + 3", text: "Every row and column has three discs and three rings." },
+  { glyph: "3 + 3", text: "Every row and column has three amber rings and three teal rings." },
   { glyph: "●●", text: "Never more than two of the same symbol in a row, across or down." },
   { glyph: "=", text: "Cells joined by = hold the same symbol." },
   { glyph: "≠", text: "Cells joined by ≠ hold opposite symbols." },
@@ -101,7 +101,7 @@ export function RulesModal({ open, onClose }: RulesModalProps) {
             paddingTop: 18,
           }}
         >
-          Tap a cell to cycle through empty, disc and ring. Every puzzle can be solved by deduction.
+          Tap a cell to cycle through empty, amber and teal. Every puzzle can be solved by deduction.
         </p>
       </div>
     </div>

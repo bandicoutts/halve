@@ -26,13 +26,13 @@
   --dust-400:  #9A8F7E;   /* muted fg on ink */
   --dust-100:  #EDE5D7;   /* primary fg on ink */
 
-  /* Amber — the hero accent AND the solid game symbol (A). Unified. */
-  --amber-paper:   #DE5F27;  /* accent + disc on paper */
+  /* Amber — the hero accent AND the broad hollow ring (A). Unified. */
+  --amber-paper:   #DE5F27;  /* accent + symbol A on paper */
   --amber-paper-s: #C24E1C;  /* pressed / strong on paper */
-  --amber-ink:     #E8703A;  /* accent + disc on ink */
+  --amber-ink:     #E8703A;  /* accent + symbol A on ink */
   --amber-ink-s:   #F2895A;  /* pressed / strong on ink */
 
-  /* Teal — the ring game symbol (B) */
+  /* Teal — the finer hollow ring (B) */
   --teal-paper: #1E9C8F;  /* game symbol B on paper */
   --teal-ink:   #45BFB2;  /* game symbol B on ink */
 
@@ -67,11 +67,11 @@
      background and the disc game-piece fill, so it can't just be darkened
      globally. Use --accent-text wherever --accent colors text (kickers,
      nav-link hover/active state, streak numbers) — never for backgrounds,
-     borders, or the disc symbol. 4.89:1 on --bg. */
+     borders, or the amber ring symbol. 4.89:1 on --bg. */
   --accent-text:   #B44414;
 
-  --symbol-a:   var(--amber-paper);   /* disc — same amber as accent */
-  --symbol-b:   var(--teal-paper);    /* ring */
+  --symbol-a:   var(--amber-paper);   /* broad hollow ring */
+  --symbol-b:   var(--teal-paper);    /* finer hollow ring */
 
   /* Board surfaces */
   --plate:      rgba(31, 26, 20, 0.055);  /* given-cell plate */
@@ -109,8 +109,8 @@
   --on-accent:     #1B1410;
   --accent-text:   var(--amber-ink); /* already 6.04:1 on dark --bg — no separate value needed */
 
-  --symbol-a:   var(--amber-ink);
-  --symbol-b:   var(--teal-ink);
+  --symbol-a:   var(--amber-ink);     /* broad hollow ring */
+  --symbol-b:   var(--teal-ink);      /* finer hollow ring */
 
   --plate:      rgba(233, 223, 205, 0.06);
   --hover:      rgba(233, 223, 205, 0.05);

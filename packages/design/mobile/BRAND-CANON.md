@@ -25,26 +25,27 @@ the other), and **edge signs** (`=` neighbours match, `≠` they differ). Every 
 every game screen.
 
 ## 3. Symbols & master mark  ← most-often-gotten-wrong
-- The two pieces are **abstract geometric opposites**: a **solid disc** (symbol A, amber)
-  and an **outlined ring** (symbol B, teal). Together they complete one circle — one fills
-  space, the other defines it.
+- The board pieces are **two hollow rings**: a **broad amber ring** (symbol A) and a
+  **finer teal ring** (symbol B). Both have transparent centres and the same outer size;
+  different band widths preserve shape recognition without relying on colour alone.
 - **They are NOT "fire" and "water," NOT teardrops, NOT elemental, NOT emoji.** That
   language is dead. (Dropped because fire/water carried fantasy-game baggage and was
-  trade-dress-adjacent to LinkedIn Tango's sun/moon.) Refer to them as **disc / ring** or
-  **symbol A / symbol B**.
+  trade-dress-adjacent to LinkedIn Tango's sun/moon.) Refer to them as **amber ring / teal
+  ring** or **symbol A / symbol B**.
 - Exact vectors (`0 0 100 100`):
-  - **A (solid):** `<circle cx=50 cy=50 r=42 fill=var(--symbol-a)>` — amber filled disc.
-  - **B (ring):** `<circle cx=50 cy=50 r=36 stroke=var(--symbol-b) stroke-width=12 fill=none>` — teal ring, same outer radius (42) for visual parity.
-- **Master mark:** a single circle **split by a vertical line** — left half amber (A), right
-  half teal (B), hairline divider. It represents the name *Halve* (one shape, cleanly
-  bisected). Logo = mark + wordmark "Halve" in Space Grotesk 600.
+  - **A:** amber stroke, centreline radius 32, stroke width 20 — broad band, smaller aperture.
+  - **B:** teal stroke, centreline radius 35.75, stroke width 12.5 — finer band, larger aperture.
+- **Website master mark:** two complementary hollow half-rings form one complete circle —
+  left half amber, right half teal, open centre. A short hairline separates the halves only
+  where the ring material meets; the hole stays transparent and shows the theme surface.
+  Logo = mark + wordmark "Halve".
 
 ## 4. Voice & copy
 - **Quiet, warm, self-assured** — a calm host, never a hype-man. Short sentences. Trusts the
   player; explains a rule once, then gets out of the way.
 - **Sentence case everywhere** (buttons, headings, labels). Only uppercase is the small
   tracked **eyebrow label** (e.g. `CURRENT STREAK`).
-- **No emoji. Anywhere.** Not in UI, not in share text. The disc/ring + ✓/✗ do all iconic
+- **No emoji. Anywhere.** Not in UI, not in share text. The two rings + ✓/✗ do all iconic
   work. (So a share reads `Halve No. 142 · 2:47 · streak 41` — **never** `🔥 8-day streak`.)
 - **Tabular numerals** for any number that changes (timer, streak, stats). Times are `m:ss`
   (`2:47`). Use `·` (middle dot) to separate metadata, `—` for a calm aside.
@@ -78,7 +79,7 @@ every game screen.
 ## 9. Icons
 - UI icons: **Lucide**, even ~1.75px stroke, 20–22px, secondary-fg colour — used only where
   unavoidable (undo, hint, share, settings, chevrons, close, stats, a streak flame-as-line-
-  glyph — **the line glyph, never the 🔥 emoji**). The disc/ring are the only illustration.
+  glyph — **the line glyph, never the 🔥 emoji**). The paired rings are the only illustration.
 - `=` / `≠` are **typographic glyphs** in a small bg-filled capsule on cell edges — not icons.
 
 ## 10. Hard no's (anti-AI-aesthetic guardrails)
@@ -94,7 +95,7 @@ Things that have already drifted — Claude Design should correct these wherever
 | Wrong (legacy) | Correct |
 |---|---|
 | "Parity" | **Halve** |
-| "fire" / "water" / teardrops / elemental | **solid disc** / **ring** (abstract A / B) |
+| "fire" / "water" / teardrops / elemental | **broad amber ring** / **finer teal ring** (abstract A / B) |
 | `halve.app` (in current prototype share text) | **`halve.today`** |
 | `🔥 8-day streak` (emoji in share text) | **`streak 8`** / `8-day streak` — no emoji |
 | `--fire-*` / `--water-*` / `--symbol-fire` tokens | `--amber-*` / `--teal-*` / `--symbol-a/b` |

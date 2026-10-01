@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Mark } from "@/components/symbols/Mark";
 
 /**
  * Shared header bar — the SAME width + padding on every screen so the wordmark
@@ -17,15 +18,12 @@ export const HEADER_BAR: React.CSSProperties = {
   flex: "none",
 };
 
-/** The split-circle mark + italic "Halve" wordmark, linking home. Used as the
+/** The split-ring mark + italic "Halve" wordmark, linking home. Used as the
  *  minimal header on auth / onboarding / tutorial / error screens. */
 export function Wordmark({ size = 21, href = "/" }: { size?: number; href?: string | null }) {
   const inner = (
     <>
-      <svg viewBox="0 0 200 200" style={{ width: size, height: size, flex: "none" }} aria-hidden="true">
-        <path d="M95 6 A94 94 0 0 0 95 194 Z" style={{ fill: "var(--accent)" }} />
-        <path d="M105 6 A94 94 0 0 1 105 194 Z" style={{ fill: "var(--symbol-b)" }} />
-      </svg>
+      <Mark size={size} decorative style={{ flex: "none" }} />
       <span style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", fontWeight: 500, fontSize: size + 1, letterSpacing: "-0.01em" }}>
         Halve
       </span>

@@ -80,8 +80,8 @@ export const Cell = memo(function Cell({
   edgeHint,
   edge,
 }: CellProps) {
-  // e.g. "Row 2, column 3, disc, given" — position + symbol + given/error context.
-  const symbolLabel = value === 0 ? "disc" : value === 1 ? "ring" : "empty";
+  // Position + symbol colour + given/error context for screen readers.
+  const symbolLabel = value === 0 ? "amber ring" : value === 1 ? "teal ring" : "empty";
   const ariaLabel = [
     `Row ${rowIndex + 1}, column ${colIndex + 1}`,
     symbolLabel,
@@ -137,13 +137,13 @@ export const Cell = memo(function Cell({
 
       {/* Symbol layers */}
       <div style={symLayer(value === 0, settleDelay)}>
-        <svg viewBox="0 0 40 40" style={{ width: "56%", height: "56%" }} aria-hidden="true">
-          <circle cx="20" cy="20" r="15" fill="var(--symbol-a)" />
+        <svg viewBox="0 0 100 100" style={{ width: "56%", height: "56%" }} aria-hidden="true">
+          <circle cx="50" cy="50" r="32" fill="none" stroke="var(--symbol-a)" strokeWidth="20" />
         </svg>
       </div>
       <div style={symLayer(value === 1, settleDelay)}>
-        <svg viewBox="0 0 40 40" style={{ width: "56%", height: "56%" }} aria-hidden="true">
-          <circle cx="20" cy="20" r="13" fill="none" stroke="var(--symbol-b)" strokeWidth="5" />
+        <svg viewBox="0 0 100 100" style={{ width: "56%", height: "56%" }} aria-hidden="true">
+          <circle cx="50" cy="50" r="35.75" fill="none" stroke="var(--symbol-b)" strokeWidth="12.5" />
         </svg>
       </div>
 

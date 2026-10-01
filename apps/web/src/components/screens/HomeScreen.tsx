@@ -21,12 +21,12 @@ const EXAMPLE = [
 function PuzzlePreview() {
   return (
     <figure className={styles.preview}>
-      <svg viewBox="0 0 360 360" role="img" aria-label="Example six by six puzzle with discs, rings and empty cells. The top row has three of each symbol." className={styles.board}>
+      <svg viewBox="0 0 360 360" role="img" aria-label="Example six by six puzzle with amber rings, teal rings and empty cells. The top row has three of each symbol." className={styles.board}>
         <path d="M0 0H360V360H0Z M60 0V360 M120 0V360 M180 0V360 M240 0V360 M300 0V360 M0 60H360 M0 120H360 M0 180H360 M0 240H360 M0 300H360" fill="none" stroke="var(--hairline)" />
         {EXAMPLE.flatMap((row, r) => row.map((value, c) => value === null ? null : (
           value === 0
-            ? <circle key={`${r}-${c}`} cx={c * 60 + 30} cy={r * 60 + 30} r={14} fill="var(--symbol-a)" />
-            : <circle key={`${r}-${c}`} cx={c * 60 + 30} cy={r * 60 + 30} r={12} fill="none" stroke="var(--symbol-b)" strokeWidth={4} />
+            ? <circle key={`${r}-${c}`} cx={c * 60 + 30} cy={r * 60 + 30} r={10.75} fill="none" stroke="var(--symbol-a)" strokeWidth={6.7} />
+            : <circle key={`${r}-${c}`} cx={c * 60 + 30} cy={r * 60 + 30} r={12} fill="none" stroke="var(--symbol-b)" strokeWidth={4.2} />
         )))}
         <g className={styles.edge}>
           <rect x={110} y={20} width={20} height={20} rx={10} />
@@ -37,7 +37,7 @@ function PuzzlePreview() {
       </svg>
       <figcaption className={styles.caption}>
         <span className={styles.eyebrow}>An example board</span>
-        <span>Three discs. Three rings.<br />Every row and column.</span>
+        <span>Three amber rings. Three teal rings.<br />Every row and column.</span>
       </figcaption>
     </figure>
   );
@@ -98,7 +98,7 @@ export function HomeScreen({
               <p className={styles.description}>
                 {solvedToday
                   ? "You’re done for today. Come back tomorrow for a new puzzle."
-                  : "A daily 6×6 puzzle. Balance the discs and rings, follow the edge clues, and solve it by deduction."}
+                  : "A daily 6×6 puzzle. Balance amber and teal rings, follow the edge clues, and solve it by deduction."}
               </p>
               {solvedToday && (
                 <p className={styles.solved}>
