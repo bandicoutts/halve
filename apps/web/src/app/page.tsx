@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { getPublicPuzzleByDate } from "@/lib/puzzle-data.server";
 import { getLocalToday } from "@/lib/local-date.server";
 import { formatDateLabel } from "@/lib/local-date";
 import { HomeScreen } from "@/components/screens/HomeScreen";
@@ -26,9 +27,9 @@ export default async function Home() {
   try {
     const supabase = await createClient();
 
-    const [{ data: { user } }, { data: todayPuzzle }] = await Promise.all([
+    const [{ data: { user } }, todayPuzzle] = await Promise.all([
       supabase.auth.getUser(),
-      supabase.from("puzzles").select("id, difficulty").eq("date", today).maybeSingle(),
+      getPublicPuzzleByDate(today),
     ]);
 
     isAuthenticated = !!user;

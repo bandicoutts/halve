@@ -1,6 +1,7 @@
 import { generateDaily } from "@parity/engine";
 import type { Difficulty } from "@parity/engine";
 import { createClient } from "@/lib/supabase/server";
+import { getPublicPuzzleByDate } from "@/lib/puzzle-data.server";
 import { getLocalToday } from "@/lib/local-date.server";
 import { parseGridSpec } from "@/lib/grid-spec";
 import { BoardScreen } from "@/components/board/BoardScreen";
@@ -20,8 +21,8 @@ export default async function PlayPage() {
 
   try {
     const supabase = await createClient();
-    const [{ data }, { data: { user } }] = await Promise.all([
-      supabase.from("puzzles").select("id, difficulty, grid_spec").eq("date", today).maybeSingle(),
+    const [data, { data: { user } }] = await Promise.all([
+      getPublicPuzzleByDate(today),
       supabase.auth.getUser(),
     ]);
 

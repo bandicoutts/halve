@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getLocalToday } from "@/lib/local-date.server";
 import { isValidDate } from "@/lib/local-date";
 import { parseGridSpec } from "@/lib/grid-spec";
+import { getPublicPuzzleByDate, getPublicPuzzleDayNumber } from "@/lib/puzzle-data.server";
 import { BoardScreen } from "@/components/board/BoardScreen";
 
 // revalidate is omitted: cookies()/getUser() in createClient() force dynamic
@@ -32,22 +33,14 @@ export default async function PlayDatePage({ params }: Props) {
   try {
     const supabase = await createClient();
 
-    const [{ data }, { count }, { data: { user } }] = await Promise.all([
-      supabase
-        .from("puzzles")
-        .select("id, difficulty, grid_spec")
-        .eq("date", date)
-        .maybeSingle(),
-      supabase
-        .from("puzzles")
-        .select("id", { count: "exact", head: true })
-        .not("date", "is", null)
-        .lte("date", date),
+    const [data, count, { data: { user } }] = await Promise.all([
+      getPublicPuzzleByDate(date),
+      getPublicPuzzleDayNumber(date),
       supabase.auth.getUser(),
     ]);
 
     puzzleRow = data;
-    if (data) dayNo = count ?? undefined;
+    if (data) dayNo = count;
 
     // Already solved this day? Tell BoardScreen so it mounts in review mode
     // instead of a fresh playable board (was always fresh, regardless of

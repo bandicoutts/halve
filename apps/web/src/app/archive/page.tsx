@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ArchiveScreen } from "@/components/screens/ArchiveScreen";
 import type { ArchiveDayEntry, ArchiveMonth } from "@/components/screens/ArchiveScreen";
 import { getLocalToday } from "@/lib/local-date.server";
+import { getPublicPuzzleArchive } from "@/lib/puzzle-data.server";
 
 // revalidate is omitted: cookies()/getUser() force dynamic rendering anyway.
 
@@ -19,15 +20,10 @@ export default async function ArchivePage() {
       {
         data: { user },
       },
-      { data: puzzles },
+      puzzles,
     ] = await Promise.all([
       supabase.auth.getUser(),
-      supabase
-        .from("puzzles")
-        .select("id, date, difficulty")
-        .not("date", "is", null)
-        .lte("date", today)
-        .order("date", { ascending: true }),
+      getPublicPuzzleArchive(today),
     ]);
 
     isAuthenticated = !!user;

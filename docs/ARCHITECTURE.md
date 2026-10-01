@@ -18,7 +18,7 @@ The Flutter app re-implements the engine rules in Dart (`packages/engine` logic 
 The Flutter app uses go_router with a `StatefulShellRoute` for the three main tabs (Today / Archive / Stats). A persistent `_HalveShellBar` (logo + settings) sits above the tab content in `AppShell`; the shell's `SafeArea(top: true)` consumes the status-bar inset so tab screens' own `SafeArea` adds nothing. Full-screen routes (Play, Win, Settings, Tutorial, Auth) live outside the shell and own their own chrome.
 
 ## Request flows
-- **Daily puzzle:** a scheduled Supabase Edge Function mints one puzzle/day at a fixed difficulty into `puzzles` keyed by date. All users fetch the same row → shared daily.
+- **Daily puzzle:** a scheduled Supabase Edge Function mints one puzzle/day at a fixed difficulty into `puzzles` keyed by date. The web app shares cached public puzzle rows and archive metadata across visitors, revalidating them every 60 seconds. User-specific solves and profiles remain request-scoped.
 - **Practice:** puzzle generated on demand (edge function or client — 6×6 generation is cheap).
 - **Solve:** on completion, the web app writes a `solves` row. Streaks/stats are **derived** from `solves`, not denormalized.
 - **Auth:** Supabase Auth from day one; per-user data protected by RLS.
