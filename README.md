@@ -1,8 +1,16 @@
 # Halve
 
+[![web](https://github.com/bandicoutts/halve/actions/workflows/web.yml/badge.svg)](https://github.com/bandicoutts/halve/actions/workflows/web.yml)
+[![web e2e](https://github.com/bandicoutts/halve/actions/workflows/web-e2e.yml/badge.svg)](https://github.com/bandicoutts/halve/actions/workflows/web-e2e.yml)
+[![validator parity](https://github.com/bandicoutts/halve/actions/workflows/validator-parity.yml/badge.svg)](https://github.com/bandicoutts/halve/actions/workflows/validator-parity.yml)
+
 A premium daily 6×6 binary Latin-square puzzle. Two abstract symbols — **solid circle** and **ring** — fill a grid under three deduction-only rules: no three identical symbols in a row or column, each row and column is exactly balanced (half of each), and `=`/`≠` edge clues constrain adjacent pairs. Every puzzle has a unique solution reachable by logic alone, no guessing.
 
-Live at **[halve.today](https://halve.today)**.
+**Play it at [parity-web-rpwn.vercel.app](https://parity-web-rpwn.vercel.app).**
+
+![Today's puzzle on the Halve home page](docs/images/halve-home.jpg)
+
+The interesting part is the engine: a generator, a human-style solver and a difficulty rater in `packages/engine`, pure TypeScript with no dependencies, shared by the web app and the Flutter app in `apps/mobile`.
 
 ## Architecture
 
